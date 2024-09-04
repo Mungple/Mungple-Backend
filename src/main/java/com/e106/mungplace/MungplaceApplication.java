@@ -10,5 +10,4 @@ public class MungplaceApplication {
 		SpringApplication.run(MungplaceApplication.class, args);
 	}
 
-
 }
