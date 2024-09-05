@@ -12,9 +12,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
-@Component
 @RequiredArgsConstructor
+@Component
 public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
+
 	private final JwtProvider jwtProvider;
 
 	@Override
