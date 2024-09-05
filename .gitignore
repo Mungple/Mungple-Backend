@@ -237,5 +237,7 @@ gradle-app.setting
 ### Gradle Patch ###
 # Java heap dump
 *.hprof
+src/main/resources/application-secret.yml
 
 # End of https://www.toptal.com/developers/gitignore/api/gradle,macos,windows,intellij
+
