@@ -24,7 +24,4 @@ public record NaverUserInfo(
 		Map<String, Object> properties = (Map<String, Object>) attributes.get("response");
 		return properties.get("name").toString();
 	}
-
-
-
 }
