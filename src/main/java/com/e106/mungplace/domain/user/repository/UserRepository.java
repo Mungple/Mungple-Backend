@@ -1,8 +1,12 @@
 package com.e106.mungplace.domain.user.repository;
 
-import org.springframework.data.repository.Repository;
+import java.util.Optional;
+
+import org.springframework.data.repository.CrudRepository;
 
 import com.e106.mungplace.domain.user.entity.User;
 
-public interface UserRepository extends Repository<User, Long> {
+public interface UserRepository extends CrudRepository<User, Long> {
+
+	Optional<User> findUserByProviderId(String providerId);
 }
