@@ -1,0 +1,23 @@
+spring:
+  h2:
+    console:
+      enabled: true
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: ""
+
+logging:
+  level:
+    org:
+      elasticsearch:
+        client: TRACE
+      springframework:
+        data:
+          elasticsearch:
+            core:
+              ElasticsearchRestTemplate: DEBUG
+
+elasticsearch:
+  host-and-port: localhost:9200

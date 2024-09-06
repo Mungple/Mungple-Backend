@@ -24,7 +24,7 @@ repositories {
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
+	// springboot
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
@@ -32,18 +32,81 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.springframework.boot:spring-boot-starter-websocket'
 	implementation 'org.springframework.kafka:spring-kafka'
+
+	// jwt
 	implementation group: 'com.auth0', name: 'java-jwt', version: '4.4.0'
 	implementation group: 'com.okta.jwt', name: 'okta-jwt-verifier', version: '0.4.0'
+
+	// lombok
 	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+
+	// persistence
+	implementation 'org.springframework.data:spring-data-elasticsearch:5.3.3'
 	runtimeOnly 'com.h2database:h2'
 	runtimeOnly 'com.mysql:mysql-connector-j'
-	annotationProcessor 'org.projectlombok:lombok'
+
+	// test
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.kafka:spring-kafka-test'
 	testImplementation 'org.springframework.security:spring-security-test'
+	testImplementation 'com.h2database:h2'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+	testCompileOnly 'org.projectlombok:lombok'
+	testAnnotationProcessor 'org.projectlombok:lombok'
+
+	// TestContainers
+	testImplementation 'org.testcontainers:elasticsearch:1.20.1'
 }
 
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+configurations {
+	unitTestImplementation.extendsFrom testImplementation, implementation
+	integrationTestImplementation.extendsFrom testImplementation, implementation
+}
+
+sourceSets {
+	test {
+		java.srcDirs = ['src/test/unit/java', 'src/test/intg/java']
+		resources {
+			srcDirs = ['src/test/unit/resources', 'src/test/intg/resources']
+		}
+	}
+
+	unitTest {
+		java.srcDirs = ['src/test/unit/java']
+		resources {
+			srcDir 'src/test/unit/resources'
+		}
+		compileClasspath += main.output + test.output
+		runtimeClasspath += main.output + test.output
+	}
+
+	integrationTest {
+		java.srcDirs=['src/test/intg/java']
+		resources {
+			srcDir 'src/test/intg/resources'
+		}
+		compileClasspath += main.output + test.output
+		runtimeClasspath += main.output + test.output
+	}
+}
+
+task unitTest(type: Test) {
+	description = "Runs unit tests"
+	group = "verification"
+	testClassesDirs = sourceSets.unitTest.output.classesDirs
+	classpath = sourceSets.unitTest.runtimeClasspath
+	useJUnitPlatform()  // JUnit 5 설정
+}
+
+task integrationTest(type: Test) {
+	description = "Runs integration tests"
+	group = "verification"
+	testClassesDirs = sourceSets.integrationTest.output.classesDirs
+	classpath = sourceSets.integrationTest.runtimeClasspath
+	useJUnitPlatform()  // JUnit 5 설정
 }
