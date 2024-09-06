@@ -10,3 +10,7 @@ spring:
 
 elasticsearch:
   host-and-port: localhost:9200
+
+redis:
+  server: localhost
+  port: 6379

@@ -52,11 +52,9 @@ dependencies {
 	testImplementation 'org.springframework.security:spring-security-test'
 	testImplementation 'com.h2database:h2'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+	testImplementation 'org.projectlombok:lombok'
 	testCompileOnly 'org.projectlombok:lombok'
 	testAnnotationProcessor 'org.projectlombok:lombok'
-
-	// TestContainers
-	testImplementation 'org.testcontainers:elasticsearch:1.20.1'
 }
 
 tasks.named('test') {
@@ -65,7 +63,9 @@ tasks.named('test') {
 
 configurations {
 	unitTestImplementation.extendsFrom testImplementation, implementation
+	unitTestAnnotationProcessor.extendsFrom annotationProcessor
 	integrationTestImplementation.extendsFrom testImplementation, implementation
+	integrationTestAnnotationProcessor.extendsFrom annotationProcessor
 }
 
 sourceSets {
@@ -102,6 +102,7 @@ task unitTest(type: Test) {
 	classpath = sourceSets.unitTest.runtimeClasspath
 	useJUnitPlatform()  // JUnit 5 설정
 }
+unitTest.finalizedBy(clean)
 
 task integrationTest(type: Test) {
 	description = "Runs integration tests"
@@ -110,3 +111,4 @@ task integrationTest(type: Test) {
 	classpath = sourceSets.integrationTest.runtimeClasspath
 	useJUnitPlatform()  // JUnit 5 설정
 }
+integrationTest.finalizedBy(clean)
