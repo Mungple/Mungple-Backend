@@ -1,5 +1,9 @@
 package com.e106.mungplace.domain.user.entity;
 
+import java.util.Base64;
+
+import com.e106.mungplace.domain.audit.BaseTime;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -14,7 +18,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Getter
 @Entity(name = "users")
-public class User {
+public class User extends BaseTime {
 
 	@Builder
 	public User(String providerId, ProviderName providerName, String nickname, String imageName) {
