@@ -1,7 +1,5 @@
 package com.e106.mungplace.domain.user.entity;
 
-import java.util.Base64;
-
 import com.e106.mungplace.domain.audit.BaseTime;
 
 import jakarta.persistence.Column;
@@ -10,7 +8,6 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
