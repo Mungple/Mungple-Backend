@@ -6,6 +6,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import com.e106.mungplace.domain.user.repository.UserRepository;
+import com.e106.mungplace.web.exception.ApplicationException;
+import com.e106.mungplace.web.exception.dto.ApplicationError;
 
 import lombok.RequiredArgsConstructor;
 
@@ -17,9 +19,8 @@ public class UserHelper {
 
 	public void validateUserExists(Long userId) {
 		// TODO <fosong98> count(*) 쿼리가 나가는 문제 해결
-		// TODO <fosong98> 예외 구체화 필요
 		if (!userRepository.existsById(userId))
-			throw new RuntimeException("사용자가 존재하지 않습니다.");
+			throw new ApplicationException(ApplicationError.USER_NOT_FOUND);
 	}
 
 	public void validateUserHasDog(Long userId) {
@@ -29,8 +30,7 @@ public class UserHelper {
 	public UserDetails getAuthenticatedUser() {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		if(authentication == null) {
-			// TODO <fosong98> 예외 구체화 필요
-			throw new RuntimeException("Authentication is null");
+			throw new ApplicationException(ApplicationError.AUTHENTICATION_ERROR);
 		}
 		return (UserDetails) authentication.getPrincipal();
 	}
