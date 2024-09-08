@@ -239,5 +239,7 @@ gradle-app.setting
 *.hprof
 src/main/resources/application-secret.yml
 
+*.data
+
 # End of https://www.toptal.com/developers/gitignore/api/gradle,macos,windows,intellij
 

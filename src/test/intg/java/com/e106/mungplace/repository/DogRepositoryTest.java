@@ -38,8 +38,26 @@ class DogRepositoryTest {
 			.build();
 		entityManager.persist(user);
 
-		Dog dog1 = new Dog(user, "멍멍이1", new Date(), Gender.MALE, 30, "image1.png", true);
-		Dog dog2 = new Dog(user, "멍멍이2", new Date(), Gender.FEMALE, 25, "image2.png", false);
+		Dog dog1 = Dog.builder()
+				.user(user)
+				.dogName("멍멍이1")
+				.birth(new Date())
+				.gender(Gender.MALE)
+				.weight(30)
+				.imageName("image1.png")
+				.isDefault(true)
+				.build();
+
+		Dog dog2 = Dog.builder()
+				.user(user)
+				.dogName("멍멍이2")
+				.birth(new Date())
+				.gender(Gender.FEMALE)
+				.weight(25)
+				.imageName("image2.png")
+				.isDefault(false)
+				.build();
+
 		entityManager.persist(dog1);
 		entityManager.persist(dog2);
 
