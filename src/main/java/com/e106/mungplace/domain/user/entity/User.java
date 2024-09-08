@@ -25,6 +25,10 @@ public class User extends BaseTime {
 		this.imageName = imageName;
 	}
 
+	public User(Long userId) {
+		this.userId = userId;
+	}
+
 	@GeneratedValue
 	@Id
 	private Long userId;
