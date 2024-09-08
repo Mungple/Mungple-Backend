@@ -1,11 +1,9 @@
 package com.e106.mungplace.web.config;
 
-import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -26,20 +24,13 @@ public class SecurityConfig {
 
 	private static final String[] AUTH_WHITELIST = {
 		"/api/users/login/*",
-		"/oauth2/callback/*"
+		"/oauth2/callback/*",
+		"/h2-console/**"
 	};
 
 	@Bean
 	public JwtAuthProcessFilter jwtAuthProcessFilter(JwtProvider jwtProvider, UserRepository userRepository) {
 		return new JwtAuthProcessFilter(jwtProvider, userRepository);
-	}
-
-	@Bean
-	public WebSecurityCustomizer webSecurityCustomizer() {
-		return web -> web
-			.ignoring()
-			.requestMatchers("/ws/**", "/sub/**", "/pub/**")
-			.requestMatchers(PathRequest.toH2Console());
 	}
 
 	@Bean
