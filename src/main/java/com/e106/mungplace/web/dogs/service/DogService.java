@@ -13,6 +13,8 @@ import com.e106.mungplace.domain.user.repository.UserRepository;
 import com.e106.mungplace.web.dogs.dto.DogCreateRequest;
 import com.e106.mungplace.web.dogs.dto.DogResponse;
 import com.e106.mungplace.web.dogs.dto.DogUpdateRequest;
+import com.e106.mungplace.web.exception.ApplicationException;
+import com.e106.mungplace.web.exception.dto.ApplicationError;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -32,9 +34,9 @@ public class DogService {
 		UserDetails userDetails = userHelper.getAuthenticatedUser();
 		Long userId = Long.valueOf(userDetails.getUsername());
 		int size = dogRepository.countDogsByUserUserId(userId);
-		// TODO <홍성우> Exception 상세화
+
 		if (size >= 5) {
-			throw new RuntimeException("A user cannot own more than 5 dogs.");
+			throw new ApplicationException(ApplicationError.EXCEED_DOG_CAPACITY);
 		}
 
 		Dog dog = dogCreateRequest.toEntity();
@@ -71,15 +73,13 @@ public class DogService {
 	}
 
 	private Dog checkDogExists(Long dogId) {
-		// TODO <홍성우> Exception 변경
 		return dogRepository.findById(dogId)
-			.orElseThrow(RuntimeException::new);
+			.orElseThrow(() -> new ApplicationException(ApplicationError.DOG_NOT_FOUND));
 	}
 
 	private void validateDogOwner(Dog dog, Long userId) {
-		// TODO <홍성우> Exception 변경
 		if (!Objects.equals(dog.getUser().getUserId(), userId)) {
-			throw new RuntimeException();
+			throw new ApplicationException(ApplicationError.DOG_NOT_OWNER);
 		}
 	}
 }

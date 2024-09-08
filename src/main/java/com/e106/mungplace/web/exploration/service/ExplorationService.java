@@ -10,6 +10,8 @@ import com.e106.mungplace.domain.exploration.entity.Exploration;
 import com.e106.mungplace.domain.exploration.repository.ExplorationRepository;
 import com.e106.mungplace.domain.user.entity.User;
 import com.e106.mungplace.domain.user.impl.UserHelper;
+import com.e106.mungplace.web.exception.ApplicationException;
+import com.e106.mungplace.web.exception.dto.ApplicationError;
 import com.e106.mungplace.web.exploration.dto.ExplorationStartResponse;
 
 import lombok.RequiredArgsConstructor;
@@ -56,18 +58,16 @@ public class ExplorationService {
 
 	private static void validateIsUsersExploration(Exploration exploration, Long userId) {
 		if (!Objects.equals(exploration.getUser().getUserId(), userId)) {
-			// TODO <fosong98> 예외 구체화 필요
-			throw new RuntimeException("사용자의 산책이 아닙니다.");
+			throw new ApplicationException(ApplicationError.EXPLORATION_NOT_OWNED);
 		}
 	}
 
 	private void validateIsNotExploring(Long userId) {
 		if (explorationRepository.existsByUserAndEndAtIsNull(new User(userId)))
-			// TODO <fosong98> 예외 구체화 필요
-			throw new RuntimeException("이미 산책 중입니다.");
+			throw new ApplicationException(ApplicationError.ALREADY_ON_EXPLORATION);
 	}
 
 	private Exploration getExplorationOrThrow(Long explorationId) {
-		return explorationRepository.findById(explorationId).orElseThrow(() -> new RuntimeException("산책이 존재하지 않습니다."));
+		return explorationRepository.findById(explorationId).orElseThrow(() -> new ApplicationException(ApplicationError.EXPLORATION_NOT_FOUND));
 	}
 }

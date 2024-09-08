@@ -2,6 +2,8 @@ package com.e106.mungplace.web.user.service;
 
 import org.springframework.stereotype.Service;
 
+import com.e106.mungplace.web.exception.ApplicationException;
+import com.e106.mungplace.web.exception.dto.ApplicationError;
 import com.e106.mungplace.web.user.dto.UserInfoResponse;
 import com.e106.mungplace.domain.user.repository.UserRepository;
 import com.e106.mungplace.domain.user.impl.UserHelper;
@@ -18,13 +20,12 @@ public class UserService {
 	private final UserHelper userHelper;
 
 	public UserInfoResponse readUserInfo(Long userId) {
-		// TODO Exception 상세화
 		return userRepository.findById(userId)
 			.map(targetUser -> UserInfoResponse.builder()
 				.userId(targetUser.getUserId())
 				.nickname(targetUser.getNickname())
 				.imageName(targetUser.getImageName())
 				.build())
-			.orElseThrow(RuntimeException::new);
+			.orElseThrow(() -> new ApplicationException(ApplicationError.USER_NOT_FOUND));
 	}
 }
