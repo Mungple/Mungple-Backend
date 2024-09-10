@@ -1,6 +1,5 @@
 package com.e106.mungplace.domain.exploration.entity;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
 
 import com.e106.mungplace.domain.audit.BaseTime;

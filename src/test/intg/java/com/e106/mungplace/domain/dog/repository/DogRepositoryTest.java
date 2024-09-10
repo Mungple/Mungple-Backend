@@ -1,4 +1,4 @@
-package com.e106.mungplace.repository;
+package com.e106.mungplace.domain.dog.repository;
 
 import static org.assertj.core.api.Assertions.*;
 
