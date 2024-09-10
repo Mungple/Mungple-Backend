@@ -25,6 +25,8 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class DogService {
 
+	private static final int MAX_DOG_CAPACITY = 5;
+
 	private final DogRepository dogRepository;
 	private final UserRepository userRepository;
 	private final UserHelper userHelper;
@@ -35,7 +37,7 @@ public class DogService {
 		Long userId = Long.valueOf(userDetails.getUsername());
 		int size = dogRepository.countDogsByUserUserId(userId);
 
-		if (size >= 5) {
+		if (size >= MAX_DOG_CAPACITY) {
 			throw new ApplicationException(ApplicationError.EXCEED_DOG_CAPACITY);
 		}
 

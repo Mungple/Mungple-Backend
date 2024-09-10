@@ -23,7 +23,10 @@ public enum ApplicationError {
 	// exploration
 	EXPLORATION_NOT_OWNED("E301", FORBIDDEN, "다른 사용자의 산책입니다."),
 	EXPLORATION_NOT_FOUND("E302",BAD_REQUEST, "산책이 존재하지 않습니다."),
-	ALREADY_ON_EXPLORATION("E303",BAD_REQUEST, "이미 산책 중입니다.");
+	ALREADY_ON_EXPLORATION("E303",BAD_REQUEST, "이미 산책 중입니다."),
+
+	// exploration
+	MARKER_NOT_FOUND("E401", BAD_REQUEST, "마커가 존재하지 않습니다.");
 
 	private String errorCode;
 	private HttpStatus status;
