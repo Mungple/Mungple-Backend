@@ -25,8 +25,14 @@ public enum ApplicationError {
 	EXPLORATION_NOT_FOUND("E302",BAD_REQUEST, "산책이 존재하지 않습니다."),
 	ALREADY_ON_EXPLORATION("E303",BAD_REQUEST, "이미 산책 중입니다."),
 
-	// exploration
+	// marker
 	MARKER_NOT_FOUND("E401", BAD_REQUEST, "마커가 존재하지 않습니다.");
+
+	// image
+	IMAGE_SAVE_ERROR("E901", INTERNAL_SERVER_ERROR, "이미지 저장에 실패했습니다."),
+	IMAGE_DELETE_ERROR("E902", INTERNAL_SERVER_ERROR, "이미지 삭제에 실패했습니다."),
+	IMAGE_FORWARDING_ERROR("E903", INTERNAL_SERVER_ERROR, "이미지 주소 생성에 실패했습니다."),
+	TRANSACTION_NOT_START("E904", INTERNAL_SERVER_ERROR, "트랜잭션이 시작하지 않았습니다.");
 
 	private String errorCode;
 	private HttpStatus status;

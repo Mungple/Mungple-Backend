@@ -1,4 +1,5 @@
 services:
+
   elasticsearch:
     container_name: es
     image: docker.elastic.co/elasticsearch/elasticsearch:7.17.23
@@ -30,6 +31,7 @@ services:
       - ./.data/zookeeper/data:/bitnami/zookeeper/data
       - ./.data/zookeeper/datalog:/bitnami/zookeeper/datalog
       - ./.data/zookeeper/logs:/bitnami/zookeeper/logs
+
   kafka1:
     image: 'bitnami/kafka:3.6.0'
     container_name: kafka1
@@ -49,6 +51,7 @@ services:
       - zookeeper
     volumes:
       - ./.data/kafka1:/bitnami/kafka/data
+
   kafka-ui:
     image: 'provectuslabs/kafka-ui:v0.7.1'
     container_name: kafka-ui
@@ -60,3 +63,14 @@ services:
     depends_on:
       - zookeeper
       - kafka1
+
+  minio:
+    image: minio/minio
+    container_name: minio
+    ports:
+      - 9000:9000
+      - 9001:9001
+    environment:
+      - MINIO_ROOT_USER=e106
+      - MINIO_ROOT_PASSWORD=password
+    command: server /data --console-address ":9001"

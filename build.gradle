@@ -41,6 +41,9 @@ dependencies {
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 
+	// minio
+	implementation 'io.minio:minio:8.5.12'
+
 	// persistence
 	implementation 'org.springframework.data:spring-data-elasticsearch:5.3.3'
 	runtimeOnly 'com.h2database:h2'

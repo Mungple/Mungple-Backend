@@ -3,6 +3,9 @@ package com.e106.mungplace.common.transaction;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.e106.mungplace.web.exception.ApplicationException;
+import com.e106.mungplace.web.exception.dto.ApplicationError;
+
 public abstract class KeyRollbackable<T> implements Rollbackable {
 
 	private int level;
@@ -20,6 +23,9 @@ public abstract class KeyRollbackable<T> implements Rollbackable {
 	 * @param key 롤백 대상 키
 	 */
 	public void addTargetKey(T key) {
+		if (keys.get() == null) {
+			throw new ApplicationException(ApplicationError.TRANSACTION_NOT_START);
+		}
 		keys.get().add(key);
 	}
 
