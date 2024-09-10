@@ -2701,6 +2701,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@stomp/stompjs@npm:^7.0.0":
+  version: 7.0.0
+  resolution: "@stomp/stompjs@npm:7.0.0"
+  checksum: 94618b5a394339ed3098dae213eef27c462f504ba050208598c9ef396abb527b57e6333b2e78af4715693d6ba04fffb23df4b1bf7041bc0f1b3bc6e92138f1dc
+  languageName: node
+  linkType: hard
+
 "@tanstack/query-core@npm:5.54.1":
   version: 5.54.1
   resolution: "@tanstack/query-core@npm:5.54.1"
@@ -7646,6 +7653,7 @@ __metadata:
     "@react-navigation/bottom-tabs": ^6.6.1
     "@react-navigation/native": ^6.1.18
     "@react-navigation/native-stack": ^6.11.0
+    "@stomp/stompjs": ^7.0.0
     "@tanstack/react-query": ^5.55.0
     "@types/jest": ^29.5.12
     "@types/react": ^18.2.6
