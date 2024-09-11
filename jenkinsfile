@@ -1,0 +1,108 @@
+pipeline {
+    agent any
+    environment{
+        TARGET_HOST = "ubuntu@172.26.1.3"
+        IMAGE_NAME = "spring-server"
+        CONTAINER_1_NAME ="spring-server-1"
+        CONTAINER_2_NAME ="spring-server-2"
+        CONTAINER_3_NAME ="spring-server-3"
+        LAST_VERSION = "latest"
+        NEW_VERSION = "latest"
+        PROJECT_PATH = "/home/ubuntu/app"
+        RESOURCE_PATH = "/home/ubuntu/jenkins-data/workspace/back/src/main/resources"
+    }
+    stages {
+        stage('Clone') {
+            steps {
+                git branch: 'backend', credentialsId: 'mungplace', url: 'https://lab.ssafy.com/s11-bigdata-dist-sub1/S11P21E106'
+            }
+        }
+
+        stage('Build'){
+            steps{
+                sshagent (credentials: ['SSH-Credential']){
+                    script{
+                        sh 'chmod +x gradlew'
+                        sh './gradlew clean build -x test'
+                    }
+                }
+            }
+        }
+
+        stage('Build and Replace') {
+            steps {
+                sshagent (credentials: ['SSH-Credential']) {
+                    script {
+                        sh 'scp -o StrictHostKeyChecking=no ./dockerfile ${TARGET_HOST}:${PROJECT_PATH}'
+                        sh 'scp -o StrictHostKeyChecking=no ./build/libs/mungplace-0.0.1-SNAPSHOT.jar ${TARGET_HOST}:${PROJECT_PATH}'
+
+                        // 비밀 파일을 작업 공간으로 가져오기
+                        withCredentials([file(credentialsId: 'application-prod.yml', variable: 'PROD_YML'), file(credentialsId: 'application-secret.yml', variable: 'SECRET_YML')]) {
+                            sh'''
+                                ssh -o StrictHostKeyChecking=no ${TARGET_HOST} "rm -f ${PROJECT_PATH}/application-prod.yml ${PROJECT_PATH}/application-secret.yml"
+                                ssh -o StrictHostKeyChecking=no ${TARGET_HOST} "rm -f ${RESOURCE_PATH}/application-prod.yml ${RESOURCE_PATH}/application-secret.yml"
+                            '''
+
+                            // 비밀 파일을 대상 서버로 전송
+                            sh 'scp -o StrictHostKeyChecking=no $PROD_YML ${TARGET_HOST}:${PROJECT_PATH}'
+                            sh 'scp -o StrictHostKeyChecking=no $SECRET_YML ${TARGET_HOST}:${PROJECT_PATH}'
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Stop process'){
+            steps{
+                sshagent (credentials: ['SSH-Credential']){
+                    script{
+                        try{
+                            sh'''
+                                ssh -o StrictHostKeyChecking=no ${TARGET_HOST} "docker stop ${CONTAINER_1_NAME}"
+                                ssh -o StrictHostKeyChecking=no ${TARGET_HOST} "docker stop ${CONTAINER_2_NAME}"
+                                ssh -o StrictHostKeyChecking=no ${TARGET_HOST} "docker stop ${CONTAINER_3_NAME}"
+
+                                ssh -o StrictHostKeyChecking=no ${TARGET_HOST} "docker rm -f ${CONTAINER_1_NAME}"
+                                ssh -o StrictHostKeyChecking=no ${TARGET_HOST} "docker rm -f ${CONTAINER_2_NAME}"
+                                ssh -o StrictHostKeyChecking=no ${TARGET_HOST} "docker rm -f ${CONTAINER_3_NAME}"
+
+                            '''
+                        } catch (e){
+                            echo 'Remove Container Failed : ${CONTAINER_NAME}'
+                        }
+                    }
+
+                }
+            }
+        }
+        stage('Remove Docker Image') {
+            steps {
+                sshagent (credentials: ['SSH-Credential']) {
+                    sh'''
+                        ssh -o StrictHostKeyChecking=no ${TARGET_HOST} "docker rmi ${IMAGE_NAME}:${LAST_VERSION}"
+                    '''
+                }
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                sshagent (credentials: ['SSH-Credential']) {
+                    sh'''
+                        ssh -o StrictHostKeyChecking=no ${TARGET_HOST} "docker build -f ${PROJECT_PATH}/dockerfile --tag ${IMAGE_NAME}:${NEW_VERSION} ${PROJECT_PATH}"
+                    '''
+                }
+            }
+        }
+
+        stage('Deploy'){
+            steps{
+                sshagent (credentials: ['SSH-Credential']){
+                   sh '''
+                        ssh -o StrictHostKeyChecking=no ${TARGET_HOST} "docker compose up -d"
+                   '''
+                }
+            }
+        }
+    }
+}
