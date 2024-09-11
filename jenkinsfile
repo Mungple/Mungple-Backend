@@ -58,14 +58,7 @@ pipeline {
                     script{
                         try{
                             sh'''
-                                ssh -o StrictHostKeyChecking=no ${TARGET_HOST} "docker stop ${CONTAINER_1_NAME}"
-                                ssh -o StrictHostKeyChecking=no ${TARGET_HOST} "docker stop ${CONTAINER_2_NAME}"
-                                ssh -o StrictHostKeyChecking=no ${TARGET_HOST} "docker stop ${CONTAINER_3_NAME}"
-
-                                ssh -o StrictHostKeyChecking=no ${TARGET_HOST} "docker rm -f ${CONTAINER_1_NAME}"
-                                ssh -o StrictHostKeyChecking=no ${TARGET_HOST} "docker rm -f ${CONTAINER_2_NAME}"
-                                ssh -o StrictHostKeyChecking=no ${TARGET_HOST} "docker rm -f ${CONTAINER_3_NAME}"
-
+                                ssh -o StrictHostKeyChecking=no ${TARGET_HOST} "docker compose -f backend-compose.yml down"
                             '''
                         } catch (e){
                             echo 'Remove Container Failed : ${CONTAINER_NAME}'
@@ -99,7 +92,7 @@ pipeline {
             steps{
                 sshagent (credentials: ['SSH-Credential']){
                    sh '''
-                        ssh -o StrictHostKeyChecking=no ${TARGET_HOST} "docker compose up -d"
+                        ssh -o StrictHostKeyChecking=no ${TARGET_HOST} "docker compose -f backend-compose.yml up -d"
                    '''
                 }
             }
