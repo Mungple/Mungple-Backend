@@ -96,6 +96,12 @@ public class KafkaConfig {
                         .partitions(3)
                         .replicas(1)
                         .config(TopicConfig.RETENTION_MS_CONFIG, String.valueOf(7 * 24 * 60 * 60))
+                        .build(),
+
+                TopicBuilder.name("access-log")
+                        .partitions(3)
+                        .replicas(1)
+                        .config(TopicConfig.RETENTION_MS_CONFIG, String.valueOf(7 * 24 * 60 * 60))
                         .build()
         );
     }

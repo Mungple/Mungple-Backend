@@ -26,7 +26,7 @@ public enum ApplicationError {
 	ALREADY_ON_EXPLORATION("E303",BAD_REQUEST, "이미 산책 중입니다."),
 
 	// marker
-	MARKER_NOT_FOUND("E401", BAD_REQUEST, "마커가 존재하지 않습니다.");
+	MARKER_NOT_FOUND("E401", BAD_REQUEST, "마커가 존재하지 않습니다."),
 
 	// image
 	IMAGE_SAVE_ERROR("E901", INTERNAL_SERVER_ERROR, "이미지 저장에 실패했습니다."),
