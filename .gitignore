@@ -238,6 +238,7 @@ gradle-app.setting
 # Java heap dump
 *.hprof
 src/main/resources/application-secret.yml
+src/main/resources/application-prod.yml
 
 *.data
 

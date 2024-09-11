@@ -2,6 +2,7 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.3.3'
 	id 'io.spring.dependency-management' version '1.1.6'
+	id 'com.google.cloud.tools.jib' version '3.4.3'
 }
 
 group = 'com.e106'
@@ -115,3 +116,9 @@ task integrationTest(type: Test) {
 	useJUnitPlatform()  // JUnit 5 설정
 }
 integrationTest.finalizedBy(clean)
+
+jib {
+	to {
+		image = 'leehyeonsoo/spring-server:latest'
+	}
+}
