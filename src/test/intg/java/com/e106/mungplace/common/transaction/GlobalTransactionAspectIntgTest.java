@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -31,7 +30,7 @@ class GlobalTransactionAspectIntgTest {
 	@Autowired
 	private GlobalTransactionNestedTestService nestedTestService;
 
-	@SpyBean
+	@Autowired
 	private KeyRollbackable<String> keyRollbackable;
 
 	@BeforeEach
@@ -88,7 +87,8 @@ class GlobalTransactionAspectIntgTest {
 		// when
 		try {
 			nestedTestService.childCommitParentRollback();
-		} catch (Exception ignored) {}
+		} catch (Exception ignored) {
+		}
 
 		// then
 		verify(keyRollbackable, times(2)).callProcess();

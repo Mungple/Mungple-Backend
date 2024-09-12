@@ -24,7 +24,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 		CustomOAuth2User oAuth2User = (CustomOAuth2User) authentication.getPrincipal();
 		User user = oAuth2User.getUser();
 
-		LoginResponse loginResponse = jwtProvider.generateTokens(user.getUserId(), user.getImageName(), user.getNickname());
-		response.setHeader("Authorization", "Bearer " + loginResponse.accessToken());
+		String accessToken = jwtProvider.createAccessToken(user.getUserId());
+		response.setHeader("Authorization", "Bearer " + accessToken);
 	}
 }

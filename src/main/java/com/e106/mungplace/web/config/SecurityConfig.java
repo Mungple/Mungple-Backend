@@ -25,13 +25,9 @@ public class SecurityConfig {
 	private static final String[] AUTH_WHITELIST = {
 		"/api/users/login/*",
 		"/oauth2/callback/*",
-		"/h2-console/**"
+		"/h2-console/**",
+		"/manager/**"
 	};
-
-	@Bean
-	public JwtAuthProcessFilter jwtAuthProcessFilter(JwtProvider jwtProvider, UserRepository userRepository) {
-		return new JwtAuthProcessFilter(jwtProvider, userRepository);
-	}
 
 	@Bean
 	public SecurityFilterChain securityFilterChain(

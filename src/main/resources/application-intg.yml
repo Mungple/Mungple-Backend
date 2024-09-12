@@ -29,6 +29,10 @@ logging:
           elasticsearch:
             core:
               ElasticsearchRestTemplate: DEBUG
+        security: DEBUG
+        web.socket: DEBUG
+        messaging: DEBUG
+        web.socket.handler: DEBUG
 
 elasticsearch:
   host-and-port: localhost:9200
