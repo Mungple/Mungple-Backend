@@ -60,7 +60,7 @@ function CustomButton({
 
 const styles = StyleSheet.create({
   container: {
-    borderRadius: 3,
+    borderRadius: 8,
     flexDirection: 'row',
     justifyContent: 'center',
   },
@@ -69,18 +69,22 @@ const styles = StyleSheet.create({
   },
   filled: {
     backgroundColor: colors.PINK_700,
+    borderRadius: 8,
   },
   outlined: {
     borderColor: colors.PINK_700,
     borderWidth: 1,
+    borderRadius: 8,
   },
   filledPressed: {
     backgroundColor: colors.PINK_500,
+    borderRadius: 8,
   },
   outlinedPressed: {
     borderColor: colors.PINK_700,
     borderWidth: 1,
     opacity: 0.5,
+    borderRadius: 8,
   },
   large: {
     width: '100%',
@@ -88,6 +92,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
     justifyContent: 'center',
+    borderRadius: 8,
   },
   medium: {
     width: '50%',
@@ -95,6 +100,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
     justifyContent: 'center',
+    borderRadius: 8,
   },
   text: {
     fontSize: 16,
