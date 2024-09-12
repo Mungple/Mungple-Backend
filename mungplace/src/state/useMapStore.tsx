@@ -45,7 +45,7 @@ interface MapState {
 
 export const useMapStore = create<MapState>((set) => ({
   showPersonalBlueZone: true, // 초기 상태는 보이게
-  showGlobalBlueZone: false,
+  showGlobalBlueZone: true,
   showRedZone: true,
   showMungPlace: true,
   showUserMarkers: true,
