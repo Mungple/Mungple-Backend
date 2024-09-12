@@ -28,7 +28,7 @@ interface CustomButtonProps extends PressableProps {
 // 화면의 높이를 가져오는 상수, 조건부 스타일링에 사용
 const deviceHeight = Dimensions.get('screen').height;
 
-function CustomButton({
+const CustomButton = ({
   label,
   inValid = false,
 
@@ -38,7 +38,7 @@ function CustomButton({
   style = null,
   textStyle = null,
   ...props
-}: CustomButtonProps) {
+}: CustomButtonProps) => {
   return (
     <Pressable
       disabled={inValid}

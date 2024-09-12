@@ -1,20 +1,11 @@
-import React, {useEffect, useRef, useState} from 'react';
-import {
-  View,
-  Button,
-  StyleSheet,
-  Modal,
-  Text,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
-  Pressable,
-} from 'react-native';
-import {colors} from '@/constants';
-import {useMapStore} from '@/state/useMapStore';
+import React, {useRef, useState} from 'react';
+import {Animated} from 'react-native';
 
+import styled from 'styled-components/native';
+import {useMapStore} from '@/state/useMapStore';
 import usePermission from '@/hooks/usePermission';
 import useUserLocation from '@/hooks/useUserLocation';
-import MarkerForm from '@/components/Marker/MarkerForm';
+import CustomMapButton from '@/components/common/CustomMapButton';
 import MapView, {Heatmap, Marker, PROVIDER_GOOGLE} from 'react-native-maps';
 
 const WalkingScreen: React.FC = () => {
@@ -23,10 +14,6 @@ const WalkingScreen: React.FC = () => {
     showGlobalBlueZone,
     showRedZone,
     showMungPlace,
-    togglePersonalBlueZone,
-    toggleGlobalBlueZone,
-    toggleRedZone,
-    toggleMungPlace,
     personalBlueZones,
     globalBlueZones,
     redZones,
@@ -34,14 +21,16 @@ const WalkingScreen: React.FC = () => {
   } = useMapStore();
 
   const mapRef = useRef<MapView | null>(null);
-  const [isFormVisible, setIsFormVisible] = useState(false);
-  const [isModalVisible, setIsModalVisible] = useState(false);
   const {userLocation, isUserLocationError} = useUserLocation();
+  const [isMenuVisible, setIsMenuVisible] = useState(false);
+  const translateY = useRef(new Animated.Value(0)).current;
+  const opacity = useRef(new Animated.Value(0)).current;
+
   const handlePressUserLocation = () => {
     if (isUserLocationError) {
       return;
     }
-    
+
     mapRef.current?.animateToRegion({
       latitude: userLocation?.latitude || 35.096406,
       longitude: userLocation?.longitude || 128.853919,
@@ -49,21 +38,55 @@ const WalkingScreen: React.FC = () => {
       longitudeDelta: 0.0421,
     });
   };
-  usePermission('LOCATION')
 
-  const toggleModal = () => {
-    setIsModalVisible(!isModalVisible);
+  const handlePressMenu = () => {
+    setIsMenuVisible(prev => !prev);
+    if (isMenuVisible) {
+      // 메뉴가 닫힐 때
+      Animated.parallel([
+        Animated.timing(translateY, {
+          toValue: 0,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+        Animated.timing(opacity, {
+          toValue: 0,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    } else {
+      // 메뉴가 열릴 때
+      Animated.parallel([
+        Animated.timing(translateY, {
+          toValue: 80,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+        Animated.timing(opacity, {
+          toValue: 1,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    }
   };
 
+  const handlePressRefresh = () => {};
+  const handlePressMarker = () => {};
+  const handlePressSetting = () => {};
+
+  usePermission('LOCATION');
+
   return (
-    <View style={styles.container}>
-      <MapView
+    <Container>
+      <StyledMapView
         ref={mapRef}
-        style={styles.map}
         provider={PROVIDER_GOOGLE}
         showsUserLocation
         followsUserLocation
-        showsMyLocationButton={false}>
+        showsMyLocationButton={false}
+      >
         {/* 개인 블루존 히트맵 */}
         {showPersonalBlueZone && (
           <Heatmap
@@ -71,7 +94,7 @@ const WalkingScreen: React.FC = () => {
               latitude: zone.latitude,
               longitude: zone.longitude,
               weight: zone.weight || 1,
-            }))}
+            }))} 
           />
         )}
 
@@ -82,146 +105,103 @@ const WalkingScreen: React.FC = () => {
               latitude: zone.latitude,
               longitude: zone.longitude,
               weight: zone.weight || 1,
-            }))}
+            }))} 
           />
         )}
 
         {/* 레드존 */}
-        {showRedZone &&
-          redZones.map((zone, index) => (
-            <Marker
-              key={index}
-              coordinate={{
-                latitude: zone.latitude,
-                longitude: zone.longitude,
-              }}
-              title="Red Zone"
-            />
-          ))}
+        {showRedZone && redZones.map((zone, index) => (
+          <Marker
+            key={index}
+            coordinate={{
+              latitude: zone.latitude,
+              longitude: zone.longitude,
+            }}
+            title="Red Zone"
+          />
+        ))}
 
         {/* 멍플레이스 */}
-        {showMungPlace &&
-          mungPlaces.map((place, index) => (
-            <Marker
-              key={index}
-              coordinate={{
-                latitude: place.latitude,
-                longitude: place.longitude,
-              }}
-              title="Mung Place"
-            />
-          ))}
-      </MapView>
-
-      <View style={styles.buttonList}>
-        <Pressable style={styles.mapButton} onPress={handlePressUserLocation}>
-          <Text>내위치</Text>
-        </Pressable>
-      </View>
+        {showMungPlace && mungPlaces.map((place, index) => (
+          <Marker
+            key={index}
+            coordinate={{
+              latitude: place.latitude,
+              longitude: place.longitude,
+            }}
+            title="Mung Place"
+          />
+        ))}
+      </StyledMapView>
 
       {/* 햄버거 버튼 */}
-      <TouchableOpacity onPress={toggleModal} style={styles.hamburgerButton}>
-        <Text style={styles.hamburgerText}>&#9776;</Text>
-      </TouchableOpacity>
+      <CustomMapButton
+        onPress={handlePressMenu}
+        iconName={'menu'}
+        top={20}
+        right={20}
+      />
 
-      {/* 모달 */}
-      <Modal
-        visible={isModalVisible}
-        transparent={true}
-        animationType="slide"
-        onRequestClose={toggleModal} // Android의 뒤로가기 버튼에 대한 동작
-      >
-        <TouchableWithoutFeedback onPress={toggleModal}>
-          <View style={styles.modal}>
-            <TouchableWithoutFeedback>
-              <View style={styles.modalContent}>
-                <Button title="Close Modal" onPress={toggleModal} />
+      {/* 마커 버튼 및 텍스트, 설정 버튼 및 텍스트 */}
+      <Animated.View style={{ transform: [{translateY}], opacity, position:'absolute', top: 0, right: 0}}>
+        <ButtonWithTextContainer top={40} right={20}>
+          <TextLabel>마커 등록</TextLabel>
+          <CustomMapButton
+            onPress={handlePressMarker}
+            iconName={'flag'}
+          />
+        </ButtonWithTextContainer>
 
-                {/* 모달 안에 버튼들 */}
-                <View style={styles.buttonContainer}>
-                  <Button
-                    title="Personal BlueZone"
-                    onPress={togglePersonalBlueZone}
-                  />
-                  <Button
-                    title="Global BlueZone"
-                    onPress={toggleGlobalBlueZone}
-                  />
-                  <Button title="RedZone" onPress={toggleRedZone} />
-                  <Button title="MungPlace" onPress={toggleMungPlace} />
-                  <Button
-                    title="Add Marker"
-                    onPress={() => setIsFormVisible(true)}
-                  />
-                </View>
-              </View>
-            </TouchableWithoutFeedback>
-          </View>
-        </TouchableWithoutFeedback>
-      </Modal>
+        <ButtonWithTextContainer top={120} right={20}>
+          <TextLabel>지도 설정</TextLabel>
+          <CustomMapButton
+            onPress={handlePressSetting}
+            iconName={'settings'}
+          />
+        </ButtonWithTextContainer>
+      </Animated.View>
 
-      {/* 마커 추가 폼 */}
-      {userLocation && (
-        <MarkerForm
-          isVisible={isFormVisible}
-          onClose={() => setIsFormVisible(false)}
-          latitude={userLocation.latitude}
-          longitude={userLocation.longitude}
-        />
-      )}
-    </View>
+      {/* 위치 버튼 */}
+      <CustomMapButton
+        onPress={handlePressUserLocation}
+        iconName={'locate'}
+        bottom={20}
+        left={20}
+      />
+
+      {/* 새로고침 버튼 */}
+      <CustomMapButton
+        onPress={handlePressRefresh}
+        iconName={'refresh'}
+        bottom={20}
+        right={20}
+      />
+    </Container>
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  map: {
-    flex: 1,
-  },
-  buttonContainer: {
-    marginTop: 20, // 버튼들이 모달 안에서 너무 밀착되지 않도록 마진 추가
-  },
-  hamburgerButton: {
-    position: 'absolute',
-    top: 20,
-    right: 20,
-    padding: 10,
-  },
-  hamburgerText: {
-    fontSize: 40,
-    fontWeight: '900',
-  },
-  modal: {
-    flex: 1,
-    justifyContent: 'flex-end',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
-  modalContent: {
-    backgroundColor: '#fff',
-    padding: 20,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-  },
-  buttonList: {
-    position: 'absolute',
-    bottom: 30,
-    right: 15,
-  },
-  mapButton: {
-    backgroundColor: colors.WHITE,
-    marginVertical: 5,
-    height: 48,
-    width: 48,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 30,
-    shadowColor: colors.BLACK,
-    shadowOffset: {width: 1, height: 2},
-    shadowOpacity: 0.5,
-    elevation: 2,
-  },
-});
+const Container = styled.View`
+  flex: 1;
+`;
+
+const StyledMapView = styled(MapView)`
+  flex: 1;
+`;
+
+const ButtonWithTextContainer = styled.View<{top?: number; right?: number}>`
+  position: absolute;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
+  top: ${({top}) => top || 0}px;
+  right: ${({right}) => right || 0}px;
+`;
+
+const TextLabel = styled.Text`
+  margin-right: 80px;
+  font-size: 24px;
+  font-weight: bold;
+  color: black;
+`;
 
 export default WalkingScreen;

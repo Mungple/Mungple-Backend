@@ -12,13 +12,14 @@ export interface MarkerData {
 }
 
 export interface MarkerFormProps {
+  isVisible: boolean;
   onSubmit: (markerData: MarkerData) => void;
-  onClose: () => void; // 모달 닫기
-  latitude: number; 
-  longitude: number 
+  onClose: () => void;
+  latitude: number;
+  longitude: number;
 }
 
-const MarkerForm: React.FC<MarkerFormProps> = ({ onSubmit, onClose, latitude, longitude }) => {
+const MarkerForm: React.FC<MarkerFormProps> = ({ isVisible, onSubmit, onClose, latitude, longitude }) => {
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
   const [imageUri, setImageUri] = useState<string | undefined>(undefined);
@@ -46,7 +47,7 @@ const MarkerForm: React.FC<MarkerFormProps> = ({ onSubmit, onClose, latitude, lo
   };
 
   return (
-    <Modal visible={true} transparent={true} animationType="slide">
+    <Modal visible={isVisible} transparent={true} animationType="slide"> {/* isVisible로 수정 */}
       <View style={styles.modalContainer}>
         <View style={styles.formContainer}>
           <TextInput
