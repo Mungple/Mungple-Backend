@@ -1,12 +1,15 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
+import React from 'react';
+import { Button, View } from 'react-native';
+import { useAppStore } from '@/state/useAppStore';
 
-export default function NaverLoginScreen() {
+const NaverLoginScreen: React.FC = () => {
+  const setLogin = useAppStore((state) => state.setLogin);
+
   return (
     <View>
-      <Text>NaverLoginScreen</Text>
+      <Button title="Login" onPress={() => setLogin(true)} />
     </View>
-  )
-}
+  );
+};
 
-const styles = StyleSheet.create({})
+export default NaverLoginScreen;

@@ -1,5 +1,4 @@
 import React from 'react';
-import {StyleSheet} from 'react-native';
 import {authNavigations} from '@/constants';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 
@@ -17,7 +16,7 @@ export type AuthStackParamList = {
 
 const Stack = createNativeStackNavigator<AuthStackParamList>();
 
-function AuthStackNavigator() {
+const AuthStackNavigator: React.FC = () => {
   return (
     <Stack.Navigator>
       <Stack.Screen

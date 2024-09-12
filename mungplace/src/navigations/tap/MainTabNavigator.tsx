@@ -8,9 +8,17 @@ import MyPageScreen from '@/screens/user/MyPageScreen';
 import RecordScreen from '@/screens/record/RecordScreen';
 import RankingScreen from '@/screens/ranking/RankingScreen';
 
-const Tab = createBottomTabNavigator();
+type MainTabParamList = {
+  [mainNavigations.HOME]: undefined;
+  [mainNavigations.MAP]: undefined;
+  [mainNavigations.RECORD]: undefined;
+  [mainNavigations.RANKING]: undefined;
+  [mainNavigations.MYPAGE]: undefined;
+};
 
-export default function MainTabNavigator() {
+const Tab = createBottomTabNavigator<MainTabParamList>();
+
+const MainTabNavigator = () => {
   return (
     <Tab.Navigator
       screenOptions={{
@@ -18,8 +26,7 @@ export default function MainTabNavigator() {
           fontSize: 18,
         },
         headerShown: false,
-      }}
-    >
+      }}>
       <Tab.Screen
         name={mainNavigations.HOME}
         component={HomeScreen}
@@ -58,3 +65,5 @@ export default function MainTabNavigator() {
     </Tab.Navigator>
   );
 }
+
+export default MainTabNavigator
