@@ -1,7 +1,6 @@
 import {useEffect, useState} from 'react';
 import {LatLng} from 'react-native-maps';
 import GeoLocation from '@react-native-community/geolocation';
-
 import useAppState from './useAppState';
 import {useMapStore} from '@/state/useMapStore';
 
