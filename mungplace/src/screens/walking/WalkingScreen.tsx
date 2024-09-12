@@ -23,6 +23,7 @@ const WalkingScreen: React.FC = () => {
   const mapRef = useRef<MapView | null>(null);
   const {userLocation, isUserLocationError} = useUserLocation();
   const [isMenuVisible, setIsMenuVisible] = useState(false);
+  const [isDisabled, setIsDisabled] = useState(true);
   const translateY = useRef(new Animated.Value(0)).current;
   const opacity = useRef(new Animated.Value(0)).current;
 
@@ -42,7 +43,6 @@ const WalkingScreen: React.FC = () => {
   const handlePressMenu = () => {
     setIsMenuVisible(prev => !prev);
     if (isMenuVisible) {
-      // 메뉴가 닫힐 때
       Animated.parallel([
         Animated.timing(translateY, {
           toValue: 0,
@@ -54,9 +54,8 @@ const WalkingScreen: React.FC = () => {
           duration: 300,
           useNativeDriver: true,
         }),
-      ]).start();
+      ]).start(() => setIsDisabled(true));
     } else {
-      // 메뉴가 열릴 때
       Animated.parallel([
         Animated.timing(translateY, {
           toValue: 80,
@@ -68,7 +67,7 @@ const WalkingScreen: React.FC = () => {
           duration: 300,
           useNativeDriver: true,
         }),
-      ]).start();
+      ]).start(() => setIsDisabled(false));
     }
   };
 
@@ -88,7 +87,7 @@ const WalkingScreen: React.FC = () => {
         showsMyLocationButton={false}
       >
         {/* 개인 블루존 히트맵 */}
-        {showPersonalBlueZone && (
+        {/* {showPersonalBlueZone && (
           <Heatmap
             points={personalBlueZones.map(zone => ({
               latitude: zone.latitude,
@@ -96,10 +95,10 @@ const WalkingScreen: React.FC = () => {
               weight: zone.weight || 1,
             }))} 
           />
-        )}
+        )} */}
 
         {/* 전체 블루존 히트맵 */}
-        {showGlobalBlueZone && (
+        {/* {showGlobalBlueZone && (
           <Heatmap
             points={globalBlueZones.map(zone => ({
               latitude: zone.latitude,
@@ -107,10 +106,10 @@ const WalkingScreen: React.FC = () => {
               weight: zone.weight || 1,
             }))} 
           />
-        )}
+        )} */}
 
         {/* 레드존 */}
-        {showRedZone && redZones.map((zone, index) => (
+        {/* {showRedZone && redZones.map((zone, index) => (
           <Marker
             key={index}
             coordinate={{
@@ -119,7 +118,7 @@ const WalkingScreen: React.FC = () => {
             }}
             title="Red Zone"
           />
-        ))}
+        ))} */}
 
         {/* 멍플레이스 */}
         {showMungPlace && mungPlaces.map((place, index) => (
@@ -149,6 +148,7 @@ const WalkingScreen: React.FC = () => {
           <CustomMapButton
             onPress={handlePressMarker}
             iconName={'flag'}
+            inValid={isDisabled}
           />
         </ButtonWithTextContainer>
 
@@ -157,6 +157,7 @@ const WalkingScreen: React.FC = () => {
           <CustomMapButton
             onPress={handlePressSetting}
             iconName={'settings'}
+            inValid={isDisabled}
           />
         </ButtonWithTextContainer>
       </Animated.View>
