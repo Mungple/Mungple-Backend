@@ -8,7 +8,8 @@ import lombok.RequiredArgsConstructor;
 public enum ProviderName {
 	KAKAO("kakao"),
 	GOOGLE("google"),
-	NAVER("naver");
+	NAVER("naver"),
+	MANAGER("manager"),;
 
 	private final String providerName;
 }
