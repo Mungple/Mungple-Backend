@@ -1,21 +1,27 @@
-// src/components/Marker/MarkerForm.tsx
 import React, { useState } from 'react';
 import { View, Button, TextInput, Modal, StyleSheet, Image } from 'react-native';
 import { launchImageLibrary } from 'react-native-image-picker';
-import { useMapStore } from '../../state/useMapStore';
 
-interface MarkerFormProps {
-  isVisible: boolean;
-  onClose: () => void;
+export interface MarkerData {
+  id: string;
   latitude: number;
   longitude: number;
+  title: string;
+  body: string;
+  imageUri?: string;
 }
 
-const MarkerForm: React.FC<MarkerFormProps> = ({ isVisible, onClose, latitude, longitude }) => {
+export interface MarkerFormProps {
+  onSubmit: (markerData: MarkerData) => void;
+  onClose: () => void; // 모달 닫기
+  latitude: number; 
+  longitude: number 
+}
+
+const MarkerForm: React.FC<MarkerFormProps> = ({ onSubmit, onClose, latitude, longitude }) => {
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
   const [imageUri, setImageUri] = useState<string | undefined>(undefined);
-  const { addMarker } = useMapStore();
 
   const handleImagePick = () => {
     launchImageLibrary({ mediaType: 'photo' }, response => {
@@ -26,19 +32,21 @@ const MarkerForm: React.FC<MarkerFormProps> = ({ isVisible, onClose, latitude, l
   };
 
   const handleSubmit = () => {
-    addMarker({
-      id: Date.now().toString(), // 예시 ID 생성
-      latitude,
-      longitude,
+    const markerData: MarkerData = {
+      id: Date.now().toString(),
+      latitude: latitude,
+      longitude: longitude,
       title,
       body,
       imageUri,
-    });
+    };
+
+    onSubmit(markerData);
     onClose();
   };
 
   return (
-    <Modal visible={isVisible} transparent={true} animationType="slide">
+    <Modal visible={true} transparent={true} animationType="slide">
       <View style={styles.modalContainer}>
         <View style={styles.formContainer}>
           <TextInput
@@ -79,14 +87,14 @@ const styles = StyleSheet.create({
   input: {
     height: 40,
     borderColor: 'gray',
-    borderWidth: 1,
+    borderBottomWidth: 1,
     marginBottom: 10,
     paddingHorizontal: 10,
   },
   image: {
     width: 100,
     height: 100,
-    marginBottom: 10,
+    marginVertical: 10,
   },
 });
 

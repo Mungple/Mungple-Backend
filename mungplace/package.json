@@ -18,6 +18,8 @@
     "@tanstack/react-query": "^5.55.0",
     "@types/styled-components": "^5.1.34",
     "axios": "^1.7.7",
+    "ngeohash": "^0.6.3",
+    "points-cluster": "^0.1.4",
     "react": "18.3.1",
     "react-native": "0.75.2",
     "react-native-gesture-handler": "^2.19.0",
