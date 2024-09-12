@@ -3,7 +3,7 @@ import {Animated, StyleSheet, Text, View, Image} from 'react-native';
 import MapView, {Heatmap, Marker, Polygon, PROVIDER_GOOGLE} from 'react-native-maps';
 import cluster from 'points-cluster';
 import geohash from 'ngeohash';
-import styled from 'styled-components';
+import styled from 'styled-components/native';
 import mungPleMarker from '../../assets/mungPleMarker.png';
 import {useMapStore} from '../../state/useMapStore';
 import MarkerForm from '../Marker/MarkerForm';
@@ -191,7 +191,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
       <Animated.View style={{ transform: [{ translateY }], opacity, position: 'absolute', top: 0, right: 0 }}>
         <ButtonWithTextContainer top={40} right={20}>
           <TextLabel>마커 등록</TextLabel>
-          <CustomMapButton onPress={() => {}} iconName="flag" inValid={isDisabled} />
+          <CustomMapButton onPress={() => {}} iconName="location-outline" inValid={isDisabled} />
         </ButtonWithTextContainer>
 
         <ButtonWithTextContainer top={120} right={20}>

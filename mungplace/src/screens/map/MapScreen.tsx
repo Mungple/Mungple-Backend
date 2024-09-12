@@ -1,8 +1,8 @@
 // screens/MapScreen.tsx
 import React, {useState} from 'react';
 import {View, Button, StyleSheet} from 'react-native';
-import MapComponent from '../../components/Map/MapComponent';
-import useUserLocation from '../../hooks/useUserLocation';
+import MapComponent from '@/components/Map/MapComponent';
+import useUserLocation from '@/hooks/useUserLocation';
 
 const MapScreen = () => {
   const {userLocation} = useUserLocation();
