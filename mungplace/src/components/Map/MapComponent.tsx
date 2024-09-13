@@ -10,8 +10,10 @@ import MapView, {
 import geohash from 'ngeohash';
 import cluster from 'points-cluster';
 import styled from 'styled-components/native';
-import MarkerForm from '../marker/MarkerForm';
 import {useMapStore} from '@/state/useMapStore';
+
+import BottomSheet from '../common/BottomSheet';
+import MarkerForm from '../marker/MarkerForm';
 import usePermission from '@/hooks/usePermission';
 import useUserLocation from '@/hooks/useUserLocation';
 import mungPleMarker from '@/assets/mungPleMarker.png';
@@ -22,7 +24,7 @@ interface MapComponentProps {
   isFormVisible: boolean;
   onFormClose: () => void;
   onAddMarker: (markerData: any) => void;
-  bottomOffset?: number; // 새로운 prop 추가
+  bottomOffset?: number;
 }
 
 const MapComponent: React.FC<MapComponentProps> = ({
@@ -30,7 +32,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
   isFormVisible,
   onFormClose,
   onAddMarker,
-  bottomOffset = 0
+  bottomOffset = 0,
 }) => {
   const {
     showPersonalBlueZone,
@@ -52,11 +54,12 @@ const MapComponent: React.FC<MapComponentProps> = ({
   const mapRef = useRef<MapView | null>(null);
   const [clusteredMarkers, setClusteredMarkers] = useState<any[]>([]);
   const [selectedCluster, setSelectedCluster] = useState<any[]>([]);
-  const {isUserLocationError} = useUserLocation();
   const [isMenuVisible, setIsMenuVisible] = useState(false);
-  const [isDisabled, setIsDisabled] = useState(true);
   const translateY = useRef(new Animated.Value(0)).current;
+  const [modalVisible, setModalVisible] = useState(false);
   const opacity = useRef(new Animated.Value(0)).current;
+  const [isDisabled, setIsDisabled] = useState(true);
+  const {isUserLocationError} = useUserLocation();
 
   // Fetch zones data
   useEffect(() => {
@@ -133,6 +136,10 @@ const MapComponent: React.FC<MapComponentProps> = ({
       }),
     ]).start(() => setIsDisabled(isMenuVisible));
   };
+
+  const handlePressSetting = () => {
+    setModalVisible(true);
+  }
 
   usePermission('LOCATION');
 
@@ -232,11 +239,15 @@ const MapComponent: React.FC<MapComponentProps> = ({
         <ButtonWithTextContainer top={120} right={20}>
           <TextLabel>지도 설정</TextLabel>
           <CustomMapButton
-            onPress={() => {}}
+            onPress={handlePressSetting}
             iconName="settings"
             inValid={isDisabled}
           />
         </ButtonWithTextContainer>
+        <BottomSheet
+          modalVisible={modalVisible}
+          setModalVisible={setModalVisible}
+        />
       </Animated.View>
 
       <CustomMapButton

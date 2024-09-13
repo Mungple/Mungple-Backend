@@ -10,11 +10,12 @@ import useUserLocation from '@/hooks/useUserLocation';
 import {MapStackParamList} from '@/navigations/stack/MapStackNavigator';
 
 import CustomCard from '@/components/common/CustomCard';
-import MapComponent from '@/components/Map/MapComponent';
+import MapComponent from '@/components/map/MapComponent';
 import ElapsedTime from '@/components/walking/ElapsedTime';
 import CustomButton from '@/components/common/CustomButton';
 
 const bottomBlockHeight = (Dimensions.get('window').height * 1) / 5;
+const bottomBlockWidth = Dimensions.get('window').width - 40;
 
 const WalkingScreen = () => {
   const {userLocation} = useUserLocation();
@@ -49,7 +50,7 @@ const WalkingScreen = () => {
             onAddMarker={handleAddMarker}
             bottomOffset={bottomBlockHeight + 20}
           />
-          <BottomCard height={bottomBlockHeight}>
+          <BottomCard height={bottomBlockHeight} width={bottomBlockWidth}>
             <WalkingInfo>
               <InfoRow>
                 <InfoBlock>
@@ -74,18 +75,20 @@ const Container = styled.View`
   flex: 1;
 `;
 
-const BottomCard = styled(CustomCard)<{height: number}>`
+const BottomCard = styled(CustomCard)<{height: number, width: number}>`
   position: absolute;
   bottom: 0;
   height: ${({height}) => `${height}px`};
-  width: 100%;
-  padding: 10px;
+  width: ${({width}) => `${width}px`};
+  margin-right: 20px;
+  padding: 20px;
 `;
 
 const WalkingInfo = styled.View`
   flex: 1;
   justify-content: center;
   align-items: center;
+  margin-bottom: 10px;
 `;
 
 const InfoRow = styled.View`
