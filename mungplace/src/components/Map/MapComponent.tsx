@@ -247,7 +247,9 @@ const MapComponent: React.FC<MapComponentProps> = ({
         <BottomSheet
           modalVisible={modalVisible}
           setModalVisible={setModalVisible}
-        />
+        >
+          <CustomMapButton iconName='flag' />
+        </BottomSheet>
       </Animated.View>
 
       <CustomMapButton
