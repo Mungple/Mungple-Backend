@@ -1,25 +1,42 @@
-// screens/MapScreen.tsx
 import React, {useState} from 'react';
-import {View, Button, StyleSheet} from 'react-native';
-import MapComponent from '../../components/Map/MapComponent';
-import useUserLocation from '../../hooks/useUserLocation';
+import {Dimensions} from 'react-native';
 
-const MapScreen = () => {
+import {mapNavigations} from '@/constants';
+import styled from 'styled-components/native';
+import { useAppStore } from '@/state/useAppStore';
+import useUserLocation from '@/hooks/useUserLocation';
+import {useNavigation} from '@react-navigation/native';
+import CustomCard from '@/components/common/CustomCard';
+import MapComponent from '@/components/Map/MapComponent';
+import CustomButton from '@/components/common/CustomButton';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import {MapStackParamList} from '@/navigations/stack/MapStackNavigator';
+
+const bottomBlockHeight = (Dimensions.get('window').height * 1) / 5;
+
+const WalkingScreen = () => {
   const {userLocation} = useUserLocation();
   const [isFormVisible, setIsFormVisible] = useState(false);
+  const setWalkingStart = useAppStore(state => state.setWalkingStart);
+
+  const navigation = useNavigation<NativeStackNavigationProp<MapStackParamList>>();
+
+  const handleWalkingEnd = () => {
+    setWalkingStart(false);
+    navigation.navigate(mapNavigations.HOME);
+  };
 
   const handleFormClose = () => {
     setIsFormVisible(false);
   };
 
   const handleAddMarker = (markerData: any) => {
-    // Marker 추가 로직
     console.log('Adding Marker:', markerData);
-    // addMarker(markerData); // 예시로 주석 처리, 실제로는 상태 관리 로직을 호출합니다.
   };
 
+
   return (
-    <View style={styles.container}>
+    <Container>
       {userLocation && (
         <>
           <MapComponent
@@ -27,25 +44,27 @@ const MapScreen = () => {
             isFormVisible={isFormVisible}
             onFormClose={handleFormClose}
             onAddMarker={handleAddMarker}
+            bottomOffset={bottomBlockHeight + 20}
           />
+          <BottomCard height={bottomBlockHeight}>
+            <CustomButton label="산책 종료하기" onPress={handleWalkingEnd} />
+          </BottomCard>
         </>
       )}
-    </View>
+    </Container>
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  buttonContainer: {
-    position: 'absolute',
-    bottom: 10,
-    left: 10,
-    right: 10,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-});
+const Container = styled.View`
+  flex: 1;
+`;
 
-export default MapScreen;
+const BottomCard = styled(CustomCard)<{ height: number }>`
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: ${({ height }) => `${height}px`};
+`;
+
+export default WalkingScreen;
