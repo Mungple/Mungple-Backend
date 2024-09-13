@@ -12,8 +12,8 @@ import cluster from 'points-cluster';
 import styled from 'styled-components/native';
 import {useMapStore} from '@/state/useMapStore';
 
-import BottomSheet from '../common/BottomSheet';
 import MarkerForm from '../marker/MarkerForm';
+import BottomSheet from '../common/BottomSheet';
 import usePermission from '@/hooks/usePermission';
 import useUserLocation from '@/hooks/useUserLocation';
 import mungPleMarker from '@/assets/mungPleMarker.png';
@@ -263,7 +263,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
       />
       <CustomMapButton
         onPress={() => {}}
-        iconName="refresh"
+        iconName="reload-outline"
         bottom={20 + bottomOffset}
         right={20}
       />

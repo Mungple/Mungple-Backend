@@ -11,10 +11,8 @@ const RootNavigator: React.FC = () => {
   const isLogin = useAppStore((state) => state.isLogin);
   const walkingStart = useAppStore(state => state.walkingStart);
 
-  if (walkingStart) {
+  if (isLogin) {
     navigatorToShow = <MapStackNavigator />;
-  } else if (isLogin) {
-    navigatorToShow = <MainTabNavigator />;
   } else {
     navigatorToShow = <AuthStackNavigator />;
   }
