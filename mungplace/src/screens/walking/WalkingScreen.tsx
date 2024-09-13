@@ -1,22 +1,24 @@
-import React, {useState} from 'react';
-import {Dimensions} from 'react-native';
+import React, { useState } from 'react';
+import { Dimensions, Text } from 'react-native';
 
-import {mapNavigations} from '@/constants';
+import { mapNavigations } from '@/constants';
 import styled from 'styled-components/native';
 import { useAppStore } from '@/state/useAppStore';
 import useUserLocation from '@/hooks/useUserLocation';
-import {useNavigation} from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import CustomCard from '@/components/common/CustomCard';
 import MapComponent from '@/components/Map/MapComponent';
 import CustomButton from '@/components/common/CustomButton';
-import {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import {MapStackParamList} from '@/navigations/stack/MapStackNavigator';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { MapStackParamList } from '@/navigations/stack/MapStackNavigator';
+import ElapsedTime from '@/components/walking/ElapsedTime';
 
 const bottomBlockHeight = (Dimensions.get('window').height * 1) / 5;
 
 const WalkingScreen = () => {
-  const {userLocation} = useUserLocation();
+  const { userLocation } = useUserLocation();
   const [isFormVisible, setIsFormVisible] = useState(false);
+  const [distance, setDistance] = useState(0);
   const setWalkingStart = useAppStore(state => state.setWalkingStart);
 
   const navigation = useNavigation<NativeStackNavigationProp<MapStackParamList>>();
@@ -34,7 +36,6 @@ const WalkingScreen = () => {
     console.log('Adding Marker:', markerData);
   };
 
-
   return (
     <Container>
       {userLocation && (
@@ -47,6 +48,19 @@ const WalkingScreen = () => {
             bottomOffset={bottomBlockHeight + 20}
           />
           <BottomCard height={bottomBlockHeight}>
+            <WalkingInfo>
+              <InfoRow>
+                <InfoBlock>
+                  <InfoLabel>소요 시간</InfoLabel>
+                  {/* Use ElapsedTime component here */}
+                  <ElapsedTime />
+                </InfoBlock>
+                <InfoBlock>
+                  <InfoLabel>이동 거리</InfoLabel>
+                  <InfoValue>{distance.toFixed(1)} km</InfoValue>
+                </InfoBlock>
+              </InfoRow>
+            </WalkingInfo>
             <CustomButton label="산책 종료하기" onPress={handleWalkingEnd} />
           </BottomCard>
         </>
@@ -62,9 +76,37 @@ const Container = styled.View`
 const BottomCard = styled(CustomCard)<{ height: number }>`
   position: absolute;
   bottom: 0;
-  left: 0;
-  right: 0;
   height: ${({ height }) => `${height}px`};
+  width: 100%;
+  padding: 10px;
+`;
+
+const WalkingInfo = styled.View`
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+`;
+
+const InfoRow = styled.View`
+  flex-direction: row;
+  justify-content: space-between;
+  width: 100%;
+`;
+
+const InfoBlock = styled.View`
+  flex: 1;
+  align-items: center;
+`;
+
+const InfoLabel = styled(Text)`
+  font-size: 18px;
+  color: #999999;
+`;
+
+const InfoValue = styled(Text)`
+  font-size: 32px;
+  font-weight: bold;
+  color: #000000;
 `;
 
 export default WalkingScreen;
