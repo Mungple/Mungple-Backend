@@ -5,15 +5,17 @@ import { Modal, Animated, TouchableWithoutFeedback, Dimensions, PanResponder} fr
 import styled from 'styled-components/native';
 
 interface BottomSheetProps {
-  modalVisible: boolean;
   setModalVisible: (visible: boolean) => void;
   children?: React.ReactNode;
+  modalVisible: boolean;
+  height?: number;
 }
 
 const BottomSheet: React.FC<BottomSheetProps> = ({
-  modalVisible,
   setModalVisible,
+  modalVisible,
   children,
+  height = 300,
 }) => {
   const screenHeight = Dimensions.get('screen').height;
   const panY = useRef(new Animated.Value(screenHeight)).current;
@@ -93,7 +95,7 @@ const BottomSheet: React.FC<BottomSheetProps> = ({
         </TouchableWithoutFeedback>
         {/* 애니메이션이 적용된 BottomSheet */}
         <BottomSheetContainer
-          style={{transform: [{translateY}]}}
+          style={{transform: [{translateY}], height}}
           {...panResponders.panHandlers}>
           {children}
         </BottomSheetContainer>
