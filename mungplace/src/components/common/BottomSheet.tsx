@@ -1,13 +1,15 @@
-import { colors } from '@/constants';
 import React, {useEffect, useRef} from 'react';
-import { Modal, Animated, TouchableWithoutFeedback, Dimensions, PanResponder} from 'react-native';
+import {Modal, Animated, TouchableWithoutFeedback, Dimensions, PanResponder, TouchableOpacity} from 'react-native';
+import Icon from 'react-native-vector-icons/Ionicons';
 
+import {colors} from '@/constants';
 import styled from 'styled-components/native';
 
 interface BottomSheetProps {
   setModalVisible: (visible: boolean) => void;
   children?: React.ReactNode;
   modalVisible: boolean;
+  menuName: string;
   height?: number;
 }
 
@@ -15,6 +17,7 @@ const BottomSheet: React.FC<BottomSheetProps> = ({
   setModalVisible,
   modalVisible,
   children,
+  menuName,
   height = 300,
 }) => {
   const screenHeight = Dimensions.get('screen').height;
@@ -87,17 +90,31 @@ const BottomSheet: React.FC<BottomSheetProps> = ({
       visible={modalVisible}
       animationType={'fade'}
       transparent
-      statusBarTranslucent>
+      statusBarTranslucent
+    >
       <Overlay>
         {/* 배경을 터치하면 모달 닫기 */}
         <TouchableWithoutFeedback onPress={closeModal}>
           <Background />
         </TouchableWithoutFeedback>
-        {/* 애니메이션이 적용된 BottomSheet */}
+
         <BottomSheetContainer
           style={{transform: [{translateY}], height}}
-          {...panResponders.panHandlers}>
-          {children}
+          {...panResponders.panHandlers}
+        >
+          {/* 상단 헤더 */}
+          <HeaderContainer>
+            <MenuText>{menuName}</MenuText>
+            <CloseButton onPress={closeModal}>
+              <Icon name={'close-outline'} size={32} color={colors.BLACK} />
+            </CloseButton>
+          </HeaderContainer>
+
+          {/* 콘텐츠 영역 */}
+          <ContentContainer>
+            {children}
+          </ContentContainer>
+
         </BottomSheetContainer>
       </Overlay>
     </Modal>
@@ -119,6 +136,32 @@ const BottomSheetContainer = styled(Animated.View)`
   background-color: ${colors.WHITE};
   border-top-left-radius: 12px;
   border-top-right-radius: 12px;
+`;
+
+const HeaderContainer = styled.View`
+  position: relative;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 16px;
+  border-bottom-width: 1px;
+  border-bottom-color: ${colors.GRAY_300};
+`;
+
+const MenuText = styled.Text`
+  font-size: 24px;
+  font-weight: bold;
+  text-align: center;
+  flex: 1;
+`;
+
+const CloseButton = styled(TouchableOpacity)`
+  position: absolute;
+  right: 20px;
+`;
+
+const ContentContainer = styled.View`
+  padding: 20px;
 `;
 
 export default BottomSheet;

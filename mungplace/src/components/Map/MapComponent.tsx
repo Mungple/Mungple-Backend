@@ -139,6 +139,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
 
   const handlePressSetting = () => {
     setModalVisible(true);
+    handlePressMenu()
   }
 
   usePermission('LOCATION');
@@ -247,9 +248,10 @@ const MapComponent: React.FC<MapComponentProps> = ({
         <BottomSheet
           modalVisible={modalVisible}
           setModalVisible={setModalVisible}
+          menuName='지도 설정'
           height={500}
         >
-          <CustomMapButton iconName='flag' />
+          <CustomMapButton iconName='star' />
         </BottomSheet>
       </Animated.View>
 
