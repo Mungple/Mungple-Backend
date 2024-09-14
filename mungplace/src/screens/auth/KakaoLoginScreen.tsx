@@ -43,13 +43,13 @@ function KakaoLoginScreen() {
   // 카카오 서버로부터 인증 코드를 받은 후, 액세스 토큰을 요청하는 함수
   const requestToken = async (code: string) => {
     const response = await axios({
-      method: 'post', // POST 요청
-      url: 'https://kauth.kakao.com/oauth/token', // 카카오 토큰 요청 URL
+      method: 'post',
+      url: 'https://kauth.kakao.com/oauth/token',
       params: {
-        grant_type: 'authorization_code', // 인증 코드 방식
-        client_id: Config.KAKAO_REST_API_KEY, // 카카오 앱 REST API 키
-        redirect_uri: REDIRECT_URI, // 리다이렉트 URI
-        code, // 카카오에서 받은 인증 코드
+        grant_type: 'authorization_code',
+        client_id: Config.KAKAO_REST_API_KEY,
+        redirect_uri: REDIRECT_URI,
+        code,
       },
     });
 
