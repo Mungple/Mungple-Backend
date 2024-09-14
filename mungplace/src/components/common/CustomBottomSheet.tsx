@@ -5,7 +5,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import {colors} from '@/constants';
 import styled from 'styled-components/native';
 
-interface BottomSheetProps {
+interface CustomBottomSheetProps {
   setModalVisible: (visible: boolean) => void;
   children?: React.ReactNode;
   modalVisible: boolean;
@@ -13,7 +13,7 @@ interface BottomSheetProps {
   height?: number;
 }
 
-const BottomSheet: React.FC<BottomSheetProps> = ({
+const CustomBottomSheet: React.FC<CustomBottomSheetProps> = ({
   setModalVisible,
   modalVisible,
   children,
@@ -164,4 +164,4 @@ const ContentContainer = styled.View`
   padding: 20px;
 `;
 
-export default BottomSheet;
+export default CustomBottomSheet;

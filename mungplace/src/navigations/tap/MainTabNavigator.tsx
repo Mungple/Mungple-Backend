@@ -49,7 +49,7 @@ function TabBarIcons(route: RouteProp<MainTabParamList>, focused: boolean) {
   return (
     <Ionicons
       name={iconName}
-      color={focused ? colors.BLUE_500 : colors.BLACK}
+      color={focused ? colors.BLACK : colors.BLACK}
       size={30}
     />
   );

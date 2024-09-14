@@ -13,11 +13,11 @@ import styled from 'styled-components/native';
 import {useMapStore} from '@/state/useMapStore';
 
 import MarkerForm from '../marker/MarkerForm';
-import BottomSheet from '../common/BottomSheet';
 import usePermission from '@/hooks/usePermission';
 import useUserLocation from '@/hooks/useUserLocation';
 import mungPleMarker from '@/assets/mungPleMarker.png';
 import CustomMapButton from '../common/CustomMapButton';
+import CustomBottomSheet from '../common/CustomBottomSheet';
 
 interface MapComponentProps {
   userLocation: {latitude: number; longitude: number};
@@ -241,18 +241,18 @@ const MapComponent: React.FC<MapComponentProps> = ({
           <TextLabel>지도 설정</TextLabel>
           <CustomMapButton
             onPress={handlePressSetting}
-            iconName="settings"
+            iconName="settings-outline"
             inValid={isDisabled}
           />
         </ButtonWithTextContainer>
-        <BottomSheet
+        <CustomBottomSheet
           modalVisible={modalVisible}
           setModalVisible={setModalVisible}
           menuName='지도 설정'
           height={500}
         >
           <CustomMapButton iconName='star' />
-        </BottomSheet>
+        </CustomBottomSheet>
       </Animated.View>
 
       <CustomMapButton
@@ -263,7 +263,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
       />
       <CustomMapButton
         onPress={() => {}}
-        iconName="reload-outline"
+        iconName="reload"
         bottom={20 + bottomOffset}
         right={20}
       />

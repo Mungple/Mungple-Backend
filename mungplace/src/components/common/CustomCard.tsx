@@ -2,7 +2,6 @@ import React from 'react';
 import styled from 'styled-components/native';
 import {ViewStyle, StyleProp} from 'react-native';
 
-// 카드 컴포넌트의 props 타입 정의
 interface CustomCardProps {
   style?: StyleProp<ViewStyle>;
   children?: React.ReactNode;
