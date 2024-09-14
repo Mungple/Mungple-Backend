@@ -2,6 +2,7 @@ import React from 'react';
 import {SafeAreaView, StyleSheet, Dimensions, Image, View} from 'react-native';
 
 import imageSource from '@/assets/mungple_logo.png'
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import CustomButton from '@/components/common/CustomButton';
 
 import {authNavigations} from '@/constants';
@@ -30,6 +31,9 @@ const AuthHomeScreen: React.FC<AuthHomeScreenProps> = ({navigation}) => {
           onPress={() => navigation.navigate(authNavigations.KAKAO)}
           style={styles.kakaoButtonContainer}
           textStyle={styles.buttonText}
+          icon={
+            <Ionicons name={'chatbubble-sharp'} color={'#181600'} size={16} />
+          }
         />
         <CustomButton
           label="네이버 로그인하기"

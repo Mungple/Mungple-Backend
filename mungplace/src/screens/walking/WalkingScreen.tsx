@@ -82,7 +82,7 @@ const WalkingScreen = () => {
 
           {/* 산책 종료 확인 모달 */}
           <CustomModal modalVisible={isModalVisible}>
-            <Icon name="alert-circle-outline" size={48} color="#f00" />
+            <Icon name="alert-circle-outline" size={48} color={colors.ORANGE.BASE} />
             <ModalTitle>산책을 종료하시겠습니까?</ModalTitle>
             <ButtonContainer>
               <ConfirmButton label="확인" onPress={confirmEndWalking} />
@@ -116,7 +116,7 @@ const ConfirmButton = styled(CustomButton)`
 `;
 
 const CancelButton = styled(CustomButton)`
-  background-color: ${colors.GRAY_300};
+  background-color: ${colors.BLUE.LIGHTER};
   width: ${bottomBlockWidth / 2 - 30}px;
 `;
 
@@ -153,13 +153,12 @@ const InfoBlock = styled.View`
 
 const InfoLabel = styled(Text)`
   font-size: 18px;
-  color: #999999;
 `;
 
 const InfoValue = styled(Text)`
   font-size: 32px;
   font-weight: bold;
-  color: #000000;
+  color: ${colors.BLACK};
 `;
 
 export default WalkingScreen;
