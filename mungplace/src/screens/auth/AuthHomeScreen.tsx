@@ -1,20 +1,13 @@
-import React, {useEffect, useState} from 'react';
-import {
-  SafeAreaView,
-  StyleSheet,
-  Dimensions,
-  Image,
-  View,
-  Text,
-} from 'react-native';
+import React from 'react';
+import {SafeAreaView, StyleSheet, Dimensions, Image, View} from 'react-native';
 
+import imageSource from '@/assets/mungple_logo.png'
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import CustomButton from '@/components/common/CustomButton';
-import NaverLogin from '@/api/naverLogin';
-import {NaverLoginResponse} from '@/api';
-import NativeKakaoLogins, {
-  KakaoOAuthToken,
-  KakaoProfile,
-} from '@/api/kakaoLogin';
+
+import {authNavigations} from '@/constants';
+import {AuthStackParamList} from '@/navigations/stack/AuthStackNavigator';
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
 
 const AuthHomeScreen = () => {
   const [naverLoginResponse, setNaverLoginResponse] = useState<NaverLoginResponse | null>(null);
@@ -54,13 +47,14 @@ const AuthHomeScreen = () => {
     }
   };
 
+const AuthHomeScreen: React.FC<AuthHomeScreenProps> = ({navigation}) => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.imageContainer}>
         <Image
           resizeMode="contain"
           style={styles.image}
-          source={require('@/assets/mungple.png')}
+          source={imageSource}
         />
       </View>
 
@@ -70,6 +64,9 @@ const AuthHomeScreen = () => {
           onPress={handleKakaoLogin}
           style={styles.kakaoButtonContainer}
           textStyle={styles.buttonText}
+          icon={
+            <Ionicons name={'chatbubble-sharp'} color={'#181600'} size={16} />
+          }
         />
         <CustomButton
           label="네이버 로그인하기"
@@ -98,18 +95,19 @@ const AuthHomeScreen = () => {
       </View>
     </SafeAreaView>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flex: 1.5,
     alignItems: 'center',
     marginHorizontal: 30,
     marginVertical: 30,
   },
   imageContainer: {
-    flex: 1.5,
-    width: Dimensions.get('screen').width / 2,
+    alignItems: 'center',
+    flex: 1,
+    width: (Dimensions.get('screen').width * 3) / 5,
   },
   image: {
     width: '100%',
@@ -125,16 +123,19 @@ const styles = StyleSheet.create({
   },
   kakaoButtonContainer: {
     backgroundColor: '#FEE503',
+    borderRadius: 0,
   },
   naverButtonContainer: {
     backgroundColor: '#19CE60',
+    borderRadius: 0,
   },
   googleButtonContainer: {
     backgroundColor: '#FFFFFF',
     borderStyle: 'solid',
     borderWidth: 1,
+    borderRadius: 0,
     borderColor: '#000000',
   },
 });
 
-export default AuthHomeScreen
+export default AuthHomeScreen;

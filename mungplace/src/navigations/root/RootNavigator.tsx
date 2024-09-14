@@ -1,14 +1,28 @@
 import React from 'react';
-import MainTabNavigator from '@/navigations/tap/MainTabNavigator';
+import {useAppStore} from '@/state/useAppStore';
 import {NavigationContainer} from '@react-navigation/native';
 import AuthHomeScreen from '@/screens/auth/AuthHomeScreen';
 
-export default function RootNavigator() {
-  const isLogin = false;
+import AuthStackNavigator from '../stack/AuthStackNavigator';
+import MainTabNavigator from '@/navigations/tap/MainTabNavigator';
+import MapStackNavigator from '../stack/MapStackNavigator';
+
+const RootNavigator: React.FC = () => {
+  let navigatorToShow: JSX.Element;
+  const isLogin = useAppStore((state) => state.isLogin);
+  const walkingStart = useAppStore(state => state.walkingStart);
+
+  if (isLogin) {
+    navigatorToShow = <MapStackNavigator />;
+  } else {
+    navigatorToShow = <AuthStackNavigator />;
+  }
 
   return (
     <NavigationContainer>
-      {isLogin ? <MainTabNavigator /> : <AuthHomeScreen />}
+      {navigatorToShow}
     </NavigationContainer>
   );
-}
+};
+
+export default RootNavigator;

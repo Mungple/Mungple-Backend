@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {ReactNode} from 'react';
 import {
   Text,
   View,
@@ -16,11 +16,12 @@ import {colors} from '@/constants';
 // 버튼 컴포넌트의 props 타입을 정의하는 인터페이스
 interface CustomButtonProps extends PressableProps {
   label: string; // 버튼에 표시할 텍스트
+  icon?: ReactNode; // 아이콘
   inValid?: boolean; // 버튼이 유효하지 않을 때, 비활성화 여부 (기본값: false)
-  
+
   size?: 'large' | 'medium'; // 버튼 크기 정의 ('large' 또는 'medium', 기본값: 'large')
   variant?: 'filled' | 'outlined'; // 버튼 스타일 정의 ('filled' 또는 'outlined', 기본값: 'filled')
-  
+
   style?: StyleProp<ViewStyle>; // 사용자 지정 스타일
   textStyle?: StyleProp<TextStyle>; // 사용자 지정 텍스트 스타일
 }
@@ -28,8 +29,9 @@ interface CustomButtonProps extends PressableProps {
 // 화면의 높이를 가져오는 상수, 조건부 스타일링에 사용
 const deviceHeight = Dimensions.get('screen').height;
 
-function CustomButton({
+const CustomButton = ({
   label,
+  icon = null,
   inValid = false,
 
   size = 'large',
@@ -38,7 +40,7 @@ function CustomButton({
   style = null,
   textStyle = null,
   ...props
-}: CustomButtonProps) {
+}: CustomButtonProps) => {
   return (
     <Pressable
       disabled={inValid}
@@ -50,17 +52,18 @@ function CustomButton({
       ]}
       {...props}>
       <View style={styles[size]}>
+        {icon}
         <Text style={[styles.text, styles[`${variant}Text`], textStyle]}>
           {label}
         </Text>
       </View>
     </Pressable>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
-    borderRadius: 3,
+    borderRadius: 8,
     flexDirection: 'row',
     justifyContent: 'center',
   },
@@ -68,19 +71,23 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   filled: {
-    backgroundColor: colors.PINK_700,
+    backgroundColor: colors.ORANGE.BASE,
+    borderRadius: 8,
   },
   outlined: {
-    borderColor: colors.PINK_700,
+    borderColor: colors.ORANGE.BASE,
     borderWidth: 1,
+    borderRadius: 8,
   },
   filledPressed: {
-    backgroundColor: colors.PINK_500,
+    backgroundColor: colors.ORANGE.DARKER,
+    borderRadius: 8,
   },
   outlinedPressed: {
-    borderColor: colors.PINK_700,
+    borderColor: colors.ORANGE.BASE,
     borderWidth: 1,
     opacity: 0.5,
+    borderRadius: 8,
   },
   large: {
     width: '100%',
@@ -88,6 +95,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
     justifyContent: 'center',
+    borderRadius: 8,
   },
   medium: {
     width: '50%',
@@ -95,6 +103,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
     justifyContent: 'center',
+    borderRadius: 8,
   },
   text: {
     fontSize: 16,
@@ -104,7 +113,7 @@ const styles = StyleSheet.create({
     color: colors.WHITE,
   },
   outlinedText: {
-    color: colors.PINK_700,
+    color: colors.ORANGE.BASE,
   },
 });
 

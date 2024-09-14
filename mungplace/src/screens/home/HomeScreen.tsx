@@ -1,76 +1,101 @@
-import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import React from 'react';
+import {Dimensions, Text} from 'react-native';
+import styled from 'styled-components/native';
 
-const HomeScreen = () => {
+import {colors, mapNavigations} from '@/constants';
+import {useAppStore} from '@/state/useAppStore';
+import {useNavigation} from '@react-navigation/native';
+import {MapStackParamList} from '@/navigations/stack/MapStackNavigator';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+
+import CustomCard from '@/components/common/CustomCard';
+import CustomButton from '@/components/common/CustomButton';
+
+const {height: windowHeight} = Dimensions.get('window');
+
+const HomeScreen: React.FC = () => {
+  const setWalkingStart = useAppStore(state => state.setWalkingStart);
+  const navigation = useNavigation<NativeStackNavigationProp<MapStackParamList>>();
+
+  const handleWalkingStart = () => {
+    setWalkingStart(true);
+    navigation.navigate(mapNavigations.WALKING);
+  };
+
   return (
-    <View style={styles.container}>
-      {/* Image Section */}
-      <View style={styles.imageContainer}>
-        <Text>이미지</Text>
-        <View style={styles.separator} />
-      </View>
+    <Container>
+      <ImageCard />
 
-      {/* Empty Space Section */}
-      <View style={styles.emptySpace}></View>
+      <DogInfo>
+        <Col>
+          <HeaderText>반려견 정보</HeaderText>
+        </Col>
+        <Col>
+          <Row>
+            <RightText>성별</RightText>
+            <RightTextBold>남아</RightTextBold>
+          </Row>
+          <Row>
+            <RightText>나이</RightText>
+            <RightTextBold>36개월</RightTextBold>
+          </Row>
+          <Row>
+            <RightText>몸무게</RightText>
+            <RightTextBold>2kg</RightTextBold>
+          </Row>
+        </Col>
+      </DogInfo>
 
-      {/* Play Button */}
-      <TouchableOpacity style={styles.playButton}>
-        <Text style={styles.playButtonText}>▶</Text>
-      </TouchableOpacity>
-    </View>
+      <CustomButton label="산책 시작하기" onPress={handleWalkingStart} />
+    </Container>
   );
-}
+};
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F5F5F5',
-    justifyContent: 'center',
-    alignItems: 'center',
-    position: 'relative', // For absolute positioning of the button
-  },
-  imageContainer: {
-    flex: 4, // 3 parts for the image
-    width: '100%',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  image: {
-    width: '100%',
-    height: '100%',
-  },
-  separator: {
-    position: 'absolute',
-    bottom: 0, // Line at the bottom of the image
-    width: '100%',
-    height: 2, // Thickness of the line
-    backgroundColor: '#000', // Color of the line
-  },
-  emptySpace: {
-    flex: 1, // 1 part for the empty space
-    width: '100%',
-    backgroundColor: '#F5F5F5', // Same as background color to blend in
-  },
-  playButton: {
-    position: 'absolute', // Absolute positioning for the button
-    bottom: 90, // Adjust this value to control how far from the bottom the button appears
-    backgroundColor: '#F5A623',
-    borderRadius: 75,
-    width: 150,
-    height: 150,
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.8,
-    shadowRadius: 2,
-    elevation: 5, // For Android shadow
-  },
-  playButtonText: {
-    color: '#fff',
-    fontSize: 60,
-    textAlign: 'center',
-  },
-});
+export default HomeScreen;
 
-export default HomeScreen
+const Container = styled.View`
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+`;
+
+const ImageCard = styled(CustomCard).attrs({
+  style: {
+    borderWidth: 1,
+  },
+})`
+  height: ${windowHeight * 0.42}px;
+`;
+
+const DogInfo = styled(CustomCard).attrs({})`
+  backgroundColor: ${colors.BEIGE.LIGHTER};
+  padding: 30px;
+  flex-direction: row;
+  align-items: center;
+`;
+
+const Col = styled.View`
+  flex: 1;
+`;
+
+const Row = styled.View`
+  flex-direction: row;
+  justify-content: space-between;
+  margin-bottom: 20px;
+`;
+
+const HeaderText = styled.Text`
+  font-size: 20px;
+  color: ${colors.BLACK};
+`;
+
+const RightText = styled.Text`
+  font-size: 20px;
+  color: ${colors.BLACK};
+`;
+
+const RightTextBold = styled(RightText)`
+  font-weight: bold;
+  text-align: right;
+`;
