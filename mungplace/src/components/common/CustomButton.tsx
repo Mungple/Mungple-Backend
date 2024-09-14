@@ -68,20 +68,20 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   filled: {
-    backgroundColor: colors.PINK_700,
+    backgroundColor: colors.ORANGE.BASE,
     borderRadius: 8,
   },
   outlined: {
-    borderColor: colors.PINK_700,
+    borderColor: colors.ORANGE.BASE,
     borderWidth: 1,
     borderRadius: 8,
   },
   filledPressed: {
-    backgroundColor: colors.PINK_500,
+    backgroundColor: colors.ORANGE.DARKER,
     borderRadius: 8,
   },
   outlinedPressed: {
-    borderColor: colors.PINK_700,
+    borderColor: colors.ORANGE.BASE,
     borderWidth: 1,
     opacity: 0.5,
     borderRadius: 8,
@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
     color: colors.WHITE,
   },
   outlinedText: {
-    color: colors.PINK_700,
+    color: colors.ORANGE.BASE,
   },
 });
 

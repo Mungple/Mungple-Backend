@@ -2,7 +2,7 @@ import React from 'react';
 import {Dimensions, Text} from 'react-native';
 import styled from 'styled-components/native';
 
-import {mapNavigations} from '@/constants';
+import {colors, mapNavigations} from '@/constants';
 import {useAppStore} from '@/state/useAppStore';
 import {useNavigation} from '@react-navigation/native';
 import {MapStackParamList} from '@/navigations/stack/MapStackNavigator';
@@ -28,7 +28,7 @@ const HomeScreen: React.FC = () => {
 
       <DogInfo>
         <Col>
-          <Text>반려견 정보</Text>
+          <HeaderText>반려견 정보</HeaderText>
         </Col>
         <Col>
           <Row>
@@ -46,7 +46,7 @@ const HomeScreen: React.FC = () => {
         </Col>
       </DogInfo>
 
-      <StyledButton label="산책 시작하기" onPress={handleWalkingStart} />
+      <CustomButton label="산책 시작하기" onPress={handleWalkingStart} />
     </Container>
   );
 };
@@ -58,33 +58,19 @@ const Container = styled.View`
   justify-content: center;
   align-items: center;
   padding: 20px;
-  background-color: #f2f2f2;
 `;
 
 const ImageCard = styled(CustomCard).attrs({
   style: {
-    backgroundColor: '#f8f9fa',
-    borderColor: '#ddd',
     borderWidth: 1,
-  },
-  titleStyle: {
-    color: '#007AFF',
-  },
-  descriptionStyle: {
-    color: '#333',
   },
 })`
   height: ${windowHeight * 0.42}px;
 `;
 
-const DogInfo = styled(CustomCard).attrs({
-  style: {
-    backgroundColor: '#fdebd0',
-  },
-})`
-  height: ${windowHeight * 0.3}px;
-  width: 100%;
-  padding: 20px;
+const DogInfo = styled(CustomCard).attrs({})`
+  backgroundColor: ${colors.BEIGE.LIGHTER};
+  padding: 30px;
   flex-direction: row;
   align-items: center;
 `;
@@ -96,24 +82,20 @@ const Col = styled.View`
 const Row = styled.View`
   flex-direction: row;
   justify-content: space-between;
-  margin-bottom: 25px;
+  margin-bottom: 20px;
+`;
+
+const HeaderText = styled.Text`
+  font-size: 20px;
+  color: ${colors.BLACK};
 `;
 
 const RightText = styled.Text`
-  font-size: 18px;
-  color: #333;
+  font-size: 20px;
+  color: ${colors.BLACK};
 `;
 
 const RightTextBold = styled(RightText)`
   font-weight: bold;
   text-align: right;
 `;
-
-const StyledButton = styled(CustomButton).attrs({
-  style: {
-    backgroundColor: '#007AFF',
-  },
-  textStyle: {
-    color: '#fff',
-  },
-})``;

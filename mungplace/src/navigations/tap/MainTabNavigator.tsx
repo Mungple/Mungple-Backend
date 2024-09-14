@@ -49,7 +49,7 @@ function TabBarIcons(route: RouteProp<MainTabParamList>, focused: boolean) {
   return (
     <Ionicons
       name={iconName}
-      color={focused ? colors.BLACK : colors.BLACK}
+      color={focused ? colors.ORANGE.BASE : colors.BLACK}
       size={30}
     />
   );
@@ -59,12 +59,20 @@ const MainTabNavigator = () => {
   return (
     <Tab.Navigator
       screenOptions={({route}) => ({
+        tabBarActiveTintColor: `${colors.ORANGE.BASE}`,
+        tabBarInactiveTintColor: `${colors.BLACK}`,
         headerStyle: {
           backgroundColor: colors.WHITE,
           shadowColor: colors.GRAY_200,
         },
+        tabBarStyle: {
+          height: 80,
+          paddingTop: 10,
+          paddingBottom: 10,
+        },
         tabBarLabelStyle: {
           fontSize: 12,
+          fontWeight: 'bold',
         },
         headerShown: false,
         tabBarIcon: ({focused}) => TabBarIcons(route, focused),
