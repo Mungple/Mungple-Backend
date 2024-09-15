@@ -12064,6 +12064,7 @@ __metadata:
     react-native-dotenv: ^3.4.11
     react-native-encrypted-storage: ^4.0.3
     react-native-gesture-handler: ^2.19.0
+    react-native-image-crop-picker: ^0.41.2
     react-native-image-picker: ^7.1.2
     react-native-maps: ^1.18.0
     react-native-permissions: ^4.1.5
@@ -13606,6 +13607,15 @@ __metadata:
     react: "*"
     react-native: "*"
   checksum: ce9b9fc6537debf962e6b8d84f1c4cf18fe00f39bd86498e84a203ebb26bf3543c2642ed247d974537840407b7ddb602939fd8c817c00a3416e87bddc8f2088f
+  languageName: node
+  linkType: hard
+
+"react-native-image-crop-picker@npm:^0.41.2":
+  version: 0.41.2
+  resolution: "react-native-image-crop-picker@npm:0.41.2"
+  peerDependencies:
+    react-native: ">=0.40.0"
+  checksum: c1333b3b761e948bd0bc856773f68dcc859c7ce39dda3e14d2c32c17d55927735bfc5cbbb7ac5e8bac21feda87c93399f2a596aca7d5b0611cc1e8203d97ad2e
   languageName: node
   linkType: hard
 
