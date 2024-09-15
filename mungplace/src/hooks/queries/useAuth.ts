@@ -1,7 +1,7 @@
 import {useEffect} from 'react';
 import queryClient from '@/api/queryClient';
 import {useMutation, useQuery} from '@tanstack/react-query';
-import {numbers, queryKeys, storageKeys} from '@/constants';
+import {numbers, queryKeys} from '@/constants';
 import type {UseMutationCustomOptions, UseQueryCustomOptions} from '@/types/common';
 import {removeEncryptStorage, removeHeader, setEncryptStorage, setHeader} from '@/utils';
 import {ResponseProfile, getAccessToken, getProfile, logout, postLogin, postSignup} from '@/api/auth';
@@ -22,7 +22,7 @@ function useLogin(mutationOptions?: UseMutationCustomOptions) {
     // 로그인 성공 시 액세스 토큰을 Authorization 헤더에 설정, 리프레시 토큰을 안전하게 저장
     onSuccess: ({accessToken, refreshToken}) => {
       setHeader('Authorization', `Bearer ${accessToken}`);
-      setEncryptStorage(storageKeys.REFRESH_TOKEN, refreshToken);
+      setEncryptStorage('refreshToken', refreshToken);
     },
     // 로그인 후 액세스 토큰과 프로필 정보를 다시 가져옴
     onSettled: () => {
@@ -52,7 +52,7 @@ function useGetRefreshToken() {
   useEffect(() => {
     if (isSuccess) {
       setHeader('Authorization', `Bearer ${data.accessToken}`);
-      setEncryptStorage(storageKeys.REFRESH_TOKEN, data.refreshToken);
+      setEncryptStorage('refreshToken', data.refreshToken);
     }
   }, [isSuccess]);
 
@@ -60,7 +60,7 @@ function useGetRefreshToken() {
   useEffect(() => {
     if (isError) {
       removeHeader('Authorization');
-      removeEncryptStorage(storageKeys.REFRESH_TOKEN);
+      removeEncryptStorage('refreshToken');
     }
   }, [isError]);
 
@@ -82,7 +82,7 @@ function useLogout(mutationOptions?: UseMutationCustomOptions) {
     mutationFn: logout,
     onSuccess: () => {
       removeHeader('Authorization');
-      removeEncryptStorage(storageKeys.REFRESH_TOKEN);
+      removeEncryptStorage('refreshToken');
     },
     onSettled: () => {
       queryClient.invalidateQueries({queryKey: [queryKeys.AUTH]});

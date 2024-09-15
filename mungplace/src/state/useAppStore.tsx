@@ -1,4 +1,5 @@
 import {create} from 'zustand';
+import useAuth from '@/hooks/queries/useAuth';
 
 interface AppState {
   isLogin: boolean;

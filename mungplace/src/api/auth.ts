@@ -1,4 +1,5 @@
 import axiosInstance from './axios';
+import {getEncryptStorage} from '@/utils';
 import type {Category, Profile} from '@/types/domain';
 
 // 회원가입 및 로그인 시 사용되는 요청 데이터 타입
@@ -40,10 +41,19 @@ const getProfile = async (): Promise<ResponseProfile> => {
   return data;
 };
 
+// 액세스 토큰 요청 함수
+const getAccessToken = async (): Promise<ResponseToken> => {
+  const refreshToken = await getEncryptStorage('refreshToken');
+  const {data} = await axiosInstance.get('/auth/refresh', {
+    headers: {Authorization: `Bearer ${refreshToken}`},
+  });
+  return data;
+};
+
 // 로그아웃 요청 함수
 const logout = async () => {
   await axiosInstance.post('/auth/logout');
 };
 
-export {postSignup, postLogin, getProfile, logout, kakaoLogin};
+export {postSignup, postLogin, getProfile, logout, getAccessToken, kakaoLogin};
 export type {RequestUser, ResponseToken, ResponseProfile};
