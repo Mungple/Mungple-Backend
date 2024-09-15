@@ -1,18 +1,11 @@
-// Axios 인스턴스의 공통 헤더를 동적으로 설정하거나 제거하는 유틸리티 함수 정의
-// 애플리케이션 전체에서 Axios를 통해 보내는 HTTP 요청에 필요한 헤더를 중앙에서 관리
-import axiosInstance from '@/api/axios';
+import axios from 'axios';
 
-// Axios 인스턴스의 공통 헤더에 새로운 헤더를 추가하거나 기존 헤더를 업데이트하는 함수
-function setHeader(key: string, value: string) {
-  axiosInstance.defaults.headers.common[key] = value;
-}
+// axios 인스턴스를 생성하고, 기본 설정을 적용
+const axiosInstance = axios.create({
+  // 기본 URL을 설정 (로컬 개발 서버 주소)
+  baseURL: 'http://10.0.2.2:3030',
+  // 요청 시 쿠키 및 인증 정보를 함께 전송 (CORS를 고려한 설정)
+  withCredentials: true,
+});
 
-// Axios 인스턴스의 공통 헤더에서 특정 헤더를 제거하는 함수
-function removeHeader(key: string) {
-  if (!axiosInstance.defaults.headers.common[key]) {
-    return;
-  }
-  delete axiosInstance.defaults.headers.common[key];
-}
-
-export {setHeader, removeHeader};
+export default axiosInstance;
