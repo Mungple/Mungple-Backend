@@ -7,12 +7,13 @@ import CustomInputField from '@/components/common/CustomInputField';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {AuthStackParamList} from '@/navigations/stack/AuthStackNavigator';
 
-type AuthHomeScreenProps = NativeStackScreenProps<
+type InputPetScreenProps = NativeStackScreenProps<
   AuthStackParamList,
-  typeof authNavigations.AUTH_HOME
+  typeof authNavigations.INPUT_PET
 >;
 
-const InputPetScreen: React.FC<AuthHomeScreenProps> = ({navigation}) => {
+
+const InputPetScreen: React.FC<InputPetScreenProps> = ({navigation}) => {
   return (
     <View>
       <CustomInputField placeholder="반려견 이름" />

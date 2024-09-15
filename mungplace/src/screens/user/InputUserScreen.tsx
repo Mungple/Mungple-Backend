@@ -7,12 +7,12 @@ import CustomInputField from '@/components/common/CustomInputField';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {AuthStackParamList} from '@/navigations/stack/AuthStackNavigator';
 
-type AuthHomeScreenProps = NativeStackScreenProps<
+type InputUserScreenProps = NativeStackScreenProps<
   AuthStackParamList,
-  typeof authNavigations.AUTH_HOME
+  typeof authNavigations.INPUT_USER
 >;
 
-const InputUserScreen: React.FC<AuthHomeScreenProps> = ({navigation}) => {
+const InputUserScreen: React.FC<InputUserScreenProps> = ({navigation}) => {
   return (
     <View>
       <CustomInputField placeholder='닉네임'/>

@@ -6,12 +6,12 @@ import {authNavigations} from '@/constants';
 import CustomButton from '@/components/common/CustomButton';
 import {AuthStackParamList} from '@/navigations/stack/AuthStackNavigator';
 
-type AuthHomeScreenProps = NativeStackScreenProps<
+type GoogleLoginScreenProps = NativeStackScreenProps<
   AuthStackParamList,
-  typeof authNavigations.AUTH_HOME
+  typeof authNavigations.GOOGLE
 >;
 
-const GoogleLoginScreen: React.FC<AuthHomeScreenProps> = ({navigation}) => {
+const GoogleLoginScreen: React.FC<GoogleLoginScreenProps> = ({navigation}) => {
   return (
     <View>
       <CustomButton
