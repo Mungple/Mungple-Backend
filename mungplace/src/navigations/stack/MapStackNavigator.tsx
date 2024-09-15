@@ -3,7 +3,7 @@ import {mapNavigations} from '@/constants';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 
 import WalkingScreen from '@/screens/walking/WalkingScreen';
-import MainTabNavigator from '../tap/MainTabNavigator';
+import MainTabNavigator from '../tab/MainTabNavigator';
 
 export type MapStackParamList = {
   [mapNavigations.WALKING]: undefined;

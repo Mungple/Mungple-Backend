@@ -10,4 +10,8 @@ const queryKeys = {
   FAVORITE: 'favorite',
 } as const;
 
-export {queryKeys};
+const storageKeys = {
+  REFRESH_TOKEN: 'refreshtoken',
+} as const;
+
+export {queryKeys, storageKeys};

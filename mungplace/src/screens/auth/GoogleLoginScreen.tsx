@@ -1,13 +1,23 @@
 import React from 'react';
-import { Button, View } from 'react-native';
-import { useAppStore } from '@/state/useAppStore';
+import {View} from 'react-native';
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
 
-const GoogleLoginScreen: React.FC = () => {
-  const setLogin = useAppStore((state) => state.setLogin);
+import {authNavigations} from '@/constants';
+import CustomButton from '@/components/common/CustomButton';
+import {AuthStackParamList} from '@/navigations/stack/AuthStackNavigator';
 
+type AuthHomeScreenProps = NativeStackScreenProps<
+  AuthStackParamList,
+  typeof authNavigations.AUTH_HOME
+>;
+
+const GoogleLoginScreen: React.FC<AuthHomeScreenProps> = ({navigation}) => {
   return (
     <View>
-      <Button title="Login" onPress={() => setLogin(true)} />
+      <CustomButton
+        label="로그인하기"
+        onPress={() => navigation.navigate(authNavigations.INPUT_USER)}
+      />
     </View>
   );
 };

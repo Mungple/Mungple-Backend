@@ -6,12 +6,16 @@ import AuthHomeScreen from '@/screens/auth/AuthHomeScreen';
 import KakaoLoginScreen from '@/screens/auth/KakaoLoginScreen';
 import NaverLoginScreen from '@/screens/auth/NaverLoginScreen';
 import GoogleLoginScreen from '@/screens/auth/GoogleLoginScreen';
+import InputUserScreen from '@/screens/user/InputUserScreen';
+import InputPetScreen from '@/screens/user/InputPetScreen';
 
 export type AuthStackParamList = {
   [authNavigations.AUTH_HOME]: undefined;
   [authNavigations.KAKAO]: undefined;
   [authNavigations.NAVER]: undefined;
   [authNavigations.GOOGLE]: undefined;
+  [authNavigations.INPUT_USER]: undefined;
+  [authNavigations.INPUT_PET]: undefined;
 };
 
 const Stack = createNativeStackNavigator<AuthStackParamList>();
@@ -46,6 +50,20 @@ const AuthStackNavigator: React.FC = () => {
         component={GoogleLoginScreen}
         options={{
           headerTitle: '구글 로그인',
+        }}
+      />
+      <Stack.Screen
+        name={authNavigations.INPUT_USER}
+        component={InputUserScreen}
+        options={{
+          headerTitle: '유저 정보 입력',
+        }}
+      />
+      <Stack.Screen
+        name={authNavigations.INPUT_PET}
+        component={InputPetScreen}
+        options={{
+          headerTitle: '펫 정보 입력',
         }}
       />
     </Stack.Navigator>

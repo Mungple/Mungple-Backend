@@ -28,6 +28,12 @@ const colors = {
     LIGHTER: '#F6A072',
     DARKER: '#D6753A',
   },
+  // Pink Red
+  RED: {
+    BASE: '#DB4455',
+    LIGHTER: '#E8828D',
+    DARKER: '#CD0C22',
+  },
   // Rich Brown
   BROWN: {
     BASE: '#8C4F2B',
