@@ -1,5 +1,5 @@
-import axiosInstance from './axios'; // Axios 인스턴스를 가져옴
-import type {Category, Profile} from '@/types/domain'; // 도메인 타입을 불러옴
+import axiosInstance from './axios';
+import type {Category, Profile} from '@/types/domain';
 
 // 회원가입 및 로그인 시 사용되는 요청 데이터 타입
 type RequestUser = {
@@ -19,31 +19,24 @@ type ResponseProfile = Profile & Category;
 // 회원가입 요청 함수
 const postSignup = async ({email, password}: RequestUser): Promise<void> => {
   const {data} = await axiosInstance.post('/auth/signup', {email, password});
-
   return data;
 };
 
 // 로그인 요청 함수
-const postLogin = async ({
-  email,
-  password,
-}: RequestUser): Promise<ResponseToken> => {
+const postLogin = async ({email, password}: RequestUser): Promise<ResponseToken> => {
   const {data} = await axiosInstance.post('/auth/signin', {email, password});
-
   return data;
 };
 
-// 카카오 로그인 요청 함수 (OAuth)
+// 카카오 로그인 요청 함수
 const kakaoLogin = async (token: string): Promise<ResponseToken> => {
   const {data} = await axiosInstance.post('/auth/oauth/kakao', {token});
-
   return data;
 };
 
-// 프로필 정보 가져오기 함수
+// 프로필 정보 요청 함수
 const getProfile = async (): Promise<ResponseProfile> => {
   const {data} = await axiosInstance.get('/auth/me');
-
   return data;
 };
 
