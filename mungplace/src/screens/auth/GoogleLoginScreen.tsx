@@ -1,5 +1,5 @@
 import React from 'react';
-import {View} from 'react-native';
+import styled from 'styled-components/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 
 import {authNavigations} from '@/constants';
@@ -13,13 +13,19 @@ type GoogleLoginScreenProps = NativeStackScreenProps<
 
 const GoogleLoginScreen: React.FC<GoogleLoginScreenProps> = ({navigation}) => {
   return (
-    <View>
+    <Container>
       <CustomButton
         label="로그인하기"
         onPress={() => navigation.navigate(authNavigations.INPUT_USER)}
       />
-    </View>
+    </Container>
   );
 };
+
+const Container = styled.SafeAreaView`
+  flex: 1;
+  justify-content: center;
+  padding: 20px;
+`
 
 export default GoogleLoginScreen;
