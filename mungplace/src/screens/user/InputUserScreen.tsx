@@ -1,10 +1,12 @@
-import React, {useState} from 'react';
+import React from 'react';
 import styled from 'styled-components/native';
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
 
+import useForm from '@/hooks/useForm';
+import {validateInputUser} from '@/utils';
 import {authNavigations} from '@/constants';
 import CustomButton from '@/components/common/CustomButton';
 import CustomInputField from '@/components/common/CustomInputField';
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {AuthStackParamList} from '@/navigations/stack/AuthStackNavigator';
 
 type InputUserScreenProps = NativeStackScreenProps<
@@ -13,49 +15,28 @@ type InputUserScreenProps = NativeStackScreenProps<
 >;
 
 const InputUserScreen: React.FC<InputUserScreenProps> = ({navigation}) => {
-  const [values, setValues] = useState({
-    photo: '',
-    nickname: '',
-  });
-  const [touched, setTouched] = useState({
-    photo: false,
-    nickname: false,
-  });
-  const handleChangeText = (name: string, text: string) => {
-    setValues({
-      ...values,
-      [name]: text,
-    });
+  const inputUser = useForm({
+    initialValue: {nickname: ''},
+    validate: validateInputUser,
+  })
+
+  const handleSubmit = () => {
+    navigation.navigate(authNavigations.INPUT_PET)
   };
-  const handleBlur = (name: string) => {
-    setTouched({
-      ...touched,
-      [name]: true,
-    });
-  }
 
   return (
     <Container>
       <InputContainer>
         <CustomInputField
-          placeholder="사진"
-          error={"닉네임을 입력하세요"}
-          touched={touched.photo}
-          value={values.photo}
-          onChangeText={(text) => handleChangeText('photo', text)}
-          onBlur={() => handleBlur('photo')}
-        />
-        <CustomInputField
           placeholder="닉네임"
-          error={"닉네임을 입력하세요"}
-          touched={touched.nickname}
-          value={values.nickname}
-          onChangeText={(text) => handleChangeText('nickname', text)}
-          onBlur={() => handleBlur('nickname')}
+          blurOnSubmit={false}
+          error={inputUser.errors.nickname}
+          touched={inputUser.touched.nickname}
+          {...inputUser.getTextInputProps('nickname')}
         />
         <CustomButton
           label="등록하기"
-          onPress={() => navigation.navigate(authNavigations.INPUT_PET)}
+          onPress={handleSubmit}
         />
       </InputContainer>
     </Container>

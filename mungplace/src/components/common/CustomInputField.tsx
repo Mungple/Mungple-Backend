@@ -1,8 +1,8 @@
-import React, { ForwardedRef, ReactNode, forwardRef, useRef } from 'react';
-import { Dimensions, TextInput, TextInputProps, Pressable } from 'react-native';
+import React, {ForwardedRef, ReactNode, forwardRef, useRef} from 'react';
+import {Dimensions, TextInput, TextInputProps, Pressable} from 'react-native';
 
-import { mergeRefs } from '@/utils';
-import { colors } from '@/constants';
+import {mergeRefs} from '@/utils';
+import {colors} from '@/constants';
 import styled from 'styled-components/native';
 
 // 커스텀 입력 필드 props 인터페이스 정의
@@ -17,7 +17,7 @@ const deviceHeight = Dimensions.get('screen').height;
 
 const CustomInputField = forwardRef(
   (
-    { error, touched, icon = null, ...props }: CustomInputFieldProps,
+    {error, touched, icon = null, ...props}: CustomInputFieldProps,
     ref?: ForwardedRef<TextInput>,
   ) => {
     const innerRef = useRef<TextInput | null>(null); // 내부 참조 생성
@@ -69,7 +69,7 @@ const Container = styled.View<{
   ${props => !props.isEditable && `background-color: ${colors.GRAY_200}`};
 `;
 
-const InnerContainer = styled.View<{ hasIcon?: boolean }>`
+const InnerContainer = styled.View<{hasIcon?: boolean}>`
   ${props => props.hasIcon && `
     gap: 5px;
     flex-direction: row;
@@ -77,9 +77,9 @@ const InnerContainer = styled.View<{ hasIcon?: boolean }>`
   `}
 `;
 
-const StyledTextInput = styled(TextInput).attrs<{ isEditable?: boolean }>(
-  props => ({ editable: props.editable }),
-)<{ isEditable?: boolean }>`
+const StyledTextInput = styled(TextInput).attrs<{isEditable?: boolean}>(
+  props => ({editable: props.editable}),
+)<{isEditable?: boolean}>`
   padding: 0;
   font-size: 16px;
   color: ${colors.BLACK};
