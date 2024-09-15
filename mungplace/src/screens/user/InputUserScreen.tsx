@@ -8,6 +8,7 @@ import {authNavigations} from '@/constants';
 import CustomButton from '@/components/common/CustomButton';
 import CustomInputField from '@/components/common/CustomInputField';
 import {AuthStackParamList} from '@/navigations/stack/AuthStackNavigator';
+import CustomImageInput from '@/components/common/CustomImageInput';
 
 type InputUserScreenProps = NativeStackScreenProps<
   AuthStackParamList,
@@ -27,6 +28,7 @@ const InputUserScreen: React.FC<InputUserScreenProps> = ({navigation}) => {
   return (
     <Container>
       <InputContainer>
+        <ImageInput onChange={() => {}} />
         <CustomInputField
           placeholder="닉네임"
           blurOnSubmit={false}
@@ -45,6 +47,7 @@ const InputUserScreen: React.FC<InputUserScreenProps> = ({navigation}) => {
 
 const Container = styled.SafeAreaView`
   flex: 1;
+  align-items: center;
   justify-content: center;
   padding: 20px;
 `;
@@ -52,5 +55,7 @@ const Container = styled.SafeAreaView`
 const InputContainer = styled.View`
   gap: 20;
 `;
+
+const ImageInput = styled(CustomImageInput)``
 
 export default InputUserScreen;

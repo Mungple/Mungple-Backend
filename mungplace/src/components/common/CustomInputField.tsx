@@ -63,10 +63,10 @@ const Container = styled.View<{
 }>`
   border-width: 1px;
   border-radius: 8px;
-  border-color: ${props => (props.hasError ? colors.RED.DARKER : colors.GRAY_200)};
+  border-color: ${props => (props.hasError ? colors.RED.DARKER : colors.GRAY_300)};
   padding: ${deviceHeight > 700 ? 15 : 10}px;
   ${props => props.multiline && `padding-bottom: ${deviceHeight > 700 ? 45 : 30}px`};
-  ${props => !props.isEditable && `background-color: ${colors.GRAY_200}`};
+  ${props => !props.isEditable && `background-color: ${colors.GRAY_300}`};
 `;
 
 const InnerContainer = styled.View<{hasIcon?: boolean}>`
@@ -84,7 +84,7 @@ const StyledTextInput = styled(TextInput).attrs<{isEditable?: boolean}>(
   font-size: 16px;
   color: ${colors.BLACK};
   ${props => !props.editable && `
-    background-color: ${colors.GRAY_200};
+    background-color: ${colors.GRAY_300};
     color: ${colors.BLUE.LIGHTER};
   `}
 `;
