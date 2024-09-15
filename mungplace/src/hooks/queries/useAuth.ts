@@ -45,9 +45,6 @@ function useLogin<T>(
   });
 }
 
-function useEmailLogin(mutationOptions?: UseMutationCustomOptions) {
-  return useLogin(postLogin, mutationOptions);
-}
 
 function useKakaoLogin(mutationOptions?: UseMutationCustomOptions) {
   return useLogin(kakaoLogin, mutationOptions);
@@ -77,14 +74,12 @@ function useLogout(mutationOptions?: UseMutationCustomOptions) {
 function useAuth() {
   const signupMutation = useSignup();
   const logoutMutation = useLogout();
-  const loginMutation = useEmailLogin();
   const getProfileQuery = useGetProfile();
   const kakaoLoginMutation = useKakaoLogin();
   const isLogin = getProfileQuery.isSuccess;
 
   return {
     isLogin,
-    loginMutation,
     logoutMutation,
     signupMutation,
     getProfileQuery,

@@ -1,24 +1,14 @@
 import axios from 'axios';
 import React, {useState} from 'react';
-import {
-  ActivityIndicator,
-  Dimensions,
-  SafeAreaView,
-  StyleSheet,
-  View,
-} from 'react-native';
-import {
-  WebView,
-  WebViewMessageEvent,
-  WebViewNavigation,
-} from 'react-native-webview';
 import Config from 'react-native-config';
+import {WebView, WebViewMessageEvent, WebViewNavigation} from 'react-native-webview';
+import {ActivityIndicator, Dimensions, SafeAreaView, StyleSheet, View} from 'react-native';
 
-import useAuth from '@/hooks/queries/useAuth';
 import {colors} from '@/constants';
+import useAuth from '@/hooks/queries/useAuth';
 
 // 카카오 로그인 후 리다이렉트될 URL 설정
-const REDIRECT_URI = `http://localhost:3030/auth/oauth/kakao`;
+const REDIRECT_URI = `http://10.0.2.2:3030/auth/oauth/kakao`;
 
 // WebView에서 메시지를 보내기 위한 JavaScript 코드
 const INJECTED_JAVASCRIPT = "window.ReactNativeWebView.postMessage('')";
@@ -67,7 +57,6 @@ function KakaoLoginScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* WebView가 로드 중일 때 로딩 인디케이터를 표시 */}
       {(isChangeNavigate || isLoading) && (
         <View style={styles.kakaoLoadingContiner}>
           <ActivityIndicator size={'small'} color={colors.BLACK} />
