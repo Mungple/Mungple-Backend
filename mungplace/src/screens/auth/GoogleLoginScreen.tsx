@@ -1,17 +1,15 @@
 import React from 'react';
 import styled from 'styled-components/native';
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 
 import {authNavigations} from '@/constants';
 import CustomButton from '@/components/common/CustomButton';
 import {AuthStackParamList} from '@/navigations/stack/AuthStackNavigator';
+import { useNavigation } from '@react-navigation/native';
 
-type GoogleLoginScreenProps = NativeStackScreenProps<
-  AuthStackParamList,
-  typeof authNavigations.GOOGLE
->;
+const GoogleLoginScreen: React.FC = () => {
+  const navigation = useNavigation<NativeStackNavigationProp<AuthStackParamList>>()
 
-const GoogleLoginScreen: React.FC<GoogleLoginScreenProps> = ({navigation}) => {
   return (
     <Container>
       <CustomButton

@@ -1,36 +1,38 @@
 import React from 'react';
 import styled from 'styled-components/native';
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
+import {useNavigation} from '@react-navigation/native';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 
 import useForm from '@/hooks/useForm';
 import {validateInputUser} from '@/utils';
 import {authNavigations} from '@/constants';
-import usePermission from '@/hooks/usePermission';
 import CustomButton from '@/components/common/CustomButton';
 import CustomInputField from '@/components/common/CustomInputField';
 import CustomImageInput from '@/components/common/CustomImageInput';
 import {AuthStackParamList} from '@/navigations/stack/AuthStackNavigator';
 
-type InputUserScreenProps = NativeStackScreenProps<
-  AuthStackParamList,
-  typeof authNavigations.INPUT_USER
->;
-
-const InputUserScreen: React.FC<InputUserScreenProps> = ({navigation}) => {
+const InputUserScreen: React.FC = () => {
+  const navigation = useNavigation<NativeStackNavigationProp<AuthStackParamList>>()
+  
   const inputUser = useForm({
     initialValue: {nickname: ''},
     validate: validateInputUser,
   })
 
   const handleSubmit = () => {
+
+
     navigation.navigate(authNavigations.INPUT_PET)
   };
+
+  // const imagePicker = useImagePicker({
+  //   initialImages: [],
+  // });
 
   return (
     <Container>
       <InputContainer>
-        <ImageInput onChange={() => {
-        }} />
+        <ImageInput onChange={() => {}} />
         <CustomInputField
           placeholder="닉네임"
           blurOnSubmit={false}

@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components/native';
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
+import {useNavigation} from '@react-navigation/native';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 
 import useForm from '@/hooks/useForm';
 import {validateInputPet} from '@/utils';
@@ -9,12 +10,9 @@ import CustomButton from '@/components/common/CustomButton';
 import CustomInputField from '@/components/common/CustomInputField';
 import {AuthStackParamList} from '@/navigations/stack/AuthStackNavigator';
 
-type InputPetScreenProps = NativeStackScreenProps<
-  AuthStackParamList,
-  typeof authNavigations.INPUT_PET
->;
+const InputPetScreen: React.FC = () => {
+  const navigation = useNavigation<NativeStackNavigationProp<AuthStackParamList>>()
 
-const InputPetScreen: React.FC<InputPetScreenProps> = ({navigation}) => {
   const inputUser = useForm({
     initialValue: {
       petName: '',
