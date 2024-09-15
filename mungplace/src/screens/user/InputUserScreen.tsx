@@ -5,10 +5,11 @@ import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import useForm from '@/hooks/useForm';
 import {validateInputUser} from '@/utils';
 import {authNavigations} from '@/constants';
+import usePermission from '@/hooks/usePermission';
 import CustomButton from '@/components/common/CustomButton';
 import CustomInputField from '@/components/common/CustomInputField';
-import {AuthStackParamList} from '@/navigations/stack/AuthStackNavigator';
 import CustomImageInput from '@/components/common/CustomImageInput';
+import {AuthStackParamList} from '@/navigations/stack/AuthStackNavigator';
 
 type InputUserScreenProps = NativeStackScreenProps<
   AuthStackParamList,
@@ -28,7 +29,8 @@ const InputUserScreen: React.FC<InputUserScreenProps> = ({navigation}) => {
   return (
     <Container>
       <InputContainer>
-        <ImageInput onChange={() => {}} />
+        <ImageInput onChange={() => {
+        }} />
         <CustomInputField
           placeholder="닉네임"
           blurOnSubmit={false}
