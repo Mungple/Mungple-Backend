@@ -1,25 +1,10 @@
 import {useEffect} from 'react';
-import {useMutation, useQuery} from '@tanstack/react-query';
-// API 관련 함수들
-import {
-  ResponseProfile,
-  getAccessToken,
-  getProfile,
-  logout,
-  postLogin,
-  postSignup,
-} from '@/api/auth';
-// JWT 저장 및 삭제 관련 유틸리티 함수들
-import {
-  removeEncryptStorage,
-  removeHeader,
-  setEncryptStorage,
-  setHeader,
-} from '@/utils';
 import queryClient from '@/api/queryClient';
-// React Query의 QueryClient 인스턴스
+import {useMutation, useQuery} from '@tanstack/react-query';
 import {numbers, queryKeys, storageKeys} from '@/constants';
 import type {UseMutationCustomOptions, UseQueryCustomOptions} from '@/types/common';
+import {removeEncryptStorage, removeHeader, setEncryptStorage, setHeader} from '@/utils';
+import {ResponseProfile, getAccessToken, getProfile, logout, postLogin, postSignup} from '@/api/auth';
 
 // 회원가입 커스텀 훅
 function useSignup(mutationOptions?: UseMutationCustomOptions) {
@@ -107,22 +92,14 @@ function useLogout(mutationOptions?: UseMutationCustomOptions) {
 }
 
 function useAuth() {
-  const signupMutation = useSignup();
-  const refreshTokenQuery = useGetRefreshToken();
-  const getProfileQuery = useGetProfile({
-    enabled: refreshTokenQuery.isSuccess,
-  });
-  const isLogin = getProfileQuery.isSuccess;
   const loginMutation = useLogin();
+  const signupMutation = useSignup();
   const logoutMutation = useLogout();
+  const refreshTokenQuery = useGetRefreshToken();
+  const getProfileQuery = useGetProfile({enabled: refreshTokenQuery.isSuccess});
+  const isLogin = getProfileQuery.isSuccess;
 
-  return {
-    signupMutation,
-    loginMutation,
-    getProfileQuery,
-    isLogin,
-    logoutMutation,
-  };
+  return {signupMutation, loginMutation, getProfileQuery, isLogin, logoutMutation};
 }
 
 export default useAuth;
