@@ -23,8 +23,34 @@ interface MapComponentProps {
   userLocation: {latitude: number; longitude: number};
   isFormVisible: boolean;
   onFormClose: () => void;
-  onAddMarker: (markerData: any) => void;
+  onAddMarker: (markerData: Marker) => void;
   bottomOffset?: number;
+}
+
+interface Marker {
+  id: string;
+  latitude: number;
+  longitude: number;
+  title?: string;
+  body?: string;
+}
+
+interface Cluster {
+  latitude: number;
+  longitude: number;
+  count: number;
+  cluster?: Marker[] | null | undefined;
+}
+
+interface Zone {
+  latitude: number;
+  longitude: number;
+  weight?: number;
+}
+
+interface MungPlace {
+  latitude: number;
+  longitude: number;
 }
 
 const MapComponent: React.FC<MapComponentProps> = ({
@@ -52,8 +78,8 @@ const MapComponent: React.FC<MapComponentProps> = ({
   } = useMapStore();
 
   const mapRef = useRef<MapView | null>(null);
-  const [clusteredMarkers, setClusteredMarkers] = useState<any[]>([]);
-  const [selectedCluster, setSelectedCluster] = useState<any[]>([]);
+  const [clusteredMarkers, setClusteredMarkers] = useState<Cluster[]>([]);
+  const [selectedCluster, setSelectedCluster] = useState<Marker[]>([]);
   const [isMenuVisible, setIsMenuVisible] = useState(false);
   const translateY = useRef(new Animated.Value(0)).current;
   const [modalVisible, setModalVisible] = useState(false);
@@ -77,25 +103,35 @@ const MapComponent: React.FC<MapComponentProps> = ({
   useEffect(() => {
     if (markers.length > 0) {
       const clustered = clusterMarkers(markers);
-      setClusteredMarkers(clustered);
+      setClusteredMarkers(
+        clustered.map(c => ({
+          ...c,
+          cluster: c.cluster || null,
+        }))
+      );
     }
   }, [markers]);
 
-  const clusterMarkers = (markers: any[]) => {
+  const clusterMarkers = (markers: Marker[]): Cluster[] => {
     return cluster(
       markers.map(marker => ({
+        id: marker.id,
         latitude: marker.latitude,
         longitude: marker.longitude,
-        id: marker.id,
       })),
       {radius: 100},
-    );
+    ).map((clusteredPoint: any) => ({
+      latitude: clusteredPoint.latitude,
+      longitude: clusteredPoint.longitude,
+      count: clusteredPoint.count,
+      cluster: clusteredPoint.cluster || null,
+    }));
   };
 
-  const handleClusterPress = (cluster: any) => {
+  const handleClusterPress = (cluster: Cluster) => {
     if (cluster.cluster) {
       setSelectedCluster(
-        cluster.cluster.map((c: any) => ({
+        cluster.cluster.map((c: Marker) => ({
           id: c.id,
           latitude: c.latitude,
           longitude: c.longitude,
@@ -162,7 +198,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
         maxZoomLevel={20}>
         {/* Clustered Markers */}
         {showUserMarkers &&
-          clusteredMarkers.map((cluster: any) => (
+          clusteredMarkers.map((cluster: Cluster) => (
             <Marker
               key={`cluster-${cluster.latitude}-${cluster.longitude}`}
               coordinate={{
@@ -271,7 +307,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
   );
 };
 
-const createHeatmapPoints = (zones: any[]) => {
+const createHeatmapPoints = (zones: Zone[]): {latitude: number; longitude: number; weight: number}[] => {
   return zones.map(zone => ({
     latitude: zone.latitude,
     longitude: zone.longitude,
@@ -279,7 +315,7 @@ const createHeatmapPoints = (zones: any[]) => {
   }));
 };
 
-const renderMungPlaces = (mungPlaces: any[]) => {
+const renderMungPlaces = (mungPlaces: MungPlace[]): JSX.Element[] => {
   return mungPlaces.map(place => {
     const hash = geohash.encode(place.latitude, place.longitude, 6);
     const {latitude, longitude} = geohash.decode(hash);
