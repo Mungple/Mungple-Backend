@@ -4,9 +4,9 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {settingNavigations} from '@/constants';
 import SettingHomeScreen from '@/screens/setting/SettingHomeScreen';
 import EditProfileScreen from '@/screens/setting/EditProfileScreen';
+import EditCategoryScreen from '@/screens/setting/EditCategoryScreen';
 import SettingHeaderLeft from '@/components/setting/SettingHeaderLeft';
 import DeleteAccountScreen from '@/screens/setting/DeleteAccountScreen';
-import EditCategoryScreen from '@/screens/setting/EditCategoryScreen';
 
 export type SettingStackParamList = {
   [settingNavigations.SETTING_HOME]: undefined;
@@ -25,7 +25,6 @@ function SettingStackNavigator() {
         component={SettingHomeScreen}
         options={({navigation}) => ({
           headerTitle: '설정',
-          headerLeft: () => SettingHeaderLeft(navigation),
         })}
       />
       <Stack.Screen
