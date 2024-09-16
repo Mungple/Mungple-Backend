@@ -17,11 +17,11 @@ const authNavigations = {
 
 const mapNavigations = {
   WALKING: 'Walking',
-  HOME: 'Home',
+  HOME: 'MapHome',
 } as const;
 
 const settingNavigations = {
-  MY_PAGE: 'MyPage',
+  MY_PAGE: 'MyPageHome',
   SETTING: 'Setting',
   PET_DETAIL: 'PetDetail',
   EDIT_PROFILE: 'EditProfile',

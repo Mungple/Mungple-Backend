@@ -16,7 +16,7 @@ const CustomImageInput: React.FC<CustomImageInputProps> = ({ onChange }) => {
         styles.imageInput,
       ]}
       onPress={onChange}>
-      <Ionicons name="camera-outline" size={25} color={colors.BLACK} />
+      <Ionicons name="camera-outline" size={25} color={colors.GRAY_400} />
       <Text style={styles.inputText}>사진 추가</Text>
     </Pressable>
   );
@@ -25,7 +25,7 @@ const CustomImageInput: React.FC<CustomImageInputProps> = ({ onChange }) => {
 const styles = StyleSheet.create({
     imageInput: {
       borderWidth: 1.5,
-      borderColor: colors.BLACK,
+      borderColor: colors.GRAY_400,
       height: 100,
       width: 100,
       alignItems: 'center',
@@ -37,7 +37,7 @@ const styles = StyleSheet.create({
     },
     inputText: {
       fontSize: 16,
-      color: colors.BLACK,
+      color: colors.GRAY_400,
     },
   });
 

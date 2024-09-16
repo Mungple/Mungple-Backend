@@ -1,14 +1,16 @@
 const colors = {
   WHITE: '#FFFFFF',
   BLACK: '#000000',
-  GRAY_100: '#F5F5F5',
-  GRAY_200: '#E0E0E0',
-  GRAY_300: '#CCCCCC',
-  // Soft Blue
+  GRAY_100: '#E0E0E0',
+  GRAY_200: '#BDBDBD',
+  GRAY_300: '#9E9E9E',
+  GRAY_400: '#757575',
+  GRAY_500: '#424242',
+  // System Blue
   BLUE: {
-    BASE: '#8697A6',
-    LIGHTER: '#A2B0BF',
-    DARKER: '#6C7A8C',
+    BASE: '#64B5F6',
+    LIGHTER: '#90CAF9',
+    DARKER: '#2196F3',
   },
   // Creamy Beige
   BEIGE: {

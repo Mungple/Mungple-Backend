@@ -116,7 +116,7 @@ const ConfirmButton = styled(CustomButton)`
 `;
 
 const CancelButton = styled(CustomButton)`
-  background-color: ${colors.BLUE.LIGHTER};
+  background-color: ${colors.GRAY_300};
   width: ${bottomBlockWidth / 2 - 30}px;
 `;
 

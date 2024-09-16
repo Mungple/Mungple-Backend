@@ -41,7 +41,7 @@ const CustomInputField = forwardRef(
             {icon}
             <StyledTextInput
               ref={ref ? mergeRefs(innerRef, ref) : innerRef}
-              placeholderTextColor={colors.BLUE.BASE}
+              placeholderTextColor={colors.GRAY_400}
               autoCapitalize="none"
               spellCheck={false}
               autoCorrect={false}
@@ -85,7 +85,7 @@ const StyledTextInput = styled(TextInput).attrs<{isEditable?: boolean}>(
   color: ${colors.BLACK};
   ${props => !props.editable && `
     background-color: ${colors.GRAY_300};
-    color: ${colors.BLUE.LIGHTER};
+    color: ${colors.GRAY_300};
   `}
 `;
 
