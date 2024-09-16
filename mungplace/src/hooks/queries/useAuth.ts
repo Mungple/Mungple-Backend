@@ -4,7 +4,7 @@ import {useMutation, useQuery} from '@tanstack/react-query';
 import {numbers, queryKeys, storageKeys} from '@/constants';
 import type {UseMutationCustomOptions, UseQueryCustomOptions} from '@/types/common';
 import {removeEncryptStorage, removeHeader, setEncryptStorage, setHeader} from '@/utils';
-import {ResponseProfile, getAccessToken, getProfile, logout, postLogin, postSignup} from '@/api/auth';
+import {ResponseProfile, editProfile, getAccessToken, getProfile, logout, postLogin, postSignup} from '@/api/auth';
 
 // 회원가입 커스텀 훅
 function useSignup(mutationOptions?: UseMutationCustomOptions) {
@@ -76,6 +76,20 @@ function useGetProfile(queryOptions?: UseQueryCustomOptions<ResponseProfile>) {
   });
 }
 
+// 프로필 정보 변경 훅
+function useUpdateProfile(mutationOptions?: UseMutationCustomOptions) {
+  return useMutation({
+    mutationFn: editProfile,
+    onSuccess: newProfile => {
+      queryClient.setQueryData(
+        [queryKeys.AUTH, queryKeys.GET_PROFILE],
+        newProfile,
+      );
+    },
+    ...mutationOptions,
+  });
+}
+
 // 로그아웃 커스텀 훅
 function useLogout(mutationOptions?: UseMutationCustomOptions) {
   return useMutation({
@@ -95,11 +109,12 @@ function useAuth() {
   const loginMutation = useLogin();
   const signupMutation = useSignup();
   const logoutMutation = useLogout();
+  const profileMutation = useUpdateProfile();
   const refreshTokenQuery = useGetRefreshToken();
   const getProfileQuery = useGetProfile({enabled: refreshTokenQuery.isSuccess});
   const isLogin = getProfileQuery.isSuccess;
 
-  return {signupMutation, loginMutation, getProfileQuery, isLogin, logoutMutation};
+  return {signupMutation, loginMutation, getProfileQuery, isLogin, logoutMutation, profileMutation};
 }
 
 export default useAuth;

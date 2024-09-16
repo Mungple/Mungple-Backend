@@ -17,6 +17,12 @@ type ResponseToken = {
 // 사용자 프로필 및 카테고리 정보를 포함하는 타입
 type ResponseProfile = Profile & Category;
 
+// 사용자 프로필 요청 타입
+type RequestProfile = Omit<
+  Profile,
+  'userId' | 'nickname' | 'imageUri'
+>;
+
 // 회원가입 요청 함수
 const postSignup = async ({email, password}: RequestUser): Promise<void> => {
   const {data} = await axiosInstance.post('/auth/signup', {email, password});
@@ -41,6 +47,12 @@ const getProfile = async (): Promise<ResponseProfile> => {
   return data;
 };
 
+// 프로필 정보 변경 함수
+const editProfile = async (body: RequestProfile): Promise<ResponseProfile> => {
+  const {data} = await axiosInstance.patch('/auth/me', body);
+  return data;
+};
+
 // 액세스 토큰 요청 함수
 const getAccessToken = async (): Promise<ResponseToken> => {
   const refreshToken = await getEncryptStorage('refreshToken');
@@ -55,5 +67,5 @@ const logout = async () => {
   await axiosInstance.post('/auth/logout');
 };
 
-export {postSignup, postLogin, getProfile, logout, getAccessToken, kakaoLogin};
-export type {RequestUser, ResponseToken, ResponseProfile};
+export {postSignup, postLogin, getProfile, editProfile, logout, getAccessToken, kakaoLogin};
+export type {RequestUser, ResponseToken, ResponseProfile, RequestProfile};
