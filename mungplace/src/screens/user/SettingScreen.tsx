@@ -1,12 +1,12 @@
 import { View, Text } from 'react-native'
 import React from 'react'
 
-const SettingHeaderLeft = () => {
+const SettingScreen = () => {
   return (
     <View>
-      <Text>SettingHeaderLeft</Text>
+      <Text>SettingScreen</Text>
     </View>
   )
 }
 
-export default SettingHeaderLeft
+export default SettingScreen

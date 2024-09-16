@@ -1,12 +1,12 @@
 import { View, Text } from 'react-native'
 import React from 'react'
 
-const SettingHomeScreen = () => {
+const SettingHeaderTop = () => {
   return (
     <View>
-      <Text>SettingHomeScreen</Text>
+      <Text>SettingHeaderTop</Text>
     </View>
   )
 }
 
-export default SettingHomeScreen
+export default SettingHeaderTop

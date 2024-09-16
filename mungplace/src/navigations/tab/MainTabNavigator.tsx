@@ -6,9 +6,9 @@ import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 
 import MapScreen from '@/screens/map/MapScreen';
 import HomeScreen from '@/screens/home/HomeScreen';
-import MyPageScreen from '@/screens/user/MyPageScreen';
 import RecordScreen from '@/screens/record/RecordScreen';
 import RankingScreen from '@/screens/ranking/RankingScreen';
+import SettingStackNavigator from '../stack/SettingStackNavigator';
 
 type MainTabParamList = {
   [mainNavigations.HOME]: undefined;
@@ -99,7 +99,7 @@ const MainTabNavigator = () => {
       />
       <Tab.Screen
         name={mainNavigations.MYPAGE}
-        component={MyPageScreen}
+        component={SettingStackNavigator}
         options={{title: '내정보'}}
       />
     </Tab.Navigator>

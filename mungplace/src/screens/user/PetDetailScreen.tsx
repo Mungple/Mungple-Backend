@@ -1,12 +1,12 @@
 import { View, Text } from 'react-native'
 import React from 'react'
 
-const EditCategoryScreen = () => {
+const PetDetailScreen = () => {
   return (
     <View>
-      <Text>EditCategoryScreen</Text>
+      <Text>PetDetailScreen</Text>
     </View>
   )
 }
 
-export default EditCategoryScreen
+export default PetDetailScreen

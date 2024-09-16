@@ -2,12 +2,12 @@ import React from 'react';
 import {mapNavigations} from '@/constants';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 
-import WalkingScreen from '@/screens/walking/WalkingScreen';
 import MainTabNavigator from '../tab/MainTabNavigator';
+import WalkingScreen from '@/screens/walking/WalkingScreen';
 
 export type MapStackParamList = {
-  [mapNavigations.WALKING]: undefined;
   [mapNavigations.HOME]: undefined;
+  [mapNavigations.WALKING]: undefined;
 };
 
 const HomeStack = createNativeStackNavigator<MapStackParamList>();

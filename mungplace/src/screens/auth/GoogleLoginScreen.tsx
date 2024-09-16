@@ -3,9 +3,9 @@ import styled from 'styled-components/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 
 import {authNavigations} from '@/constants';
+import {useNavigation} from '@react-navigation/native';
 import CustomButton from '@/components/common/CustomButton';
 import {AuthStackParamList} from '@/navigations/stack/AuthStackNavigator';
-import { useNavigation } from '@react-navigation/native';
 
 const GoogleLoginScreen: React.FC = () => {
   const navigation = useNavigation<NativeStackNavigationProp<AuthStackParamList>>()

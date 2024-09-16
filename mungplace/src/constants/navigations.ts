@@ -21,10 +21,11 @@ const mapNavigations = {
 } as const;
 
 const settingNavigations = {
-  SETTING_HOME: 'SettingHome',
+  MY_PAGE: 'MyPage',
+  SETTING: 'Setting',
+  PET_DETAIL: 'PetDetail',
   EDIT_PROFILE: 'EditProfile',
   DELETE_ACCOUNT: 'DeleteAccount',
-  EDIT_CATEGORY: 'EditCategory',
 } as const;
 
 export {
