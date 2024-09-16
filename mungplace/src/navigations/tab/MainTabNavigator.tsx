@@ -1,5 +1,5 @@
 import React from 'react';
-import {RouteProp} from '@react-navigation/native';
+import {NavigatorScreenParams, RouteProp} from '@react-navigation/native';
 import {colors, mainNavigations} from '@/constants';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
@@ -8,14 +8,14 @@ import MapScreen from '@/screens/map/MapScreen';
 import HomeScreen from '@/screens/home/HomeScreen';
 import RecordScreen from '@/screens/record/RecordScreen';
 import RankingScreen from '@/screens/ranking/RankingScreen';
-import SettingStackNavigator from '../stack/SettingStackNavigator';
+import SettingStackNavigator, {SettingStackParamList} from '../stack/SettingStackNavigator';
 
 type MainTabParamList = {
   [mainNavigations.HOME]: undefined;
   [mainNavigations.MAP]: undefined;
   [mainNavigations.RECORD]: undefined;
   [mainNavigations.RANKING]: undefined;
-  [mainNavigations.MYPAGE]: undefined;
+  [mainNavigations.MYPAGE]: NavigatorScreenParams<SettingStackParamList>;
 };
 
 const Tab = createBottomTabNavigator<MainTabParamList>();

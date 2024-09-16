@@ -1,16 +1,15 @@
 import React from 'react';
-import {Text, View} from 'react-native';
+import {Text} from 'react-native';
 import styled from 'styled-components/native';
-import {useNavigation} from '@react-navigation/native';
-import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
 
 import {settingNavigations} from '@/constants';
 import CustomButton from '@/components/common/CustomButton';
 import {SettingStackParamList} from '@/navigations/stack/SettingStackNavigator';
 
-const MyPageScreen = () => {
-  const navigation =
-    useNavigation<NativeStackNavigationProp<SettingStackParamList>>();
+type MyPageScreenProps = NativeStackScreenProps<SettingStackParamList, typeof settingNavigations.MY_PAGE>;
+
+const MyPageScreen: React.FC<MyPageScreenProps> = ({navigation}) => {
 
   return (
     <Container>

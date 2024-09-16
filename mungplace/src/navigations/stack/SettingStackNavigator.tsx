@@ -24,7 +24,7 @@ function SettingStackNavigator() {
         name={settingNavigations.MY_PAGE}
         component={MyPageScreen}
         options={{
-          headerTitle: '내정보',
+          headerShown: false,
         }}
       />
       <Stack.Screen
