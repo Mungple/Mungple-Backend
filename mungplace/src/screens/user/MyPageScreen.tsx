@@ -49,7 +49,7 @@ const Container = styled.SafeAreaView`
 `;
 
 const InnerContainer = styled.View`
-  gap: 20;
+  gap: 20px;
 `;
 
 const Section = styled.View`

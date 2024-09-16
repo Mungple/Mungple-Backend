@@ -1,22 +1,19 @@
-import React from 'react';
 import {Keyboard} from 'react-native';
+import React from 'react';
 import styled from 'styled-components/native';
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
 
-import {colors} from '@/constants';
 import useForm from '@/hooks/useForm';
 import useModal from '@/hooks/useModal';
 import {validateInputUser} from '@/utils';
 import useAuth from '@/hooks/queries/useAuth';
+import {colors, errorMessages} from '@/constants';
 import useImagePicker from '@/hooks/useImagePicker';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import CustomInputField from '@/components/common/CustomInputField';
-import {SettingStackParamList} from '@/navigations/stack/SettingStackNavigator';
 import EditProfileImageOption from '@/components/setting/EditProfileImageOption';
+import CustomButton from '@/components/common/CustomButton';
 
-type EditProfileScreenProps = NativeStackScreenProps<SettingStackParamList>;
-
-function EditProfileScreen({navigation}: EditProfileScreenProps) {
+const EditProfileScreen = () => {
   const imageOption = useModal();
   const {getProfileQuery, profileMutation} = useAuth();
   const {nickname, imageUri, kakaoImageUri} = getProfileQuery.data || {};
@@ -38,6 +35,19 @@ function EditProfileScreen({navigation}: EditProfileScreenProps) {
   const handlePressImage = () => {
     imageOption.show();
     Keyboard.dismiss();
+  };
+
+  const handleSubmit = () => {
+    profileMutation.mutate(
+      {
+        ...editProfile.values,
+        imageUri: imagePicker.imageUris[0]?.uri,
+      },
+      {
+        onSuccess: () => console.log('hi'),
+        onError: error => console.log(error)
+      },
+    );
   };
 
   return (
@@ -68,6 +78,9 @@ function EditProfileScreen({navigation}: EditProfileScreenProps) {
         placeholder="닉네임을 입력해주세요."
       />
 
+      {/* 제출 버튼 */}
+      <SubmitButton label='완료' onPress={handleSubmit} />
+
       {/* 프로필 이미지 수정 모달 옵션 */}
       <EditProfileImageOption
         isVisible={imageOption.isVisible}        // 모달이 보이는지 여부
@@ -97,14 +110,17 @@ const MyImage = styled.Image`
 `;
 
 const ImageContainer = styled.Pressable`
-  width: 150px;
-  height: 150px;
-  border-radius: 75px;
-  justify-content: center;
-  align-items: center;
-  border-color: ${colors.GRAY_300};
-  border-width: 1px;
+width: 150px;
+height: 150px;
+border-radius: 75px;
+justify-content: center;
+align-items: center;
+border-color: ${colors.GRAY_300};
+border-width: 1px;
 `;
 
+const SubmitButton = styled(CustomButton)`
+  margin-top: 20px;
+`;
 
 export default EditProfileScreen;
