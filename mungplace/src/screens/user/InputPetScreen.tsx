@@ -1,18 +1,26 @@
 import React from 'react';
 import styled from 'styled-components/native';
-import {useNavigation} from '@react-navigation/native';
-import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
 
 import useForm from '@/hooks/useForm';
+import {Keyboard} from 'react-native';
+import useModal from '@/hooks/useModal';
 import {validateInputPet} from '@/utils';
-import {authNavigations} from '@/constants';
+import useAuth from '@/hooks/queries/useAuth';
+import useImagePicker from '@/hooks/useImagePicker';
+import {authNavigations, colors} from '@/constants';
 import CustomButton from '@/components/common/CustomButton';
 import CustomInputField from '@/components/common/CustomInputField';
 import {AuthStackParamList} from '@/navigations/stack/AuthStackNavigator';
+import EditProfileImageOption from '@/components/setting/EditProfileImageOption';
 
-const InputPetScreen: React.FC = () => {
-  const navigation = useNavigation<NativeStackNavigationProp<AuthStackParamList>>()
+type InputPetScreenProps = NativeStackScreenProps<AuthStackParamList>;
 
+const InputPetScreen = ({navigation}: InputPetScreenProps) => {
+  const imageOption = useModal();
+  const {getProfileQuery, profileMutation} = useAuth();
+  const {nickname, imageUri} = getProfileQuery.data || {};
   const inputUser = useForm({
     initialValue: {
       petName: '',
@@ -23,12 +31,39 @@ const InputPetScreen: React.FC = () => {
     validate: validateInputPet,
   })
 
+  // 이미지 선택 기능을 위한 커스텀 훅
+  const imagePicker = useImagePicker({
+    initialImages: imageUri ? [{uri: imageUri}] : [],
+    mode: 'single',
+    onSettled: imageOption.hide,
+  });
+
+  // 프로필 이미지 클릭 시 모달을 열고 키보드를 숨김
+  const handlePressImage = () => {
+    imageOption.show();
+    Keyboard.dismiss();
+  };
+
   const handleSubmit = () => {
     console.log('values', inputUser.values);
   };
 
   return (
     <Container>
+      {/* 프로필 이미지 영역 */}
+      <ProfileContainer>
+        <ImageContainer onPress={handlePressImage}>
+          {/* 이미지가 없을 때 기본 아이콘 표시 */}
+          {imagePicker.imageUris.length === 0 && (
+            <Ionicons name="camera-outline" size={40} color={colors.GRAY_400} />
+          )}
+          {/* 이미지가 있을 때 해당 이미지 표시 */}
+          {imagePicker.imageUris.length > 0 && (
+            <MyImage source={{uri: `http://10.0.2.2:3030/${imagePicker.imageUris[0]?.uri}`}} resizeMode="cover" />
+          )}
+        </ImageContainer>
+      </ProfileContainer>
+
       <InputContainer>
         <CustomInputField
           placeholder="반려견 이름"
@@ -62,6 +97,13 @@ const InputPetScreen: React.FC = () => {
           }}
         />
       </InputContainer>
+
+      {/* 프로필 이미지 수정 모달 옵션 */}
+      <EditProfileImageOption
+        isVisible={imageOption.isVisible}        // 모달이 보이는지 여부
+        hideOption={imageOption.hide}            // 모달 숨기기 함수
+        onChangeImage={imagePicker.handleChange} // 이미지 선택 후 동작 함수
+      />
     </Container>
   );
 };
@@ -70,6 +112,28 @@ const Container = styled.SafeAreaView`
   flex: 1;
   justify-content: center;
   padding: 20px;
+`;
+
+const ProfileContainer = styled.View`
+  align-items: center;
+  margin-top: 20px;
+  margin-bottom: 40px;
+`;
+
+const MyImage = styled.Image`
+  width: 100%;
+  height: 100%;
+  border-radius: 50px;
+`;
+
+const ImageContainer = styled.Pressable`
+  width: 150px;
+  height: 150px;
+  border-radius: 75px;
+  justify-content: center;
+  align-items: center;
+  border-color: ${colors.GRAY_300};
+  border-width: 1px;
 `;
 
 const InputContainer = styled.View`

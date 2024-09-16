@@ -11,7 +11,7 @@ const authNavigations = {
   KAKAO: 'Kakao',
   NAVER: 'Naver',
   GOOGLE: 'Google',
-  INPUT_USER: 'InputUser',
+  POST_PROFILE: 'PostProfile',
   INPUT_PET: 'InputPet',
 } as const;
 

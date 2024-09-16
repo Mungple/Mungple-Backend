@@ -3,20 +3,24 @@ import {Keyboard} from 'react-native';
 import styled from 'styled-components/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
-import {colors} from '@/constants';
 import useForm from '@/hooks/useForm';
 import useModal from '@/hooks/useModal';
 import {validateInputUser} from '@/utils';
 import useAuth from '@/hooks/queries/useAuth';
 import useImagePicker from '@/hooks/useImagePicker';
+import {authNavigations, colors} from '@/constants';
 import CustomButton from '@/components/common/CustomButton';
 import CustomInputField from '@/components/common/CustomInputField';
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
+import {AuthStackParamList} from '@/navigations/stack/AuthStackNavigator';
 import EditProfileImageOption from '@/components/setting/EditProfileImageOption';
 
-const EditProfileScreen = () => {
+type PostProfileScreenProps = NativeStackScreenProps<AuthStackParamList>;
+
+const EditProfileScreen = ({navigation}: PostProfileScreenProps) => {
   const imageOption = useModal();
   const {getProfileQuery, profileMutation} = useAuth();
-  const {nickname, imageUri, kakaoImageUri} = getProfileQuery.data || {};
+  const {nickname, imageUri} = getProfileQuery.data || {};
 
   // 이미지 선택 기능을 위한 커스텀 훅
   const imagePicker = useImagePicker({
@@ -38,6 +42,7 @@ const EditProfileScreen = () => {
   };
 
   const handleSubmit = () => {
+    navigation.navigate(authNavigations.INPUT_PET)
   };
 
   return (
@@ -45,15 +50,11 @@ const EditProfileScreen = () => {
       {/* 프로필 이미지 영역 */}
       <ProfileContainer>
         <ImageContainer onPress={handlePressImage}>
-          {/* 이미지가 없고, 카카오 프로필 이미지도 없을 때 기본 아이콘 표시 */}
-          {imagePicker.imageUris.length === 0 && !kakaoImageUri && (
+          {/* 이미지가 없을 때 기본 아이콘 표시 */}
+          {imagePicker.imageUris.length === 0 && (
             <Ionicons name="camera-outline" size={40} color={colors.GRAY_400} />
           )}
-          {/* 카카오 프로필 이미지가 있을 때 해당 이미지 표시 */}
-          {imagePicker.imageUris.length === 0 && kakaoImageUri && (
-            <MyImage source={{uri: `http://10.0.2.2:3030/${kakaoImageUri}`}} resizeMode="cover" />
-          )}
-          {/* 선택한 이미지가 있을 때 해당 이미지 표시 */}
+          {/* 이미지가 있을 때 해당 이미지 표시 */}
           {imagePicker.imageUris.length > 0 && (
             <MyImage source={{uri: `http://10.0.2.2:3030/${imagePicker.imageUris[0]?.uri}`}} resizeMode="cover" />
           )}
