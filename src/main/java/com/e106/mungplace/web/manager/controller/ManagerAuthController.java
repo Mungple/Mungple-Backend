@@ -1,4 +1,4 @@
-package com.e106.mungplace.web.test;
+package com.e106.mungplace.web.manager.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.e106.mungplace.web.manager.service.ManagerAuthService;
 import com.e106.mungplace.web.user.dto.LoginResponse;
 
 import lombok.RequiredArgsConstructor;

@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.e106.mungplace.domain.exploration.entity.Exploration;
-import com.e106.mungplace.domain.exploration.repository.ExplorationRepository;
+import com.e106.mungplace.domain.exploration.impl.ExplorationReader;
 import com.e106.mungplace.domain.user.entity.User;
 import com.e106.mungplace.domain.user.impl.UserHelper;
 import com.e106.mungplace.web.exception.ApplicationException;
@@ -22,8 +22,8 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class ExplorationService {
 
-	private final ExplorationRepository explorationRepository;
 	private final UserHelper userHelper;
+	private final ExplorationReader explorationReader;
 
 	// TODO <fosong98> 클라이언트가 애견 정보를 선택해서 받는 방식으로 변경 필요
 	@Transactional
@@ -32,9 +32,8 @@ public class ExplorationService {
 		userHelper.validateUserHasDog(userId);
 		validateIsNotExploring(userId);
 
-		Exploration exploration = new Exploration(new User(userId), LocalDateTime.now());
 		// TODO <fosong98> Redis에서 사용자 이동 거리 초기화 distance = 0
-		explorationRepository.save(exploration);
+		Exploration exploration = explorationReader.create(new User(userId), LocalDateTime.now());
 
 		return ExplorationStartResponse.of(exploration);
 	}
@@ -42,7 +41,7 @@ public class ExplorationService {
 	@Transactional
 	public void endExplorationProcess(Long explorationId) {
 		Long userId = userHelper.getCurrentUserId();
-		Exploration exploration = getExplorationOrThrow(explorationId);
+		Exploration exploration = explorationReader.get(explorationId);
 
 		validateIsUsersExploration(exploration, userId);
 
@@ -63,11 +62,8 @@ public class ExplorationService {
 	}
 
 	private void validateIsNotExploring(Long userId) {
-		if (explorationRepository.existsByUserAndEndAtIsNull(new User(userId)))
+		if (explorationReader.isExploring(new User(userId)))
 			throw new ApplicationException(ApplicationError.ALREADY_ON_EXPLORATION);
 	}
 
-	private Exploration getExplorationOrThrow(Long explorationId) {
-		return explorationRepository.findById(explorationId).orElseThrow(() -> new ApplicationException(ApplicationError.EXPLORATION_NOT_FOUND));
-	}
 }
