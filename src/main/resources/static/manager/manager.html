@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="kr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDoU0R6s2XbF8ucaEzpVDaiQ7G6oUz0-gQ&libraries=geometry,drawing"></script>
+    <title>Document</title>
+    <style>
+        /* 텍스트박스 스타일 */
+        #nameInputContainer {
+            position: absolute;
+            top: 10px; /* 상단 여백 제거 */
+            right: 20px; /* 오른쪽 정렬 */
+            z-index: 1; /* 지도 위에 표시되도록 z-index 설정 */
+            background-color: white; /* 배경색 설정 */
+            padding: 10px; /* 내부 여백 추가 */
+            border-radius: 5px; /* 모서리 둥글게 */
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.3); /* 그림자 추가 */
+        }
+
+        #nameInput {
+            width: 200px; /* 텍스트박스 너비 */
+            height: 30px; /* 텍스트박스 높이 */
+            font-size: 16px; /* 텍스트 크기 */
+        }
+
+        /* 지도 */
+        #map {
+            height: 98vh; /* 상단 여백 제거 */
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+<div id="nameInputContainer">
+    <label for="nameInput">이름:</label>
+    <input type="text" id="nameInput" value="manager" placeholder="사용자 이름 입력">
+</div>
+<div id="map"></div>
+<script>
+    let map;
+    let polyline = null;
+    let drawing = false;
+    let points = [];
+    let isDKeyPressed = false;
+    let baseUrl = window.location.origin + window.location.pathname;
+
+    function initMap() {
+        map = new google.maps.Map(document.getElementById("map"), {
+            zoom: 17,
+            center: {lat: 35.07556, lng: 129.01694},
+            disableDefaultUI: false, // 기본 UI 활성화
+            zoomControl: true, // 줌 컨트롤 추가
+        });
+
+        // 마우스 이동 이벤트 등록
+        google.maps.event.addListener(map, "mousemove", (event) => {
+            if (drawing && isDKeyPressed) {  // "D" 키가 눌린 상태에서만 동작
+                drawLine(event);
+            }
+        });
+
+        // 키 다운 이벤트 등록
+        window.addEventListener("keydown", (event) => {
+            if (event.key === 'd' || event.key === 'D') {
+                isDKeyPressed = true;
+                if (!drawing) {
+                    startDrawing();
+                }
+            }
+        });
+
+        // 키 업 이벤트 등록
+        window.addEventListener("keyup", (event) => {
+            if (event.key === 'd' || event.key === 'D') {
+                isDKeyPressed = false;
+                if (drawing) {
+                    finishDrawing();
+                }
+            }
+        });
+    }
+
+    // 그리기 시작 함수
+    function startDrawing() {
+        drawing = true;
+        points = []; // 기존 좌표 초기화
+        if (polyline) {
+            polyline.setMap(null); // 기존 폴리라인 삭제
+            polyline = null;
+        }
+        polyline = new google.maps.Polyline({
+            path: points,
+            map: map,
+            geodesic: true,
+            strokeColor: "#0037ff",
+            strokeOpacity: 1.0,
+            strokeWeight: 5,
+        });
+        map.setOptions({draggable: false}); // 그리기 중일 때는 지도를 드래그하지 못하게 함
+        console.log('그리기 시작');
+    }
+
+    // 선을 그리는 함수
+    function drawLine(event) {
+        points.push(event.latLng); // 마우스 움직임에 따라 좌표 추가
+        polyline.setPath(points);  // 폴리라인 경로 업데이트
+    }
+
+    // 그리기 종료 함수
+    function finishDrawing() {
+        drawing = false;
+        map.setOptions({draggable: true}); // 그리기 종료 후에는 지도를 다시 드래그 가능하게 설정
+
+        // 폴리라인을 지도에서 삭제
+        if (polyline) {
+            polyline.setMap(null);
+            polyline = null; // 폴리라인을 완전히 제거
+        }
+
+        // 좌표와 사용자 이름을 서버로 전송
+        sendPointsToBackend(points);
+    }
+
+    // 좌표를 서버로 전송하는 함수
+    async function sendPointsToBackend(points) {
+        const managerName = document.getElementById("nameInput").value || "manager"; // 이름 필드 값 가져오기, 없으면 "manager" 기본값
+        const formattedPoints = points.map(point => ({
+            lat: point.lat(),
+            lon: point.lng()
+        }));
+
+        const data = {
+            managerName: managerName,
+            points: formattedPoints // points로 변경
+        };
+
+        try {
+            const response = await fetch(`${baseUrl}/../explorations`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+
+            if (response.status === 201) {
+                console.log('데이터가 성공적으로 전송되었습니다.');
+            } else {
+                console.error('데이터 전송 실패:', response.status);
+            }
+        } catch (error) {
+            console.error('서버 전송 중 오류 발생:', error);
+        }
+    }
+
+    window.onload = initMap;
+</script>
+</body>
+</html>

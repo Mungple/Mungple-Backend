@@ -26,7 +26,8 @@ public class SecurityConfig {
 		"/api/users/login/*",
 		"/oauth2/callback/*",
 		"/h2-console/**",
-		"/manager/**"
+		"/manager/**",
+		"/error/**"
 	};
 
 	@Bean
@@ -46,7 +47,8 @@ public class SecurityConfig {
 			.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 			.formLogin(AbstractHttpConfigurer::disable)
 			.httpBasic(AbstractHttpConfigurer::disable)
-			.addFilterBefore(new JwtAuthProcessFilter(jwtProvider, userRepository), UsernamePasswordAuthenticationFilter.class)
+			.addFilterBefore(new JwtAuthProcessFilter(jwtProvider, userRepository),
+				UsernamePasswordAuthenticationFilter.class)
 			.authorizeHttpRequests(request -> request
 				.requestMatchers(AUTH_WHITELIST).permitAll()
 				.anyRequest().authenticated())
