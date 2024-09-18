@@ -1,20 +1,20 @@
-import React, {useState} from 'react';
 import {Dimensions, Text} from 'react-native';
 import styled from 'styled-components/native';
+import React, {useEffect, useState} from 'react';
+import Icon from 'react-native-vector-icons/Ionicons';
 import {useNavigation} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 
-import Icon from 'react-native-vector-icons/Ionicons';
-import {MapStackParamList} from '@/navigations/stack/MapStackNavigator';
 
 import {useAppStore} from '@/state/useAppStore';
 import {colors, mapNavigations} from '@/constants';
 import useUserLocation from '@/hooks/useUserLocation';
 import CustomCard from '@/components/common/CustomCard';
 import MapComponent from '@/components/map/MapComponent';
+import CustomModal from '@/components/common/CustomModal';
 import ElapsedTime from '@/components/walking/ElapsedTime';
 import CustomButton from '@/components/common/CustomButton';
-import CustomModal from '@/components/common/CustomModal';
+import {MapStackParamList} from '@/navigations/stack/MapStackNavigator';
 
 const bottomBlockHeight = (Dimensions.get('window').height * 1) / 5;
 const bottomBlockWidth = Dimensions.get('window').width - 40;
@@ -25,6 +25,7 @@ const WalkingScreen = () => {
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const setWalkingStart = useAppStore(state => state.setWalkingStart);
+  const [path, setPath] = useState<{latitude: number; longitude: number}[]>([]);
 
   const navigation =
     useNavigation<NativeStackNavigationProp<MapStackParamList>>();
@@ -51,11 +52,25 @@ const WalkingScreen = () => {
     setIsModalVisible(false);
   };
 
+  // 5초마다 좌표를 수집하여 경로 업데이트
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      if (userLocation) {
+        // 새로운 좌표를 경로에 추가
+        setPath(prevPath => [...prevPath, userLocation]);
+      }
+    }, 5000);
+
+    // 컴포넌트 언마운트 시 interval 정리
+    return () => clearInterval(intervalId);
+  }, [userLocation]);
+
   return (
     <Container>
       {userLocation && (
         <>
           <MapComponent
+            path={path}
             userLocation={userLocation}
             isFormVisible={isFormVisible}
             onFormClose={handleFormClose}

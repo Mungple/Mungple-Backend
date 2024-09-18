@@ -4,6 +4,7 @@ import MapView, {
   Heatmap,
   Marker,
   Polygon,
+  Polyline,
   PROVIDER_GOOGLE,
 } from 'react-native-maps';
 
@@ -18,9 +19,11 @@ import useUserLocation from '@/hooks/useUserLocation';
 import mungPleMarker from '@/assets/mungPleMarker.png';
 import CustomMapButton from '../common/CustomMapButton';
 import CustomBottomSheet from '../common/CustomBottomSheet';
+import { colors } from '@/constants';
 
 interface MapComponentProps {
   userLocation: {latitude: number; longitude: number};
+  path?: {latitude: number; longitude: number}[];
   isFormVisible: boolean;
   onFormClose: () => void;
   onAddMarker: (markerData: Marker) => void;
@@ -59,6 +62,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
   onFormClose,
   onAddMarker,
   bottomOffset = 0,
+  path = [],
 }) => {
   const {
     showPersonalBlueZone,
@@ -196,6 +200,16 @@ const MapComponent: React.FC<MapComponentProps> = ({
         }}
         minZoomLevel={15}
         maxZoomLevel={20}>
+
+        {/* path가 있을 때만 Polyline으로 표시 */}
+        {path.length > 1 && (
+          <Polyline
+            coordinates={path}
+            strokeColor={colors.ORANGE.LIGHTER} // Change color if needed
+            strokeWidth={5}
+          />
+        )}
+
         {/* Clustered Markers */}
         {showUserMarkers &&
           clusteredMarkers.map((cluster: Cluster) => (
