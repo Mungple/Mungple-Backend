@@ -1,17 +1,15 @@
 package com.e106.mungplace.domain.dogs.entity;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import com.e106.mungplace.domain.audit.BaseTime;
+import com.e106.mungplace.domain.exploration.entity.DogExploration;
+import com.e106.mungplace.domain.exploration.entity.Exploration;
 import com.e106.mungplace.domain.user.entity.User;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -21,7 +19,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity(name = "dogs")
+@Entity
 public class Dog extends BaseTime {
 
 	@GeneratedValue
@@ -49,6 +47,10 @@ public class Dog extends BaseTime {
 
 	@Column(nullable = false)
 	private Boolean isDefault;
+
+	@OneToMany(mappedBy = "dog")
+	@Builder.Default
+	private List<DogExploration> dogExplorations = new ArrayList<>();
 
 	public void updateDefaultDog(boolean isDefault) {
 		this.isDefault = isDefault;
