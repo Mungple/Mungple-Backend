@@ -1,18 +1,13 @@
 package com.e106.mungplace.domain.exploration.entity;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.e106.mungplace.domain.audit.BaseTime;
 import com.e106.mungplace.domain.user.entity.User;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -37,11 +32,19 @@ public class Exploration extends BaseTime {
 
 	private LocalDateTime endAt;
 
+	@OneToMany(mappedBy = "exploration")
+	private List<DogExploration> dogExplorations = new ArrayList<>();
+
 	public Exploration(User user, LocalDateTime startAt) {
 		this.user = user;
 		this.startAt = startAt;
 	}
 
+	public Exploration(Long id, User user, LocalDateTime startAt) {
+		this.id = id;
+		this.user = user;
+		this.startAt = startAt;
+	}
 	public void end(Long distance) {
 		this.distance = distance;
 		this.endAt = LocalDateTime.now();

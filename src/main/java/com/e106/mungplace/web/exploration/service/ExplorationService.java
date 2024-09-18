@@ -1,8 +1,13 @@
 package com.e106.mungplace.web.exploration.service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Objects;
+import java.util.ArrayList;
+import java.util.List;
 
+import com.e106.mungplace.domain.exploration.impl.ExplorationHelper;
+import com.e106.mungplace.web.exploration.dto.*;
+import com.e106.mungplace.web.util.StatisticUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -10,9 +15,6 @@ import com.e106.mungplace.domain.exploration.entity.Exploration;
 import com.e106.mungplace.domain.exploration.impl.ExplorationReader;
 import com.e106.mungplace.domain.user.entity.User;
 import com.e106.mungplace.domain.user.impl.UserHelper;
-import com.e106.mungplace.web.exception.ApplicationException;
-import com.e106.mungplace.web.exception.dto.ApplicationError;
-import com.e106.mungplace.web.exploration.dto.ExplorationStartResponse;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,16 +26,19 @@ public class ExplorationService {
 
 	private final UserHelper userHelper;
 	private final ExplorationReader explorationReader;
+	private final ExplorationHelper explorationHelper;
 
-	// TODO <fosong98> 클라이언트가 애견 정보를 선택해서 받는 방식으로 변경 필요
 	@Transactional
-	public ExplorationStartResponse startExplorationProcess() {
+	public ExplorationStartResponse startExplorationProcess(ExplorationStartWithDogsRequest dogs) {
 		Long userId = userHelper.getCurrentUserId();
 		userHelper.validateUserHasDog(userId);
-		validateIsNotExploring(userId);
+		explorationHelper.validateIsEndedExploration(userId);
+
+		Exploration exploration = explorationReader.create(new User(userId), LocalDateTime.now());
+		explorationHelper.validateExplorationWithDogs(dogs);
+		explorationHelper.createDogsInExploration(dogs, exploration);
 
 		// TODO <fosong98> Redis에서 사용자 이동 거리 초기화 distance = 0
-		Exploration exploration = explorationReader.create(new User(userId), LocalDateTime.now());
 
 		return ExplorationStartResponse.of(exploration);
 	}
@@ -43,7 +48,7 @@ public class ExplorationService {
 		Long userId = userHelper.getCurrentUserId();
 		Exploration exploration = explorationReader.get(explorationId);
 
-		validateIsUsersExploration(exploration, userId);
+		explorationHelper.validateIsUsersExploration(exploration, userId);
 
 		if (exploration.isEnded()) {
 			log.debug("이미 종료된 산책 호출 id={}", explorationId);
@@ -51,19 +56,40 @@ public class ExplorationService {
 		}
 
 		// TODO <fosong98> Redis에서 사용자 이동 거리 조회
+
 		Long distance = 0L;
 		exploration.end(distance);
 	}
 
-	private static void validateIsUsersExploration(Exploration exploration, Long userId) {
-		if (!Objects.equals(exploration.getUser().getUserId(), userId)) {
-			throw new ApplicationException(ApplicationError.EXPLORATION_NOT_OWNED);
-		}
+	@Transactional(readOnly = true)
+	public ExplorationsResponse findExplorationsOfMonthProcess(int year, int month) {
+		Long userId = userHelper.getCurrentUserId();
+		List<ExplorationResponse> explorationInfos = explorationHelper.getExplorationInfos(userId, LocalDate.of(year, month, 1));
+		return ExplorationsResponse.of(year, month, explorationInfos);
 	}
 
-	private void validateIsNotExploring(Long userId) {
-		if (explorationReader.isExploring(new User(userId)))
-			throw new ApplicationException(ApplicationError.ALREADY_ON_EXPLORATION);
+	@Transactional(readOnly = true)
+	public ExplorationsResponse findExplorationsOfDayProcess(LocalDate date) {
+		Long userId = userHelper.getCurrentUserId();
+		List<ExplorationResponse> explorations = explorationHelper.getExplorationInfos(userId, date);
+		return ExplorationsResponse.of(date.getYear(), date.getMonthValue(), explorations);
 	}
 
+	@Transactional(readOnly = true)
+	public ExplorationResponse findExplorationProcess(Long explorationId) {
+		Long userId = userHelper.getCurrentUserId();
+		Exploration exploration = explorationReader.get(explorationId);
+		List<Long> togetherDogIds = explorationHelper.getTogetherDogIds(exploration);
+		explorationHelper.validateIsEndedExploration(userId);
+		List<ExplorationPoint> points = new ArrayList<>(); // TODO : <이현수> elastic search 조회 매핑
+
+		return ExplorationResponse.of(exploration, togetherDogIds, points);
+	}
+
+	@Transactional(readOnly = true)
+	public ExplorationStatisticResponse findExplorationStatisticsProcess(int year, int month) {
+		Long userId = userHelper.getCurrentUserId();
+		List<ExplorationResponse> explorationInfos = explorationHelper.getExplorationInfos(userId, LocalDate.of(year, month, 1));
+		return StatisticUtils.createExplorationStatisticOfMonth(year, month, explorationInfos);
+	}
 }

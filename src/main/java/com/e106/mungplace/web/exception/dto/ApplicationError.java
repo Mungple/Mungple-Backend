@@ -28,7 +28,8 @@ public enum ApplicationError {
 	// exploration
 	EXPLORATION_NOT_OWNED("E401", FORBIDDEN, "다른 사용자의 산책입니다."),
 	EXPLORATION_NOT_FOUND("E402",BAD_REQUEST, "산책이 존재하지 않습니다."),
-	ALREADY_ON_EXPLORATION("E403",BAD_REQUEST, "이미 산책 중입니다."),
+	ALREADY_ON_EXPLORATION("E403",BAD_REQUEST, "산책이 진행되고 있습니다."),
+	EXPLORATION_NOT_WITH_DOGS("E404", BAD_REQUEST, "동반하는 애견이 없습니다."),
 
 	// marker
 	MARKER_NOT_FOUND("E501", BAD_REQUEST, "마커가 존재하지 않습니다."),

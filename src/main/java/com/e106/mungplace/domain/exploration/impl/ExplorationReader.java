@@ -1,8 +1,6 @@
 package com.e106.mungplace.domain.exploration.impl;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
-
 import org.springframework.stereotype.Component;
 
 import com.e106.mungplace.domain.exploration.entity.Exploration;
@@ -26,13 +24,5 @@ public class ExplorationReader {
 	public Exploration get(Long explorationId) {
 		return explorationRepository.findById(explorationId).orElseThrow(() -> new ApplicationException(
 			ApplicationError.EXPLORATION_NOT_FOUND));
-	}
-
-	public Optional<Exploration> findById(Long explorationId) {
-		return explorationRepository.findById(explorationId);
-	}
-
-	public boolean isExploring(User user) {
-		return explorationRepository.existsByUserAndEndAtIsNull(user);
 	}
 }
