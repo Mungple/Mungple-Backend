@@ -19,7 +19,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-public class MarkerOutbox {
+public class MarkerEvent {
 
 	@Column(updatable = false, nullable = false)
 	@GeneratedValue(generator = "UUID")

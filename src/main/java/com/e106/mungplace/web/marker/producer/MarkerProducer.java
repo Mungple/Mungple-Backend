@@ -8,7 +8,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import com.e106.mungplace.domain.marker.entity.Marker;
-import com.e106.mungplace.domain.marker.entity.MarkerOutbox;
+import com.e106.mungplace.domain.marker.entity.MarkerEvent;
 import com.e106.mungplace.domain.marker.entity.PublishStatus;
 import com.e106.mungplace.domain.marker.repository.MarkerOutboxRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -26,7 +26,7 @@ public class MarkerProducer {
 	private static final String KAFKA_TOPIC = "marker";
 	private static final String KAFKA_KEY = "marker";
 
-	private final KafkaTemplate<String, MarkerOutbox> kafkaTemplate;
+	private final KafkaTemplate<String, MarkerEvent> kafkaTemplate;
 	private final MarkerOutboxRepository markerOutboxRepository;
 	private final ObjectMapper objectMapper;
 
@@ -34,20 +34,20 @@ public class MarkerProducer {
 	@Scheduled(fixedDelayString = "${outbox.polling.interval:5000}")
 	public void pollOutbox() {
 		// READY 상태인 MarkerOutbox 목록을 비관적 잠금으로 가져옴
-		List<MarkerOutbox> pendingOutboxes = markerOutboxRepository.findByStatusWithLock(PublishStatus.READY);
+		List<MarkerEvent> pendingOutboxes = markerOutboxRepository.findByStatusWithLock(PublishStatus.READY);
 
 		if (pendingOutboxes.isEmpty()) {
 			return;
 		}
 
 		// 각 Outbox를 처리
-		for (MarkerOutbox outbox : pendingOutboxes) {
+		for (MarkerEvent outbox : pendingOutboxes) {
 			processOutbox(outbox);
 		}
 	}
 
 	// Outbox 레코드 처리 로직 분리
-	private void processOutbox(MarkerOutbox outbox) {
+	private void processOutbox(MarkerEvent outbox) {
 		try {
 			sendEvent(outbox); // Marker 객체를 Kafka로 전송
 			markAsDone(outbox); // 상태를 DONE으로 업데이트
@@ -57,7 +57,7 @@ public class MarkerProducer {
 	}
 
 	// Marker 객체를 Kafka로 전송
-	public void sendEvent(MarkerOutbox outboxEntry) {
+	public void sendEvent(MarkerEvent outboxEntry) {
 		// Kafka로 Marker 객체 전송
 		kafkaTemplate.send(KAFKA_TOPIC, KAFKA_KEY, outboxEntry).whenComplete((result, ex) -> {
 			if (ex == null) {
@@ -78,7 +78,7 @@ public class MarkerProducer {
 	}
 
 	// Outbox의 상태를 DONE으로 업데이트하고 저장
-	private void markAsDone(MarkerOutbox outbox) {
+	private void markAsDone(MarkerEvent outbox) {
 		outbox.updateStatus(PublishStatus.DONE);
 		markerOutboxRepository.save(outbox);
 	}

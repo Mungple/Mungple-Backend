@@ -7,16 +7,16 @@ import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import com.e106.mungplace.domain.marker.entity.MarkerOutbox;
+import com.e106.mungplace.domain.marker.entity.MarkerEvent;
 import com.e106.mungplace.domain.marker.entity.PublishStatus;
 
 import jakarta.persistence.LockModeType;
 
-public interface MarkerOutboxRepository extends JpaRepository<MarkerOutbox, Long> {
+public interface MarkerOutboxRepository extends JpaRepository<MarkerEvent, Long> {
 
-	List<MarkerOutbox> findByStatus(PublishStatus status);
+	List<MarkerEvent> findByStatus(PublishStatus status);
 
 	@Lock(LockModeType.PESSIMISTIC_WRITE)
-	@Query("SELECT o FROM MarkerOutbox o WHERE o.status = :status")
-	List<MarkerOutbox> findByStatusWithLock(@Param("status") PublishStatus status);
+	@Query("SELECT o FROM MarkerEvent o WHERE o.status = :status")
+	List<MarkerEvent> findByStatusWithLock(@Param("status") PublishStatus status);
 }

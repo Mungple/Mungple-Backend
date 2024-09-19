@@ -14,7 +14,7 @@ import com.e106.mungplace.domain.exploration.repository.ExplorationRepository;
 import com.e106.mungplace.domain.image.entity.ImageInfo;
 import com.e106.mungplace.domain.image.repository.ImageInfoRepository;
 import com.e106.mungplace.domain.marker.entity.Marker;
-import com.e106.mungplace.domain.marker.entity.MarkerOutbox;
+import com.e106.mungplace.domain.marker.entity.MarkerEvent;
 import com.e106.mungplace.domain.marker.entity.OperationType;
 import com.e106.mungplace.domain.marker.entity.PublishStatus;
 import com.e106.mungplace.domain.marker.repository.MarkerOutboxRepository;
@@ -42,10 +42,10 @@ public class MarkerService {
 	private final MarkerRepository markerRepository;
 	private final ExplorationRepository explorationRepository;
 	private final ImageInfoRepository imageInfoRepository;
+	private final MarkerOutboxRepository markerOutboxRepository;
 	private final UserHelper userHelper;
 	private final ImageStore imageStore;
 	private final ObjectMapper objectMapper;
-	private final MarkerOutboxRepository markerOutboxRepository;
 
 	@GlobalTransactional
 	@Transactional
@@ -65,7 +65,7 @@ public class MarkerService {
 		saveImageFiles(imageFiles, marker);
 
 		// Outbox 생성
-		saveMarkerOutbox(marker);
+		createMarkerEvent(marker);
 	}
 
 	private void validateImageFileCount(List<MultipartFile> imageFiles) {
@@ -91,11 +91,11 @@ public class MarkerService {
 		}
 	}
 
-	private void saveMarkerOutbox(Marker marker) {
+	private void createMarkerEvent(Marker marker) {
 		// TODO: <홍성우> Exception 변경
 		String payload = serializeMarker(marker).orElseThrow(RuntimeException::new);
 
-		MarkerOutbox outboxEntry = MarkerOutbox.builder()
+		MarkerEvent outboxEntry = MarkerEvent.builder()
 			.createdAt(LocalDateTime.now())
 			.status(PublishStatus.READY)
 			.payload(payload)
