@@ -32,7 +32,8 @@ public enum ApplicationError {
 	EXPLORATION_NOT_WITH_DOGS("E404", BAD_REQUEST, "동반하는 애견이 없습니다."),
 
 	// marker
-	MARKER_NOT_FOUND("E501", BAD_REQUEST, "마커가 존재하지 않습니다."),
+	MARKER_NOT_FOUND("E401", BAD_REQUEST, "마커가 존재하지 않습니다."),
+	MARKER_REQUEST_NOT_VALID("E402", BAD_REQUEST, "유효하지 않은 마커 요청 형식입니다."),
 
 	// socket
 	SOCKET_SESSION_NOT_FOUND("E802", FORBIDDEN, "소켓 세션이 존재하지 않습니다."),
@@ -42,7 +43,9 @@ public enum ApplicationError {
 	IMAGE_SAVE_ERROR("E901", INTERNAL_SERVER_ERROR, "이미지 저장에 실패했습니다."),
 	IMAGE_DELETE_ERROR("E902", INTERNAL_SERVER_ERROR, "이미지 삭제에 실패했습니다."),
 	IMAGE_FORWARDING_ERROR("E903", INTERNAL_SERVER_ERROR, "이미지 주소 생성에 실패했습니다."),
-	TRANSACTION_NOT_START("E904", INTERNAL_SERVER_ERROR, "트랜잭션이 시작하지 않았습니다.");
+	TRANSACTION_NOT_START("E904", INTERNAL_SERVER_ERROR, "트랜잭션이 시작하지 않았습니다."),
+	IMAGE_NOT_SUPPORTED("E903", BAD_REQUEST, "유효하지 않은 이미지 타입 입니다."),
+	IMAGE_COUNT_EXCEEDS_LIMIT("E905", BAD_REQUEST, "이미지는 3개이하여야 합니다.");
 
 	private String errorCode;
 	private HttpStatus status;

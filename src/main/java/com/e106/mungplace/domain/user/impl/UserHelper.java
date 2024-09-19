@@ -5,6 +5,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
+import com.e106.mungplace.domain.user.entity.User;
 import com.e106.mungplace.domain.user.repository.UserRepository;
 import com.e106.mungplace.web.exception.ApplicationException;
 import com.e106.mungplace.web.exception.dto.ApplicationError;
@@ -37,5 +38,10 @@ public class UserHelper {
 
 	public Long getCurrentUserId() {
 		return Long.parseLong(getAuthenticatedUser().getUsername());
+	}
+
+	public User getCurrentUser() {
+		return userRepository.findById(Long.parseLong(getAuthenticatedUser().getUsername()))
+			.orElseThrow(() -> new ApplicationException(ApplicationError.USER_NOT_FOUND));
 	}
 }
