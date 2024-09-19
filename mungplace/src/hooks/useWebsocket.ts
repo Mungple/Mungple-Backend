@@ -61,6 +61,8 @@ const useWebSocket = (explorationId: number = -1, userId: number = -1) => {
       debug: str => {
         console.log(str);
       },
+      appendMissingNULLonIncoming: true, // 서버로부터 받은 메시지에 NULL 문자가 없을 때 추가(RN Polyfill)
+      forceBinaryWSFrames: true, // WebSocket 프레임을 항상 바이너리로 설정(RN Polyfill)
       reconnectDelay: 5000, // 재연결 시도 간격
       // beforeConnect: () => {}, // 연결 전
       // connectionTimeout: 1000, // 연결 시간 초과
