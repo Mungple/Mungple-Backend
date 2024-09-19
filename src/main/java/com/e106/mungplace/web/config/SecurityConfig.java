@@ -12,9 +12,9 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.e106.mungplace.domain.user.repository.UserRepository;
-import com.e106.mungplace.web.filter.JwtAuthProcessFilter;
-import com.e106.mungplace.web.filter.OAuth2FailureHandler;
-import com.e106.mungplace.web.filter.OAuth2SuccessHandler;
+import com.e106.mungplace.web.handler.filter.JwtAuthProcessFilter;
+import com.e106.mungplace.web.handler.filter.OAuth2FailureHandler;
+import com.e106.mungplace.web.handler.filter.OAuth2SuccessHandler;
 import com.e106.mungplace.web.user.service.OAuth2UserService;
 import com.e106.mungplace.web.util.JwtProvider;
 

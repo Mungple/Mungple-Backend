@@ -1,6 +1,6 @@
 package com.e106.mungplace.domain.user.entity;
 
-import com.e106.mungplace.domain.audit.BaseTime;
+import com.e106.mungplace.common.audit.BaseTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

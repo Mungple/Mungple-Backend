@@ -7,7 +7,7 @@ import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBr
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 
-import com.e106.mungplace.web.interceptor.StompInterceptor;
+import com.e106.mungplace.web.handler.interceptor.StompInterceptor;
 
 import lombok.RequiredArgsConstructor;
 

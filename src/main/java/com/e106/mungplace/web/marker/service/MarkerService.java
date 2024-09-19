@@ -1,11 +1,9 @@
 package com.e106.mungplace.web.marker.service;
 
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,7 +20,7 @@ import com.e106.mungplace.domain.marker.entity.PublishStatus;
 import com.e106.mungplace.domain.marker.repository.MarkerOutboxRepository;
 import com.e106.mungplace.domain.marker.repository.MarkerRepository;
 import com.e106.mungplace.domain.user.impl.UserHelper;
-import com.e106.mungplace.minio.impl.ImageStore;
+import com.e106.mungplace.common.config.minio.impl.ImageStore;
 import com.e106.mungplace.web.exception.ApplicationException;
 import com.e106.mungplace.web.exception.dto.ApplicationError;
 import com.e106.mungplace.web.marker.dto.MarkerCreateRequest;

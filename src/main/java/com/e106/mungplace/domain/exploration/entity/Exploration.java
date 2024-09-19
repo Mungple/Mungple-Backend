@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.e106.mungplace.domain.audit.BaseTime;
+import com.e106.mungplace.common.audit.BaseTime;
 import com.e106.mungplace.domain.user.entity.User;
 
 import jakarta.persistence.*;
