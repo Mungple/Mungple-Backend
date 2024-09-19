@@ -1,13 +1,13 @@
 import {useState, useEffect, useCallback} from 'react';
 import {Client} from '@stomp/stompjs';
 
-interface Location {
+interface ToLocation {
   latitude: number;
   longitude: number;
   timestamp: number;
 }
 
-interface MyBlueZone {
+interface ToMyBlueZone {
   userId: number;
   latitude: number;
   longitude: number;
@@ -16,20 +16,45 @@ interface MyBlueZone {
   month: number;
 }
 
-interface AllUserZone {
+interface ToAllUserZone {
   latitude: number;
   longitude: number;
   radius: number;
 }
 
-const useWebSocket = () => {
-  const [clientSocket, setClientSocket] = useState<Client | null>(null);
+interface ErrorMessage {
+  errorCode: string;
+  message: string;
+}
 
+interface Point {
+  latitude: number;
+  longitude: number;
+  weight: number;
+}
+
+interface Zone {
+  radius: number; // 단위는 미터(m)
+  points: Point[];
+}
+
+interface MungZone {
+  points: Point[];
+}
+
+const useWebSocket = (explorationId: number = -1, userId: number = -1) => {
+  const [clientSocket, setClientSocket] = useState<Client | null>(null);
+  const [explorations, setExplorations] = useState<ErrorMessage | null>(null);
+  const [myBlueZone, setMyBlueZone] = useState<Zone | null>(null);
+  const [allBlueZone, setAllBlueZone] = useState<Zone | null>(null);
+  const [allRedZone, setAllRedZone] = useState<Zone | null>(null);
+  const [mungZone, setMungZone] = useState<MungZone | null>(null);
   // Bear Token 가져오기
   // const token = useSelector((state: RootState) => state.auth.token);
   useEffect(() => {
     const socket = new Client({
-      brokerURL: 'ws://localhost:8080/ws',
+      // brokerURL: 'ws://localhost:8080/ws',
+      webSocketFactory: () => new WebSocket('ws://localhost:8080/ws'),
       connectHeaders: {
         // Authorization: `Bearer ${token}`,
       },
@@ -37,27 +62,59 @@ const useWebSocket = () => {
         console.log(str);
       },
       reconnectDelay: 5000, // 재연결 시도 간격
+      // beforeConnect: () => {}, // 연결 전
+      // connectionTimeout: 1000, // 연결 시간 초과
       // heartbeatIncoming: 4000, // 서버로부터 메시지를 받는 주기
       // heartbeatOutgoing: 4000, // 서버로 메시지를 보내는 주기
+      // onWebSocketError // 웹소켓 에러 발생 시
 
       onConnect: () => {
         console.log('소켓 연결 성공');
         setClientSocket(socket);
         // 산책 기록 위치 수집
-        socket.subscribe('sub/explorations/{explorationId}', message => {
-          console.log('산책 기록 위치 수집 에러 발생', message.body);
+        socket.subscribe(`sub/explorations/${explorationId}`, message => {
+          try {
+            const parsedMessage = JSON.parse(message.body) as ErrorMessage;
+            setExplorations(parsedMessage);
+          } catch (e) {
+            console.log(e);
+          }
         });
         // 개인 블루존 조회
-        socket.subscribe('sub/users/{userId}/bluezone', message => {
-          console.log('개인 블루존 조회', message.body);
+        socket.subscribe(`sub/users/${userId}/bluezone`, message => {
+          try {
+            const parsedMessage = JSON.parse(message.body) as Zone;
+            setMyBlueZone(parsedMessage);
+          } catch (e) {
+            console.log(e);
+          }
         });
         // 전체 블루존 조회
         socket.subscribe('sub/bluezone', message => {
-          console.log('전체 블루존 조회', message.body);
+          try {
+            const parsedMessage = JSON.parse(message.body) as Zone;
+            setAllBlueZone(parsedMessage);
+          } catch (e) {
+            console.log(e);
+          }
         });
         // 전체 레드존 조회
         socket.subscribe('sub/redzone', message => {
-          console.log('전체 레드존 조회', message.body);
+          try {
+            const parsedMessage = JSON.parse(message.body) as Zone;
+            setAllRedZone(parsedMessage);
+          } catch (e) {
+            console.log(e);
+          }
+        });
+        // 멍플 조회
+        socket.subscribe('sub/mungplace', message => {
+          try {
+            const parsedMessage = JSON.parse(message.body) as MungZone;
+            setMungZone(parsedMessage);
+          } catch (e) {
+            console.log(e);
+          }
         });
       },
 
@@ -73,10 +130,10 @@ const useWebSocket = () => {
       socket.deactivate();
       setClientSocket(null);
     };
-  }, []);
+  }, [explorationId, userId]);
 
   const sendLocation = useCallback(
-    (explorationId: number, location: Location) => {
+    (explorationId: number, location: ToLocation) => {
       if (clientSocket && clientSocket.connected) {
         clientSocket.publish({
           destination: `pub/explorations/${explorationId}`,
@@ -90,7 +147,7 @@ const useWebSocket = () => {
   );
 
   const checkMyBlueZone = useCallback(
-    (myBlueZone: MyBlueZone) => {
+    (myBlueZone: ToMyBlueZone) => {
       if (clientSocket && clientSocket.connected) {
         clientSocket.publish({
           destination: `pub/users/${myBlueZone.userId}/bluezone`,
@@ -103,8 +160,8 @@ const useWebSocket = () => {
     [clientSocket],
   );
 
-  const checkALlUserZone = useCallback(
-    (zoneType: number, allUserZone: AllUserZone) => {
+  const checkAllUserZone = useCallback(
+    (zoneType: number, allUserZone: ToAllUserZone) => {
       if (clientSocket && clientSocket.connected) {
         // zoneType: 0(블루존), 1(레드존)
         if (zoneType === 0) {
@@ -125,18 +182,32 @@ const useWebSocket = () => {
     [clientSocket],
   );
 
-  const checkMungPlace = useCallback(() => {
-    if (clientSocket && clientSocket.connected) {
-      clientSocket.publish({
-        destination: 'pub/mungplace',
-        body: JSON.stringify({}),
-      });
-    } else {
-      console.log('소켓 연결이 되어있지 않습니다.');
-    }
-  }, [clientSocket]);
+  const checkMungPlace = useCallback(
+    (allUserZone: ToAllUserZone) => {
+      if (clientSocket && clientSocket.connected) {
+        clientSocket.publish({
+          destination: 'pub/mungplace',
+          body: JSON.stringify(allUserZone),
+        });
+      } else {
+        console.log('소켓 연결이 되어있지 않습니다.');
+      }
+    },
+    [clientSocket],
+  );
 
-  return {sendLocation, checkMyBlueZone, checkALlUserZone, checkMungPlace};
+  return {
+    clientSocket,
+    explorations,
+    myBlueZone,
+    allBlueZone,
+    allRedZone,
+    mungZone,
+    sendLocation,
+    checkMyBlueZone,
+    checkAllUserZone,
+    checkMungPlace,
+  };
 };
 
 export default useWebSocket;
