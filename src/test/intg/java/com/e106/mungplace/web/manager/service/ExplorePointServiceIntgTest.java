@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.geo.Point;
+import org.springframework.data.elasticsearch.core.geo.GeoPoint;
 import org.springframework.test.context.ActiveProfiles;
 
 import net.bytebuddy.utility.RandomString;
@@ -48,7 +48,7 @@ class ManagerExplorePointServiceIntgTest {
 		User user = generateRandomUser();
 		when(userHelper.getCurrentUserId()).thenReturn(user.getUserId());
 
-		List<Point> points = Stream.generate(this::generateRandomPoint).limit(100).toList();
+		List<GeoPoint> points = Stream.generate(this::generateRandomPoint).limit(100).toList();
 
 		// when
 		Iterable<ExplorePoint> savedPoints = explorePointService.bulkInsertProcess(user.getProviderId(), points);
@@ -68,8 +68,8 @@ class ManagerExplorePointServiceIntgTest {
 			new User(RandomString.make(), ProviderName.MANAGER, RandomString.make(), RandomString.make()));
 	}
 
-	private Point generateRandomPoint() {
+	private GeoPoint generateRandomPoint() {
 		Random random = new Random(System.currentTimeMillis());
-		return new Point(random.nextDouble() * 10, random.nextDouble() * 10);
+		return new GeoPoint(random.nextDouble() * 10, random.nextDouble() * 10);
 	}
 }
