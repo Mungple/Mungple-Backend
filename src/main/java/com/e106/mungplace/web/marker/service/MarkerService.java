@@ -1,17 +1,33 @@
 package com.e106.mungplace.web.marker.service;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.e106.mungplace.common.transaction.GlobalTransactional;
 import com.e106.mungplace.domain.exploration.entity.Exploration;
 import com.e106.mungplace.domain.exploration.repository.ExplorationRepository;
+import com.e106.mungplace.domain.image.entity.ImageInfo;
+import com.e106.mungplace.domain.image.repository.ImageInfoRepository;
 import com.e106.mungplace.domain.marker.entity.Marker;
+import com.e106.mungplace.domain.marker.entity.MarkerOutbox;
+import com.e106.mungplace.domain.marker.entity.OperationType;
+import com.e106.mungplace.domain.marker.entity.PublishStatus;
+import com.e106.mungplace.domain.marker.repository.MarkerOutboxRepository;
 import com.e106.mungplace.domain.marker.repository.MarkerRepository;
 import com.e106.mungplace.domain.user.impl.UserHelper;
+import com.e106.mungplace.minio.impl.ImageStore;
 import com.e106.mungplace.web.exception.ApplicationException;
 import com.e106.mungplace.web.exception.dto.ApplicationError;
 import com.e106.mungplace.web.marker.dto.MarkerCreateRequest;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -22,18 +38,84 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class MarkerService {
 
+	private static final int MAX_IMAGE_FILE_COUNT = 3;
+	private static final String ENTITY_TYPE_MARKER = "Marker";
+
 	private final MarkerRepository markerRepository;
 	private final ExplorationRepository explorationRepository;
+	private final ImageInfoRepository imageInfoRepository;
 	private final UserHelper userHelper;
+	private final ImageStore imageStore;
+	private final ObjectMapper objectMapper;
+	private final MarkerOutboxRepository markerOutboxRepository;
 
+	@GlobalTransactional
 	@Transactional
-	public void createMarkerProcess(MarkerCreateRequest markerInfo) {
+	public void createMarkerProcess(String markerInfoJson, List<MultipartFile> imageFiles) {
+		// 이미지 파일 개수 검증
+		validateImageFileCount(imageFiles);
+
+		// Marker 정보 파싱
+		MarkerCreateRequest markerInfo = parseMarkerInfo(markerInfoJson);
+
+		// Marker 생성 및 저장
 		Marker marker = createMarker(markerInfo);
+		marker.updateUser(userHelper.getCurrentUser());
 		markerRepository.save(marker);
 
-		// TODO: <홍성우> MinIO 에 저장
-		// TODO: <홍성우> ES 에 저장
-		// TODO: <홍성우> Outbox에 등록
+		// 이미지 저장 처리
+		saveImageFiles(imageFiles, marker);
+
+		// Outbox 생성
+		saveMarkerOutbox(marker);
+	}
+
+	private void validateImageFileCount(List<MultipartFile> imageFiles) {
+		if (imageFiles != null && imageFiles.size() > MAX_IMAGE_FILE_COUNT) {
+			throw new ApplicationException(ApplicationError.IMAGE_COUNT_EXCEEDS_LIMIT);
+		}
+	}
+
+	private MarkerCreateRequest parseMarkerInfo(String markerInfoJson) {
+		try {
+			return objectMapper.readValue(markerInfoJson, MarkerCreateRequest.class);
+		} catch (JsonProcessingException e) {
+			throw new ApplicationException(ApplicationError.MARKER_REQUEST_NOT_VALID);
+		}
+	}
+
+	private void saveImageFiles(List<MultipartFile> imageFiles, Marker marker) {
+		if (imageFiles != null && !imageFiles.isEmpty()) {
+			for (MultipartFile file : imageFiles) {
+				String imageName = imageStore.saveImage(file);
+				imageInfoRepository.save(new ImageInfo(imageName, marker));
+			}
+		}
+	}
+
+	private void saveMarkerOutbox(Marker marker) {
+		// TODO: <홍성우> Exception 변경
+		String payload = serializeMarker(marker).orElseThrow(RuntimeException::new);
+
+		MarkerOutbox outboxEntry = MarkerOutbox.builder()
+			.createdAt(LocalDateTime.now())
+			.status(PublishStatus.READY)
+			.payload(payload)
+			.operationType(OperationType.CREATE)
+			.entityType(ENTITY_TYPE_MARKER)
+			.entityId(marker.getId())
+			.build();
+
+		markerOutboxRepository.save(outboxEntry);
+	}
+
+	private Optional<String> serializeMarker(Marker marker) {
+		try {
+			return Optional.of(objectMapper.writeValueAsString(marker));
+		} catch (JsonProcessingException e) {
+			log.error("Marker 객체를 JSON으로 변환하는 중 오류 발생: {}", marker.getId(), e);
+			return Optional.empty();
+		}
 	}
 
 	@Transactional

@@ -53,5 +53,18 @@ public class ImageRepository extends RollbackableRepository<String, MultipartFil
 			throw new ApplicationException(ApplicationError.IMAGE_DELETE_ERROR);
 		}
 	}
+
+	public void deleteImageById(String fileName) {
+		try {
+			minioClient.removeObject(
+				RemoveObjectArgs.builder()
+					.bucket(bucketName)
+					.object(fileName)
+					.build()
+			);
+		} catch (Exception e) {
+			throw new ApplicationException(ApplicationError.IMAGE_DELETE_ERROR);
+		}
+	}
 }
 

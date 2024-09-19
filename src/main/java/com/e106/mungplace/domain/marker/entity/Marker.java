@@ -15,10 +15,12 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+@AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Entity
@@ -63,6 +65,10 @@ public class Marker extends BaseTime {
 		this.lat = lat;
 		this.lon = lon;
 		this.type = type;
+	}
+
+	public void updateUser(User user) {
+		this.user = user;
 	}
 }
 
