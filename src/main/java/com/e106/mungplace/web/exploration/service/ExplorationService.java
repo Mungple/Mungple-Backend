@@ -5,8 +5,10 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.e106.mungplace.domain.exploration.entity.ExplorationEvent;
 import com.e106.mungplace.domain.exploration.impl.ExplorationHelper;
 import com.e106.mungplace.web.exploration.dto.*;
+import com.e106.mungplace.web.exploration.service.producer.ExplorationProducer;
 import com.e106.mungplace.web.util.StatisticUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +29,7 @@ public class ExplorationService {
 	private final UserHelper userHelper;
 	private final ExplorationReader explorationReader;
 	private final ExplorationHelper explorationHelper;
+	private final ExplorationProducer producer;
 
 	@Transactional
 	public ExplorationStartResponse startExplorationProcess(ExplorationStartWithDogsRequest dogs) {
@@ -91,5 +94,12 @@ public class ExplorationService {
 		Long userId = userHelper.getCurrentUserId();
 		List<ExplorationResponse> explorationInfos = explorationHelper.getExplorationInfos(userId, LocalDate.of(year, month, 1));
 		return StatisticUtils.createExplorationStatisticOfMonth(year, month, explorationInfos);
+	}
+
+	@Transactional
+	public void createExplorationEventProcess(ExplorationEventRequest eventRequest, Long explorationId) {
+		String payload = explorationHelper.createExplorationEventPayload(eventRequest);
+		ExplorationEvent event = ExplorationEvent.of(eventRequest, explorationId, payload);
+		producer.sendExplorationEvent(event);
 	}
 }

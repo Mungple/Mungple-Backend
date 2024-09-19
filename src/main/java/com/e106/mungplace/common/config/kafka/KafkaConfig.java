@@ -1,5 +1,6 @@
 package com.e106.mungplace.common.config.kafka;
 
+import com.e106.mungplace.web.handler.interceptor.KafkaProducerInterceptor;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
@@ -80,8 +81,10 @@ public class KafkaConfig {
 
     @Bean
     @Primary
-    public KafkaTemplate<String, ?> kafkaTemplate(KafkaProperties kafkaProperties) {
-        return new KafkaTemplate<>(producerFactory(kafkaProperties));
+    public KafkaTemplate<String, ?> kafkaTemplate(KafkaProperties kafkaProperties, KafkaProducerInterceptor producerInterceptor) {
+        KafkaTemplate<String, Object> kafkaTemplate = new KafkaTemplate<>(producerFactory(kafkaProperties));
+        kafkaTemplate.setProducerInterceptor(producerInterceptor);
+        return kafkaTemplate;
     }
 
     @Bean
