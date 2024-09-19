@@ -1,8 +1,11 @@
 package com.e106.mungplace.common.config.kafka;
 
+import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.config.TopicConfig;
+import org.apache.kafka.common.serialization.StringDeserializer;
+import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -14,6 +17,8 @@ import org.springframework.kafka.core.*;
 import org.springframework.kafka.listener.ContainerProperties;
 import org.springframework.kafka.listener.DeadLetterPublishingRecoverer;
 import org.springframework.kafka.listener.DefaultErrorHandler;
+import org.springframework.kafka.support.serializer.JsonDeserializer;
+import org.springframework.kafka.support.serializer.JsonSerializer;
 import org.springframework.util.backoff.BackOff;
 import org.springframework.util.backoff.ExponentialBackOff;
 
@@ -50,11 +55,12 @@ public class KafkaConfig {
         Map<String, Object> props = new HashMap<>();
 
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaProperties.getBootstrapServers());
-        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, kafkaProperties.getConsumer().getKeyDeserializer());
-        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, kafkaProperties.getConsumer().getValueDeserializer());
+        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
+        props.put(JsonDeserializer.TRUSTED_PACKAGES, "*");
+        props.put(JsonDeserializer.USE_TYPE_INFO_HEADERS, true);
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
         props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "false");
-
         return new DefaultKafkaConsumerFactory<>(props);
     }
 
@@ -63,10 +69,11 @@ public class KafkaConfig {
     public ProducerFactory<String ,Object> producerFactory(KafkaProperties kafkaProperties) {
         Map<String, Object> props = new HashMap<>();
         props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaProperties.getBootstrapServers());
-        props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, kafkaProperties.getProducer().getKeySerializer());
-        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, kafkaProperties.getProducer().getValueSerializer());
+        props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
         props.put(ProducerConfig.ACKS_CONFIG, kafkaProperties.getProducer().getAcks());
         props.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, "true");
+        props.put(JsonSerializer.ADD_TYPE_INFO_HEADERS, true);
 
         return new DefaultKafkaProducerFactory<>(props);
     }
@@ -78,32 +85,48 @@ public class KafkaConfig {
     }
 
     @Bean
-    public KafkaAdmin.NewTopics newTopics() {
-        return new KafkaAdmin.NewTopics(
-                TopicBuilder.name("temp")
-                        .partitions(3)
-                        .replicas(1)
-                        .config(TopicConfig.RETENTION_MS_CONFIG, String.valueOf(7 * 24 * 60 * 60))
-                        .build(),
+    public NewTopic tempTopic() {
+        return TopicBuilder.name("temp")
+            .partitions(3)
+            .replicas(1)
+            .config(TopicConfig.RETENTION_MS_CONFIG, String.valueOf(7 * 24 * 60 * 60))
+            .build();
+    }
 
-                TopicBuilder.name("marker")
-                        .partitions(3)
-                        .replicas(1)
-                        .config(TopicConfig.RETENTION_MS_CONFIG, String.valueOf(7 * 24 * 60 * 60))
-                        .build(),
+    @Bean
+    public NewTopic markerTopic() {
+        return TopicBuilder.name("marker")
+            .partitions(3)
+            .replicas(1)
+            .config(TopicConfig.RETENTION_MS_CONFIG, String.valueOf(7 * 24 * 60 * 60))
+            .build();
+    }
 
-                TopicBuilder.name("exploration")
-                        .partitions(3)
-                        .replicas(1)
-                        .config(TopicConfig.RETENTION_MS_CONFIG, String.valueOf(7 * 24 * 60 * 60))
-                        .build(),
+    @Bean
+    public NewTopic explorationTopic() {
+        return TopicBuilder.name("exploration")
+            .partitions(3)
+            .replicas(1)
+            .config(TopicConfig.RETENTION_MS_CONFIG, String.valueOf(7 * 24 * 60 * 60))
+            .build();
+    }
 
-                TopicBuilder.name("access-log")
-                        .partitions(3)
-                        .replicas(1)
-                        .config(TopicConfig.RETENTION_MS_CONFIG, String.valueOf(7 * 24 * 60 * 60))
-                        .build()
-        );
+    @Bean
+    public NewTopic hitMapTopic() {
+        return TopicBuilder.name("hitmap")
+            .partitions(3)
+            .replicas(1)
+            .config(TopicConfig.RETENTION_MS_CONFIG, String.valueOf(7 * 24 * 60 * 60))
+            .build();
+    }
+
+    @Bean
+    public NewTopic accessLogTopic() {
+        return TopicBuilder.name("access-log")
+            .partitions(3)
+            .replicas(1)
+            .config(TopicConfig.RETENTION_MS_CONFIG, String.valueOf(7 * 24 * 60 * 60))
+            .build();
     }
 
     private BackOff generatedBackoff() {
