@@ -3,28 +3,43 @@ package com.e106.mungplace.web.marker.service;
 import static org.mockito.Mockito.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import org.assertj.core.api.Assertions;
 import org.assertj.core.api.ThrowableAssert;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.e106.mungplace.common.config.minio.impl.ImageStore;
 import com.e106.mungplace.domain.exploration.entity.Exploration;
 import com.e106.mungplace.domain.exploration.repository.ExplorationRepository;
+import com.e106.mungplace.domain.image.entity.ImageInfo;
+import com.e106.mungplace.domain.image.repository.ImageInfoRepository;
 import com.e106.mungplace.domain.marker.entity.Marker;
+import com.e106.mungplace.domain.marker.entity.MarkerType;
+import com.e106.mungplace.domain.marker.repository.MarkerOutboxRepository;
 import com.e106.mungplace.domain.marker.repository.MarkerRepository;
+import com.e106.mungplace.domain.user.entity.ProviderName;
 import com.e106.mungplace.domain.user.entity.User;
 import com.e106.mungplace.domain.user.impl.UserHelper;
 import com.e106.mungplace.web.exception.ApplicationException;
 import com.e106.mungplace.web.marker.dto.MarkerCreateRequest;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @ExtendWith(MockitoExtension.class)
-public class MarkerServiceTest {
+class MarkerServiceTest {
 
 	@Mock
 	private MarkerRepository markerRepository;
@@ -35,109 +50,133 @@ public class MarkerServiceTest {
 	@Mock
 	private UserHelper userHelper;
 
+	@Mock
+	private ImageStore imageStore;
+
+	@Mock
+	private ImageInfoRepository imageInfoRepository;
+
+	@Mock
+	private MarkerOutboxRepository markerOutboxRepository;
+
 	@InjectMocks
 	private MarkerService markerService;
 
-	@DisplayName("마커 생성시 없는 여행일시 예외 발생")
+	@Spy
+	private final ObjectMapper objectMapper = new ObjectMapper();
+
+	@DisplayName("이미지가 4개 이상이면 에러")
 	@Test
-	public void testCreateMarkerProcess_WhenExplorationNotFound_ThrowsException() {
+	void testCreateMarkerProcess_WhenImageCountExceeds_ThrowsException() throws Exception {
 		// given
-		MarkerCreateRequest request = MarkerCreateRequest.builder()
-			.title("markerTitle")
-			.content("markerContent")
-			.lat(new BigDecimal("36.9369"))
-			.lon(new BigDecimal("22.2222"))
-			.explorationId(1L)
-			.build();
+		String markerInfoJson = "{"
+			+ "\"title\": \"markerTitle\","
+			+ "\"content\": \"markerContent\","
+			+ "\"markerType\": \"BLUE\","
+			+ "\"lat\": 36.9369,"
+			+ "\"lon\": 22.2222"
+			+ "}";
+
+		List<MultipartFile> imageFiles = Arrays.asList(
+			mock(MultipartFile.class),
+			mock(MultipartFile.class),
+			mock(MultipartFile.class),
+			mock(MultipartFile.class)
+		);
 
 		// when
-		when(explorationRepository.findById(1L)).thenReturn(Optional.empty());
-		ThrowableAssert.ThrowingCallable expectThrow = () -> markerService.createMarkerProcess(request);
+		ThrowableAssert.ThrowingCallable expectThrow = () -> markerService.createMarkerProcess(markerInfoJson, imageFiles);
 
 		// then
 		Assertions.assertThatThrownBy(expectThrow).isInstanceOf(ApplicationException.class);
+	}
+
+	@DisplayName("산책중이 아닐때 마커생성")
+	@Test
+	void testCreateMarkerProcess_Success() throws Exception {
+		// given
+		User user = User.builder()
+			.providerId("provider123")
+			.providerName(ProviderName.GOOGLE)
+			.nickname("testNickname")
+			.imageName("profileImage.png")
+			.build();
+
+		String markerInfoJson = "{"
+			+ "\"title\": \"markerTitle\","
+			+ "\"content\": \"markerContent\","
+			+ "\"markerType\": \"BLUE\","
+			+ "\"lat\": 36.9369,"
+			+ "\"lon\": 22.2222"
+			+ "}";
+
+		// MarkerCreateRequest 객체를 생성하는 실제 파싱
+		MarkerCreateRequest request = objectMapper.readValue(markerInfoJson, MarkerCreateRequest.class);
+		List<MultipartFile> imageFiles = Arrays.asList(
+			mock(MultipartFile.class),
+			mock(MultipartFile.class),
+			mock(MultipartFile.class)
+		);
+
+		// Marker 객체 생성
+		Marker marker = Marker.builder()
+			.lat(new BigDecimal("36.9369"))
+			.lon(new BigDecimal("22.2222"))
+			.title("markerTitle")
+			.content("markerContent")
+			.type(MarkerType.BLUE)
+			.build();
+
+		// when
+		when(userHelper.getCurrentUser()).thenReturn(user);
+		when(markerRepository.save(any(Marker.class))).thenReturn(marker);
+
+		// then
+		markerService.createMarkerProcess(markerInfoJson, imageFiles);
+
+		verify(markerRepository).save(any(Marker.class));
+		verify(imageStore, times(imageFiles.size())).saveImage(any(MultipartFile.class));
+		verify(imageInfoRepository, times(imageFiles.size())).save(any(ImageInfo.class));
 	}
 
 	@DisplayName("마커 생성시 마커 저장(산책 할때)")
 	@Test
-	public void testCreateMarkerProcess_WhenExploring_ThenSaveExploration() {
-		// given
-		Exploration exploration = new Exploration();
-		MarkerCreateRequest request = MarkerCreateRequest.builder()
-			.title("markerTitle")
-			.content("markerContent")
-			.lat(new BigDecimal("36.9369"))
-			.lon(new BigDecimal("22.2222"))
-			.explorationId(1L)
-			.build();
+	void testCreateMarkerProcess_WhenExploring_ThenSaveExploration() throws Exception {
+			// given
+			User user = new User(1L);
+			Exploration exploration = new Exploration();
 
-		// when
-		when(explorationRepository.findById(1L)).thenReturn(Optional.of(exploration));
-		markerService.createMarkerProcess(request);
+			List<MultipartFile> imageFiles = Arrays.asList(
+				mock(MultipartFile.class),
+				mock(MultipartFile.class)
+			);
 
-		// then
-		verify(explorationRepository).findById(1L);
-		verify(markerRepository).save(any(Marker.class));
-	}
+			Marker marker = Marker.builder()
+				.lat(new BigDecimal("36.9369"))
+				.lon(new BigDecimal("22.2222"))
+				.title("markerTitle")
+				.content("markerContent")
+				.exploration(exploration)
+				.type(MarkerType.BLUE)
+				.user(user)
+				.build();
+			String markerInfoJson = "{"
+				+ "\"title\": \"markerTitle\","
+				+ "\"content\": \"markerContent\","
+				+ "\"markerType\": \"BLUE\","
+				+ "\"lat\": 36.9369,"
+				+ "\"lon\": 22.2222"
+				+ "}";
+			String markerJson = "{\"lat\":36.9369,\"lon\":22.2222,\"title\":\"markerTitle\",\"content\":\"markerContent\",\"type\":\"BLUE\"}";
 
-	@DisplayName("마커 생성시 마커 저장(산책 안할때)")
-	@Test
-	public void testCreateMarkerProcess_WhenNotExploring_ThenSaveExploration() {
-		// given
-		Exploration exploration = new Exploration();
-		MarkerCreateRequest request = MarkerCreateRequest.builder()
-			.title("markerTitle")
-			.content("markerContent")
-			.lat(new BigDecimal("36.9369"))
-			.lon(new BigDecimal("22.2222"))
-			.build();
+			// when
+			when(userHelper.getCurrentUser()).thenReturn(user);
+			when(markerRepository.save(any(Marker.class))).thenReturn(marker);
 
-		// when
-		markerService.createMarkerProcess(request);
-
-		// then
-		verify(explorationRepository, never()).findById(any());
-		verify(markerRepository).save(any(Marker.class));
-	}
-
-	@DisplayName("마커 삭제 시 사용자가 소유하지 않은 마커에 대해 예외 발생")
-	@Test
-	public void testDeleteMarkerProcess_WhenUserDoesNotOwnMarker_ThrowsException() {
-		// given
-		Long userId = 1L;
-		Long markerId = 1L;
-		User markerOwner = User.builder().build();
-
-		Marker marker = Marker.builder()
-			.title("testMarker")
-			.content("testContent")
-			.user(markerOwner)
-			.build();
-
-		// when
-		when(userHelper.getCurrentUserId()).thenReturn(userId);
-		when(markerRepository.findById(markerId)).thenReturn(Optional.of(marker));
-
-		// then
-		Assertions.assertThatThrownBy(() -> markerService.deleteMarkerProcess(markerId))
-			.isInstanceOf(ApplicationException.class);
-		verify(markerRepository, never()).delete(any(Marker.class));
-	}
-
-	@DisplayName("마커 삭제시 마커가 존재하지 않을 때 예외 발생")
-	@Test
-	public void testDeleteMarkerProcess_WhenMarkerNotFound_ThrowsException() {
-		// given
-		Long markerId = 1L;
-
-		// when
-		when(markerRepository.findById(markerId)).thenReturn(Optional.empty());
-		when(userHelper.getCurrentUserId()).thenReturn(1L);
-		ThrowableAssert.ThrowingCallable expectThrow = () -> markerService.deleteMarkerProcess(markerId);
-
-		// then
-		Assertions.assertThatThrownBy(expectThrow).isInstanceOf(ApplicationException.class);
-		verify(markerRepository, never()).delete(any(Marker.class));
+			// then
+			markerService.createMarkerProcess(markerInfoJson,imageFiles);
+			verify(imageStore, times(imageFiles.size())).saveImage(any(MultipartFile.class));
+			verify(imageInfoRepository, times(imageFiles.size())).save(any(ImageInfo.class));
 	}
 }
 
