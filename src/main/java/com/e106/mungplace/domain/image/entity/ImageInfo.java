@@ -1,6 +1,6 @@
 package com.e106.mungplace.domain.image.entity;
 
-import com.e106.mungplace.domain.audit.BaseTime;
+import com.e106.mungplace.common.audit.BaseTime;
 import com.e106.mungplace.domain.marker.entity.Marker;
 
 import jakarta.persistence.Column;

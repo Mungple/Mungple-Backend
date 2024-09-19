@@ -2,7 +2,7 @@ package com.e106.mungplace.domain.marker.entity;
 
 import java.math.BigDecimal;
 
-import com.e106.mungplace.domain.audit.BaseTime;
+import com.e106.mungplace.common.audit.BaseTime;
 import com.e106.mungplace.domain.exploration.entity.Exploration;
 import com.e106.mungplace.domain.user.entity.User;
 

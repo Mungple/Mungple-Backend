@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.e106.mungplace.domain.user.entity.User;
 import com.e106.mungplace.domain.user.repository.UserRepository;
-import com.e106.mungplace.web.filter.CustomOAuth2User;
+import com.e106.mungplace.web.handler.filter.CustomOAuth2User;
 import com.e106.mungplace.web.user.dto.GoogleUserInfo;
 import com.e106.mungplace.web.user.dto.KakaoUserInfo;
 import com.e106.mungplace.web.user.dto.NaverUserInfo;
