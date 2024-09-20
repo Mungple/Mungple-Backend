@@ -2,20 +2,21 @@
 import { create } from 'zustand'; // 상태 관리 store
 
 // zone의 구조를 정의
-interface Zone {
+export interface Zone {
   latitude: number;
   longitude: number;
   weight?: number; // 히트맵 가중치는 optional하게
 }
 
 // 마커 데이터 인터페이스
-interface MarkerData {
+export interface MarkerData {
   id: string
   latitude: number
   longitude: number
   title: string
   body: string
   imageUri?: string // 마커에 사용될 이미지 uri도 선택적임
+  type: 'blue' | 'red'
 }
 
 // 맵 화면의 상태 정의
