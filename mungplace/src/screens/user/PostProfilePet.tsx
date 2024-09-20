@@ -1,26 +1,23 @@
 import React from 'react';
 import styled from 'styled-components/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
 
+import {colors} from '@/constants';
 import useForm from '@/hooks/useForm';
 import {Keyboard} from 'react-native';
 import useModal from '@/hooks/useModal';
 import {validateInputPet} from '@/utils';
 import useAuth from '@/hooks/queries/useAuth';
+import {useAppStore} from '@/state/useAppStore';
 import useImagePicker from '@/hooks/useImagePicker';
-import {authNavigations, colors} from '@/constants';
 import CustomButton from '@/components/common/CustomButton';
 import CustomInputField from '@/components/common/CustomInputField';
-import {AuthStackParamList} from '@/navigations/stack/AuthStackNavigator';
 import EditProfileImageOption from '@/components/setting/EditProfileImageOption';
 
-type InputPetScreenProps = NativeStackScreenProps<AuthStackParamList>;
-
-const InputPetScreen = ({navigation}: InputPetScreenProps) => {
+const PostProfilePetScreen = () => {
   const imageOption = useModal();
-  const {getProfileQuery, profileMutation} = useAuth();
-  const {nickname, imageUri} = getProfileQuery.data || {};
+  const {getProfileQuery} = useAuth();
+  const {imageUri} = getProfileQuery.data || {};
   const inputUser = useForm({
     initialValue: {
       petName: '',
@@ -30,6 +27,7 @@ const InputPetScreen = ({navigation}: InputPetScreenProps) => {
     },
     validate: validateInputPet,
   })
+  const setLogin = useAppStore((state) => state.setLogin);
 
   // 이미지 선택 기능을 위한 커스텀 훅
   const imagePicker = useImagePicker({
@@ -46,6 +44,7 @@ const InputPetScreen = ({navigation}: InputPetScreenProps) => {
 
   const handleSubmit = () => {
     console.log('values', inputUser.values);
+    setLogin(true);
   };
 
   return (
@@ -93,7 +92,6 @@ const InputPetScreen = ({navigation}: InputPetScreenProps) => {
           label="등록 완료"
           onPress={() => {
             handleSubmit()
-            navigation.navigate(authNavigations.AUTH_HOME)
           }}
         />
       </InputContainer>
@@ -140,4 +138,4 @@ const InputContainer = styled.View`
   gap: 20px;
 `;
 
-export default InputPetScreen;
+export default PostProfilePetScreen;

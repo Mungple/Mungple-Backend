@@ -19,7 +19,7 @@ type PostProfileScreenProps = NativeStackScreenProps<AuthStackParamList>;
 
 const EditProfileScreen = ({navigation}: PostProfileScreenProps) => {
   const imageOption = useModal();
-  const {getProfileQuery, profileMutation} = useAuth();
+  const {getProfileQuery} = useAuth();
   const {nickname, imageUri} = getProfileQuery.data || {};
 
   // 이미지 선택 기능을 위한 커스텀 훅
@@ -42,7 +42,7 @@ const EditProfileScreen = ({navigation}: PostProfileScreenProps) => {
   };
 
   const handleSubmit = () => {
-    navigation.navigate(authNavigations.INPUT_PET)
+    navigation.navigate(authNavigations.POST_PROFILE_PET)
   };
 
   return (
