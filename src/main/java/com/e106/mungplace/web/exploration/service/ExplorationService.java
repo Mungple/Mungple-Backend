@@ -98,7 +98,7 @@ public class ExplorationService {
 
 	@Transactional
 	public void createExplorationEventProcess(ExplorationEventRequest eventRequest, Long explorationId) {
-		String payload = explorationHelper.createExplorationEventPayload(eventRequest);
+		ExplorationPayload payload = explorationHelper.createExplorationEventPayload(eventRequest);
 		ExplorationEvent event = ExplorationEvent.of(eventRequest, explorationId, payload);
 		producer.sendExplorationEvent(event);
 	}

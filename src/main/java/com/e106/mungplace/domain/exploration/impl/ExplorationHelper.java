@@ -8,25 +8,22 @@ import com.e106.mungplace.domain.user.entity.User;
 import com.e106.mungplace.web.exception.ApplicationException;
 import com.e106.mungplace.web.exception.dto.ApplicationError;
 import com.e106.mungplace.web.exploration.dto.ExplorationEventRequest;
+import com.e106.mungplace.web.exploration.dto.ExplorationPayload;
 import com.e106.mungplace.web.exploration.dto.ExplorationResponse;
 import com.e106.mungplace.web.exploration.dto.ExplorationStartWithDogsRequest;
 import com.e106.mungplace.web.util.DateRange;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.elasticsearch.core.geo.GeoPoint;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 @RequiredArgsConstructor
 @Component
 public class ExplorationHelper {
 
-    private final ObjectMapper objectMapper;
     private final ExplorationRepository explorationRepository;
     private final DogExplorationRepository dogExplorationRepository;
 
@@ -40,17 +37,9 @@ public class ExplorationHelper {
                 .forEach(dogExplorationRepository::save);
     }
 
-    public String createExplorationEventPayload(ExplorationEventRequest request) {
-        Map<String, Object> payloadMap = new HashMap<>();
-        payloadMap.put("latitude", request.getLatitude());
-        payloadMap.put("longitude", request.getLongitude());
-        payloadMap.put("timestamp", request.getTimestamp());
-
-        try {
-            return objectMapper.writeValueAsString(payloadMap);
-        } catch (JsonProcessingException e) {
-            throw new ApplicationException(ApplicationError.JSON_PROCESS_FAILED);
-        }
+    public ExplorationPayload createExplorationEventPayload(ExplorationEventRequest request) {
+        GeoPoint geoPoint = getGeoPoint(request.getLatitude(), request.getLongitude());
+        return ExplorationPayload.of(geoPoint, request.getRecordedAt());
     }
 
     public List<ExplorationResponse> getExplorationInfos(Long userId, LocalDate date) {
@@ -90,5 +79,9 @@ public class ExplorationHelper {
         if (explorationRepository.existsByUserAndEndAtIsNull(new User(userId)))
             throw new ApplicationException(ApplicationError.ALREADY_ON_EXPLORATION);
         return true;
+    }
+
+    private GeoPoint getGeoPoint(String latitude, String longitude) {
+        return new GeoPoint(Double.parseDouble(latitude), Double.parseDouble(longitude));
     }
 }

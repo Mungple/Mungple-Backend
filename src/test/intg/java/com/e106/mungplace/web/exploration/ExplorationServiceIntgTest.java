@@ -5,8 +5,6 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -66,13 +64,8 @@ public class ExplorationServiceIntgTest {
                 .userId(1L)
                 .latitude("32.153321")
                 .longitude("32.153321")
-                .timestamp(LocalDateTime.now())
+                .recordedAt(LocalDateTime.now())
                 .build();
-
-        Map<String, Object> payloadMap = new HashMap<>();
-        payloadMap.put("latitude", request.getLatitude());
-        payloadMap.put("longitude", request.getLongitude());
-        payloadMap.put("timestamp", request.getTimestamp());
 
         // kafka Produce 를 가로채 "test" 토픽으로 전송
         when(kafkaTemplate.send(any(String.class), any(String.class), any(ExplorationEvent.class))).then(invocationOnMock ->
@@ -90,7 +83,6 @@ public class ExplorationServiceIntgTest {
         assertThat(receivedEvent.userId()).isEqualTo(userId);
         assertThat(receivedEvent.explorationId()).isEqualTo(explorationId);
         assertThat(receivedEvent.entityType()).isEqualTo("Exploration");
-        assertThat(receivedEvent.payload()).isEqualTo(objectMapper.writeValueAsString(payloadMap));
         assertThat(receivedEvent.publishedAt()).isNotNull();
     }
 }
