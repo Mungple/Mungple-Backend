@@ -1,15 +1,8 @@
 import React, { useState } from 'react';
-import { View, Button, TextInput, Modal, StyleSheet, Image } from 'react-native';
+import { View, Button, TextInput, Modal, StyleSheet, Image, Text} from 'react-native';
 import { launchImageLibrary } from 'react-native-image-picker';
-
-export interface MarkerData {
-  id: string;
-  latitude: number;
-  longitude: number;
-  title: string;
-  body: string;
-  imageUri?: string;
-}
+import { Picker } from '@react-native-picker/picker';
+import { MarkerData } from '../../state/useMapStore'
 
 export interface MarkerFormProps {
   isVisible: boolean;
@@ -23,6 +16,7 @@ const MarkerForm: React.FC<MarkerFormProps> = ({ isVisible, onSubmit, onClose, l
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
   const [imageUri, setImageUri] = useState<string | undefined>(undefined);
+  const [type, setType] = useState<'blue' | 'red'>('blue')
 
   const handleImagePick = () => {
     launchImageLibrary({ mediaType: 'photo' }, response => {
@@ -40,6 +34,7 @@ const MarkerForm: React.FC<MarkerFormProps> = ({ isVisible, onSubmit, onClose, l
       title,
       body,
       imageUri,
+      type,
     };
 
     onSubmit(markerData);
@@ -47,7 +42,7 @@ const MarkerForm: React.FC<MarkerFormProps> = ({ isVisible, onSubmit, onClose, l
   };
 
   return (
-    <Modal visible={isVisible} transparent={true} animationType="slide"> {/* isVisible로 수정 */}
+    <Modal visible={isVisible} transparent={true} animationType="slide">
       <View style={styles.modalContainer}>
         <View style={styles.formContainer}>
           <TextInput
@@ -64,6 +59,19 @@ const MarkerForm: React.FC<MarkerFormProps> = ({ isVisible, onSubmit, onClose, l
           />
           {imageUri && <Image source={{ uri: imageUri }} style={styles.image} />}
           <Button title="Pick an Image" onPress={handleImagePick} />
+
+          <Text style={styles.label}>마커 타입 선택:</Text>
+          <View style={styles.pickerContainer}>
+            <Picker
+              selectedValue={type}
+              onValueChange={(itemValue) => setType(itemValue as 'blue' | 'red')}
+              style={styles.picker}
+            >
+              <Picker.Item label="Blue" value="blue" />
+              <Picker.Item label="Red" value="red" />
+            </Picker>
+          </View>
+
           <Button title="Submit" onPress={handleSubmit} />
           <Button title="Close" onPress={onClose} />
         </View>
@@ -96,6 +104,17 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     marginVertical: 10,
+  },
+  label: {
+    marginTop: 10,
+    fontSize: 16,
+  },
+  pickerContainer: {
+    marginVertical: 10,
+  },
+  picker: {
+    height: 50,
+    width: '100%',
   },
 });
 
