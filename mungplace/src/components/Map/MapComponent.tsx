@@ -1,5 +1,5 @@
 import React, {useRef, useEffect, useState} from 'react';
-import {Animated, StyleSheet, Image} from 'react-native';
+import {Animated, StyleSheet, Image, Modal, View, Text, FlatList, Button } from 'react-native';
 import MapView, {
   Heatmap,
   Marker,
@@ -7,10 +7,10 @@ import MapView, {
   Polyline,
   PROVIDER_GOOGLE,
 } from 'react-native-maps';
+import ClusteredMapView, { Cluster } from 'react-native-map-clustering'
 import geohash from 'ngeohash';
 import styled from 'styled-components/native';
-import {useMapStore} from '@/state/useMapStore';
-import { Zone, MarkerData } from '../../state/useMapStore' // zustand
+import { useMapStore, Zone, MarkerData} from '@/state/useMapStore'; // zustand
 import MarkerForm from '../marker/MarkerForm';
 import usePermission from '@/hooks/usePermission';
 import useUserLocation from '@/hooks/useUserLocation';
@@ -18,6 +18,8 @@ import mungPleMarker from '@/assets/mungPleMarker.png';
 import CustomMapButton from '../common/CustomMapButton';
 import CustomBottomSheet from '../common/CustomBottomSheet';
 import { colors } from '@/constants';
+import blueMarker from '@/assets/blueMarker.png'
+import redMarker from '@/assets/redMarker.png'
 
 interface MapComponentProps {
   userLocation: {latitude: number; longitude: number};
@@ -44,6 +46,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
     globalBlueZones,
     redZones,
     mungPlaces,
+    markers,
     addMarker,
     fetchPersonalBlueZone,
     fetchGlobalBlueZone,
@@ -59,6 +62,10 @@ const MapComponent: React.FC<MapComponentProps> = ({
   const opacity = useRef(new Animated.Value(0)).current;
   const [isDisabled, setIsDisabled] = useState(true);
   const {isUserLocationError} = useUserLocation();
+  const [ clusterMarkers, setClusterMarkers ] = useState<MarkerData[]>([]) // 클러스터에 포함된 마커
+  const [ isListVisible, setListVisible ] = useState(false) // 마커 리스트 모달 표시 여부
+  const [ selectedMarker, setSelectedMarker ] = useState<MarkerData | null>(null) // 리스트에서 선택된 마커
+  const [ isModalVisible, setIsModalVisible ] = useState(false) // 마커 상세 정보 모달 표시 여부
 
   // Fetch zones data
   useEffect(() => {
@@ -71,11 +78,11 @@ const MapComponent: React.FC<MapComponentProps> = ({
     fetchRedZone(location.latitude, location.longitude);
     fetchMungPlace(location.latitude, location.longitude);
   };
-
+  // 마커 추가 버튼 클릭 시 호출되는 함수
   const handleAddMarker = (markerData: MarkerData) => {
     addMarker(markerData)
   }
-
+  // 유저의 위치를 호출하는 함수
   const handlePressUserLocation = () => {
     if (!isUserLocationError) {
       mapRef.current?.animateToRegion({
@@ -87,6 +94,27 @@ const MapComponent: React.FC<MapComponentProps> = ({
     }
   };
 
+  // 클러스터 클릭 시 호출되는 함수
+  const handleClusterPress = (cluster: Cluster, markers: MarkerData[]) => {
+    console.log('클러스터 정보:', cluster)
+    console.log('마커 정보:', markers)
+    
+    const clusterMarker = markers.map(marker => ({
+      id : marker.properties.index.toString(),
+      title : marker.properties.title,
+      description : marker.properties.description
+    }))
+    setClusterMarkers(clusterMarker)
+    setListVisible(true) // 리스트 모달 호출
+  }
+
+  // 마커 클릭 시 상세 정보 모달 호출
+  const handleMarkerPress = (marker: MarkerData) => {
+    setSelectedMarker(marker)
+    setIsModalVisible(true)
+  }
+
+  // 메뉴 햄버거 바 클릭 시 호출되는 함수
   const handlePressMenu = () => {
     setIsMenuVisible(prev => !prev);
     const animationTargets = isMenuVisible
@@ -116,7 +144,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
 
   return (
     <Container>
-      <StyledMapView
+      <ClusteredMapView
         ref={mapRef}
         provider={PROVIDER_GOOGLE}
         showsUserLocation
@@ -129,7 +157,12 @@ const MapComponent: React.FC<MapComponentProps> = ({
           longitudeDelta: 0.0421,
         }}
         minZoomLevel={15}
-        maxZoomLevel={20}>
+        maxZoomLevel={20}
+        style={{flex : 1}}
+        clusteringEnabled={true}
+        clusterColor={colors.ORANGE.DARKER}
+        onClusterPress={handleClusterPress}
+        >
 
         {/* path가 있을 때만 Polyline으로 표시 */}
         {path.length > 1 && (
@@ -157,9 +190,21 @@ const MapComponent: React.FC<MapComponentProps> = ({
 
         {/* Mung Places */}
         {showMungPlace && renderMungPlaces(mungPlaces)}
-      </StyledMapView>
 
-      {/* Marker Form */}
+        {markers.map(marker => (
+          <Marker
+            key={marker.id}
+            coordinate={{ latitude: marker.latitude, longitude: marker.longitude }}
+            title={marker.title}
+            description={marker.body}
+            onPress={() => handleMarkerPress(marker)}
+          >
+            <Image source={marker.type === 'blue' ? blueMarker : redMarker } style={styles.markerImage} />
+          </Marker>
+        ))}
+      </ClusteredMapView>
+
+      {/* 마커 폼 호출 */}
       {isFormVisible && userLocation && (
         <MarkerForm
           isVisible={true}
@@ -173,7 +218,39 @@ const MapComponent: React.FC<MapComponentProps> = ({
         />
       )}
 
-      {/* Custom Map Buttons */}
+      {/* 클러스터에 포함된 마커 리스트 모달 */}
+        <Modal visible={isListVisible} animationType="slide" onRequestClose={() => setListVisible(false)}>
+          <View style={styles.modalContainer}>
+            <Text style={styles.modalTitle}>Clustered Markers</Text>
+            <FlatList
+              data={clusterMarkers}
+              keyExtractor={item => item.id}
+              renderItem={({item}) => (
+                <View style={styles.listItem}>
+                  <Text>{item.title}</Text>
+                  <Button title="Details" onPress={() => handleMarkerPress(item)} />
+                </View>
+              )}
+            />
+            <Button title="Close" onPress={() => setListVisible(false)} />
+          </View>
+        </Modal>
+
+        {/* 마커 상세 정보 모달 */}
+        {selectedMarker && (
+          <Modal visible={isModalVisible} animationType="slide" onRequestClose={() => setModalVisible(false)}>
+            <View style={styles.modalContainer}>
+              <Text style={styles.modalTitle}>{selectedMarker.title}</Text>
+              <Text>{selectedMarker.body}</Text>
+              {selectedMarker.imageUri && (
+                <Image source={{uri: selectedMarker.imageUri}} style={styles.markerImageLarge} />
+              )}
+              <Button title="Close" onPress={() => setModalVisible(false)} />
+            </View>
+          </Modal>
+        )}
+
+      {/* 커스텀 맵 버튼 */}
       <CustomMapButton
         onPress={handlePressMenu}
         iconName="menu"
@@ -272,15 +349,36 @@ const styles = StyleSheet.create({
     width: 30,
     height: 30,
   },
+  markerImageLarge: {
+    width: 100,
+    height: 100,
+    resizeMode: 'contain',
+  },
+  modalContainer: {
+    flex: 1,
+    padding: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0,5)'
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+  listItem: {
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+  },
 });
 
 const Container = styled.View`
   flex: 1;
 `;
 
-const StyledMapView = styled(MapView)`
-  flex: 1;
-`;
+// const StyledMapView = styled(MapView)`
+//   flex: 1;
+// `;
 
 const ButtonWithTextContainer = styled.View<{top?: number; right?: number}>`
   position: absolute;
