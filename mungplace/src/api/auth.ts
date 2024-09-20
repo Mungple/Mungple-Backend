@@ -23,21 +23,15 @@ type RequestProfile = Omit<
   'userId' | 'nickname' | 'imageUri'
 >;
 
-// 회원가입 요청 함수
-const postSignup = async ({email, password}: RequestUser): Promise<void> => {
-  const {data} = await axiosInstance.post('/auth/signup', {email, password});
-  return data;
-};
-
 // 로그인 요청 함수
 const postLogin = async ({email, password}: RequestUser): Promise<ResponseToken> => {
   const {data} = await axiosInstance.post('/auth/signin', {email, password});
   return data;
 };
 
-// 카카오 로그인 요청 함수
-const kakaoLogin = async (token: string): Promise<ResponseToken> => {
-  const {data} = await axiosInstance.post('/auth/oauth/kakao', {token});
+// 소셜 로그인 요청 함수
+const socialLogin = async (token: string): Promise<ResponseToken> => {
+  const {data} = await axiosInstance.post('/auth/oauth/social', {token});
   return data;
 };
 
@@ -67,5 +61,5 @@ const logout = async () => {
   await axiosInstance.post('/auth/logout');
 };
 
-export {postSignup, postLogin, getProfile, editProfile, logout, getAccessToken, kakaoLogin};
+export {postLogin, getProfile, editProfile, logout, getAccessToken, socialLogin};
 export type {RequestUser, ResponseToken, ResponseProfile, RequestProfile};

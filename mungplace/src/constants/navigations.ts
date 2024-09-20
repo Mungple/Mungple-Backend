@@ -8,11 +8,9 @@ const mainNavigations = {
 
 const authNavigations = {
   AUTH_HOME: 'AuthHome',
-  KAKAO: 'Kakao',
-  NAVER: 'Naver',
-  GOOGLE: 'Google',
+  SOCIAL_LOGIN: 'SocialLogin',
   POST_PROFILE: 'PostProfile',
-  INPUT_PET: 'InputPet',
+  POST_PROFILE_PET: 'InputPet',
 } as const;
 
 const mapNavigations = {
