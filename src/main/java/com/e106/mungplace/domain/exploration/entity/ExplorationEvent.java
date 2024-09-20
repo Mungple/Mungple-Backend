@@ -1,6 +1,7 @@
 package com.e106.mungplace.domain.exploration.entity;
 
 import com.e106.mungplace.web.exploration.dto.ExplorationEventRequest;
+import com.e106.mungplace.web.exploration.dto.ExplorationPayload;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
@@ -11,10 +12,10 @@ public record ExplorationEvent (
         String entityType,
         Long userId,
         Long explorationId,
-        String payload,
+        ExplorationPayload payload,
         LocalDateTime publishedAt
 ) {
-    public static ExplorationEvent of(ExplorationEventRequest request, Long id, String payload) {
+    public static ExplorationEvent of(ExplorationEventRequest request, Long id, ExplorationPayload payload) {
         return ExplorationEvent.builder()
                 .entityType("Exploration")
                 .userId(request.getUserId())

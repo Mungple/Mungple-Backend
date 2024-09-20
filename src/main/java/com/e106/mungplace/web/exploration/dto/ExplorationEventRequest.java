@@ -24,5 +24,5 @@ public class ExplorationEventRequest {
     private String longitude;
 
     @NotNull
-    private LocalDateTime timestamp;
+    private LocalDateTime recordedAt;
 }

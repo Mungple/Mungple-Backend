@@ -29,7 +29,7 @@ public class ManagerExplorePointService {
 		User manager = managerReader.findOrCreateManager(managerName);
 		Exploration exploration = explorationReader.create(manager, LocalDateTime.now());
 		List<ExplorePoint> explorePoints = points.stream()
-			.map((point) -> new ExplorePoint(manager.getUserId(), exploration.getId(), point))
+			.map((point) -> new ExplorePoint(manager.getUserId(), exploration.getId(), point, LocalDateTime.now()))
 			.toList();
 
 		return explorePointRepository.saveAll(explorePoints);
