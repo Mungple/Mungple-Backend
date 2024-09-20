@@ -1,6 +1,6 @@
 // screens/MapScreen.tsx
 import React, {useState} from 'react';
-import {View, Button, StyleSheet} from 'react-native';
+import {View, StyleSheet} from 'react-native';
 import MapComponent from '@/components/map/MapComponent';
 import useUserLocation from '@/hooks/useUserLocation';
 
@@ -28,9 +28,6 @@ const MapScreen = () => {
             onFormClose={handleFormClose}
             onAddMarker={handleAddMarker}
           />
-          <View style={styles.buttonContainer}>
-            <Button title="Add Marker" onPress={() => setIsFormVisible(true)} />
-          </View>
         </>
       )}
     </View>

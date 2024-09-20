@@ -7,12 +7,10 @@ import MapView, {
   Polyline,
   PROVIDER_GOOGLE,
 } from 'react-native-maps';
-
 import geohash from 'ngeohash';
-import cluster from 'points-cluster';
 import styled from 'styled-components/native';
 import {useMapStore} from '@/state/useMapStore';
-
+import { Zone, MarkerData } from '../../state/useMapStore' // zustand
 import MarkerForm from '../marker/MarkerForm';
 import usePermission from '@/hooks/usePermission';
 import useUserLocation from '@/hooks/useUserLocation';
@@ -24,31 +22,7 @@ import { colors } from '@/constants';
 interface MapComponentProps {
   userLocation: {latitude: number; longitude: number};
   path?: {latitude: number; longitude: number}[];
-  isFormVisible: boolean;
-  onFormClose: () => void;
-  onAddMarker: (markerData: Marker) => void;
   bottomOffset?: number;
-}
-
-interface Marker {
-  id: string;
-  latitude: number;
-  longitude: number;
-  title?: string;
-  body?: string;
-}
-
-interface Cluster {
-  latitude: number;
-  longitude: number;
-  count: number;
-  cluster?: Marker[] | null | undefined;
-}
-
-interface Zone {
-  latitude: number;
-  longitude: number;
-  weight?: number;
 }
 
 interface MungPlace {
@@ -58,9 +32,6 @@ interface MungPlace {
 
 const MapComponent: React.FC<MapComponentProps> = ({
   userLocation,
-  isFormVisible,
-  onFormClose,
-  onAddMarker,
   bottomOffset = 0,
   path = [],
 }) => {
@@ -69,12 +40,11 @@ const MapComponent: React.FC<MapComponentProps> = ({
     showGlobalBlueZone,
     showRedZone,
     showMungPlace,
-    showUserMarkers,
     personalBlueZones,
     globalBlueZones,
     redZones,
     mungPlaces,
-    markers,
+    addMarker,
     fetchPersonalBlueZone,
     fetchGlobalBlueZone,
     fetchRedZone,
@@ -82,9 +52,8 @@ const MapComponent: React.FC<MapComponentProps> = ({
   } = useMapStore();
 
   const mapRef = useRef<MapView | null>(null);
-  const [clusteredMarkers, setClusteredMarkers] = useState<Cluster[]>([]);
-  const [selectedCluster, setSelectedCluster] = useState<Marker[]>([]);
   const [isMenuVisible, setIsMenuVisible] = useState(false);
+  const [isFormVisible, setFormVisible] = useState(false);
   const translateY = useRef(new Animated.Value(0)).current;
   const [modalVisible, setModalVisible] = useState(false);
   const opacity = useRef(new Animated.Value(0)).current;
@@ -103,48 +72,9 @@ const MapComponent: React.FC<MapComponentProps> = ({
     fetchMungPlace(location.latitude, location.longitude);
   };
 
-  // Cluster markers
-  useEffect(() => {
-    if (markers.length > 0) {
-      const clustered = clusterMarkers(markers);
-      setClusteredMarkers(
-        clustered.map(c => ({
-          ...c,
-          cluster: c.cluster || null,
-        }))
-      );
-    }
-  }, [markers]);
-
-  const clusterMarkers = (markers: Marker[]): Cluster[] => {
-    return cluster(
-      markers.map(marker => ({
-        id: marker.id,
-        latitude: marker.latitude,
-        longitude: marker.longitude,
-      })),
-      {radius: 100},
-    ).map((clusteredPoint: any) => ({
-      latitude: clusteredPoint.latitude,
-      longitude: clusteredPoint.longitude,
-      count: clusteredPoint.count,
-      cluster: clusteredPoint.cluster || null,
-    }));
-  };
-
-  const handleClusterPress = (cluster: Cluster) => {
-    if (cluster.cluster) {
-      setSelectedCluster(
-        cluster.cluster.map((c: Marker) => ({
-          id: c.id,
-          latitude: c.latitude,
-          longitude: c.longitude,
-          title: c.title,
-          body: c.body,
-        })),
-      );
-    }
-  };
+  const handleAddMarker = (markerData: MarkerData) => {
+    addMarker(markerData)
+  }
 
   const handlePressUserLocation = () => {
     if (!isUserLocationError) {
@@ -210,26 +140,6 @@ const MapComponent: React.FC<MapComponentProps> = ({
           />
         )}
 
-        {/* Clustered Markers */}
-        {showUserMarkers &&
-          clusteredMarkers.map((cluster: Cluster) => (
-            <Marker
-              key={`cluster-${cluster.latitude}-${cluster.longitude}`}
-              coordinate={{
-                latitude: cluster.latitude,
-                longitude: cluster.longitude,
-              }}
-              onPress={() => handleClusterPress(cluster)}>
-              {cluster.cluster ? (
-                <ClusterContainer>
-                  <ClusterText>{cluster.count}</ClusterText>
-                </ClusterContainer>
-              ) : (
-                <Image source={mungPleMarker} style={styles.markerImage} />
-              )}
-            </Marker>
-          ))}
-
         {/* Heatmaps */}
         {showPersonalBlueZone && (
           <Heatmap points={createHeatmapPoints(personalBlueZones)} />
@@ -252,11 +162,12 @@ const MapComponent: React.FC<MapComponentProps> = ({
       {/* Marker Form */}
       {isFormVisible && userLocation && (
         <MarkerForm
+          isVisible={true}
           onSubmit={markerData => {
-            onAddMarker(markerData);
-            onFormClose();
+            handleAddMarker(markerData)
+            setFormVisible(false)
           }}
-          onClose={onFormClose}
+          onClose={() => setFormVisible(false)}
           latitude={userLocation.latitude}
           longitude={userLocation.longitude}
         />
@@ -281,7 +192,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
         <ButtonWithTextContainer top={40} right={20}>
           <TextLabel>마커 등록</TextLabel>
           <CustomMapButton
-            onPress={() => {}}
+            onPress={() => setFormVisible(true)}
             iconName="location-outline"
             inValid={isDisabled}
           />
@@ -385,19 +296,6 @@ const TextLabel = styled.Text`
   font-size: 24px;
   font-weight: bold;
   color: black;
-`;
-
-const ClusterContainer = styled.View`
-  background-color: #ff6347;
-  padding: 10px;
-  border-radius: 20px;
-  align-items: center;
-  justify-content: center;
-`;
-
-const ClusterText = styled.Text`
-  color: #fff;
-  font-size: 14px;
 `;
 
 export default MapComponent;
