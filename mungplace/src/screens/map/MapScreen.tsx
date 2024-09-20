@@ -12,7 +12,7 @@ const MapScreen = () => {
     setIsFormVisible(false);
   };
 
-  const handleAddMarker = (markerData: any) => {
+  const handleAddMarker = (markerData: string | number) => {
     // Marker 추가 로직
     console.log('Adding Marker:', markerData);
     // addMarker(markerData); // 예시로 주석 처리, 실제로는 상태 관리 로직을 호출합니다.
