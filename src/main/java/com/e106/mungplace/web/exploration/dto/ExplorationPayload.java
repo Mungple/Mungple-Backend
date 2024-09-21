@@ -1,18 +1,19 @@
 package com.e106.mungplace.web.exploration.dto;
 
 import lombok.Builder;
-import org.springframework.data.elasticsearch.core.geo.GeoPoint;
 
 import java.time.LocalDateTime;
 
+import com.e106.mungplace.common.map.dto.Point;
+
 @Builder
 public record ExplorationPayload (
-    GeoPoint geoPoint,
+    Point point,
     LocalDateTime recordedAt
 ) {
-    public static ExplorationPayload of(GeoPoint geoPoint, LocalDateTime createdAt) {
+    public static ExplorationPayload of(Point point, LocalDateTime createdAt) {
         return ExplorationPayload.builder()
-                .geoPoint(geoPoint)
+                .point(point)
                 .recordedAt(createdAt)
                 .build();
     }

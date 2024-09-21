@@ -49,6 +49,9 @@ server:
 
 logging:
   level:
+    org.elasticsearch: TRACE
+    org.elasticsearch.client.RestClient: TRACE
+    org.springframework.data.elasticsearch.core: TRACE
     org.springframework.security: DEBUG
     org.springframework.web.socket: DEBUG
     org.springframework.messaging: DEBUG

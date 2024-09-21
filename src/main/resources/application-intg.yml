@@ -16,18 +16,13 @@ spring:
 
 logging:
   level:
-    org:
-      elasticsearch:
-        client: TRACE
-      springframework:
-        data:
-          elasticsearch:
-            core:
-              ElasticsearchRestTemplate: DEBUG
-        security: DEBUG
-        web.socket: DEBUG
-        messaging: DEBUG
-        web.socket.handler: DEBUG
+    org.elasticsearch: TRACE
+    org.elasticsearch.client.RestClient: TRACE
+    org.springframework.data.elasticsearch.core: TRACE
+    org.springframework.security: DEBUG
+    org.springframework.web.socket: DEBUG
+    org.springframework.messaging: DEBUG
+    org.springframework.web.socket.handler: DEBUG
 
 elasticsearch:
   host-and-port: localhost:9200
