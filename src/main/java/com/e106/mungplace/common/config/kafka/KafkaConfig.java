@@ -115,8 +115,8 @@ public class KafkaConfig {
     }
 
     @Bean
-    public NewTopic hitMapTopic() {
-        return TopicBuilder.name("hitmap")
+    public NewTopic heatMapTopic() {
+        return TopicBuilder.name("heatmap")
             .partitions(3)
             .replicas(1)
             .config(TopicConfig.RETENTION_MS_CONFIG, String.valueOf(7 * 24 * 60 * 60))

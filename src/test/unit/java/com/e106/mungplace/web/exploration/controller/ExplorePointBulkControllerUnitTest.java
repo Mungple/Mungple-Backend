@@ -13,11 +13,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.elasticsearch.core.geo.GeoPoint;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
+import com.e106.mungplace.common.map.dto.Point;
 import com.e106.mungplace.domain.user.repository.UserRepository;
 import com.e106.mungplace.web.manager.controller.ExplorePointBulkController;
 import com.e106.mungplace.web.manager.dto.ManagerExplorePointCreateRequest;
@@ -45,7 +45,7 @@ class ExplorePointBulkControllerUnitTest {
 	void insertBulkExplorePoint() throws Exception {
 		// given
 		String managerName = "manager";
-		List<GeoPoint> points = Stream.generate(this::generateRandomPoint).limit(100).toList();
+		List<Point> points = Stream.generate(this::generateRandomPoint).limit(100).toList();
 		String requestBody = objectMapper.writeValueAsString(new ManagerExplorePointCreateRequest(managerName, points));
 
 		// when
@@ -58,8 +58,8 @@ class ExplorePointBulkControllerUnitTest {
 
 	}
 
-	private GeoPoint generateRandomPoint() {
+	private Point generateRandomPoint() {
 		Random random = new Random();
-		return new GeoPoint(random.nextDouble() * 10, random.nextDouble() * 10);
+		return new Point(random.nextDouble() * 10, random.nextDouble() * 10);
 	}
 }

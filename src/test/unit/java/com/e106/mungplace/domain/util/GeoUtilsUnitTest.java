@@ -8,7 +8,8 @@ import org.gavaghan.geodesy.GeodeticCurve;
 import org.gavaghan.geodesy.GlobalCoordinates;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.data.geo.Point;
+
+import com.e106.mungplace.common.map.dto.Point;
 
 class GeoUtilsUnitTest {
 
@@ -35,8 +36,8 @@ class GeoUtilsUnitTest {
 		Ellipsoid reference = Ellipsoid.WGS84;
 
 		// 두 좌표 사이의 거리 계산
-		GeodeticCurve geoCurve = geoCalc.calculateGeodeticCurve(reference, new GlobalCoordinates(p1.getX(), p1.getY()),
-			new GlobalCoordinates(p2.getX(), p2.getY()));
+		GeodeticCurve geoCurve = geoCalc.calculateGeodeticCurve(reference, new GlobalCoordinates(p1.lat(), p1.lon()),
+			new GlobalCoordinates(p2.lat(), p2.lon()));
 
 		return geoCurve.getEllipsoidalDistance();
 	}

@@ -1,4 +1,4 @@
-package com.e106.mungplace.web.hitmap.service;
+package com.e106.mungplace.web.heatmap.service;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -13,41 +13,41 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.geo.Point;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.test.context.ActiveProfiles;
 
-import com.e106.mungplace.domain.hitmap.event.HitMapQueryEvent;
-import com.e106.mungplace.domain.hitmap.event.HitMapQueryType;
-import com.e106.mungplace.web.hitmap.dto.HitMapRequest;
+import com.e106.mungplace.common.map.dto.Point;
+import com.e106.mungplace.domain.heatmap.event.HeatmapQueryEvent;
+import com.e106.mungplace.domain.heatmap.event.HeatmapQueryType;
+import com.e106.mungplace.web.heatmap.dto.HeatmapRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @ActiveProfiles("intg")
 @SpringBootTest
-public class HitMapServiceIntgTest {
+public class HeatmapQueryListenerServiceIntgTest {
 
 	@Autowired
-	private HitMapService hitMapService;
+	private HeatmapQueryListenerService heatmapQueryListenerService;
 
 	@MockBean
 	private KafkaTemplate<String, Object> kafkaTemplate;
 
 	@Autowired
-	private KafkaTemplate<String, HitMapQueryEvent> realKafkaTemplate;
+	private KafkaTemplate<String, HeatmapQueryEvent> realKafkaTemplate;
 
 	@Autowired
 	private ObjectMapper objectMapper;
 
-	private BlockingQueue<HitMapQueryEvent> records;
+	private BlockingQueue<HeatmapQueryEvent> records;
 
 	@BeforeEach
 	void setUp() {
 		records = new LinkedBlockingQueue<>();
 	}
 
-	@KafkaListener(topics = "test", groupId = "#{T(java.util.UUID).randomUUID().toString()}")
-	public void consume(HitMapQueryEvent event) {
+	@KafkaListener(topics = "heatmap-query-test", groupId = "#{T(java.util.UUID).randomUUID().toString()}")
+	public void consume(HeatmapQueryEvent event) {
 		records.add(event);
 	}
 
@@ -56,21 +56,21 @@ public class HitMapServiceIntgTest {
 	void When_EmitHitMapQueryEvent_Then_CanConsumeEvent() throws InterruptedException {
 		// given
 		Long userId = 1L;
-		HitMapRequest request = new HitMapRequest(new Point(38.39204, 123.343433), 100);
-		// kafka Produce를 가로채 "test" 토픽으로 전송
+		HeatmapRequest request = new HeatmapRequest(new Point(38.39204, 123.343433), 100);
+		// kafka Produce를 가로채 "heatmap-query-test" 토픽으로 전송
 		when(kafkaTemplate.send(any(), any())).then(invocationOnMock -> {
-			return realKafkaTemplate.send("test", invocationOnMock.getArgument(1));
+			return realKafkaTemplate.send("heatmap-query-test", invocationOnMock.getArgument(1));
 		});
 
 		// when
 		// Consumer가 생성될 때까지 대기
-		Thread.sleep(3000);
-		hitMapService.userBluezoneQueryProcess(userId, request);
-		HitMapQueryEvent receivedEvent = records.poll(10, TimeUnit.SECONDS);
+		Thread.sleep(5000);
+		heatmapQueryListenerService.userBluezoneQueryProcess(userId, request);
+		HeatmapQueryEvent receivedEvent = records.poll(10, TimeUnit.SECONDS);
 
 		// then
-		assertThat(receivedEvent).isNotNull().isInstanceOf(HitMapQueryEvent.class);
+		assertThat(receivedEvent).isNotNull().isInstanceOf(HeatmapQueryEvent.class);
 		assertThat(receivedEvent.userId()).isEqualTo(userId);
-		assertThat(receivedEvent.queryType()).isEqualTo(HitMapQueryType.USER_BLUEZONE);
+		assertThat(receivedEvent.queryType()).isEqualTo(HeatmapQueryType.USER_BLUEZONE);
 	}
 }

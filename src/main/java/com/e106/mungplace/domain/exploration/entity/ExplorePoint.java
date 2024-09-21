@@ -1,20 +1,20 @@
 package com.e106.mungplace.domain.exploration.entity;
 
-import lombok.Builder;
-import lombok.ToString;
+import java.time.LocalDateTime;
+
 import org.springframework.data.elasticsearch.annotations.DateFormat;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 import org.springframework.data.elasticsearch.core.geo.GeoPoint;
 
+import com.e106.mungplace.common.map.dto.Point;
+
 import jakarta.persistence.Id;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-
-@ToString
 @NoArgsConstructor
 @Getter
 @Document(indexName = "explore_point")
@@ -35,10 +35,10 @@ public class ExplorePoint {
 	private LocalDateTime recordedAt;
 
 	@Builder
-	public ExplorePoint(Long userId, Long explorationId, GeoPoint point, LocalDateTime recordedAt) {
+	public ExplorePoint(Long userId, Long explorationId, Point point, LocalDateTime recordedAt) {
 		this.userId = userId;
 		this.explorationId = explorationId;
-		this.point = point;
+		this.point = new GeoPoint(point.lat(), point.lon());
 		this.recordedAt = recordedAt;
 	}
 }

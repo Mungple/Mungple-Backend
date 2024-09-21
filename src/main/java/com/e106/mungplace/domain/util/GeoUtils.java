@@ -3,22 +3,30 @@ package com.e106.mungplace.domain.util;
 import org.gavaghan.geodesy.Ellipsoid;
 import org.gavaghan.geodesy.GeodeticCalculator;
 import org.gavaghan.geodesy.GlobalCoordinates;
-import org.springframework.data.geo.Point;
+import org.locationtech.spatial4j.context.SpatialContext;
+import org.locationtech.spatial4j.io.GeohashUtils;
 
-public class GeoUtils {
+import com.e106.mungplace.common.map.dto.Point;
 
-	public static Point calculateNorthWestPoint(Point point, int sideLength) {
-		GlobalCoordinates nw = calculateOffset(new GlobalCoordinates(point.getX(), point.getY()), -45,
+public interface GeoUtils {
+
+	static Point calculateNorthWestPoint(Point point, int sideLength) {
+		GlobalCoordinates nw = calculateOffset(new GlobalCoordinates(point.lat(), point.lon()), -45,
 			sideLength / Math.sqrt(2));
 
 		return new Point(nw.getLatitude(), nw.getLongitude());
 	}
 
-	public static Point calculateSouthEastPoint(Point point, int sideLength) {
-		GlobalCoordinates nw = calculateOffset(new GlobalCoordinates(point.getX(), point.getY()), 135,
+	static Point calculateSouthEastPoint(Point point, int sideLength) {
+		GlobalCoordinates nw = calculateOffset(new GlobalCoordinates(point.lat(), point.lon()), 135,
 			sideLength / Math.sqrt(2));
 
 		return new Point(nw.getLatitude(), nw.getLongitude());
+	}
+
+	static Point calculateGeohashCenterPoint(String geoHashString) {
+		var center = GeohashUtils.decode(geoHashString, SpatialContext.GEO);
+		return new Point(center.getLat(), center.getLon());
 	}
 
 	private static GlobalCoordinates calculateOffset(GlobalCoordinates center, double bearing, double distanceMeters) {

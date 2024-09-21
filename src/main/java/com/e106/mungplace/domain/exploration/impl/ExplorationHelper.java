@@ -1,5 +1,6 @@
 package com.e106.mungplace.domain.exploration.impl;
 
+import com.e106.mungplace.common.map.dto.Point;
 import com.e106.mungplace.domain.exploration.entity.DogExploration;
 import com.e106.mungplace.domain.exploration.entity.Exploration;
 import com.e106.mungplace.domain.exploration.repository.DogExplorationRepository;
@@ -13,7 +14,6 @@ import com.e106.mungplace.web.exploration.dto.ExplorationResponse;
 import com.e106.mungplace.web.exploration.dto.ExplorationStartWithDogsRequest;
 import com.e106.mungplace.web.util.DateRange;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.elasticsearch.core.geo.GeoPoint;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
@@ -38,8 +38,8 @@ public class ExplorationHelper {
     }
 
     public ExplorationPayload createExplorationEventPayload(ExplorationEventRequest request) {
-        GeoPoint geoPoint = getGeoPoint(request.getLatitude(), request.getLongitude());
-        return ExplorationPayload.of(geoPoint, request.getRecordedAt());
+        Point point = getPoint(request.getLatitude(), request.getLongitude());
+        return ExplorationPayload.of(point, request.getRecordedAt());
     }
 
     public List<ExplorationResponse> getExplorationInfos(Long userId, LocalDate date) {
@@ -81,7 +81,7 @@ public class ExplorationHelper {
         return true;
     }
 
-    private GeoPoint getGeoPoint(String latitude, String longitude) {
-        return new GeoPoint(Double.parseDouble(latitude), Double.parseDouble(longitude));
+    private Point getPoint(String latitude, String longitude) {
+        return new Point(Double.parseDouble(latitude), Double.parseDouble(longitude));
     }
 }

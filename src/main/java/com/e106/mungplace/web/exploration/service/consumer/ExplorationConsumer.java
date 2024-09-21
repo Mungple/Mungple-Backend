@@ -31,7 +31,7 @@ public class ExplorationConsumer {
         ExplorePoint explorePoint = ExplorePoint.builder()
                 .userId(receivedEvent.userId())
                 .explorationId(receivedEvent.explorationId())
-                .point(receivedEvent.payload().geoPoint())
+                .point(receivedEvent.payload().point())
                 .recordedAt(receivedEvent.payload().recordedAt())
                 .build();
 

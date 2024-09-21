@@ -13,11 +13,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.elasticsearch.core.geo.GeoPoint;
 import org.springframework.test.context.ActiveProfiles;
 
 import net.bytebuddy.utility.RandomString;
 
+import com.e106.mungplace.common.map.dto.Point;
 import com.e106.mungplace.domain.exploration.entity.ExplorePoint;
 import com.e106.mungplace.domain.exploration.repository.ExplorePointRepository;
 import com.e106.mungplace.domain.user.entity.ProviderName;
@@ -48,7 +48,7 @@ class ManagerExplorePointServiceIntgTest {
 		User user = generateRandomUser();
 		when(userHelper.getCurrentUserId()).thenReturn(user.getUserId());
 
-		List<GeoPoint> points = Stream.generate(this::generateRandomPoint).limit(100).toList();
+		List<Point> points = Stream.generate(this::generateRandomPoint).limit(100).toList();
 
 		// when
 		Iterable<ExplorePoint> savedPoints = explorePointService.bulkInsertProcess(user.getProviderId(), points);
@@ -68,8 +68,8 @@ class ManagerExplorePointServiceIntgTest {
 			new User(RandomString.make(), ProviderName.MANAGER, RandomString.make(), RandomString.make()));
 	}
 
-	private GeoPoint generateRandomPoint() {
+	private Point generateRandomPoint() {
 		Random random = new Random(System.currentTimeMillis());
-		return new GeoPoint(random.nextDouble() * 10, random.nextDouble() * 10);
+		return new Point(random.nextDouble() * 10, random.nextDouble() * 10);
 	}
 }
