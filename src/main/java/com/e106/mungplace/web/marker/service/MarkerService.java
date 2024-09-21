@@ -8,6 +8,7 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.e106.mungplace.common.config.minio.impl.ImageStore;
 import com.e106.mungplace.common.transaction.GlobalTransactional;
 import com.e106.mungplace.domain.exploration.entity.Exploration;
 import com.e106.mungplace.domain.exploration.repository.ExplorationRepository;
@@ -20,10 +21,10 @@ import com.e106.mungplace.domain.marker.entity.PublishStatus;
 import com.e106.mungplace.domain.marker.repository.MarkerOutboxRepository;
 import com.e106.mungplace.domain.marker.repository.MarkerRepository;
 import com.e106.mungplace.domain.user.impl.UserHelper;
-import com.e106.mungplace.common.config.minio.impl.ImageStore;
 import com.e106.mungplace.web.exception.ApplicationException;
 import com.e106.mungplace.web.exception.dto.ApplicationError;
 import com.e106.mungplace.web.marker.dto.MarkerCreateRequest;
+import com.e106.mungplace.web.marker.dto.MarkerPayload;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -58,14 +59,25 @@ public class MarkerService {
 
 		// Marker 생성 및 저장
 		Marker marker = createMarker(markerInfo);
+
 		marker.updateUser(userHelper.getCurrentUser());
 		markerRepository.save(marker);
 
 		// 이미지 저장 처리
 		saveImageFiles(imageFiles, marker);
 
+		MarkerPayload markerPayload = MarkerPayload.builder()
+			.markerId(marker.getId())
+			.userId(marker.getUser().getUserId())
+			.title(marker.getTitle())
+			.lat(marker.getLat())
+			.lon(marker.getLon())
+			.type(marker.getType().name())
+			.explorationId(marker.getExploration() != null ? marker.getExploration().getId() : null)
+			.build();
+
 		// Outbox 생성
-		createMarkerEvent(marker);
+		createMarkerEvent(marker, markerPayload);
 	}
 
 	private void validateImageFileCount(List<MultipartFile> imageFiles) {
@@ -91,10 +103,10 @@ public class MarkerService {
 		}
 	}
 
-	private void createMarkerEvent(Marker marker) {
-		// TODO: <홍성우> Exception 변경
-		String payload = serializeMarker(marker).orElseThrow(RuntimeException::new);
-
+	private void createMarkerEvent(Marker marker, MarkerPayload markerPayload) {
+		// MarkerPayload를 JSON으로 직렬화
+		String payload = serializeMarker(markerPayload).orElseThrow(RuntimeException::new);
+		// MarkerEvent 객체 생성
 		MarkerEvent outboxEntry = MarkerEvent.builder()
 			.createdAt(LocalDateTime.now())
 			.status(PublishStatus.READY)
@@ -104,14 +116,15 @@ public class MarkerService {
 			.entityId(marker.getId())
 			.build();
 
+		// Outbox에 저장
 		markerOutboxRepository.save(outboxEntry);
 	}
 
-	private Optional<String> serializeMarker(Marker marker) {
+	private Optional<String> serializeMarker(MarkerPayload markerPayload) {
 		try {
-			return Optional.of(objectMapper.writeValueAsString(marker));
+			return Optional.of(objectMapper.writeValueAsString(markerPayload));
 		} catch (JsonProcessingException e) {
-			log.error("Marker 객체를 JSON으로 변환하는 중 오류 발생: {}", marker.getId(), e);
+			log.error("MarkerPayload 객체를 JSON으로 변환하는 중 오류 발생: {}", markerPayload.getMarkerId(), e);
 			return Optional.empty();
 		}
 	}

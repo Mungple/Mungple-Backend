@@ -1,18 +1,14 @@
 package com.e106.mungplace.web.marker.producer;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import com.e106.mungplace.domain.marker.entity.Marker;
 import com.e106.mungplace.domain.marker.entity.MarkerEvent;
 import com.e106.mungplace.domain.marker.entity.PublishStatus;
 import com.e106.mungplace.domain.marker.repository.MarkerOutboxRepository;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +24,6 @@ public class MarkerProducer {
 
 	private final KafkaTemplate<String, MarkerEvent> kafkaTemplate;
 	private final MarkerOutboxRepository markerOutboxRepository;
-	private final ObjectMapper objectMapper;
 
 	@Transactional
 	@Scheduled(fixedDelayString = "${outbox.polling.interval:5000}")
@@ -66,15 +61,6 @@ public class MarkerProducer {
 				log.error("Kafka 메시지 발송 실패 - EntityId: {}", outboxEntry.getEntityId(), ex);
 			}
 		});
-	}
-
-	private Optional<Marker> deserializeMarker(String payload) {
-		try {
-			return Optional.of(objectMapper.readValue(payload, Marker.class));
-		} catch (JsonProcessingException e) {
-			log.error("JSON 문자열을 Marker 객체로 변환하는 중 오류 발생: {}", payload, e);
-			return Optional.empty();
-		}
 	}
 
 	// Outbox의 상태를 DONE으로 업데이트하고 저장

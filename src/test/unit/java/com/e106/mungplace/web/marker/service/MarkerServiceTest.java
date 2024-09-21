@@ -2,16 +2,11 @@ package com.e106.mungplace.web.marker.service;
 
 import static org.mockito.Mockito.*;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 import org.assertj.core.api.Assertions;
 import org.assertj.core.api.ThrowableAssert;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -35,7 +30,7 @@ import com.e106.mungplace.domain.user.entity.User;
 import com.e106.mungplace.domain.user.impl.UserHelper;
 import com.e106.mungplace.web.exception.ApplicationException;
 import com.e106.mungplace.web.marker.dto.MarkerCreateRequest;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.e106.mungplace.web.marker.dto.MarkerPayload;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @ExtendWith(MockitoExtension.class)
@@ -120,11 +115,22 @@ class MarkerServiceTest {
 
 		// Marker 객체 생성
 		Marker marker = Marker.builder()
-			.lat(new BigDecimal("36.9369"))
-			.lon(new BigDecimal("22.2222"))
+			.lat(36.9369)
+			.lon(22.2222)
 			.title("markerTitle")
 			.content("markerContent")
 			.type(MarkerType.BLUE)
+			.build();
+
+		// MarkerPayload 객체 생성
+		MarkerPayload markerPayload = MarkerPayload.builder()
+			.markerId(marker.getId())
+			.userId(user.getUserId())
+			.title(marker.getTitle())
+			.lat(marker.getLat())
+			.lon(marker.getLon())
+			.type(marker.getType().name())
+			.explorationId(null)
 			.build();
 
 		// when
@@ -142,42 +148,51 @@ class MarkerServiceTest {
 	@DisplayName("마커 생성시 마커 저장(산책 할때)")
 	@Test
 	void testCreateMarkerProcess_WhenExploring_ThenSaveExploration() throws Exception {
-			// given
-			User user = new User(1L);
-			Exploration exploration = new Exploration();
+		// given
+		User user = new User(1L);
+		Exploration exploration = new Exploration();
 
-			List<MultipartFile> imageFiles = Arrays.asList(
-				mock(MultipartFile.class),
-				mock(MultipartFile.class)
-			);
+		List<MultipartFile> imageFiles = Arrays.asList(
+			mock(MultipartFile.class),
+			mock(MultipartFile.class)
+		);
 
-			Marker marker = Marker.builder()
-				.lat(new BigDecimal("36.9369"))
-				.lon(new BigDecimal("22.2222"))
-				.title("markerTitle")
-				.content("markerContent")
-				.exploration(exploration)
-				.type(MarkerType.BLUE)
-				.user(user)
-				.build();
-			String markerInfoJson = "{"
-				+ "\"title\": \"markerTitle\","
-				+ "\"content\": \"markerContent\","
-				+ "\"markerType\": \"BLUE\","
-				+ "\"lat\": 36.9369,"
-				+ "\"lon\": 22.2222"
-				+ "}";
-			String markerJson = "{\"lat\":36.9369,\"lon\":22.2222,\"title\":\"markerTitle\",\"content\":\"markerContent\",\"type\":\"BLUE\"}";
+		Marker marker = Marker.builder()
+			.lat(36.9369)
+			.lon(22.2222)
+			.title("markerTitle")
+			.content("markerContent")
+			.exploration(exploration)
+			.type(MarkerType.BLUE)
+			.user(user)
+			.build();
+		String markerInfoJson = "{"
+			+ "\"title\": \"markerTitle\","
+			+ "\"content\": \"markerContent\","
+			+ "\"markerType\": \"BLUE\","
+			+ "\"lat\": 36.9369,"
+			+ "\"lon\": 22.2222"
+			+ "}";
 
-			// when
-			when(userHelper.getCurrentUser()).thenReturn(user);
-			when(markerRepository.save(any(Marker.class))).thenReturn(marker);
+		// MarkerPayload 객체 생성
+		MarkerPayload markerPayload = MarkerPayload.builder()
+			.markerId(marker.getId())
+			.userId(user.getUserId())
+			.title(marker.getTitle())
+			.lat(marker.getLat())
+			.lon(marker.getLon())
+			.type(marker.getType().name())
+			.explorationId(exploration.getId())
+			.build();
 
-			// then
-			markerService.createMarkerProcess(markerInfoJson,imageFiles);
-			verify(imageStore, times(imageFiles.size())).saveImage(any(MultipartFile.class));
-			verify(imageInfoRepository, times(imageFiles.size())).save(any(ImageInfo.class));
+		// when
+		when(userHelper.getCurrentUser()).thenReturn(user);
+		when(markerRepository.save(any(Marker.class))).thenReturn(marker);
+
+		// then
+		markerService.createMarkerProcess(markerInfoJson, imageFiles);
+		verify(imageStore, times(imageFiles.size())).saveImage(any(MultipartFile.class));
+		verify(imageInfoRepository, times(imageFiles.size())).save(any(ImageInfo.class));
 	}
 }
-
 
