@@ -1,7 +1,5 @@
 package com.e106.mungplace.domain.marker.entity;
 
-import java.math.BigDecimal;
-
 import com.e106.mungplace.common.audit.BaseTime;
 import com.e106.mungplace.domain.exploration.entity.Exploration;
 import com.e106.mungplace.domain.user.entity.User;
@@ -45,18 +43,18 @@ public class Marker extends BaseTime {
 	@Column(length = 400, nullable = false)
 	private String content;
 
-	@Column(precision = 10, scale = 6, nullable = false)
-	private BigDecimal lat;
+	@Column(precision = 10, nullable = false)
+	private Double lat;
 
-	@Column(precision = 10, scale = 6, nullable = false)
-	private BigDecimal lon;
+	@Column(precision = 10, nullable = false)
+	private Double lon;
 
 	@Column(length = 20, nullable = false)
 	@Enumerated(EnumType.STRING)
 	private MarkerType type;
 
 	@Builder
-	public Marker(User user, Exploration exploration, String title, String content, BigDecimal lat, BigDecimal lon,
+	public Marker(User user, Exploration exploration, String title, String content, Double lat, Double lon,
 		MarkerType type) {
 		this.user = user;
 		this.exploration = exploration;

@@ -2,8 +2,6 @@ package com.e106.mungplace.domain.marker.repository;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.math.BigDecimal;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +14,7 @@ import com.e106.mungplace.domain.user.entity.ProviderName;
 import com.e106.mungplace.domain.user.entity.User;
 
 @DataJpaTest
-public class MarkerRepositoryTest {
+class MarkerRepositoryTest {
 
 	@Autowired
 	private TestEntityManager entityManager;
@@ -39,14 +37,14 @@ public class MarkerRepositoryTest {
 	}
 
 	@Test
-	public void testSaveMarkerWithoutExploration() {
+	void testSaveMarkerWithoutExploration() {
 		Marker marker = Marker.builder()
 			.user(user)
 			.exploration(null)
 			.title("TestTitle")
 			.content("TestContent")
-			.lat(new BigDecimal("36.9369"))
-			.lon(new BigDecimal("-90.9369"))
+			.lat(36.9369)
+			.lon(-90.9369)
 			.build();
 
 		Marker savedMarker = markerRepository.save(marker);
@@ -57,15 +55,15 @@ public class MarkerRepositoryTest {
 	}
 
 	@Test
-	public void testSaveMarkerWithExploration() {
+	void testSaveMarkerWithExploration() {
 		Exploration exploration = new Exploration();
 		Marker marker = Marker.builder()
 			.user(user)
 			.exploration(exploration)
 			.title("TestTitle")
 			.content("TestContent")
-			.lat(new BigDecimal("36.9369"))
-			.lon(new BigDecimal("-90.9369"))
+			.lat(36.9369)
+			.lon(-90.9369)
 			.build();
 
 		Marker savedMarker = markerRepository.save(marker);
