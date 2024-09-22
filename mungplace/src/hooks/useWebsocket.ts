@@ -53,7 +53,6 @@ const useWebSocket = (explorationId: number = -1, userId: number = -1) => {
   // const token = useSelector((state: RootState) => state.auth.token);
   useEffect(() => {
     const socket = new Client({
-      // brokerURL: 'ws://localhost:8080/ws',
       webSocketFactory: () => new WebSocket('ws://localhost:8080/ws'),
       connectHeaders: {
         // Authorization: `Bearer ${token}`,
