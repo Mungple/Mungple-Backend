@@ -24,7 +24,7 @@ public class DogResponse {
 
 	public static DogResponse of(Dog dog) {
 		return builder()
-			.id(dog.getDogId())
+			.id(dog.getId())
 			.isDefault(dog.getIsDefault())
 			.name(dog.getDogName())
 			.gender(String.valueOf(dog.getGender()))

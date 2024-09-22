@@ -33,6 +33,7 @@ public class ExplorationHelper {
                         .builder()
                         .exploration(exploration)
                         .dog(dog)
+                        .isEnded(false)
                         .build())
                 .forEach(dogExplorationRepository::save);
     }
@@ -40,6 +41,12 @@ public class ExplorationHelper {
     public ExplorationPayload createExplorationEventPayload(ExplorationEventRequest request) {
         Point point = getPoint(request.getLatitude(), request.getLongitude());
         return ExplorationPayload.of(point, request.getRecordedAt());
+    }
+
+    public void updateExplorationIsEnded(List<DogExploration> dogExplorations) {
+        dogExplorations.stream()
+                .peek(dogExploration -> dogExploration.updateIsEnded(true))
+                .forEach(dogExplorationRepository::save);
     }
 
     public List<ExplorationResponse> getExplorationInfos(Long userId, LocalDate date) {
@@ -56,7 +63,7 @@ public class ExplorationHelper {
 
     public List<Long> getTogetherDogIds(Exploration exploration) {
         return exploration.getDogExplorations().stream()
-                .map(dogExploration -> dogExploration.getDog().getDogId())
+                .map(dogExploration -> dogExploration.getDog().getId())
                 .toList();
     }
 

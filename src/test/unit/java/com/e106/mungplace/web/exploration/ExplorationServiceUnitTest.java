@@ -9,9 +9,14 @@ import java.util.List;
 
 import com.e106.mungplace.domain.dogs.entity.Dog;
 import com.e106.mungplace.domain.exploration.impl.ExplorationHelper;
+import com.e106.mungplace.domain.exploration.repository.ExplorationRepository;
 import com.e106.mungplace.web.exception.ApplicationException;
 
+import com.e106.mungplace.web.exception.ApplicationSocketException;
+import com.e106.mungplace.web.exception.dto.ApplicationSocketError;
+import com.e106.mungplace.web.exploration.dto.ExplorationEventRequest;
 import com.e106.mungplace.web.exploration.dto.ExplorationStartWithDogsRequest;
+import com.e106.mungplace.web.exploration.service.producer.ExplorationProducer;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.api.ThrowableAssert;
 import org.junit.jupiter.api.BeforeEach;
@@ -41,6 +46,12 @@ class ExplorationServiceUnitTest {
 	@Mock
 	private ExplorationHelper explorationHelper;
 
+	@Mock
+	private ExplorationRepository explorationRepository;
+
+	@Mock
+	private ExplorationProducer producer;
+
 	@InjectMocks
 	private ExplorationService explorationService;
 
@@ -53,7 +64,7 @@ class ExplorationServiceUnitTest {
 		when(userHelper.getCurrentUserId()).thenReturn(CURRENT_USER_ID);
 
 		List<Dog> dogList = new ArrayList<>();
-		dogList.add(Dog.builder().dogId(1L).build());
+		dogList.add(Dog.builder().id(1L).build());
 		dogs.setDogs(dogList);
 	}
 
@@ -113,6 +124,54 @@ class ExplorationServiceUnitTest {
 
 		// then
 		Assertions.assertThatThrownBy(expectThrow).isInstanceOf(ApplicationException.class);
+	}
+
+	@DisplayName("종료 된 산책에 기록을 보낼 경우 예외가 발생한다.")
+	@Test
+	void When_Send_WebSocket_With_Ended_Exploration_Then_Fail() {
+		// given
+		Exploration exploration = new Exploration(new User(userHelper.getCurrentUserId()), LocalDateTime.now());
+		exploration.updateId(1L);
+
+		//when
+		when(explorationReader.getDuringExploring(any())).thenThrow(new ApplicationSocketException(ApplicationSocketError.IS_ENDED_EXPLORATION));
+
+		ExplorationEventRequest request = ExplorationEventRequest.builder()
+				.userId(1L)
+				.latitude("37.5665")
+				.longitude("126.978")
+				.recordedAt(LocalDateTime.now())
+				.build();
+
+		// when
+		ThrowableAssert.ThrowingCallable expectThrow = () -> explorationService.createExplorationEventProcess(request, exploration.getId());
+
+		// then
+		Assertions.assertThatThrownBy(expectThrow).isInstanceOf(ApplicationSocketException.class);
+	}
+
+	@DisplayName("없는 산책에 기록을 보낼 경우 예외가 발생한다.")
+	@Test
+	void When_Send_WebSocket_With_NOT_FOUND_Exploration_Then_Fail() {
+		// given
+		Exploration exploration = new Exploration(new User(userHelper.getCurrentUserId()), LocalDateTime.now());
+		exploration.updateId(1L);
+
+		//when
+		when(explorationReader.getDuringExploring(any())).thenThrow(new ApplicationSocketException(ApplicationSocketError.EXPLORATION_NOT_FOUND));
+
+		ExplorationEventRequest request = ExplorationEventRequest.builder()
+				.userId(1L)
+				.latitude("37.5665")
+				.longitude("126.978")
+				.recordedAt(LocalDateTime.now())
+				.build();
+
+		// when
+		ThrowableAssert.ThrowingCallable expectThrow = () -> explorationService.createExplorationEventProcess(request, exploration.getId());
+
+		// then
+		Assertions.assertThatThrownBy(expectThrow).isInstanceOf(ApplicationSocketException.class);
 	}
 
 }

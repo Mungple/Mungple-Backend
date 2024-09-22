@@ -52,6 +52,7 @@ public class ExplorationService {
 		Exploration exploration = explorationReader.get(explorationId);
 
 		explorationHelper.validateIsUsersExploration(exploration, userId);
+		explorationHelper.updateExplorationIsEnded(exploration.getDogExplorations());
 
 		if (exploration.isEnded()) {
 			log.debug("이미 종료된 산책 호출 id={}", explorationId);
@@ -98,6 +99,7 @@ public class ExplorationService {
 
 	@Transactional
 	public void createExplorationEventProcess(ExplorationEventRequest eventRequest, Long explorationId) {
+		explorationReader.getDuringExploring(explorationId);
 		ExplorationPayload payload = explorationHelper.createExplorationEventPayload(eventRequest);
 		ExplorationEvent event = ExplorationEvent.of(eventRequest, explorationId, payload);
 		producer.sendExplorationEvent(event);

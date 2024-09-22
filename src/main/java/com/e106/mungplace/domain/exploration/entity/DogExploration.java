@@ -26,4 +26,11 @@ public class DogExploration {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "exploration_id")
     private Exploration exploration;
+
+    @Column(name = "is_ended")
+    private boolean isEnded;
+
+    public void updateIsEnded(boolean flag) {
+        this.isEnded = flag;
+    }
 }

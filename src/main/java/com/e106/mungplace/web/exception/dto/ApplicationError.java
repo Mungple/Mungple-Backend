@@ -30,6 +30,7 @@ public enum ApplicationError {
 	DOG_NOT_OWNER("E301", FORBIDDEN, "애견의 주인이 아닙니다."),
 	DOG_NOT_FOUND("E302", BAD_REQUEST, "애견이 존재하지 않습니다."),
 	EXCEED_DOG_CAPACITY("E303", BAD_REQUEST, "A user cannot own more than 5 dogs."),
+	DOG_IS_EXPLORING("E304", BAD_REQUEST, "애견이 산책 중입니다. 산책 종료 후 시도해주세요."),
 
 	// exploration
 	EXPLORATION_NOT_OWNED("E401", FORBIDDEN, "다른 사용자의 산책입니다."),
