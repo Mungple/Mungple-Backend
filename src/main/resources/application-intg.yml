@@ -24,8 +24,11 @@ logging:
     org.springframework.messaging: DEBUG
     org.springframework.web.socket.handler: DEBUG
 
+#Elasticsearch
 elasticsearch:
   host-and-port: localhost:9200
+  username: elastic
+  password: mung1234!@
 
 redis:
   server: localhost

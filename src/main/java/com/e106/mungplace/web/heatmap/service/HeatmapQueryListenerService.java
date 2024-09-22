@@ -1,5 +1,7 @@
 package com.e106.mungplace.web.heatmap.service;
 
+import com.e106.mungplace.web.exception.ApplicationSocketException;
+import com.e106.mungplace.web.exception.dto.ApplicationSocketError;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
@@ -39,6 +41,7 @@ public class HeatmapQueryListenerService {
 				log.debug("HitMap Event 발행: {}", result.getProducerRecord().value().toString());
 			} else {
 				log.error("HitMap Event 실패: {}", throwable.getMessage(), throwable);
+				throw new ApplicationSocketException(ApplicationSocketError.EVENT_REQUEST_NOT_SEND);
 			}
 		});
 	}

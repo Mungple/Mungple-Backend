@@ -3,6 +3,8 @@ package com.e106.mungplace.domain.heatmap.impl;
 import java.util.List;
 import java.util.Optional;
 
+import com.e106.mungplace.web.exception.ApplicationSocketException;
+import com.e106.mungplace.web.exception.dto.ApplicationSocketError;
 import org.springframework.data.elasticsearch.client.elc.ElasticsearchAggregation;
 import org.springframework.data.elasticsearch.client.elc.ElasticsearchAggregations;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
@@ -73,7 +75,7 @@ public class HeatmapSearcher {
 		ElasticsearchAggregation aggregation = aggregations.get(GEO_HASH_AGGREGATION);
 
 		if (aggregation == null) {
-			throw new ApplicationException(ApplicationError.UN_RECOGNIZED_ERROR);
+			throw new ApplicationSocketException(ApplicationSocketError.COULD_NOT_LOAD_DATA);
 		}
 
 		return convertAggregationToHeatmapCells(aggregation);
@@ -96,7 +98,7 @@ public class HeatmapSearcher {
 	private ElasticsearchAggregations fetchAggregations(Query query) {
 		return Optional.ofNullable(operations.search(query, ExplorePoint.class).getAggregations())
 			.map(ElasticsearchAggregations.class::cast)
-			.orElseThrow(() -> new ApplicationException(ApplicationError.UN_RECOGNIZED_ERROR));
+			.orElseThrow(() -> new ApplicationSocketException(ApplicationSocketError.COULD_NOT_LOAD_DATA));
 	}
 
 	private Aggregation heatmapAggregation(Point nw, Point se) {

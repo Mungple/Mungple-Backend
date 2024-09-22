@@ -32,7 +32,7 @@ public class Exploration extends BaseTime {
 
 	private LocalDateTime endAt;
 
-	@OneToMany(mappedBy = "exploration")
+	@OneToMany(mappedBy = "exploration", cascade = CascadeType.REMOVE)
 	private List<DogExploration> dogExplorations = new ArrayList<>();
 
 	public Exploration(User user, LocalDateTime startAt) {
@@ -50,6 +50,9 @@ public class Exploration extends BaseTime {
 		this.endAt = LocalDateTime.now();
 	}
 
+	public void updateId(Long id) {
+		this.id = id;
+	}
 	public boolean isEnded() {
 		return endAt != null;
 	}

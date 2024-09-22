@@ -1,5 +1,6 @@
 package com.e106.mungplace.web.config;
 
+import com.e106.mungplace.web.handler.interceptor.StompExceptionHandler;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
@@ -17,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
 	private final StompInterceptor stompInterceptor;
+	private final StompExceptionHandler stompExceptionHandler;
 
 	@Override
 	public void configureMessageBroker(MessageBrokerRegistry registry) {
@@ -27,6 +29,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 	@Override
 	public void registerStompEndpoints(StompEndpointRegistry registry) {
 		registry.addEndpoint("/ws").setAllowedOriginPatterns("*");
+		registry.setErrorHandler(stompExceptionHandler);
 	}
 
 	@Override

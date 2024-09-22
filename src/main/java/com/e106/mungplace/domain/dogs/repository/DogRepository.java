@@ -8,7 +8,7 @@ import com.e106.mungplace.domain.dogs.entity.Dog;
 
 public interface DogRepository extends CrudRepository<Dog, Long> {
 
-	int countDogsByUserUserId(Long userId);
+	Integer countDogsByUserUserId(Long userId);
 
 	List<Dog> findByUserUserId(Long userId);
 }

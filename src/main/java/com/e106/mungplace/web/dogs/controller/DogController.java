@@ -4,13 +4,7 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.e106.mungplace.web.dogs.dto.DogCreateRequest;
 import com.e106.mungplace.web.dogs.dto.DogResponse;
@@ -42,5 +36,11 @@ public class DogController {
 	public ResponseEntity<DogResponse> updateDogInfo(@PathVariable("dogId") Long dogId,
 		@RequestBody DogUpdateRequest dogUpdateRequest) {
 		return ResponseEntity.ok(dogService.updateDogProcess(dogId, dogUpdateRequest));
+	}
+
+	@ResponseStatus(HttpStatus.OK)
+	@DeleteMapping("/users/dogs/{dogId}")
+	public void removeDog(@PathVariable("dogId") Long dogId) {
+		dogService.removeDogProcess(dogId);
 	}
 }

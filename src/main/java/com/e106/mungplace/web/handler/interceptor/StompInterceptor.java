@@ -45,6 +45,8 @@ public class StompInterceptor implements ChannelInterceptor {
 		log.debug("--- SOCKET CONNECT ---");
 		log.debug("CONNECT username: {}", accessor.getUser());
 		log.debug("CONNECT attr: {}", accessor.getSessionAttributes());
+
+		// TODO <이현수> : Redis 세션 저장하기
 	}
 
 	private void handleSubscribe(StompHeaderAccessor accessor) {
@@ -59,6 +61,10 @@ public class StompInterceptor implements ChannelInterceptor {
 		log.info("SEND username: {}", accessor.getUser());
 		log.info("SEND ID: {}", accessor.getSessionId());
 		log.info("SEND destination: {}", accessor.getDestination());
+	}
+
+	private void handleDisconnect(StompHeaderAccessor accessor) {
+		// TODO <이현수> : Redis 세션 제거하기
 	}
 
 	private Map<String, Object> validateAndGetSession(StompHeaderAccessor accessor) {

@@ -22,8 +22,9 @@ import lombok.NoArgsConstructor;
 public class Dog extends BaseTime {
 
 	@GeneratedValue
+	@Column(name = "dog_id")
 	@Id
-	private Long dogId;
+	private Long id;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_id")
@@ -47,7 +48,7 @@ public class Dog extends BaseTime {
 	@Column(nullable = false)
 	private Boolean isDefault;
 
-	@OneToMany(mappedBy = "dog")
+	@OneToMany(mappedBy = "dog", cascade = CascadeType.REMOVE)
 	@Builder.Default
 	private List<DogExploration> dogExplorations = new ArrayList<>();
 

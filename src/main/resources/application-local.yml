@@ -8,7 +8,7 @@ spring:
     username: sa
     password: ""
   jpa:
-    show-sql: true
+    show-sql: false
     properties:
       hibernate:
         format_sql: true
@@ -24,7 +24,6 @@ spring:
       max-file-size: 100MB
       max-request-size: 100MB
 
-
 #Minio
 minio:
   url: http://localhost:9000
@@ -36,6 +35,8 @@ minio:
 #Elasticsearch
 elasticsearch:
   host-and-port: localhost:9200
+  username: elastic
+  password: mung1234!@
 
 #Redis
 redis:

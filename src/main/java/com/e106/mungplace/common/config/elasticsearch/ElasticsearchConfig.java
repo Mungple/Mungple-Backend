@@ -11,8 +11,14 @@ public class ElasticsearchConfig extends ElasticsearchConfiguration {
 	@Value("${elasticsearch.host-and-port}")
 	private String hostAndPort;
 
+	@Value("${elasticsearch.username}")
+	private String username;
+
+	@Value("${elasticsearch.password}")
+	private String password;
+
 	@Override
 	public ClientConfiguration clientConfiguration() {
-		return ClientConfiguration.builder().connectedTo(hostAndPort).build();
+		return ClientConfiguration.builder().connectedTo(hostAndPort).withBasicAuth(username, password).build();
 	}
 }
