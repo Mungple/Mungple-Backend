@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { View, Button, TextInput, Modal, StyleSheet, Image, Text} from 'react-native';
+import { View, Button, TextInput, Modal, StyleSheet, Image } from 'react-native';
 import { launchImageLibrary } from 'react-native-image-picker';
 import { Picker } from '@react-native-picker/picker';
-import { MarkerData } from '../../state/useMapStore'
+import axios from 'axios';
+import { MarkerData } from '../../state/useMapStore';
+import { getAccessToken } from '@/api/auth';
 
 export interface MarkerFormProps {
   isVisible: boolean;
@@ -16,29 +18,75 @@ const MarkerForm: React.FC<MarkerFormProps> = ({ isVisible, onSubmit, onClose, l
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
   const [imageUri, setImageUri] = useState<string | undefined>(undefined);
-  const [type, setType] = useState<'blue' | 'red'>('blue')
+  const [type, setType] = useState<'blue' | 'red'>('blue');
 
   const handleImagePick = () => {
     launchImageLibrary({ mediaType: 'photo' }, response => {
-      if (!response.didCancel && !response.errorCode) {
-        setImageUri(response.assets?.[0]?.uri);
+      if (!response.didCancel && !response.errorCode && response.assets ) {
+        setImageUri(response.assets[0].uri);
+        const imageFileName = response.assets[0].fileName || 'image.jpg';
+        setImageFileName(imageFileName)
       }
     });
   };
 
-  const handleSubmit = () => {
+  const [imageFileName, setImageFileName] = useState('')
+
+  const handleSubmit = async () => {
+    console.log('제출 함수 불러오기 ')
+
     const markerData: MarkerData = {
-      id: Date.now().toString(),
-      latitude: latitude,
-      longitude: longitude,
+      id: Date.now().toString(), // 임시 ID, 서버에서 받아오는 ID로 교체 필요
+      latitude,
+      longitude,
       title,
       body,
       imageUri,
       type,
     };
 
-    onSubmit(markerData);
-    onClose();
+    console.log('Marker Data:', markerData);
+
+    const formData = new FormData();
+    const imageFile = imageUri ? { uri: imageUri, name: imageFileName, type: imageUri.endsWith('.png') ? 'image/png' : 'image/jpeg' } : undefined;
+
+    const markerPayload = {
+      lat: latitude,
+      lon: longitude,
+      title,
+      content: body,
+      explorationId: null, // 필요시 explorationId 추가
+      markerType: type.toUpperCase(),
+    };
+
+    formData.append('MarkerCreateRequest', JSON.stringify(markerPayload));
+
+    if (imageFile) {
+      formData.append('image', imageFile);
+    }
+
+    try {
+      const accessToken = await getAccessToken()
+            
+      const response = await axios.post('/markers', formData, {
+        headers : {
+          'Content-Type': 'multipart/form-data',
+          'Authorization': `Bearer ${accessToken}` 
+        },
+      })
+      // 서버에서 받아온 ID로 업데이트
+      console.log("Response from server:", response.data);
+      const createdMarker: MarkerData = {
+        ...markerData,
+        id: response.data.id, // 서버 응답에서 ID 가져오기
+      };
+
+      onSubmit(createdMarker); // 부모 컴포넌트에 마커 데이터 전달
+      onClose();
+    } catch (error) {
+      console.error('Error adding marker:', error);
+      // 오류 처리 추가
+    }
   };
 
   return (
@@ -47,33 +95,32 @@ const MarkerForm: React.FC<MarkerFormProps> = ({ isVisible, onSubmit, onClose, l
         <View style={styles.formContainer}>
           <TextInput
             style={styles.input}
-            placeholder="Title"
+            placeholder="제목을 입력하세요"
             value={title}
             onChangeText={setTitle}
           />
           <TextInput
             style={styles.input}
-            placeholder="Body"
+            placeholder="내용을 입력하세요"
             value={body}
             onChangeText={setBody}
           />
           {imageUri && <Image source={{ uri: imageUri }} style={styles.image} />}
-          <Button title="Pick an Image" onPress={handleImagePick} />
+          <Button title="이미지 선택" onPress={handleImagePick} />
 
-          <Text style={styles.label}>마커 타입 선택:</Text>
           <View style={styles.pickerContainer}>
             <Picker
               selectedValue={type}
               onValueChange={(itemValue) => setType(itemValue as 'blue' | 'red')}
               style={styles.picker}
             >
-              <Picker.Item label="Blue" value="blue" />
-              <Picker.Item label="Red" value="red" />
+              <Picker.Item label="파랑" value="blue" />
+              <Picker.Item label="빨강" value="red" />
             </Picker>
           </View>
 
-          <Button title="Submit" onPress={handleSubmit} />
-          <Button title="Close" onPress={onClose} />
+          <Button title="작성 완료" onPress={handleSubmit} />
+          <Button title="닫기" onPress={onClose} />
         </View>
       </View>
     </Modal>
@@ -104,10 +151,6 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     marginVertical: 10,
-  },
-  label: {
-    marginTop: 10,
-    fontSize: 16,
   },
   pickerContainer: {
     marginVertical: 10,
