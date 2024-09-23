@@ -25,6 +25,9 @@ interface MapComponentProps {
   userLocation: {latitude: number; longitude: number};
   path?: {latitude: number; longitude: number}[];
   bottomOffset?: number;
+  onFormClose: () => void;
+  onAddMarker: (marker: unknown) => void;
+  isFormVisible: boolean;
 }
 
 interface MungPlace {
@@ -36,6 +39,8 @@ const MapComponent: React.FC<MapComponentProps> = ({
   userLocation,
   bottomOffset = 0,
   path = [],
+  onFormClose,
+  onAddMarker,
 }) => {
   const {
     showPersonalBlueZone,
@@ -99,12 +104,12 @@ const MapComponent: React.FC<MapComponentProps> = ({
     console.log('클러스터 정보:', cluster)
     console.log('마커 정보:', markers)
     
-    const clusterMarker = markers.map(marker => ({
-      id : marker.properties.index.toString(),
-      title : marker.properties.title,
-      description : marker.properties.description
-    }))
-    setClusterMarkers(clusterMarker)
+    // const clusterMarker = markers.map(marker => ({
+    //   id : marker.properties.index.toString(),
+    //   title : marker.properties.title,
+    //   description : marker.properties.description
+    // }))
+    // setClusterMarkers(clusterMarker)
     setListVisible(true) // 리스트 모달 호출
   }
 
@@ -161,7 +166,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
         style={{flex : 1}}
         clusteringEnabled={true}
         clusterColor={colors.ORANGE.DARKER}
-        onClusterPress={handleClusterPress}
+        // onClusterPress={handleClusterPress}
         >
 
         {/* path가 있을 때만 Polyline으로 표시 */}

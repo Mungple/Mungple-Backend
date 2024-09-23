@@ -2,7 +2,7 @@ import React from 'react';
 import {authNavigations} from '@/constants';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 
-import PostProfilePet from '@/screens/user/PostProfilePet';
+import PostProfilePetScreen from '@/screens/user/PostProfilePetScreen';
 import AuthHomeScreen from '@/screens/auth/AuthHomeScreen';
 import SocialLoginScreen from '@/screens/auth/SocialLoginScreen';
 import PostProfileScreen from '@/screens/user/PostProfileScreen';
@@ -22,7 +22,7 @@ const AuthStackNavigator: React.FC = () => {
       <Stack.Screen name={authNavigations.AUTH_HOME} component={AuthHomeScreen} />
       <Stack.Screen name={authNavigations.SOCIAL_LOGIN} component={SocialLoginScreen} />
       <Stack.Screen name={authNavigations.POST_PROFILE} component={PostProfileScreen} />
-      <Stack.Screen name={authNavigations.POST_PROFILE_PET} component={PostProfilePet} />
+      <Stack.Screen name={authNavigations.POST_PROFILE_PET} component={PostProfilePetScreen} />
     </Stack.Navigator>
   );
 };
