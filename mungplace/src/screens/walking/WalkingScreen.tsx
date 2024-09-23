@@ -38,7 +38,7 @@ const WalkingScreen = () => {
     setIsFormVisible(false);
   };
 
-  const handleAddMarker = (markerData: any) => {
+  const handleAddMarker = (markerData: unknown) => {
     console.log('Adding Marker:', markerData);
   };
 

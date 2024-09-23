@@ -9,12 +9,15 @@ import kakaoLogo from '@/assets/kakao_login_button.png';
 import naverLogo from '@/assets/naver_login_button.png';
 import googleLogo from '@/assets/google_login_button.png';
 import {AuthStackParamList} from '@/navigations/stack/AuthStackNavigator';
+import CustomButton from '@/components/common/CustomButton';
+import { useAppStore } from '@/state/useAppStore';
 
 type AuthHomeScreenProps = NativeStackScreenProps<AuthStackParamList, typeof authNavigations.AUTH_HOME>;
 
 const width = Dimensions.get('screen').width
 
 const AuthHomeScreen: React.FC<AuthHomeScreenProps> = ({navigation}) => {
+  const setLogin = useAppStore((state) => state.setLogin);
   return (
     <Container>
       <LogoContainer >
@@ -33,6 +36,8 @@ const AuthHomeScreen: React.FC<AuthHomeScreenProps> = ({navigation}) => {
         <LoginButton onPress={() => navigation.navigate(authNavigations.SOCIAL_LOGIN, {provider:'google'})}>
           <ButtonImage source={googleLogo} />
         </LoginButton>
+        
+        <CustomButton label='빠른 로그인' onPress={() => {setLogin(true)}} />
       </ButtonsContainer>
     </Container>
   );
