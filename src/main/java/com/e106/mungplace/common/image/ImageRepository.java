@@ -1,4 +1,4 @@
-package com.e106.mungplace.common.config.minio.impl;
+package com.e106.mungplace.common.image;
 
 import java.io.InputStream;
 

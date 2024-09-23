@@ -16,7 +16,7 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.e106.mungplace.common.config.minio.impl.ImageStore;
+import com.e106.mungplace.common.image.ImageStore;
 import com.e106.mungplace.domain.exploration.entity.Exploration;
 import com.e106.mungplace.domain.exploration.repository.ExplorationRepository;
 import com.e106.mungplace.domain.image.entity.ImageInfo;

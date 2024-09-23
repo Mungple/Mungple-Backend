@@ -1,4 +1,4 @@
-package com.e106.mungplace.common.config.kafka;
+package com.e106.mungplace.common.config;
 
 import com.e106.mungplace.web.handler.interceptor.KafkaProducerInterceptor;
 import org.apache.kafka.clients.admin.NewTopic;
