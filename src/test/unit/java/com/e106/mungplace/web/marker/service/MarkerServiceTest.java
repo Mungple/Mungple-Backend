@@ -18,13 +18,13 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.e106.mungplace.common.image.ImageStore;
 import com.e106.mungplace.domain.exploration.entity.Exploration;
-import com.e106.mungplace.domain.exploration.repository.ExplorationRepository;
-import com.e106.mungplace.domain.image.entity.ImageInfo;
-import com.e106.mungplace.domain.image.repository.ImageInfoRepository;
+import com.e106.mungplace.domain.exploration.impl.ExplorationReader;
+import com.e106.mungplace.domain.image.repository.MarkerImageRepository;
 import com.e106.mungplace.domain.marker.entity.Marker;
+import com.e106.mungplace.domain.marker.entity.MarkerEvent;
 import com.e106.mungplace.domain.marker.entity.MarkerType;
-import com.e106.mungplace.domain.marker.repository.MarkerOutboxRepository;
-import com.e106.mungplace.domain.marker.repository.MarkerRepository;
+import com.e106.mungplace.domain.marker.impl.MarkerReader;
+import com.e106.mungplace.domain.marker.impl.MarkerWriter;
 import com.e106.mungplace.domain.user.entity.ProviderName;
 import com.e106.mungplace.domain.user.entity.User;
 import com.e106.mungplace.domain.user.impl.UserHelper;
@@ -37,28 +37,28 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 class MarkerServiceTest {
 
 	@Mock
-	private MarkerRepository markerRepository;
+	private ExplorationReader explorationReader;
 
 	@Mock
-	private ExplorationRepository explorationRepository;
+	private MarkerWriter markerWriter;
+
+	@Mock
+	private MarkerReader markerReader;
 
 	@Mock
 	private UserHelper userHelper;
+
+	@Spy
+	private final ObjectMapper objectMapper = new ObjectMapper();
+
+	@InjectMocks
+	private MarkerService markerService;
 
 	@Mock
 	private ImageStore imageStore;
 
 	@Mock
-	private ImageInfoRepository imageInfoRepository;
-
-	@Mock
-	private MarkerOutboxRepository markerOutboxRepository;
-
-	@InjectMocks
-	private MarkerService markerService;
-
-	@Spy
-	private final ObjectMapper objectMapper = new ObjectMapper();
+	private MarkerImageRepository markerImageRepository;
 
 	@DisplayName("이미지가 4개 이상이면 에러")
 	@Test
@@ -106,7 +106,14 @@ class MarkerServiceTest {
 			+ "}";
 
 		// MarkerCreateRequest 객체를 생성하는 실제 파싱
-		MarkerCreateRequest request = objectMapper.readValue(markerInfoJson, MarkerCreateRequest.class);
+		MarkerCreateRequest request = MarkerCreateRequest.builder()
+			.title("markerTitle")
+			.content("markerContent")
+			.markerType(MarkerType.BLUE)
+			.lat(36.9369)
+			.lon(22.2222)
+			.build();
+
 		List<MultipartFile> imageFiles = Arrays.asList(
 			mock(MultipartFile.class),
 			mock(MultipartFile.class),
@@ -133,16 +140,19 @@ class MarkerServiceTest {
 			.explorationId(null)
 			.build();
 
+		// JSON 직렬화된 MarkerPayload
+		String serializedPayload = new ObjectMapper().writeValueAsString(markerPayload);
+
 		// when
 		when(userHelper.getCurrentUser()).thenReturn(user);
-		when(markerRepository.save(any(Marker.class))).thenReturn(marker);
+		when(objectMapper.readValue(markerInfoJson, MarkerCreateRequest.class)).thenReturn(request);
+		when(objectMapper.writeValueAsString(any(MarkerPayload.class))).thenReturn(serializedPayload);
 
 		// then
 		markerService.createMarkerProcess(markerInfoJson, imageFiles);
 
-		verify(markerRepository).save(any(Marker.class));
-		verify(imageStore, times(imageFiles.size())).saveImage(any(MultipartFile.class));
-		verify(imageInfoRepository, times(imageFiles.size())).save(any(ImageInfo.class));
+		verify(markerWriter).saveMarker(any(Marker.class));
+		verify(markerWriter, times(1)).createMarkerEvent(any(MarkerEvent.class));
 	}
 
 	@DisplayName("마커 생성시 마커 저장(산책 할때)")
@@ -166,6 +176,7 @@ class MarkerServiceTest {
 			.type(MarkerType.BLUE)
 			.user(user)
 			.build();
+
 		String markerInfoJson = "{"
 			+ "\"title\": \"markerTitle\","
 			+ "\"content\": \"markerContent\","
@@ -182,17 +193,17 @@ class MarkerServiceTest {
 			.lat(marker.getLat())
 			.lon(marker.getLon())
 			.type(marker.getType().name())
-			.explorationId(exploration.getId())
+			.explorationId(exploration.getId()) // 탐험 ID 설정
 			.build();
 
 		// when
 		when(userHelper.getCurrentUser()).thenReturn(user);
-		when(markerRepository.save(any(Marker.class))).thenReturn(marker);
 
 		// then
 		markerService.createMarkerProcess(markerInfoJson, imageFiles);
-		verify(imageStore, times(imageFiles.size())).saveImage(any(MultipartFile.class));
-		verify(imageInfoRepository, times(imageFiles.size())).save(any(ImageInfo.class));
+
+		verify(markerWriter, times(1)).saveMarker(any(Marker.class));
+		verify(markerWriter, times(1)).createMarkerEvent(any(MarkerEvent.class));
 	}
 }
 
