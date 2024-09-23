@@ -1,4 +1,4 @@
-package com.e106.mungplace.common.config.elasticsearch;
+package com.e106.mungplace.common.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;

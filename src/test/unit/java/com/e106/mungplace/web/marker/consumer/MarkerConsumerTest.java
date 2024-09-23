@@ -1,10 +1,13 @@
 package com.e106.mungplace.web.marker.consumer;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import org.apache.kafka.clients.admin.NewTopic;
+import org.assertj.core.api.ThrowableAssert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -33,7 +36,9 @@ class MarkerConsumerTest {
 	@Mock
 	private Acknowledgment acknowledgment;
 
-	@InjectMocks
+	@Mock
+	private NewTopic markerTopic;
+
 	private MarkerConsumer markerConsumer;
 
 	private MarkerEvent event;
@@ -41,6 +46,10 @@ class MarkerConsumerTest {
 
 	@BeforeEach
 	void setUp() {
+		when(markerTopic.name()).thenReturn("marker");
+
+		markerConsumer = new MarkerConsumer(markerTopic, markerPointRepository, objectMapper);
+
 		// Mock MarkerPayload 생성
 		markerPayload = MarkerPayload.builder()
 			.markerId(1L)
@@ -67,7 +76,7 @@ class MarkerConsumerTest {
 		when(objectMapper.readValue(anyString(), eq(MarkerPayload.class))).thenReturn(markerPayload);
 
 		// when
-		markerConsumer.handleHeatmapQueryEventProcess(event, acknowledgment);
+		markerConsumer.saveMarkerEventProcess(event, acknowledgment);
 
 		// then
 		verify(markerPointRepository, times(1)).save(any(MarkerPoint.class));
@@ -81,10 +90,11 @@ class MarkerConsumerTest {
 		when(objectMapper.readValue(anyString(), eq(MarkerPayload.class))).thenThrow(new JsonProcessingException("JSON 오류") {});
 
 		// when
-		markerConsumer.handleHeatmapQueryEventProcess(event, acknowledgment);
+		ThrowableAssert.ThrowingCallable expectedThrow = () -> markerConsumer.saveMarkerEventProcess(event, acknowledgment);
 
 		// then
+		assertThatThrownBy(expectedThrow);
 		verify(markerPointRepository, never()).save(any(MarkerPoint.class));
-		verify(acknowledgment, times(1)).acknowledge();
+		verify(acknowledgment, never()).acknowledge();
 	}
 }

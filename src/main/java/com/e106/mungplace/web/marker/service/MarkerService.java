@@ -8,7 +8,7 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.e106.mungplace.common.config.minio.impl.ImageStore;
+import com.e106.mungplace.common.image.ImageStore;
 import com.e106.mungplace.common.transaction.GlobalTransactional;
 import com.e106.mungplace.domain.exploration.entity.Exploration;
 import com.e106.mungplace.domain.exploration.repository.ExplorationRepository;
@@ -157,7 +157,7 @@ public class MarkerService {
 	}
 
 	private Marker getMarkerOrThrow(Long markerId) {
-		return markerRepository.findById(markerId).orElseThrow(
-			() -> new ApplicationException(ApplicationError.MARKER_NOT_FOUND));
+		return markerRepository.findById(markerId)
+			.orElseThrow(() -> new ApplicationException(ApplicationError.MARKER_NOT_FOUND));
 	}
 }

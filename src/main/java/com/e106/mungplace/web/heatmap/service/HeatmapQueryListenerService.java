@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.e106.mungplace.domain.heatmap.event.HeatmapQueryEvent;
 import com.e106.mungplace.domain.heatmap.event.HeatmapQueryType;
+import com.e106.mungplace.domain.heatmap.impl.HeatmapChunkConsumer;
 import com.e106.mungplace.web.heatmap.dto.HeatmapRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -21,18 +22,22 @@ public class HeatmapQueryListenerService {
 
 	private final ObjectMapper objectMapper;
 	private final KafkaTemplate<String, Object> kafkaTemplate;
+	private final HeatmapChunkConsumer heatmapChunkConsumer;
 	private final NewTopic heatMapTopic;
 
 	public void userBluezoneQueryProcess(Long userId, HeatmapRequest request) {
 		emitHitMapQueryEvent(request.toEvent(userId, HeatmapQueryType.USER_BLUEZONE));
+		heatmapChunkConsumer.consume(userId, HeatmapQueryType.USER_BLUEZONE);
 	}
 
 	public void bluezoneQueryProcess(Long userId, HeatmapRequest request) {
 		emitHitMapQueryEvent(request.toEvent(userId, HeatmapQueryType.BLUEZONE));
+		heatmapChunkConsumer.consume(userId, HeatmapQueryType.BLUEZONE);
 	}
 
 	public void redzoneQueryProcess(Long userId, HeatmapRequest request) {
 		emitHitMapQueryEvent(request.toEvent(userId, HeatmapQueryType.REDZONE));
+		heatmapChunkConsumer.consume(userId, HeatmapQueryType.REDZONE);
 	}
 
 	private void emitHitMapQueryEvent(HeatmapQueryEvent event) {
