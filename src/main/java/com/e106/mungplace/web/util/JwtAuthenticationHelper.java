@@ -1,8 +1,14 @@
 package com.e106.mungplace.web.util;
 
 import java.util.Date;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import com.auth0.jwt.JWT;
@@ -10,13 +16,12 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import com.e106.mungplace.domain.user.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Component
-public class JwtProvider {
+public class JwtAuthenticationHelper {
 
 	private static final String ISSUER = "Mungplace";
 
@@ -25,8 +30,6 @@ public class JwtProvider {
 
 	@Value("${jwt.access-token-expire-time}")
 	private Long accessTokenExpireTime;
-
-	private final UserRepository userRepository;
 
 	public String createAccessToken(Long userId) {
 		Date now = new Date();
@@ -56,6 +59,23 @@ public class JwtProvider {
 			return jwt.getClaim("userId").asLong();
 		} catch (Exception e) {
 			throw new IllegalArgumentException("Invalid token");
+		}
+	}
+
+	public void storeAuthenticationInContext(String token) {
+		if (verifyToken(token)) {
+			Long userId = extractUserIdFromToken(token);
+
+			UserDetails user = User.builder()
+					.username(userId.toString())
+					.password("")
+					.authorities(List.of())
+					.build();
+
+			Authentication authentication = new UsernamePasswordAuthenticationToken(
+					user, "", user.getAuthorities());
+
+			SecurityContextHolder.getContext().setAuthentication(authentication);
 		}
 	}
 }

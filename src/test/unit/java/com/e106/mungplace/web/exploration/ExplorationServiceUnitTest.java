@@ -17,6 +17,7 @@ import com.e106.mungplace.web.exception.dto.ApplicationSocketError;
 import com.e106.mungplace.web.exploration.dto.ExplorationEventRequest;
 import com.e106.mungplace.web.exploration.dto.ExplorationStartWithDogsRequest;
 import com.e106.mungplace.web.exploration.service.producer.ExplorationProducer;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.api.ThrowableAssert;
 import org.junit.jupiter.api.BeforeEach;
@@ -133,15 +134,14 @@ class ExplorationServiceUnitTest {
 		Exploration exploration = new Exploration(new User(userHelper.getCurrentUserId()), LocalDateTime.now());
 		exploration.updateId(1L);
 
-		//when
-		when(explorationReader.getDuringExploring(any())).thenThrow(new ApplicationSocketException(ApplicationSocketError.IS_ENDED_EXPLORATION));
-
 		ExplorationEventRequest request = ExplorationEventRequest.builder()
 				.userId(1L)
 				.latitude("37.5665")
 				.longitude("126.978")
 				.recordedAt(LocalDateTime.now())
 				.build();
+
+		when(explorationReader.getDuringExploring(any())).thenThrow(new ApplicationSocketException(ApplicationSocketError.IS_ENDED_EXPLORATION));
 
 		// when
 		ThrowableAssert.ThrowingCallable expectThrow = () -> explorationService.createExplorationEventProcess(request, exploration.getId());
@@ -157,9 +157,6 @@ class ExplorationServiceUnitTest {
 		Exploration exploration = new Exploration(new User(userHelper.getCurrentUserId()), LocalDateTime.now());
 		exploration.updateId(1L);
 
-		//when
-		when(explorationReader.getDuringExploring(any())).thenThrow(new ApplicationSocketException(ApplicationSocketError.EXPLORATION_NOT_FOUND));
-
 		ExplorationEventRequest request = ExplorationEventRequest.builder()
 				.userId(1L)
 				.latitude("37.5665")
@@ -167,11 +164,12 @@ class ExplorationServiceUnitTest {
 				.recordedAt(LocalDateTime.now())
 				.build();
 
+		when(explorationReader.getDuringExploring(any())).thenThrow(new ApplicationSocketException(ApplicationSocketError.EXPLORATION_NOT_FOUND));
+
 		// when
 		ThrowableAssert.ThrowingCallable expectThrow = () -> explorationService.createExplorationEventProcess(request, exploration.getId());
 
 		// then
 		Assertions.assertThatThrownBy(expectThrow).isInstanceOf(ApplicationSocketException.class);
 	}
-
 }

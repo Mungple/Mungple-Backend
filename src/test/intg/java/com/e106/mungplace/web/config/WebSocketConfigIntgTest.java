@@ -28,7 +28,7 @@ import org.springframework.web.socket.messaging.WebSocketStompClient;
 
 import com.e106.mungplace.domain.user.entity.User;
 import com.e106.mungplace.domain.user.repository.UserRepository;
-import com.e106.mungplace.web.util.JwtProvider;
+import com.e106.mungplace.web.util.JwtAuthenticationHelper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @ActiveProfiles("intg")
@@ -44,7 +44,7 @@ class WebSocketConfigIntgTest {
 	private final Long userId = 1L;
 
 	@Autowired
-	private JwtProvider jwtProvider;
+	private JwtAuthenticationHelper jwtAuthenticationHelper;
 
 	@Autowired
 	ObjectMapper objectMapper;
@@ -61,7 +61,7 @@ class WebSocketConfigIntgTest {
 		stompClient.setMessageConverter(new MappingJackson2MessageConverter(objectMapper));
 
 		WebSocketHttpHeaders headers = new WebSocketHttpHeaders();
-		String accessToken = jwtProvider.createAccessToken(userId);
+		String accessToken = jwtAuthenticationHelper.createAccessToken(userId);
 		headers.set("Authorization", "Bearer " + accessToken);
 
 		session = stompClient.connectAsync(String.format(WEBSOCKET_URI, port), headers,
