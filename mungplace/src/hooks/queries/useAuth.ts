@@ -1,6 +1,10 @@
 import {useEffect} from 'react';
 import queryClient from '@/api/queryClient';
-import {MutationFunction, UseQueryOptions, useMutation, useQuery} from '@tanstack/react-query';
+import {
+  MutationFunction,
+  useMutation,
+  useQuery,
+} from '@tanstack/react-query';
 import {numbers, queryKeys, storageKeys} from '@/constants';
 import type {
   ResponseError,
@@ -84,10 +88,10 @@ function useGetRefreshToken() {
 
 // 프로필 정보 가져오기 훅
 function useGetProfile(
-  userId: number, 
-  queryOptions?: UseQueryOptions<ResponseProfile, Error>
+  userId: number,
+  queryOptions?: UseQueryCustomOptions<ResponseProfile>
 ) {
-  return useQuery<ResponseProfile, Error>({
+  return useQuery({
     queryFn: () => getProfile(userId),
     queryKey: [queryKeys.AUTH, queryKeys.GET_PROFILE, userId],
     ...queryOptions,
@@ -96,10 +100,17 @@ function useGetProfile(
 
 // 프로필 정보 변경 훅
 function useUpdateProfile(mutationOptions?: UseMutationCustomOptions) {
-  return useMutation<ResponseProfile, ResponseError, { userId: number; body: RequestProfile }>({
+  return useMutation<
+    ResponseProfile,
+    ResponseError,
+    {userId: number; body: RequestProfile}
+  >({
     mutationFn: ({userId, body}) => editProfile(userId, body),
     onSuccess: newProfile => {
-      queryClient.setQueryData([queryKeys.AUTH, queryKeys.GET_PROFILE], newProfile);
+      queryClient.setQueryData(
+        [queryKeys.AUTH, queryKeys.GET_PROFILE],
+        newProfile,
+      );
     },
     ...mutationOptions,
   });
@@ -125,7 +136,7 @@ function useAuth() {
   const profileMutation = useUpdateProfile();
   const socialLoginMutation = useSocialLogin();
   const refreshTokenQuery = useGetRefreshToken();
-  const getProfileQuery = useGetProfile({enabled: refreshTokenQuery.isSuccess});
+  const getProfileQuery = useGetProfile(1, { enabled: refreshTokenQuery.isSuccess });
   const isLogin = getProfileQuery.isSuccess;
 
   return {

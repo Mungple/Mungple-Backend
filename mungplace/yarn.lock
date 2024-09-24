@@ -2987,6 +2987,25 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@tanstack/query-devtools@npm:5.56.1":
+  version: 5.56.1
+  resolution: "@tanstack/query-devtools@npm:5.56.1"
+  checksum: 9de5b62a4ecbce2619a023174e45f6de5d202c8b1e35c6a847b7df57668144c8a687a96a60d3c036550f970f6b27accf8acd765c0047ad6ee3143ed116077d13
+  languageName: node
+  linkType: hard
+
+"@tanstack/react-query-devtools@npm:^5.56.2":
+  version: 5.56.2
+  resolution: "@tanstack/react-query-devtools@npm:5.56.2"
+  dependencies:
+    "@tanstack/query-devtools": 5.56.1
+  peerDependencies:
+    "@tanstack/react-query": ^5.56.2
+    react: ^18 || ^19
+  checksum: 9b89a1a8f695321ca5952a0b589059093373485c44fb757ca56fb76ec3c2c90f2536afd1e2cbd0fc2d3ec96c09958451f02b2b38e43df93378b961efda53086a
+  languageName: node
+  linkType: hard
+
 "@tanstack/react-query@npm:^5.55.0":
   version: 5.55.4
   resolution: "@tanstack/react-query@npm:5.55.4"
@@ -12082,6 +12101,7 @@ __metadata:
     "@react-navigation/native": ^6.1.18
     "@react-navigation/native-stack": ^6.11.0
     "@tanstack/react-query": ^5.55.0
+    "@tanstack/react-query-devtools": ^5.56.2
     "@types/jest": ^29.5.12
     "@types/react": ^18.2.6
     "@types/react-native-vector-icons": ^6.4.18

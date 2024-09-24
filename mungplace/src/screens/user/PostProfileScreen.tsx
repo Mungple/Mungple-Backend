@@ -20,11 +20,11 @@ type PostProfileScreenProps = NativeStackScreenProps<AuthStackParamList>;
 const EditProfileScreen = ({navigation}: PostProfileScreenProps) => {
   const imageOption = useModal();
   const {getProfileQuery} = useAuth();
-  const {nickname, imageUri} = getProfileQuery.data || {};
+  const {nickname, imageName} = getProfileQuery.data || {};
 
   // 이미지 선택 기능을 위한 커스텀 훅
   const imagePicker = useImagePicker({
-    initialImages: imageUri ? [{uri: imageUri}] : [],
+    initialImages: imageName ? [{uri: imageName}] : [],
     mode: 'single',
     onSettled: imageOption.hide,
   });
@@ -51,12 +51,12 @@ const EditProfileScreen = ({navigation}: PostProfileScreenProps) => {
       <ProfileContainer>
         <ImageContainer onPress={handlePressImage}>
           {/* 이미지가 없을 때 기본 아이콘 표시 */}
-          {imagePicker.imageUris.length === 0 && (
+          {imagePicker.imageNames.length === 0 && (
             <Ionicons name="camera-outline" size={40} color={colors.GRAY_400} />
           )}
           {/* 이미지가 있을 때 해당 이미지 표시 */}
-          {imagePicker.imageUris.length > 0 && (
-            <MyImage source={{uri: `http://10.0.2.2:3030/${imagePicker.imageUris[0]?.uri}`}} resizeMode="cover" />
+          {imagePicker.imageNames.length > 0 && (
+            <MyImage source={{uri: `http://10.0.2.2:3030/${imagePicker.imageNames[0]?.uri}`}} resizeMode="cover" />
           )}
         </ImageContainer>
       </ProfileContainer>
