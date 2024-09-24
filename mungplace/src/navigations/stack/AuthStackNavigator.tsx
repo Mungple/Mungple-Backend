@@ -2,10 +2,8 @@ import React from 'react';
 import {authNavigations} from '@/constants';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 
-import PostProfilePetScreen from '@/screens/user/PostProfilePetScreen';
 import AuthHomeScreen from '@/screens/auth/AuthHomeScreen';
 import SocialLoginScreen from '@/screens/auth/SocialLoginScreen';
-import PostProfileScreen from '@/screens/user/PostProfileScreen';
 
 export type AuthStackParamList = {
   [authNavigations.AUTH_HOME]: undefined;
@@ -21,8 +19,6 @@ const AuthStackNavigator: React.FC = () => {
     <Stack.Navigator screenOptions={{headerShown: false}}>
       <Stack.Screen name={authNavigations.AUTH_HOME} component={AuthHomeScreen} />
       <Stack.Screen name={authNavigations.SOCIAL_LOGIN} component={SocialLoginScreen} />
-      <Stack.Screen name={authNavigations.POST_PROFILE} component={PostProfileScreen} />
-      <Stack.Screen name={authNavigations.POST_PROFILE_PET} component={PostProfilePetScreen} />
     </Stack.Navigator>
   );
 };

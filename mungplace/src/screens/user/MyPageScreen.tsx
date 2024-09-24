@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {Dimensions} from 'react-native';
 import styled from 'styled-components/native';
 import IonIcons from 'react-native-vector-icons/Ionicons';
@@ -13,6 +13,7 @@ import {SettingStackParamList} from '@/navigations/stack/SettingStackNavigator';
 import PetList from '@/components/user/PetList';
 import CustomCard from '@/components/common/CustomCard';
 import CustomHeader from '@/components/common/CustomHeader';
+import { getProfile } from '@/api';
 
 type MyPageScreenProps = NativeStackScreenProps<
   SettingStackParamList,
@@ -24,14 +25,15 @@ const windowHeight = Dimensions.get('window').height;
 const MyPageScreen: React.FC<MyPageScreenProps> = ({navigation}) => {
   const imageOption = useModal();
   const {getProfileQuery} = useAuth();
-  const {nickname = '닉네임', imageUri} = getProfileQuery.data || {};
+  const data = getProfile(1);
+  console.log(data)
 
   // 이미지 선택 기능을 위한 커스텀 훅
-  const imagePicker = useImagePicker({
-    initialImages: imageUri ? [{uri: imageUri}] : [],
-    mode: 'single',
-    onSettled: imageOption.hide,
-  });
+  // const imagePicker = useImagePicker({
+  //   initialImages: imageName ? [{uri: imageName}] : [],
+  //   mode: 'single',
+  //   onSettled: imageOption.hide,
+  // });
   
   const handleSettingPress = () => {
     navigation.navigate(settingNavigations.SETTING)
@@ -42,6 +44,7 @@ const MyPageScreen: React.FC<MyPageScreenProps> = ({navigation}) => {
   };
   
   const handlePetSelect = () => {};
+
 
   return (
     <Container>
@@ -55,20 +58,20 @@ const MyPageScreen: React.FC<MyPageScreenProps> = ({navigation}) => {
         />
       </CustomHeader>
       <ProfileCard onPress={handleProfilePress}>
-        <ImageContainer>
-          {imagePicker.imageUris.length === 0 ? (
+        {/* <ImageContainer>
+          {imagePicker.imageNames.length === 0 ? (
             <MyImage source={ProfileImage} />
           ) : (
             <MyImage
               source={{
-                uri: `http://10.0.2.2:3030/${imagePicker.imageUris[0]?.uri}`,
+                uri: `http://10.0.2.2:3030/${imagePicker.imageNames[0]?.uri}`,
               }}
               resizeMode="cover"
             />
           )}
-        </ImageContainer>
+        </ImageContainer> */}
         <InfoContainer>
-          <DogName>{nickname}</DogName>
+          {/* <DogName>{data}</DogName> */}
           <SecondaryInfo>128 포인트</SecondaryInfo>
         </InfoContainer>
       </ProfileCard>

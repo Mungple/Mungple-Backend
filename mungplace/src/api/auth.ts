@@ -18,14 +18,8 @@ type ResponseProfile = {
   imageName: string | null;
 };
 
-// 소셜 로그인 요청 함수
-const socialLogin = async (provider: string): Promise<ResponseToken> => {
-  const {data} = await axiosInstance.post(`/api/users/login/${provider}`);
-  return data;
-};
-
 // 프로필 정보 요청 함수
-const getProfile = async (userId: number): Promise<ResponseProfile> => {
+const getProfile = async (userId?: number): Promise<ResponseProfile> => {
   const {data} = await axiosInstance.get(`/users/${userId}`);
   return data;
 };
@@ -39,10 +33,10 @@ const editProfile = async (userId: number, body: RequestProfile): Promise<Respon
 // 액세스 토큰 요청 함수
 const getAccessToken = async (): Promise<ResponseToken> => {
   const refreshToken = await getEncryptStorage('refreshToken');
-  const {data} = await axiosInstance.get('/auth/refresh', {
-    headers: {Authorization: `Bearer ${refreshToken}`},
-  });
-  return data;
+  // const {data} = await axiosInstance.get('/auth/refresh', {
+  //   headers: {Authorization: `Bearer ${refreshToken}`},
+  // });
+  return refreshToken;
 };
 
 // 로그아웃 요청 함수
@@ -50,5 +44,5 @@ const logout = async () => {
   await axiosInstance.post('/users/logout');
 };
 
-export {getProfile, editProfile, logout, getAccessToken, socialLogin};
+export {getProfile, editProfile, logout, getAccessToken};
 export type {ResponseToken, RequestProfile, ResponseProfile};

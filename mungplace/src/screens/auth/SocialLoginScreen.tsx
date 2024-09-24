@@ -7,7 +7,6 @@ import {authNavigations} from '@/constants';
 import useAuth from '@/hooks/queries/useAuth';
 import {AuthStackParamList} from '@/navigations/stack/AuthStackNavigator';
 import { useAppStore } from '@/state/useAppStore';
-import { getAccessToken } from '@/api';
 
 type SocialLoginScreenProps = NativeStackScreenProps<
   AuthStackParamList,
@@ -24,6 +23,8 @@ const SocialLoginScreen: React.FC<SocialLoginScreenProps> = ({route, navigation}
   const getTokenUrl =  `http://localhost:8080/auth/oauth-response/`;
   const [currentUrl, setCurrentUrl] = useState<string>(getAuthUrl(provider));
   const setLogin = useAppStore((state) => state.setLogin);
+  const setToken = useAppStore((state) => state.setToken);
+
   const handleNavigationStateChange = (event: WebViewNavigation) => {
     const url = event.url;
     setCurrentUrl(url);
@@ -33,11 +34,11 @@ const SocialLoginScreen: React.FC<SocialLoginScreenProps> = ({route, navigation}
       setCurrentUrl(`${getCallbackUrl(provider, '10.0.2.2')}?${queryParams}`);
     } else if (url.startsWith(getTokenUrl)) {
       const pathSegments = url.split('/');
-      const token = pathSegments[pathSegments.length - 1];
-      socialLoginMutation.mutate(token);
+      const accessToken = pathSegments[pathSegments.length - 1];
+      socialLoginMutation.mutate(accessToken);
+      setToken(accessToken)
       // navigation.navigate(authNavigations.POST_PROFILE);
-      setLogin(true);
-      console.log(getAccessToken())
+      setLogin(true)
     }
   };
 
