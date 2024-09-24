@@ -1,46 +1,40 @@
 import React, {useRef, useEffect, useState} from 'react';
-import {Animated, StyleSheet, Image, Modal, View, Text, FlatList, Button } from 'react-native';
+import {Animated, StyleSheet, Image } from 'react-native';
 import MapView, {
-  Heatmap,
   Marker,
-  Polygon,
   Polyline,
   PROVIDER_GOOGLE,
 } from 'react-native-maps';
+import HeatmapLayer from './HeatmapLayer'; // 히트맵
 import ClusteredMapView, { Cluster } from 'react-native-map-clustering'
-import geohash from 'ngeohash';
 import styled from 'styled-components/native';
-import { useMapStore, Zone, MarkerData} from '@/state/useMapStore'; // zustand
-import MarkerForm from '../marker/MarkerForm';
-import usePermission from '@/hooks/usePermission';
-import useUserLocation from '@/hooks/useUserLocation';
-import mungPleMarker from '@/assets/mungPleMarker.png';
-import CustomMapButton from '../common/CustomMapButton';
-import CustomBottomSheet from '../common/CustomBottomSheet';
-import { colors } from '@/constants';
-import blueMarker from '@/assets/blueMarker.png'
-import redMarker from '@/assets/redMarker.png'
+import { useMapStore, MarkerData} from '@/state/useMapStore'; // zustand
+import usePermission from '@/hooks/usePermission'; // 퍼미션
+import useUserLocation from '@/hooks/useUserLocation'; // 유저 위치
+import CustomMapButton from '../common/CustomMapButton'; // 커스텀 버튼
+import CustomBottomSheet from '../common/CustomBottomSheet'; // 커스텀 바텀 바
+import { colors } from '@/constants'; // 색깔
+import blueMarker from '@/assets/blueMarker.png' // 블루 마커
+import redMarker from '@/assets/redMarker.png' // 레드 마커
+import PolygonLayer from './PolygonLayer'; // 멍플 지오해시
+import MarkerManager from '../marker/MarkerManager'; // 마커 관리
+import ClusterMarkerList from '../marker/ClusterMarkerList' // 클러스터 마커 리스트
+
 
 interface MapComponentProps {
   userLocation: {latitude: number; longitude: number};
   path?: {latitude: number; longitude: number}[];
   bottomOffset?: number;
-  onFormClose: () => void;
-  onAddMarker: (marker: unknown) => void;
+  markers : MarkerData[]
   isFormVisible: boolean;
-}
-
-interface MungPlace {
-  latitude: number;
-  longitude: number;
 }
 
 const MapComponent: React.FC<MapComponentProps> = ({
   userLocation,
   bottomOffset = 0,
   path = [],
-  onFormClose,
-  onAddMarker,
+  // onFormClose,
+  // onAddMarker,
 }) => {
   const {
     showPersonalBlueZone,
@@ -69,7 +63,6 @@ const MapComponent: React.FC<MapComponentProps> = ({
   const {isUserLocationError} = useUserLocation();
   const [ clusterMarkers, setClusterMarkers ] = useState<MarkerData[]>([]) // 클러스터에 포함된 마커
   const [ isListVisible, setListVisible ] = useState(false) // 마커 리스트 모달 표시 여부
-  const [ selectedMarker, setSelectedMarker ] = useState<MarkerData | null>(null) // 리스트에서 선택된 마커
   const [ isModalVisible, setIsModalVisible ] = useState(false) // 마커 상세 정보 모달 표시 여부
 
   // Fetch zones data
@@ -83,10 +76,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
     fetchRedZone(location.latitude, location.longitude);
     fetchMungPlace(location.latitude, location.longitude);
   };
-  // 마커 추가 버튼 클릭 시 호출되는 함수
-  const handleAddMarker = (markerData: MarkerData) => {
-    addMarker(markerData)
-  }
+
   // 유저의 위치를 호출하는 함수
   const handlePressUserLocation = () => {
     if (!isUserLocationError) {
@@ -109,7 +99,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
     //   title : marker.properties.title,
     //   description : marker.properties.description
     // }))
-    // setClusterMarkers(clusterMarker)
+    setClusterMarkers(markers)
     setListVisible(true) // 리스트 모달 호출
   }
 
@@ -166,7 +156,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
         style={{flex : 1}}
         clusteringEnabled={true}
         clusterColor={colors.ORANGE.DARKER}
-        // onClusterPress={handleClusterPress}
+        onClusterPress={handleClusterPress}
         >
 
         {/* path가 있을 때만 Polyline으로 표시 */}
@@ -178,23 +168,23 @@ const MapComponent: React.FC<MapComponentProps> = ({
           />
         )}
 
-        {/* Heatmaps */}
+        {/* 히트맵 */}
         {showPersonalBlueZone && (
-          <Heatmap points={createHeatmapPoints(personalBlueZones)} />
+          <HeatmapLayer zones={personalBlueZones} />
         )}
         {showGlobalBlueZone && (
-          <Heatmap points={createHeatmapPoints(globalBlueZones)} />
+          <HeatmapLayer zones={globalBlueZones} />
         )}
         {showRedZone && (
-          <Heatmap
-            points={createHeatmapPoints(redZones)}
+          <HeatmapLayer
+            zones={redZones}
             radius={50}
             opacity={0.6}
           />
         )}
 
-        {/* Mung Places */}
-        {showMungPlace && renderMungPlaces(mungPlaces)}
+        {/* 멍플 */}
+        {showMungPlace && <PolygonLayer mungPlaces={mungPlaces} />}
 
         {markers.map(marker => (
           <Marker
@@ -208,52 +198,23 @@ const MapComponent: React.FC<MapComponentProps> = ({
           </Marker>
         ))}
       </ClusteredMapView>
+      
+      {/* 마커 매니저 */}
+      <MarkerManager
+        userLocation={userLocation}
+        onAddMarker={addMarker}
+        markers={markers}
+        isFormVisible={isFormVisible}
+        setFormVisible={setFormVisible}
+      />
 
-      {/* 마커 폼 호출 */}
-      {isFormVisible && userLocation && (
-        <MarkerForm
-          isVisible={true}
-          onSubmit={markerData => {
-            handleAddMarker(markerData)
-            setFormVisible(false)
-          }}
-          onClose={() => setFormVisible(false)}
-          latitude={userLocation.latitude}
-          longitude={userLocation.longitude}
-        />
-      )}
-
-      {/* 클러스터에 포함된 마커 리스트 모달 */}
-        <Modal visible={isListVisible} animationType="slide" onRequestClose={() => setListVisible(false)}>
-          <View style={styles.modalContainer}>
-            <Text style={styles.modalTitle}>Clustered Markers</Text>
-            <FlatList
-              data={clusterMarkers}
-              keyExtractor={item => item.id}
-              renderItem={({item}) => (
-                <View style={styles.listItem}>
-                  <Text>{item.title}</Text>
-                  <Button title="Details" onPress={() => handleMarkerPress(item)} />
-                </View>
-              )}
-            />
-            <Button title="Close" onPress={() => setListVisible(false)} />
-          </View>
-        </Modal>
-
-        {/* 마커 상세 정보 모달 */}
-        {selectedMarker && (
-          <Modal visible={isModalVisible} animationType="slide" onRequestClose={() => setModalVisible(false)}>
-            <View style={styles.modalContainer}>
-              <Text style={styles.modalTitle}>{selectedMarker.title}</Text>
-              <Text>{selectedMarker.body}</Text>
-              {selectedMarker.imageUri && (
-                <Image source={{uri: selectedMarker.imageUri}} style={styles.markerImageLarge} />
-              )}
-              <Button title="Close" onPress={() => setModalVisible(false)} />
-            </View>
-          </Modal>
-        )}
+      {/* 클러스터 마커 리스트 */}
+      <ClusterMarkerList
+        isVisible={isListVisible}
+        clusterMarkers={clusterMarkers}
+        onMarkerPress={handleMarkerPress}
+        onClose={() => setListVisible(false)}
+      />
 
       {/* 커스텀 맵 버튼 */}
       <CustomMapButton
@@ -274,7 +235,9 @@ const MapComponent: React.FC<MapComponentProps> = ({
         <ButtonWithTextContainer top={40} right={20}>
           <TextLabel>마커 등록</TextLabel>
           <CustomMapButton
-            onPress={() => setFormVisible(true)}
+            onPress={() => { 
+              console.log('모달 열기')
+              setFormVisible(true)}}
             iconName="location-outline"
             inValid={isDisabled}
           />
@@ -314,41 +277,6 @@ const MapComponent: React.FC<MapComponentProps> = ({
   );
 };
 
-const createHeatmapPoints = (zones: Zone[]): {latitude: number; longitude: number; weight: number}[] => {
-  return zones.map(zone => ({
-    latitude: zone.latitude,
-    longitude: zone.longitude,
-    weight: zone.weight || 1,
-  }));
-};
-
-const renderMungPlaces = (mungPlaces: MungPlace[]): JSX.Element[] => {
-  return mungPlaces.map(place => {
-    const hash = geohash.encode(place.latitude, place.longitude, 6);
-    const {latitude, longitude} = geohash.decode(hash);
-    const delta = 0.001;
-    const coordinates = [
-      {latitude: latitude - delta, longitude: longitude - delta},
-      {latitude: latitude - delta, longitude: longitude + delta},
-      {latitude: latitude + delta, longitude: longitude + delta},
-      {latitude: latitude + delta, longitude: longitude - delta},
-    ];
-
-    return (
-      <React.Fragment key={`${place.latitude}-${place.longitude}`}>
-        <Polygon
-          coordinates={coordinates}
-          fillColor="rgba(255, 255, 0, 0.3)"
-          strokeColor="rgba(255, 255, 0, 0.7)"
-        />
-        <Marker coordinate={{latitude, longitude}}>
-          <Image source={mungPleMarker} style={styles.markerImage} />
-        </Marker>
-      </React.Fragment>
-    );
-  });
-};
-
 const styles = StyleSheet.create({
   markerImage: {
     width: 30,
@@ -380,10 +308,6 @@ const styles = StyleSheet.create({
 const Container = styled.View`
   flex: 1;
 `;
-
-// const StyledMapView = styled(MapView)`
-//   flex: 1;
-// `;
 
 const ButtonWithTextContainer = styled.View<{top?: number; right?: number}>`
   position: absolute;
