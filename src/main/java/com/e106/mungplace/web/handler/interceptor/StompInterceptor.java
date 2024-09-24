@@ -38,6 +38,7 @@ public class StompInterceptor implements ChannelInterceptor {
 			case CONNECT -> handleConnect(accessor);
 			case SUBSCRIBE -> handleSubscribe(accessor);
 			case SEND -> handleSend(accessor);
+			case UNSUBSCRIBE -> handleUnsubscribe(accessor);
 			case DISCONNECT -> handleDisconnect(accessor);
 		}
 
@@ -66,6 +67,15 @@ public class StompInterceptor implements ChannelInterceptor {
 
 		putSessionMap(accessor, "destination", accessor.getDestination());
 	}
+	
+	private void handleUnsubscribe(StompHeaderAccessor accessor) {
+		log.debug("--- SOCKET UNSUBSCRIBE ---");
+		log.debug("UNSUBSCRIBE username: {}", accessor.getUser());
+		log.debug("UNSUBSCRIBE ID: {}", accessor.getSessionId());
+		log.debug("UNSUBSCRIBE destination: {}", accessor.getDestination());
+
+		postProcess(accessor);
+	}
 
 	private void handleDisconnect(StompHeaderAccessor accessor) {
 		log.debug("--- SOCKET DISCONNECT ---");
@@ -73,6 +83,10 @@ public class StompInterceptor implements ChannelInterceptor {
 		log.info("DISCONNECT ID: {}", accessor.getSessionId());
 		log.info("DISCONNECT destination: {}", accessor.getDestination());
 
+		postProcess(accessor);
+	}
+
+	private void postProcess(StompHeaderAccessor accessor) {
 		String[] parts = getSessionMapValue(accessor, "destination").toString().split("/");
 		if (Objects.equals(parts[1], "exploration")) {
 			endExplorationProcess(Long.parseLong(parts[2]));
