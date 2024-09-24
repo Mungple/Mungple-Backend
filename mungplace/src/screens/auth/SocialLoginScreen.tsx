@@ -3,9 +3,9 @@ import styled from 'styled-components/native';
 import {WebView, WebViewNavigation} from 'react-native-webview';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 
-import useAuth from '@/hooks/queries/useAuth';
+import {useAppStore} from '@/state/useAppStore';
 import {AuthStackParamList} from '@/navigations/stack/AuthStackNavigator';
-import { useAppStore } from '@/state/useAppStore';
+import {setHeader} from '@/utils';
 
 type SocialLoginScreenProps = NativeStackScreenProps<
   AuthStackParamList,
@@ -14,36 +14,38 @@ type SocialLoginScreenProps = NativeStackScreenProps<
 
 const SocialLoginScreen: React.FC<SocialLoginScreenProps> = ({route}) => {
   const {provider} = route.params;
-  const {socialLoginMutation} = useAuth();
-  const getAuthUrl = (provider: string) => `http://10.0.2.2:8080/api/users/login/${provider}`;
-  const getCallbackUrl = (provider: string, domain: string = 'localhost') => {
+  const setLogin = useAppStore(state => state.setLogin);
+  const setToken = useAppStore(state => state.setToken);
+
+  const getCallbackPath = (provider: string, domain: string = 'localhost') => {
     return `http://${domain}:8080/oauth2/callback/${provider}`;
   };
-  const getTokenUrl =  `http://localhost:8080/auth/oauth-response/`;
-  const [currentUrl, setCurrentUrl] = useState<string>(getAuthUrl(provider));
-  const setLogin = useAppStore((state) => state.setLogin);
-  const setToken = useAppStore((state) => state.setToken);
+  const [nowPath, setNowPath] = useState<string>(
+    `http://10.0.2.2:8080/api/users/login/${provider}`
+  );
 
   const handleNavigationStateChange = (event: WebViewNavigation) => {
     const url = event.url;
-    setCurrentUrl(url);
+    setNowPath(url);
 
-    if (url.startsWith(`${getCallbackUrl(provider)}?code=`)) {
+    if (url.startsWith(`${getCallbackPath(provider)}?code=`)) {
       const queryParams = url.split('?')[1];
-      setCurrentUrl(`${getCallbackUrl(provider, '10.0.2.2')}?${queryParams}`);
-    } else if (url.startsWith(getTokenUrl)) {
+      setNowPath(`${getCallbackPath(provider, '10.0.2.2')}?${queryParams}`);
+    } else if (url.startsWith(`http://localhost:8080/auth/oauth-response/`)) {
       const pathSegments = url.split('/');
       const accessToken = pathSegments[pathSegments.length - 1];
-      socialLoginMutation.mutate(accessToken);
-      setToken(accessToken)
-      setLogin(true)
+
+      setHeader('Authorization', `Bearer ${accessToken}`);
+      setHeader('Content-Type', `application/json; charset=utf8`);
+      setToken(accessToken);
+      setLogin(true);
     }
   };
 
   return (
     <Container>
       <WebViewContainer
-        source={{uri: currentUrl}}
+        source={{uri: nowPath}}
         onNavigationStateChange={handleNavigationStateChange}
         startInLoadingState
         javaScriptEnabled

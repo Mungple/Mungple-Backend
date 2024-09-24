@@ -17,10 +17,11 @@ type ResponseProfile = {
   nickname: string;
   imageName: string | null;
 };
+
 // 프로필 정보 요청 함수
 const getProfile = async (userId: number): Promise<ResponseProfile> => {
   try {
-    const { data } = await axiosInstance.get(`/users/${userId}`);
+    const {data} = await axiosInstance.get(`/users/${userId}`);
     console.log('Profile data:', data);
     return data;
   } catch (error) {

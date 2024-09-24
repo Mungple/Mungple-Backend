@@ -1,22 +1,10 @@
-import queryClient from '@/api/queryClient';
 import {useMutation, useQuery} from '@tanstack/react-query';
+
 import {queryKeys} from '@/constants';
-import type {
-  ResponseError,
-  UseMutationCustomOptions,
-  UseQueryCustomOptions,
-} from '@/types/common';
-import {
-  removeHeader,
-  setHeader,
-} from '@/utils';
-import {
-  getProfile,
-  editProfile,
-  logout,
-  ResponseProfile,
-  RequestProfile,
-} from '@/api/auth';
+import queryClient from '@/api/queryClient';
+import {removeHeader, setHeader} from '@/utils';
+import {getProfile, editProfile, logout, ResponseProfile, RequestProfile} from '@/api/auth';
+import type {ResponseError, UseMutationCustomOptions, UseQueryCustomOptions} from '@/types/common';
 
 // 로그인 커스텀 훅
 function useLogin(mutationOptions?: UseMutationCustomOptions) {
