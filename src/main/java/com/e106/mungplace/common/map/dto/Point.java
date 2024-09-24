@@ -31,7 +31,11 @@ public record Point(
 		return GeohashUtils.encodeLatLon(Double.parseDouble(latitude), Double.parseDouble(longitude), 9);
 	}
 
-	public static String toMungPlaceGeoHash(String latitude, String longitude) {
+	public static String toConstantGeoHash(String latitude, String longitude) {
+		return GeohashUtils.encodeLatLon(Double.parseDouble(latitude), Double.parseDouble(longitude), 8);
+	}
+
+	public static String toMungGeoHash(String latitude, String longitude) {
 		return GeohashUtils.encodeLatLon(Double.parseDouble(latitude), Double.parseDouble(longitude), 7);
 	}
 }

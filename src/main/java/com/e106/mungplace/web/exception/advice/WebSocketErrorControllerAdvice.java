@@ -55,10 +55,8 @@ public class WebSocketErrorControllerAdvice {
     public void handleCustomException(ApplicationSocketException e, StompHeaderAccessor accessor) throws IOException {
         sendErrorMessage(accessor, e.getError());
 
-        if (e.getError().getErrorCode().startsWith("FES")) {
-            explorationRecorder.removeUser(accessor.getUser().getName());
-            decorator.closeSession(accessor.getSessionId());
-        }
+        if (e.getError().getErrorCode().startsWith("FES")) explorationRecorder.endRecord(accessor.getUser().getName());
+        decorator.closeSession(accessor.getSessionId());
     }
 
     private void sendErrorMessage(StompHeaderAccessor accessor, ApplicationSocketError error) {

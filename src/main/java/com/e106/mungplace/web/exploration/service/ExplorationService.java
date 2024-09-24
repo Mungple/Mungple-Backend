@@ -44,8 +44,7 @@ public class ExplorationService {
 		explorationHelper.createDogsInExploration(request, exploration);
 
 		// TODO <fosong98> Redis에서 사용자 이동 거리 초기화 distance = 0
-		explorationRecorder.saveUser(userId.toString());
-		explorationRecorder.saveCurrentUserGeoHash(userId.toString(), request.getLatitude(), request.getLongitude()); //
+		explorationRecorder.initRecord(userId.toString(), request.getLatitude(), request.getLongitude());
 
 		return ExplorationStartResponse.of(exploration);
 	}
@@ -59,6 +58,7 @@ public class ExplorationService {
 
 		explorationHelper.validateIsUsersExploration(exploration, userId);
 		explorationHelper.updateExplorationIsEnded(exploration);
+		explorationRecorder.endRecord(userId.toString());
 	}
 
 	@Transactional(readOnly = true)
@@ -96,8 +96,8 @@ public class ExplorationService {
 
 	@Transactional
 	public void createExplorationEventProcess(ExplorationEventRequest eventRequest, Long explorationId) {
-//		explorationReader.getDuringExploring(explorationId);
-		explorationRecorder.saveCurrentUserGeoHash(eventRequest.getUserId().toString(), eventRequest.getLatitude(), eventRequest.getLongitude());
+		explorationReader.getDuringExploring(explorationId);
+		explorationRecorder.recordCurrentUserGeoHash(eventRequest.getUserId().toString(), eventRequest.getLatitude(), eventRequest.getLongitude());
 
 		ExplorationPayload payload = explorationHelper.createExplorationEventPayload(eventRequest);
 		ExplorationEvent event = ExplorationEvent.of(eventRequest, explorationId, payload);
