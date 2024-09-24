@@ -43,8 +43,11 @@ public class ExplorationHelper {
         return ExplorationPayload.of(point, request.getRecordedAt());
     }
 
-    public void updateExplorationIsEnded(List<DogExploration> dogExplorations) {
-        dogExplorations.stream()
+    public void updateExplorationIsEnded(Exploration exploration) {
+        Long distance = 0L; // TODO <fosong98> Redis에서 사용자 이동 거리 조회
+        exploration.end(distance);
+
+        dogExplorationRepository.findDogExplorationsByExplorationId(exploration.getId()).stream()
                 .peek(dogExploration -> dogExploration.updateIsEnded(true))
                 .forEach(dogExplorationRepository::save);
     }

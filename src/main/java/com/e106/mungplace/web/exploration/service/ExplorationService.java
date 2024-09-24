@@ -51,18 +51,10 @@ public class ExplorationService {
 		Long userId = userHelper.getCurrentUserId();
 		Exploration exploration = explorationReader.get(explorationId);
 
+		if (exploration.isEnded()) return;
+
 		explorationHelper.validateIsUsersExploration(exploration, userId);
-		explorationHelper.updateExplorationIsEnded(exploration.getDogExplorations());
-
-		if (exploration.isEnded()) {
-			log.debug("이미 종료된 산책 호출 id={}", explorationId);
-			return;
-		}
-
-		// TODO <fosong98> Redis에서 사용자 이동 거리 조회
-
-		Long distance = 0L;
-		exploration.end(distance);
+		explorationHelper.updateExplorationIsEnded(exploration);
 	}
 
 	@Transactional(readOnly = true)
@@ -85,6 +77,7 @@ public class ExplorationService {
 		Exploration exploration = explorationReader.get(explorationId);
 		List<Long> togetherDogIds = explorationHelper.getTogetherDogIds(exploration);
 		explorationHelper.validateIsEndedExploration(userId);
+
 		List<ExplorationPoint> points = new ArrayList<>(); // TODO : <이현수> elastic search 조회 매핑
 
 		return ExplorationResponse.of(exploration, togetherDogIds, points);

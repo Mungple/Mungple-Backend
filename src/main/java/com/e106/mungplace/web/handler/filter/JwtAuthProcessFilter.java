@@ -1,17 +1,8 @@
 package com.e106.mungplace.web.handler.filter;
 
 import java.io.IOException;
-import java.util.List;
-
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.filter.OncePerRequestFilter;
-
-import com.e106.mungplace.domain.user.repository.UserRepository;
-import com.e106.mungplace.web.util.JwtProvider;
+import com.e106.mungplace.web.util.JwtAuthenticationHelper;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -22,8 +13,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class JwtAuthProcessFilter extends OncePerRequestFilter {
 
-	private final JwtProvider jwtProvider;
-	private final UserRepository userRepository;
+	private final JwtAuthenticationHelper helper;
 
 	@Override
 	public void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -33,22 +23,9 @@ public class JwtAuthProcessFilter extends OncePerRequestFilter {
 
 		if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
 			String token = authorizationHeader.substring(7);
-
-			if (jwtProvider.verifyToken(token)) {
-				Long userId = jwtProvider.extractUserIdFromToken(token);
-
-				UserDetails user = User.builder()
-					.username(userId.toString())
-					.password("")
-					.authorities(List.of())
-					.build();
-
-				Authentication authentication = new UsernamePasswordAuthenticationToken(
-					user, "", user.getAuthorities());
-
-				SecurityContextHolder.getContext().setAuthentication(authentication);
-			}
+			helper.storeAuthenticationInContext(token);
 		}
+
 		filterChain.doFilter(request, response);
 	}
 }

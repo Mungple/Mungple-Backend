@@ -11,12 +11,11 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import com.e106.mungplace.domain.user.repository.UserRepository;
 import com.e106.mungplace.web.handler.filter.JwtAuthProcessFilter;
 import com.e106.mungplace.web.handler.filter.OAuth2FailureHandler;
 import com.e106.mungplace.web.handler.filter.OAuth2SuccessHandler;
 import com.e106.mungplace.web.user.service.OAuth2UserService;
-import com.e106.mungplace.web.util.JwtProvider;
+import com.e106.mungplace.web.util.JwtAuthenticationHelper;
 
 @Configuration
 @EnableWebSecurity
@@ -27,7 +26,8 @@ public class SecurityConfig {
 		"/oauth2/callback/*",
 		"/h2-console/**",
 		"/manager/**",
-		"/error/**"
+		"/error/**",
+		"/ws/**"
 	};
 
 	@Bean
@@ -38,8 +38,7 @@ public class SecurityConfig {
 		OAuth2SuccessHandler oAuth2SuccessHandler,
 		OAuth2FailureHandler oAuth2FailureHandler,
 		CorsConfig corsConfig,
-		JwtProvider jwtProvider,
-		UserRepository userRepository
+		JwtAuthenticationHelper jwtAuthenticationHelper
 	) throws Exception {
 		return http
 			.csrf(AbstractHttpConfigurer::disable)
@@ -47,7 +46,7 @@ public class SecurityConfig {
 			.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 			.formLogin(AbstractHttpConfigurer::disable)
 			.httpBasic(AbstractHttpConfigurer::disable)
-			.addFilterBefore(new JwtAuthProcessFilter(jwtProvider, userRepository),
+			.addFilterBefore(new JwtAuthProcessFilter(jwtAuthenticationHelper),
 				UsernamePasswordAuthenticationFilter.class)
 			.authorizeHttpRequests(request -> request
 				.requestMatchers(AUTH_WHITELIST).permitAll()

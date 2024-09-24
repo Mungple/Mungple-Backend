@@ -5,9 +5,12 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface DogExplorationRepository extends CrudRepository<DogExploration, Long> {
     @Query(value = "SELECT de FROM dog_exploration de WHERE de.dog.id = :dogId ORDER BY de.dogExplorationId DESC")
     Optional<DogExploration> findLatestByDogId(@Param("dogId") Long dogId);
+
+    List<DogExploration> findDogExplorationsByExplorationId(Long explorationId);
 }
