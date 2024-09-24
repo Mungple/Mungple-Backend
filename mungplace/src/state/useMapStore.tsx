@@ -16,6 +16,7 @@ export interface MarkerData {
   title: string
   body: string
   imageUri?: string // 마커에 사용될 이미지 uri도 선택적임
+  explorationId?: number // 있으면 산책임
   type: 'blue' | 'red'
 }
 
