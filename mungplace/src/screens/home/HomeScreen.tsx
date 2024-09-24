@@ -3,25 +3,37 @@ import {useNavigation} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 
 import * as HS from './HomeScreenStyle';
+import {Dimensions} from 'react-native';
+import PetList from '@/components/user/PetList';
 import {useAppStore} from '@/state/useAppStore';
 import {colors, mapNavigations} from '@/constants';
-import {IonIcons} from 'react-native-vector-icons/Ionicons';
+import IonIcons from 'react-native-vector-icons/Ionicons';
 import CustomModal from '@/components/common/CustomModal';
 import CustomButton from '@/components/common/CustomButton';
 import {MapStackParamList} from '@/navigations/stack/MapStackNavigator';
 
+const windowHeight = Dimensions.get('window').height;
+
 const HomeScreen: React.FC = () => {
-  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
   const setWalkingStart = useAppStore(state => state.setWalkingStart);
+  const [selectedPets, setSelectedPets] = useState<number[]>([]);
   const navigation = useNavigation<NativeStackNavigationProp<MapStackParamList>>();
 
   const handleModalVisible = () => {
-    setIsModalVisible(!isModalVisible);
+    setModalVisible(!modalVisible);
   };
 
   const handleWalkingStart = () => {
+    setModalVisible(false)
     setWalkingStart(true);
     navigation.navigate(mapNavigations.WALKING);
+  };
+
+  const handlePetSelect = (dogId: number) => {
+    setSelectedPets((prev) =>
+      prev.includes(dogId) ? prev.filter(id => id !== dogId) : [...prev, dogId]
+    );
   };
 
   return (
@@ -51,16 +63,25 @@ const HomeScreen: React.FC = () => {
       <CustomButton label="산책 시작하기" onPress={handleModalVisible} />
 
       {/* 산책 시작 확인 모달 */}
-      <CustomModal modalVisible={isModalVisible}>
+      <CustomModal
+        isWide={true}
+        height={windowHeight * 0.7}
+        modalVisible={modalVisible}
+        setModalVisible={setModalVisible}
+      >
         {/* 상단 헤더 */}
         <HS.HeaderContainer>
           <HS.MenuText>반려견 선택</HS.MenuText>
           <HS.CloseButton onPress={handleModalVisible}>
-            {/* <IonIcons name={'close'} size={32} color={colors.BLACK} /> */}
+            <IonIcons name={'close'} size={32} color={colors.BLACK} />
           </HS.CloseButton>
         </HS.HeaderContainer>
-
-        <CustomButton label="산책 시작하기" onPress={handleWalkingStart} />
+        {/* 반려견 목록 */}
+        <PetList
+          selectedPets={selectedPets}
+          handlePetSelect={handlePetSelect}>
+          <CustomButton label="산책 시작하기" onPress={handleWalkingStart} />
+        </PetList>
       </CustomModal>
     </HS.Container>
   );

@@ -5,16 +5,25 @@ import {Dimensions, Modal} from 'react-native';
 import {colors} from '@/constants';
 
 interface CustomModalProps {
-  children?: React.ReactNode;
+  height?: number;
+  isWide?: boolean;
   modalVisible: boolean;
+  children?: React.ReactNode;
+  setModalVisible: (visible: boolean) => void;
 }
 
-const bottomBlockWidth = Dimensions.get('window').width - 40;
+const windowWidth = Dimensions.get('window').width;
 
 const CustomModal: React.FC<CustomModalProps> = ({
-  modalVisible,
+  height,
+  isWide = false,
   children,
+  modalVisible,
+  setModalVisible,
 }) => {
+  const closeModal = () => {
+    setModalVisible(false);
+  };
 
   return (
     <Modal
@@ -23,32 +32,31 @@ const CustomModal: React.FC<CustomModalProps> = ({
       transparent
       statusBarTranslucent
     >
-      <Overlay>
-
-        {/* 콘텐츠 영역 */}
-        <ModalContainer>
+      <Overlay onPress={closeModal}>
+        <ModalContainer isWide={isWide} height={height}>
           {children}
         </ModalContainer>
-
       </Overlay>
     </Modal>
   );
 };
 
-const Overlay = styled.View`
+const Overlay = styled.Pressable`
   flex: 1;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
   background-color: rgba(0, 0, 0, 0.5);
 `;
 
-const ModalContainer = styled.View`
-  width: ${bottomBlockWidth}px;
-  background-color: ${colors.WHITE};
-  border-radius: 10px;
-  padding: 20px;
-  justify-content: center;
+const ModalContainer = styled.View<{isWide: boolean; height?: number;}>`
+  flex: 1;
+  position: absolute;
   align-items: center;
+  border-radius: 10px;
+  width: ${windowWidth - 40}px;
+  background-color: ${colors.WHITE};
+  padding: ${({isWide}) => isWide ? 0 : 20}px;
+  height: ${({height}) => height ? `${height}px` : 'auto'};
 `;
 
 export default CustomModal;

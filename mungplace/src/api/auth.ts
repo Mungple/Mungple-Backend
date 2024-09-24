@@ -1,12 +1,6 @@
 import axiosInstance from './axios';
 import {getEncryptStorage} from '@/utils';
-import type {Category, Profile} from '@/types/domain';
-
-// 회원가입 및 로그인 시 사용되는 요청 데이터 타입
-type RequestUser = {
-  email: string;
-  password: string;
-};
+import type {Profile} from '@/types/domain';
 
 // 로그인 후 응답받는 토큰 데이터 타입
 type ResponseToken = {
@@ -14,36 +8,31 @@ type ResponseToken = {
   refreshToken: string;
 };
 
-// 사용자 프로필 및 카테고리 정보를 포함하는 타입
-type ResponseProfile = Profile & Category;
-
 // 사용자 프로필 요청 타입
-type RequestProfile = Omit<
-  Profile,
-  'userId' | 'nickname' | 'imageUri'
->;
+type RequestProfile = Omit<Profile, 'userId' | 'nickname' | 'imageName'>;
 
-// 로그인 요청 함수
-const postLogin = async ({email, password}: RequestUser): Promise<ResponseToken> => {
-  const {data} = await axiosInstance.post('/auth/signin', {email, password});
-  return data;
+// 사용자 프로필 반환 타입
+type ResponseProfile = {
+  userId: number;
+  nickname: string;
+  imageName: string | null;
 };
 
 // 소셜 로그인 요청 함수
-const socialLogin = async (token: string): Promise<ResponseToken> => {
-  const {data} = await axiosInstance.post('/auth/oauth/social', {token});
+const socialLogin = async (provider: string): Promise<ResponseToken> => {
+  const {data} = await axiosInstance.post(`/api/users/login/${provider}`);
   return data;
 };
 
 // 프로필 정보 요청 함수
-const getProfile = async (): Promise<ResponseProfile> => {
-  const {data} = await axiosInstance.get('/auth/me');
+const getProfile = async (userId: number): Promise<ResponseProfile> => {
+  const {data} = await axiosInstance.get(`/users/${userId}`);
   return data;
 };
 
 // 프로필 정보 변경 함수
-const editProfile = async (body: RequestProfile): Promise<ResponseProfile> => {
-  const {data} = await axiosInstance.patch('/auth/me', body);
+const editProfile = async (userId: number, body: RequestProfile): Promise<ResponseProfile> => {
+  const {data} = await axiosInstance.patch(`/users/${userId}`, body);
   return data;
 };
 
@@ -58,8 +47,8 @@ const getAccessToken = async (): Promise<ResponseToken> => {
 
 // 로그아웃 요청 함수
 const logout = async () => {
-  await axiosInstance.post('/auth/logout');
+  await axiosInstance.post('/users/logout');
 };
 
-export {postLogin, getProfile, editProfile, logout, getAccessToken, socialLogin};
-export type {RequestUser, ResponseToken, ResponseProfile, RequestProfile};
+export {getProfile, editProfile, logout, getAccessToken, socialLogin};
+export type {ResponseToken, RequestProfile, ResponseProfile};

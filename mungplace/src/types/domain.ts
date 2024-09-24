@@ -31,12 +31,17 @@ interface Post extends Marker {
 
 // 사용자 프로필 정보를 정의한 타입
 interface Profile {
-  id: number;
-  email: string;
-  nickname: string | null;
-  imageUri: string | null;
-  kakaoImageUri: string | null;
-  loginType: 'kakao' | 'naver' | 'google';
+  userId: number;
+  nickname: string;
+  imageName: string | null;
 }
 
-export type {MarkerColor, Category, ImageUri, Profile, Marker, Post};
+// 반려견 프로필 정보를 정의한 타입
+interface PetProfile {
+  petName: string;
+  petGender: 'Male' | 'Female';
+  petWeight: number;
+  petBirth: Date;
+}
+
+export type {MarkerColor, Category, ImageUri, PetProfile, Profile, Marker, Post};

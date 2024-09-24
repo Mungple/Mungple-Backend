@@ -1,10 +1,8 @@
 import styled from 'styled-components/native';
-import { Dimensions, TouchableOpacity } from 'react-native';
+import {TouchableOpacity} from 'react-native';
 
 import {colors} from '@/constants';
 import CustomCard from '@/components/common/CustomCard';
-
-const {height: windowHeight} = Dimensions.get('window');
 
 const Container = styled.View`
   flex: 1;
@@ -13,16 +11,13 @@ const Container = styled.View`
   padding: 20px;
 `;
 
-const ImageCard = styled(CustomCard).attrs({
-  style: {
-    borderWidth: 1,
-  },
-})`
-  height: ${windowHeight * 0.42}px;
+const ImageCard = styled(CustomCard)`
+  flex: 2;
 `;
 
-const DogInfo = styled(CustomCard).attrs({})`
-  backgroundcolor: ${colors.BEIGE.LIGHTER};
+const DogInfo = styled(CustomCard)`
+  flex: 1;
+  background-color: ${colors.BEIGE.LIGHTER};
   padding: 30px;
   flex-direction: row;
   align-items: center;
@@ -53,12 +48,15 @@ const RightTextBold = styled(RightText)`
   text-align: right;
 `;
 
+// Modal 부분
+
 const HeaderContainer = styled.View`
-  position: relative;
+  width: 100%;
+  padding: 16px;
+  position: relation;
+  align-items: center;
   flex-direction: row;
   justify-content: center;
-  align-items: center;
-  padding: 16px;
   border-bottom-width: 1px;
   border-bottom-color: ${colors.GRAY_300};
 `;
@@ -67,7 +65,7 @@ const MenuText = styled.Text`
   font-size: 24px;
   font-weight: bold;
   text-align: center;
-  flex: 1;
+  color: ${colors.BLACK};
 `;
 
 const CloseButton = styled(TouchableOpacity)`

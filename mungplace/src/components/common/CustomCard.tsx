@@ -4,15 +4,20 @@ import {ViewStyle, StyleProp} from 'react-native';
 import {colors} from '@/constants';
 
 interface CustomCardProps {
-  style?: StyleProp<ViewStyle>;
+  onPress?: () => void;
   children?: React.ReactNode;
+  style?: StyleProp<ViewStyle>;
 }
 
-const CustomCard: React.FC<CustomCardProps> = ({style, children}) => {
-  return <CardContainer style={style}>{children}</CardContainer>;
+const CustomCard: React.FC<CustomCardProps> = ({style, children, onPress}) => {
+  return (
+    <CardContainer style={style} onPress={onPress}>
+      {children}
+    </CardContainer>
+  );
 };
 
-const CardContainer = styled.View`
+const CardContainer = styled.TouchableOpacity`
   background-color: ${colors.WHITE};
   border-radius: 16px;
   padding: 20px;
