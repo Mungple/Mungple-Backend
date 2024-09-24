@@ -23,7 +23,7 @@ public class ExplorationController {
 	private final ExplorationService explorationService;
 
 	@PostMapping
-	public ResponseEntity<ExplorationStartResponse> startExploration(@RequestBody ExplorationStartWithDogsRequest dogs) {
+	public ResponseEntity<ExplorationStartResponse> startExploration(@Validated @RequestBody ExplorationStartWithDogsRequest dogs) {
 		return ResponseEntity.status(HttpStatus.CREATED).body(explorationService.startExplorationProcess(dogs));
 	}
 

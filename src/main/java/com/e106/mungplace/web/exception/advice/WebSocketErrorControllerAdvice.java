@@ -1,5 +1,6 @@
 package com.e106.mungplace.web.exception.advice;
 
+import com.e106.mungplace.domain.exploration.impl.ExplorationRecorder;
 import com.e106.mungplace.web.exception.ApplicationSocketException;
 import com.e106.mungplace.web.exception.dto.ApplicationSocketError;
 import com.e106.mungplace.web.exception.dto.ErrorResponse;
@@ -10,7 +11,6 @@ import org.springframework.messaging.MessageDeliveryException;
 import org.springframework.messaging.converter.MessageConversionException;
 import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
 import org.springframework.messaging.handler.annotation.support.MethodArgumentNotValidException;
-import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -27,6 +27,7 @@ public class WebSocketErrorControllerAdvice {
 
     private final CustomWebSocketHandlerDecorator decorator;
     private final SimpMessagingTemplate messagingTemplate;
+    private final ExplorationRecorder explorationRecorder;
 
     /* 지정되지 않은 소켓 예외인 경우(ES00) */
     @MessageExceptionHandler(SocketException.class)
@@ -49,11 +50,15 @@ public class WebSocketErrorControllerAdvice {
         decorator.closeSession(accessor.getSessionId());
     }
 
-    /* 그 외 비즈니스 로직에서 지정할 수 있는 예외인 경우 */
+    /* 그 외 비즈니스 로직에서 지정할 수 있는 예외인 경우, ES 소켓 유지, FES 소켓 만료(현재 FES 는 산책밖에 없지만 추후 생긴다면 if 분리 ) */
     @MessageExceptionHandler(ApplicationSocketException.class)
     public void handleCustomException(ApplicationSocketException e, StompHeaderAccessor accessor) throws IOException {
         sendErrorMessage(accessor, e.getError());
-        decorator.closeSession(accessor.getSessionId());
+
+        if (e.getError().getErrorCode().startsWith("FES")) {
+            explorationRecorder.removeUser(accessor.getUser().getName());
+            decorator.closeSession(accessor.getSessionId());
+        }
     }
 
     private void sendErrorMessage(StompHeaderAccessor accessor, ApplicationSocketError error) {

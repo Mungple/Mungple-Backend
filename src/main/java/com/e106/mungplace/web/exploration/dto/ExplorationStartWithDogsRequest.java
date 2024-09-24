@@ -1,6 +1,7 @@
 package com.e106.mungplace.web.exploration.dto;
 
 import com.e106.mungplace.domain.dogs.entity.Dog;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,5 +16,12 @@ import java.util.List;
 @AllArgsConstructor
 public class ExplorationStartWithDogsRequest {
 
+    @NotNull
+    String latitude;
+
+    @NotNull
+    String longitude;
+
+    @NotNull
     List<Dog> dogs = new ArrayList<>();
 }

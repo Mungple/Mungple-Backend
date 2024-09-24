@@ -4,17 +4,13 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.concurrent.TimeUnit;
 
-import com.e106.mungplace.common.map.dto.Point;
 import com.e106.mungplace.domain.exploration.entity.ExplorationEvent;
 import com.e106.mungplace.domain.exploration.impl.ExplorationHelper;
 import com.e106.mungplace.domain.exploration.impl.ExplorationRecorder;
 import com.e106.mungplace.web.exploration.dto.*;
 import com.e106.mungplace.web.exploration.service.producer.ExplorationProducer;
 import com.e106.mungplace.web.util.StatisticUtils;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,16 +34,18 @@ public class ExplorationService {
 	private final ExplorationProducer producer;
 
 	@Transactional
-	public ExplorationStartResponse startExplorationProcess(ExplorationStartWithDogsRequest dogs) {
+	public ExplorationStartResponse startExplorationProcess(ExplorationStartWithDogsRequest request) {
 		Long userId = userHelper.getCurrentUserId();
 		userHelper.validateUserHasDog(userId);
 		explorationHelper.validateIsEndedExploration(userId);
 
 		Exploration exploration = explorationReader.create(new User(userId), LocalDateTime.now());
-		explorationHelper.validateExplorationWithDogs(dogs);
-		explorationHelper.createDogsInExploration(dogs, exploration);
+		explorationHelper.validateExplorationWithDogs(request);
+		explorationHelper.createDogsInExploration(request, exploration);
 
 		// TODO <fosong98> Redis에서 사용자 이동 거리 초기화 distance = 0
+		explorationRecorder.saveUser(userId.toString());
+		explorationRecorder.saveCurrentUserGeoHash(userId.toString(), request.getLatitude(), request.getLongitude()); //
 
 		return ExplorationStartResponse.of(exploration);
 	}
@@ -99,7 +97,7 @@ public class ExplorationService {
 	@Transactional
 	public void createExplorationEventProcess(ExplorationEventRequest eventRequest, Long explorationId) {
 //		explorationReader.getDuringExploring(explorationId);
-		explorationRecorder.saveCurrentUser(eventRequest.getUserId().toString(), eventRequest.getLatitude(), eventRequest.getLongitude());
+		explorationRecorder.saveCurrentUserGeoHash(eventRequest.getUserId().toString(), eventRequest.getLatitude(), eventRequest.getLongitude());
 
 		ExplorationPayload payload = explorationHelper.createExplorationEventPayload(eventRequest);
 		ExplorationEvent event = ExplorationEvent.of(eventRequest, explorationId, payload);
