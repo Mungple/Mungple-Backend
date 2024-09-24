@@ -1,8 +1,9 @@
 import {useEffect} from 'react';
 import queryClient from '@/api/queryClient';
-import {MutationFunction, useMutation, useQuery} from '@tanstack/react-query';
+import {MutationFunction, UseQueryOptions, useMutation, useQuery} from '@tanstack/react-query';
 import {numbers, queryKeys, storageKeys} from '@/constants';
 import type {
+  ResponseError,
   UseMutationCustomOptions,
   UseQueryCustomOptions,
 } from '@/types/common';
@@ -13,13 +14,14 @@ import {
   setHeader,
 } from '@/utils';
 import {
-  ResponseProfile,
-  ResponseToken,
-  editProfile,
-  getAccessToken,
   getProfile,
-  socialLogin,
+  editProfile,
   logout,
+  getAccessToken,
+  socialLogin,
+  ResponseToken,
+  ResponseProfile,
+  RequestProfile,
 } from '@/api/auth';
 
 // 로그인 커스텀 훅
@@ -81,23 +83,23 @@ function useGetRefreshToken() {
 }
 
 // 프로필 정보 가져오기 훅
-function useGetProfile(queryOptions?: UseQueryCustomOptions<ResponseProfile>) {
-  return useQuery({
-    queryFn: getProfile,
-    queryKey: [queryKeys.AUTH, queryKeys.GET_PROFILE],
+function useGetProfile(
+  userId: number, 
+  queryOptions?: UseQueryOptions<ResponseProfile, Error>
+) {
+  return useQuery<ResponseProfile, Error>({
+    queryFn: () => getProfile(userId),
+    queryKey: [queryKeys.AUTH, queryKeys.GET_PROFILE, userId],
     ...queryOptions,
   });
 }
 
 // 프로필 정보 변경 훅
 function useUpdateProfile(mutationOptions?: UseMutationCustomOptions) {
-  return useMutation({
-    mutationFn: editProfile,
+  return useMutation<ResponseProfile, ResponseError, { userId: number; body: RequestProfile }>({
+    mutationFn: ({userId, body}) => editProfile(userId, body),
     onSuccess: newProfile => {
-      queryClient.setQueryData(
-        [queryKeys.AUTH, queryKeys.GET_PROFILE],
-        newProfile,
-      );
+      queryClient.setQueryData([queryKeys.AUTH, queryKeys.GET_PROFILE], newProfile);
     },
     ...mutationOptions,
   });
@@ -119,19 +121,19 @@ function useLogout(mutationOptions?: UseMutationCustomOptions) {
 }
 
 function useAuth() {
-  const socialLoginMutation = useSocialLogin();
   const logoutMutation = useLogout();
   const profileMutation = useUpdateProfile();
+  const socialLoginMutation = useSocialLogin();
   const refreshTokenQuery = useGetRefreshToken();
   const getProfileQuery = useGetProfile({enabled: refreshTokenQuery.isSuccess});
   const isLogin = getProfileQuery.isSuccess;
 
   return {
-    socialLoginMutation,
-    getProfileQuery,
     isLogin,
     logoutMutation,
     profileMutation,
+    getProfileQuery,
+    socialLoginMutation,
   };
 }
 

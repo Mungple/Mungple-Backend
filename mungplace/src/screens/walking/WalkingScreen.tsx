@@ -5,7 +5,6 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import {useNavigation} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 
-
 import {useAppStore} from '@/state/useAppStore';
 import {colors, mapNavigations} from '@/constants';
 import useUserLocation from '@/hooks/useUserLocation';
@@ -23,7 +22,7 @@ const WalkingScreen = () => {
   const {userLocation} = useUserLocation();
   const [distance, setDistance] = useState(0);
   const [isFormVisible, setIsFormVisible] = useState(false);
-  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
   const setWalkingStart = useAppStore(state => state.setWalkingStart);
   const [path, setPath] = useState<{latitude: number; longitude: number}[]>([]);
 
@@ -31,7 +30,7 @@ const WalkingScreen = () => {
     useNavigation<NativeStackNavigationProp<MapStackParamList>>();
 
   const handleWalkingEnd = () => {
-    setIsModalVisible(true);
+    setModalVisible(true);
   };
 
   const handleFormClose = () => {
@@ -44,12 +43,12 @@ const WalkingScreen = () => {
 
   const confirmEndWalking = () => {
     setWalkingStart(false);
-    setIsModalVisible(false);
+    setModalVisible(false);
     navigation.navigate(mapNavigations.HOME);
   };
 
   const cancelEndWalking = () => {
-    setIsModalVisible(false);
+    setModalVisible(false);
   };
 
   // 5초마다 좌표를 수집하여 경로 업데이트
@@ -96,15 +95,20 @@ const WalkingScreen = () => {
           </BottomCard>
 
           {/* 산책 종료 확인 모달 */}
-          <CustomModal modalVisible={isModalVisible}>
-            <Icon name="alert-circle-outline" size={48} color={colors.ORANGE.BASE} />
+          <CustomModal
+            modalVisible={modalVisible}
+            setModalVisible={setModalVisible}>
+            <Icon
+              size={48}
+              name="alert-circle-outline"
+              color={colors.ORANGE.BASE}
+            />
             <ModalTitle>산책을 종료하시겠습니까?</ModalTitle>
             <ButtonContainer>
               <ConfirmButton label="확인" onPress={confirmEndWalking} />
               <CancelButton label="취소" onPress={cancelEndWalking} />
             </ButtonContainer>
           </CustomModal>
-
         </>
       )}
     </Container>

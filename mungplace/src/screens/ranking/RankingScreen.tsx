@@ -1,12 +1,14 @@
-import { StyleSheet, Text, View } from 'react-native'
+import { View, Text } from 'react-native'
 import React from 'react'
+import CustomHeader from '@/components/common/CustomHeader'
 
-export default function RankingScreen() {
+const RankingScreen = () => {
   return (
     <View>
+      <CustomHeader title='랭킹' />
       <Text>RankingScreen</Text>
     </View>
   )
 }
 
-const styles = StyleSheet.create({})
+export default RankingScreen

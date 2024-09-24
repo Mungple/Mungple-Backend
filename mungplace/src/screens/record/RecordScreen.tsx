@@ -5,6 +5,7 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {colors} from '@/constants';
 import Calendar from '@/components/calender/Calendar';
 import {getMonthYearDetails, getNewMonthYear} from '@/utils/date';
+import CustomHeader from '@/components/common/CustomHeader';
 
 const RecordScreen = () => {
   const [selectedDate, setSelectedDate] = useState(0);
@@ -30,13 +31,12 @@ const RecordScreen = () => {
 
   return (
     <Container>
-      <Header>
-        <HeaderText>월간 산책</HeaderText>
+      <CustomHeader title='월간 산책'>
         <DropdownContainer>
           <DropdownText>뭉치1</DropdownText>
           <MaterialIcons name="keyboard-arrow-down" size={20} />
         </DropdownContainer>
-      </Header>
+      </CustomHeader>
 
       <Calendar
         attendance={[]}
@@ -80,21 +80,6 @@ const RecordScreen = () => {
 const Container = styled.SafeAreaView`
   flex: 1;
   background-color: ${colors.WHITE};
-`;
-
-const Header = styled.View`
-  padding: 20px;
-  border-bottom-width: 1px;
-  border-bottom-color: ${colors.GRAY_100};
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-`;
-
-const HeaderText = styled.Text`
-  font-size: 22px;
-  font-weight: bold;
-  color: ${colors.BLACK};
 `;
 
 const DropdownContainer = styled.View`
