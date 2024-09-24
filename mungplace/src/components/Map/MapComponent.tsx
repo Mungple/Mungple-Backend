@@ -64,6 +64,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
   const [ clusterMarkers, setClusterMarkers ] = useState<MarkerData[]>([]) // 클러스터에 포함된 마커
   const [ isListVisible, setListVisible ] = useState(false) // 마커 리스트 모달 표시 여부
   const [ isModalVisible, setIsModalVisible ] = useState(false) // 마커 상세 정보 모달 표시 여부
+  const [ selectedMarker, setSelectedMarker ] = useState<MarkerData | null>(null)
 
   // Fetch zones data
   useEffect(() => {
@@ -105,6 +106,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
 
   // 마커 클릭 시 상세 정보 모달 호출
   const handleMarkerPress = (marker: MarkerData) => {
+    console.log("마커임 ㅇㅇ",marker)
     setSelectedMarker(marker)
     setIsModalVisible(true)
   }
@@ -194,7 +196,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
             description={marker.body}
             onPress={() => handleMarkerPress(marker)}
           >
-            <Image source={marker.type === 'blue' ? blueMarker : redMarker } style={styles.markerImage} />
+            <Image source={marker.type === 'BLUE' ? blueMarker : redMarker } style={styles.markerImage} />
           </Marker>
         ))}
       </ClusteredMapView>

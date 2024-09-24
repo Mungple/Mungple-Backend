@@ -17,7 +17,7 @@ export interface MarkerData {
   body: string
   imageUri?: string // 마커에 사용될 이미지 uri도 선택적임
   explorationId?: number // 있으면 산책임
-  type: 'blue' | 'red'
+  type: 'BLUE' | 'RED'
 }
 
 // 맵 화면의 상태 정의

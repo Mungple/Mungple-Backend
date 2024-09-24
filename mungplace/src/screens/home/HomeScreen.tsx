@@ -10,11 +10,13 @@ import CustomModal from '@/components/common/CustomModal';
 import CustomButton from '@/components/common/CustomButton';
 import {MapStackParamList} from '@/navigations/stack/MapStackNavigator';
 
+
 const HomeScreen: React.FC = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const setWalkingStart = useAppStore(state => state.setWalkingStart);
   const navigation = useNavigation<NativeStackNavigationProp<MapStackParamList>>();
-
+  // const accessToken = useAppStore((state) => state.token)
+  // console.log("어 형이야", accessToken)
   const handleModalVisible = () => {
     setIsModalVisible(!isModalVisible);
   };
