@@ -25,14 +25,14 @@ const HomeScreen: React.FC = () => {
   };
 
   const handleWalkingStart = () => {
-    setModalVisible(false)
+    setModalVisible(false);
     setWalkingStart(true);
     navigation.navigate(mapNavigations.WALKING);
   };
 
   const handlePetSelect = (dogId: number) => {
-    setSelectedPets((prev) =>
-      prev.includes(dogId) ? prev.filter(id => id !== dogId) : [...prev, dogId]
+    setSelectedPets(prev =>
+      prev.includes(dogId) ? prev.filter(id => id !== dogId) : [...prev, dogId],
     );
   };
 
@@ -67,8 +67,7 @@ const HomeScreen: React.FC = () => {
         isWide={true}
         height={windowHeight * 0.7}
         modalVisible={modalVisible}
-        setModalVisible={setModalVisible}
-      >
+        setModalVisible={setModalVisible}>
         {/* 상단 헤더 */}
         <HS.HeaderContainer>
           <HS.MenuText>반려견 선택</HS.MenuText>
@@ -77,9 +76,7 @@ const HomeScreen: React.FC = () => {
           </HS.CloseButton>
         </HS.HeaderContainer>
         {/* 반려견 목록 */}
-        <PetList
-          selectedPets={selectedPets}
-          handlePetSelect={handlePetSelect}>
+        <PetList selectedPets={selectedPets} handlePetSelect={handlePetSelect}>
           <CustomButton label="산책 시작하기" onPress={handleWalkingStart} />
         </PetList>
       </CustomModal>

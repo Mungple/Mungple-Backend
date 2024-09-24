@@ -16,7 +16,7 @@ import EditProfileImageOption from '@/components/setting/EditProfileImageOption'
 const EditProfileScreen = () => {
   const imageOption = useModal();
   const {getProfileQuery} = useAuth();
-  const {nickname, imageName} = getProfileQuery(1).data || {};
+  const {nickname, imageName} = getProfileQuery.data || {};
 
   // 이미지 선택 기능을 위한 커스텀 훅
   const imagePicker = useImagePicker({

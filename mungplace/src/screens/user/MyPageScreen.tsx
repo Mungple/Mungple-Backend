@@ -13,7 +13,7 @@ import {SettingStackParamList} from '@/navigations/stack/SettingStackNavigator';
 import PetList from '@/components/user/PetList';
 import CustomCard from '@/components/common/CustomCard';
 import CustomHeader from '@/components/common/CustomHeader';
-import { getProfile } from '@/api';
+import axiosInstance from '@/api/axios';
 
 type MyPageScreenProps = NativeStackScreenProps<
   SettingStackParamList,
@@ -23,10 +23,9 @@ type MyPageScreenProps = NativeStackScreenProps<
 const windowHeight = Dimensions.get('window').height;
 
 const MyPageScreen: React.FC<MyPageScreenProps> = ({navigation}) => {
-  const imageOption = useModal();
+  // const imageOption = useModal();
   const {getProfileQuery} = useAuth();
-  const data = getProfile(1);
-  console.log(data)
+  const {nickname, imageName} = getProfileQuery.data || {};
 
   // 이미지 선택 기능을 위한 커스텀 훅
   // const imagePicker = useImagePicker({
@@ -71,7 +70,7 @@ const MyPageScreen: React.FC<MyPageScreenProps> = ({navigation}) => {
           )}
         </ImageContainer> */}
         <InfoContainer>
-          {/* <DogName>{data}</DogName> */}
+          <Nickname>{nickname}</Nickname>
           <SecondaryInfo>128 포인트</SecondaryInfo>
         </InfoContainer>
       </ProfileCard>
@@ -144,7 +143,7 @@ const InfoContainer = styled.View`
   flex-direction: column;
 `;
 
-const DogName = styled.Text`
+const Nickname = styled.Text`
   font-size: 18px;
   font-weight: bold;
   margin-bottom: 8px;

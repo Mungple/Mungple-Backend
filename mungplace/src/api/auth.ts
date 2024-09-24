@@ -17,11 +17,16 @@ type ResponseProfile = {
   nickname: string;
   imageName: string | null;
 };
-
 // 프로필 정보 요청 함수
-const getProfile = async (userId?: number): Promise<ResponseProfile> => {
-  const {data} = await axiosInstance.get(`/users/${userId}`);
-  return data;
+const getProfile = async (userId: number): Promise<ResponseProfile> => {
+  try {
+    const { data } = await axiosInstance.get(`/users/${userId}`);
+    console.log('Profile data:', data);
+    return data;
+  } catch (error) {
+    console.error('Error fetching profile:', error);
+    throw error;  // 에러가 발생하면 다시 던져서 상위에서 처리할 수 있게 함
+  }
 };
 
 // 프로필 정보 변경 함수

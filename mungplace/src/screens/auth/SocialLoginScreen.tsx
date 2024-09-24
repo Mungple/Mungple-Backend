@@ -3,7 +3,6 @@ import styled from 'styled-components/native';
 import {WebView, WebViewNavigation} from 'react-native-webview';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 
-import {authNavigations} from '@/constants';
 import useAuth from '@/hooks/queries/useAuth';
 import {AuthStackParamList} from '@/navigations/stack/AuthStackNavigator';
 import { useAppStore } from '@/state/useAppStore';
@@ -13,7 +12,7 @@ type SocialLoginScreenProps = NativeStackScreenProps<
   'SocialLogin'
 >;
 
-const SocialLoginScreen: React.FC<SocialLoginScreenProps> = ({route, navigation}) => {
+const SocialLoginScreen: React.FC<SocialLoginScreenProps> = ({route}) => {
   const {provider} = route.params;
   const {socialLoginMutation} = useAuth();
   const getAuthUrl = (provider: string) => `http://10.0.2.2:8080/api/users/login/${provider}`;
@@ -37,7 +36,6 @@ const SocialLoginScreen: React.FC<SocialLoginScreenProps> = ({route, navigation}
       const accessToken = pathSegments[pathSegments.length - 1];
       socialLoginMutation.mutate(accessToken);
       setToken(accessToken)
-      // navigation.navigate(authNavigations.POST_PROFILE);
       setLogin(true)
     }
   };

@@ -26,7 +26,9 @@ function useLogin(mutationOptions?: UseMutationCustomOptions) {
       return accessToken;
     },
     onSuccess: (accessToken: string) => {
+      console.log('onSuccess')
       setHeader('Authorization', `Bearer ${accessToken}`);
+      setHeader('Content-Type', `application/json; charset=utf8`);
     },
     onSettled: () => {
       queryClient.refetchQueries({
@@ -43,10 +45,7 @@ function useSocialLogin(mutationOptions?: UseMutationCustomOptions) {
 }
 
 // 프로필 정보 가져오기 훅
-function useGetProfile(
-  userId: number,
-  queryOptions?: UseQueryCustomOptions<ResponseProfile>,
-) {
+function useGetProfile(userId: number, queryOptions?: UseQueryCustomOptions<ResponseProfile>) {
   return useQuery({
     queryFn: () => getProfile(userId),
     queryKey: [queryKeys.AUTH, queryKeys.GET_PROFILE, userId],
@@ -90,8 +89,8 @@ function useAuth() {
   const logoutMutation = useLogout();
   const profileMutation = useUpdateProfile();
   const socialLoginMutation = useSocialLogin();
-  const getProfileQuery = (userId: number) => useGetProfile(userId);
-  const isLogin = getProfileQuery(1).isSuccess;
+  const getProfileQuery = useGetProfile(1);
+  const isLogin = getProfileQuery.isSuccess;
 
   return {
     isLogin,
