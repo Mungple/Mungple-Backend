@@ -18,23 +18,20 @@ import lombok.RequiredArgsConstructor;
 @Component
 public class ExplorationReader {
 
-	private final ExplorationRepository explorationRepository;
+    private final ExplorationRepository explorationRepository;
 
-	public Exploration create(User user, LocalDateTime localDateTime) {
-		return explorationRepository.save(new Exploration(user, localDateTime));
-	}
+    public Exploration create(User user, LocalDateTime localDateTime) {
+        return explorationRepository.save(new Exploration(user, localDateTime));
+    }
 
-	public Exploration get(Long explorationId) {
-		return explorationRepository.findById(explorationId).orElseThrow(() -> new ApplicationException(
-			ApplicationError.EXPLORATION_NOT_FOUND));
-	}
+    public Exploration get(Long explorationId) {
+        return explorationRepository.findById(explorationId).orElseThrow(() -> new ApplicationException(ApplicationError.EXPLORATION_NOT_FOUND));
+    }
 
-	public Exploration getDuringExploring(Long explorationId) {
-		return explorationRepository.findById(explorationId).map(result -> {
-			if (result.isEnded()) throw new ApplicationSocketException(ApplicationSocketError.IS_ENDED_EXPLORATION);
-			// TODO <이현수> : 세션 삭제하기
-			return result;
-		}).orElseThrow(() -> new ApplicationSocketException(ApplicationSocketError.EXPLORATION_NOT_FOUND));
-		// TODO <이현수> : 세션 삭제하기
-	}
+    public Exploration getDuringExploring(Long explorationId) {
+        return explorationRepository.findById(explorationId).map(result -> {
+            if (result.isEnded()) throw new ApplicationSocketException(ApplicationSocketError.IS_ENDED_EXPLORATION);
+            return result;
+        }).orElseThrow(() -> new ApplicationSocketException(ApplicationSocketError.EXPLORATION_NOT_FOUND));
+    }
 }
