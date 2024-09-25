@@ -4,9 +4,7 @@ const queryKeys = {
   GET_PROFILE: 'getProfile',
   MARKER: 'marker',
   GET_MARKERS: 'getMarkers',
-  POST: 'post',
-  GET_POST: 'getPost',
-  GET_POSTS: 'getPosts',
+  GET_PETS: 'getPets',
 } as const;
 
 const storageKeys = {

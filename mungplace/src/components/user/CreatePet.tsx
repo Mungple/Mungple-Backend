@@ -17,6 +17,8 @@ import {PetProfile} from '@/types';
 
 const CreatePet = () => {
   const imageOption = useModal();
+  const {getProfileQuery} = useAuth();
+  const {imageName} = getProfileQuery.data || {};
   const inputUser = useForm({
     initialValue: {
       petName: '',
@@ -71,7 +73,7 @@ const CreatePet = () => {
           placeholder="생년월일"
           error={inputUser.errors.birthday}
           touched={inputUser.touched.birthday}
-          {...inputUser.getTextInputProps('PetBirth')}
+          {...inputUser.getTextInputProps('petBirth')}
         />
         <CustomInputField
           placeholder="성별"

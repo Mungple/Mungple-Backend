@@ -8,14 +8,18 @@ type RequestPetProfile = {
   petBirth: string;
 };
 
-type ResponsePetProfile = {
+type PetProfile = {
   id: number;
   default: boolean;
   name: string;
   gender: 'Male' | 'Female';
   weight: number;
   birth: string;
-  photoId: string;
+  photoId: string | null;
+};
+
+type ResponsePetProfile = {
+  pets: PetProfile[];
 };
 
 // 반려견 정보 등록 함수

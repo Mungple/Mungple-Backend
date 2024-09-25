@@ -13,11 +13,10 @@ import {SettingStackParamList} from '@/navigations/stack/SettingStackNavigator';
 import PetList from '@/components/user/PetList';
 import CustomCard from '@/components/common/CustomCard';
 import CustomHeader from '@/components/common/CustomHeader';
-import axiosInstance from '@/api/axios';
-import { getProfile } from '@/api';
 import CustomModal from '@/components/common/CustomModal';
 import CustomModalHeader from '@/components/common/CustomModalHeader';
 import CreatePet from '@/components/user/CreatePet';
+import useGetPet from '@/hooks/queries/useGetPet';
 
 type MyPageScreenProps = NativeStackScreenProps<
   SettingStackParamList,
@@ -30,6 +29,7 @@ const MyPageScreen: React.FC<MyPageScreenProps> = ({navigation}) => {
   // const imageOption = useModal();
   const {getProfileQuery} = useAuth();
   const {nickname, imageName} = getProfileQuery.data || {};
+  const [dogs] = useGetPet().data?.pets || [];
   const [modalVisible, setModalVisible] = useState(false)
 
   // 이미지 선택 기능을 위한 커스텀 훅
