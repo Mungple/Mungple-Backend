@@ -23,5 +23,5 @@ public class ExplorationStartWithDogsRequest {
     String longitude;
 
     @NotNull
-    List<Dog> dogs = new ArrayList<>();
+    List<Long> dogIds = new ArrayList<>();
 }

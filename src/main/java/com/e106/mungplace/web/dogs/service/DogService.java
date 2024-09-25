@@ -34,7 +34,7 @@ public class DogService {
 	private final UserHelper userHelper;
 
 	@Transactional
-	public void createDogProcess(DogCreateRequest dogCreateRequest) {
+	public DogResponse createDogProcess(DogCreateRequest dogCreateRequest) {
 		Long userId = userHelper.getCurrentUserId();
 		int size = isAcceptableSize(userId);
 
@@ -42,7 +42,9 @@ public class DogService {
 		userRepository.findById(userId).ifPresent(dog::updateDogOwner);
 
 		dog.updateDefaultDog(size == 0);
-		dogRepository.save(dog);
+		Dog saveDog = dogRepository.save(dog);
+
+		return DogResponse.of(saveDog);
 	}
 
     @Transactional(readOnly = true)

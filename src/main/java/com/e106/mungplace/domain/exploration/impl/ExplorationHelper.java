@@ -1,6 +1,7 @@
 package com.e106.mungplace.domain.exploration.impl;
 
 import com.e106.mungplace.common.map.dto.Point;
+import com.e106.mungplace.domain.dogs.repository.DogRepository;
 import com.e106.mungplace.domain.exploration.entity.DogExploration;
 import com.e106.mungplace.domain.exploration.entity.Exploration;
 import com.e106.mungplace.domain.exploration.repository.DogExplorationRepository;
@@ -24,17 +25,19 @@ import java.util.Objects;
 @Component
 public class ExplorationHelper {
 
+    private final DogRepository dogRepository;
     private final ExplorationRepository explorationRepository;
     private final DogExplorationRepository dogExplorationRepository;
 
-    public void createDogsInExploration(ExplorationStartWithDogsRequest dogs, Exploration exploration) {
-        dogs.getDogs().stream()
-                .map(dog -> DogExploration
-                        .builder()
-                        .exploration(exploration)
-                        .dog(dog)
-                        .isEnded(false)
-                        .build())
+    public void createDogsInExploration(ExplorationStartWithDogsRequest dogIds, Exploration exploration) {
+        dogIds.getDogIds().stream()
+                .map(dogId -> dogRepository.findById(dogId)
+                        .map(dog -> DogExploration.builder()
+                                .exploration(exploration)
+                                .dog(dog)
+                                .isEnded(false)
+                                .build())
+                        .orElseThrow(() -> new ApplicationException(ApplicationError.DOG_NOT_FOUND)))
                 .forEach(dogExplorationRepository::save);
     }
 
@@ -78,7 +81,7 @@ public class ExplorationHelper {
     }
 
     public boolean validateExplorationWithDogs(ExplorationStartWithDogsRequest dogs) {
-        if(dogs.getDogs().isEmpty())
+        if(dogs.getDogIds().isEmpty())
             throw new ApplicationException(ApplicationError.EXPLORATION_NOT_WITH_DOGS);
 
         return true;
