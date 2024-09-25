@@ -44,7 +44,7 @@ public class MarkerConsumer {
 			GeoPoint geoPoint = new GeoPoint(markerPayload.getLat(), markerPayload.getLon());
 
 			MarkerPoint markerPoint = MarkerPoint.builder()
-				.markerId(event.getUuid())
+				.markerId(event.getEntityId())
 				.userId(markerPayload.getUserId())
 				.explorationId(markerPayload.getExplorationId() != null ? markerPayload.getExplorationId() : null)
 				.point(geoPoint)

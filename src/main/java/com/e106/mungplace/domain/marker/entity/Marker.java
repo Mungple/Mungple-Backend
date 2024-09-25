@@ -1,5 +1,7 @@
 package com.e106.mungplace.domain.marker.entity;
 
+import java.util.UUID;
+
 import com.e106.mungplace.common.audit.BaseTime;
 import com.e106.mungplace.domain.exploration.entity.Exploration;
 import com.e106.mungplace.domain.user.entity.User;
@@ -24,10 +26,10 @@ import lombok.NoArgsConstructor;
 @Entity
 public class Marker extends BaseTime {
 
-	@GeneratedValue
+	@GeneratedValue(generator = "UUID")
 	@Column(name = "marker_id")
 	@Id
-	private long id;
+	private UUID id;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_id", nullable = false)

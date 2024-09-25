@@ -44,7 +44,7 @@ public class MarkerEvent {
 	private String entityType;
 
 	@Column(nullable = false)
-	private Long entityId;
+	private UUID entityId;
 
 	public void updateStatus(PublishStatus status) {
 		this.status = status;
