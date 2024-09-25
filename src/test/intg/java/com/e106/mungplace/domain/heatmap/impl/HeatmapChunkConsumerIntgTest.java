@@ -59,7 +59,7 @@ class HeatmapChunkConsumerIntgTest {
 		assertThat(resultChunk).isNull();
 
 		ArgumentCaptor<HeatmapChunk> captor = ArgumentCaptor.forClass(HeatmapChunk.class);
-		verify(messagingTemplate, times(1)).convertAndSend(any(), captor.capture());
+		verify(messagingTemplate, times(1)).convertAndSendToUser(any(), any(), captor.capture());
 		HeatmapChunk sentChunk = captor.getValue();
 
 		assertThat(sentChunk).isNotNull();

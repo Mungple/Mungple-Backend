@@ -34,7 +34,7 @@ public class HeatmapChunkConsumer {
 			HeatmapChunk chunk = redisTemplate.opsForList().leftPop(key, 500, TimeUnit.MILLISECONDS);
 			if (chunk != null) {
 				log.info("key: {}, chunk: {}", key, chunk);
-				messagingTemplate.convertAndSend(destination, chunk);
+				messagingTemplate.convertAndSendToUser(userId.toString(), destination, chunk);
 			}
 		}
 		log.info("key: {} | 소켓 송신 종료", key);
@@ -46,9 +46,9 @@ public class HeatmapChunkConsumer {
 
 	private String generateDestination(Long userId, HeatmapQueryType queryType) {
 		return switch (queryType) {
-			case USER_BLUEZONE -> String.format("/users/%s/bluezone", userId);
-			case BLUEZONE -> "/users/bluezone";
-			case REDZONE -> "/users/redzone";
+			case USER_BLUEZONE -> "/sub/users/bluezone";
+			case BLUEZONE -> "/sub/bluezone";
+			case REDZONE -> "/sub/redzone";
 		};
 	}
 }

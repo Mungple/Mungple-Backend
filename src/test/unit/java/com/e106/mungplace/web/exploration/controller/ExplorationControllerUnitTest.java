@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.e106.mungplace.web.exploration.dto.*;
+import com.e106.mungplace.web.handler.interceptor.CustomWebSocketHandlerDecorator;
 import com.e106.mungplace.web.util.StatisticUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -45,6 +46,9 @@ class ExplorationControllerUnitTest {
 
 	@MockBean
 	private SimpMessagingTemplate simpMessagingTemplate;
+
+	@MockBean
+	private CustomWebSocketHandlerDecorator decorator;
 
 	@Autowired
 	private ObjectMapper objectMapper;
