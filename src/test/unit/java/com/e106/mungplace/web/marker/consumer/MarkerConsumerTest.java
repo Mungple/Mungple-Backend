@@ -51,7 +51,7 @@ class MarkerConsumerTest {
 
 		// Mock MarkerPayload 생성
 		markerPayload = MarkerPayload.builder()
-			.markerId(1L)
+			.markerId(UUID.randomUUID())
 			.userId(1L)
 			.title("Test Marker")
 			.lat(37.5665)

@@ -248,7 +248,7 @@ class MarkerServiceTest {
 
 		// then
 		assertNotNull(response);
-		assertThat(response.getMarkersGroupedByGeohash()).isNotEmpty();
+		assertThat(response.markersGroupedByGeohash()).isNotEmpty();
 		verify(markerReader, times(1)).findMarkersByGeoDistanceAndCreatedAtRange(anyString(), anyDouble(), anyDouble(), anyString(), anyString());
 	}
 
@@ -278,7 +278,7 @@ class MarkerServiceTest {
 
 		// then
 		assertNotNull(response);
-		assertThat(response.getMarkersGroupedByGeohash()).isNotEmpty();
+		assertThat(response.markersGroupedByGeohash()).isNotEmpty();
 		verify(markerReader, times(1)).findMarkersByGeoDistanceAndCreatedAtRangeAndType(anyString(), anyDouble(), anyDouble(), anyString(), anyString(), anyString());
 	}
 }

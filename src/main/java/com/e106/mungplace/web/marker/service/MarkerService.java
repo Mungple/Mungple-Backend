@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.locationtech.spatial4j.io.GeohashUtils;
@@ -13,9 +14,11 @@ import org.springframework.data.elasticsearch.core.geo.GeoPoint;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.e106.mungplace.common.map.dto.Point;
 import com.e106.mungplace.common.transaction.GlobalTransactional;
 import com.e106.mungplace.domain.exploration.entity.Exploration;
 import com.e106.mungplace.domain.exploration.impl.ExplorationReader;
+import com.e106.mungplace.domain.image.entity.ImageInfo;
 import com.e106.mungplace.domain.marker.entity.Marker;
 import com.e106.mungplace.domain.marker.entity.MarkerEvent;
 import com.e106.mungplace.domain.marker.entity.MarkerPoint;
@@ -27,9 +30,11 @@ import com.e106.mungplace.domain.user.impl.UserHelper;
 import com.e106.mungplace.domain.util.GeoUtils;
 import com.e106.mungplace.web.exception.ApplicationException;
 import com.e106.mungplace.web.exception.dto.ApplicationError;
+import com.e106.mungplace.web.marker.dto.CreateMarkerResponse;
 import com.e106.mungplace.web.marker.dto.GeohashMarkerInfo;
 import com.e106.mungplace.web.marker.dto.GeohashMarkerResponse;
 import com.e106.mungplace.web.marker.dto.MarkerCreateRequest;
+import com.e106.mungplace.web.marker.dto.MarkerInfoResponse;
 import com.e106.mungplace.web.marker.dto.MarkerPayload;
 import com.e106.mungplace.web.marker.dto.MarkerPointResponse;
 import com.e106.mungplace.web.marker.dto.MarkerSearchRequest;
@@ -61,7 +66,7 @@ public class MarkerService {
 
 	@GlobalTransactional
 	@Transactional
-	public void createMarkerProcess(String markerInfoJson, List<MultipartFile> imageFiles) {
+	public CreateMarkerResponse createMarkerProcess(String markerInfoJson, List<MultipartFile> imageFiles) {
 		// 이미지 파일 개수 검증
 		validateImageFileCount(imageFiles);
 
@@ -97,6 +102,8 @@ public class MarkerService {
 
 		// Outbox 생성
 		markerWriter.createMarkerEvent(outboxEntry);
+
+		return new CreateMarkerResponse(marker.getId());
 	}
 
 	private Optional<String> serializeMarker(MarkerPayload markerPayload) {
@@ -135,13 +142,13 @@ public class MarkerService {
 		}
 	}
 
-	private Marker getMarkerOrThrow(Long markerId) {
+	private Marker getMarkerOrThrow(UUID markerId) {
 		return markerReader.find(markerId).orElseThrow(
 			() -> new ApplicationException(ApplicationError.MARKER_NOT_FOUND));
 	}
 
 	@Transactional
-	public void deleteMarkerProcess(Long markerId) {
+	public void deleteMarkerProcess(UUID markerId) {
 		Long userId = userHelper.getCurrentUserId();
 		Marker marker = getMarkerOrThrow(markerId);
 		validateIsUsersMarker(marker, userId);
@@ -223,6 +230,26 @@ public class MarkerService {
 			.userId(markerPoint.getUserId())
 			.createdAt(markerPoint.getCreatedAt())
 			.type(markerPoint.getType().name())
+			.build();
+	}
+
+	public MarkerInfoResponse getMarkerInfo(UUID markerId) {
+		Marker marker = getMarkerOrThrow(markerId);
+		List<ImageInfo> imageInfos = markerReader.findMarkerImage(markerId);
+
+		List<String> imageNames = imageInfos.stream()
+			.map(ImageInfo::getImageName)
+			.toList();
+
+		return MarkerInfoResponse.builder()
+			.id(marker.getId())
+			.point(new Point(marker.getLon(), marker.getLat()))
+			.title(marker.getTitle())
+			.content(marker.getContent())
+			.type(marker.getType().name())
+			.userId(marker.getUser().getUserId())
+			.images(imageNames)
+			.createdAt(marker.getCreatedDate())
 			.build();
 	}
 }
