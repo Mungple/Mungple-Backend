@@ -1,7 +1,10 @@
 package com.e106.mungplace.web.marker.service;
 
+import static org.assertj.core.api.AssertionsForInterfaceTypes.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
@@ -14,6 +17,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.elasticsearch.core.geo.GeoPoint;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.e106.mungplace.common.image.ImageStore;
@@ -22,6 +26,7 @@ import com.e106.mungplace.domain.exploration.impl.ExplorationReader;
 import com.e106.mungplace.domain.image.repository.MarkerImageRepository;
 import com.e106.mungplace.domain.marker.entity.Marker;
 import com.e106.mungplace.domain.marker.entity.MarkerEvent;
+import com.e106.mungplace.domain.marker.entity.MarkerPoint;
 import com.e106.mungplace.domain.marker.entity.MarkerType;
 import com.e106.mungplace.domain.marker.impl.MarkerReader;
 import com.e106.mungplace.domain.marker.impl.MarkerWriter;
@@ -29,8 +34,11 @@ import com.e106.mungplace.domain.user.entity.ProviderName;
 import com.e106.mungplace.domain.user.entity.User;
 import com.e106.mungplace.domain.user.impl.UserHelper;
 import com.e106.mungplace.web.exception.ApplicationException;
+import com.e106.mungplace.web.marker.dto.GeohashMarkerResponse;
 import com.e106.mungplace.web.marker.dto.MarkerCreateRequest;
 import com.e106.mungplace.web.marker.dto.MarkerPayload;
+import com.e106.mungplace.web.marker.dto.MarkerSearchRequest;
+import com.e106.mungplace.web.marker.dto.RequestMarkerType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @ExtendWith(MockitoExtension.class)
@@ -204,6 +212,74 @@ class MarkerServiceTest {
 
 		verify(markerWriter, times(1)).saveMarker(any(Marker.class));
 		verify(markerWriter, times(1)).createMarkerEvent(any(MarkerEvent.class));
+	}
+
+	@DisplayName("모든 타입의 마커 조회")
+	@Test
+	void testGetMarkersGroupedByGeohash_AllType() {
+		// given
+		MarkerSearchRequest request = MarkerSearchRequest.builder()
+			.latitude(36.9369)
+			.longitude(22.2222)
+			.markerType(RequestMarkerType.ALL)
+			.build();
+
+		MarkerPoint markerPoint1 = MarkerPoint.builder()
+			.userId(101L)
+			.createdAt(LocalDateTime.now())
+			.type(MarkerType.BLUE)
+			.point(new GeoPoint(35.123456, 128.123456))
+			.build();
+
+		MarkerPoint markerPoint2 = MarkerPoint.builder()
+			.userId(102L)
+			.createdAt(LocalDateTime.now())
+			.type(MarkerType.RED)
+			.point(new GeoPoint(35.123457, 128.123457))
+			.build();
+
+		List<MarkerPoint> mockMarkerPoints = List.of(markerPoint1, markerPoint2);
+
+		when(markerReader.findMarkersByGeoDistanceAndCreatedAtRange(anyString(), anyDouble(), anyDouble(), anyString(), anyString()))
+			.thenReturn(mockMarkerPoints);
+
+		// when
+		GeohashMarkerResponse response = markerService.getMarkersGroupedByGeohash(request);
+
+		// then
+		assertNotNull(response);
+		assertThat(response.getMarkersGroupedByGeohash()).isNotEmpty();
+		verify(markerReader, times(1)).findMarkersByGeoDistanceAndCreatedAtRange(anyString(), anyDouble(), anyDouble(), anyString(), anyString());
+	}
+
+	@DisplayName("모든 RED타입의 마커 조회")
+	@Test
+	void testGetMarkersGroupedByGeohash_TypeFiltered() {
+		// given
+		MarkerSearchRequest request = MarkerSearchRequest.builder()
+			.latitude(36.9369)
+			.longitude(22.2222)
+			.markerType(RequestMarkerType.RED)
+			.build();
+
+		MarkerPoint markerPoint = MarkerPoint.builder()
+			.userId(101L)
+			.createdAt(LocalDateTime.now())
+			.type(MarkerType.RED)
+			.point(new GeoPoint(35.123456, 128.123456))
+			.build();
+
+		List<MarkerPoint> mockMarkerPoints = List.of(markerPoint);
+		when(markerReader.findMarkersByGeoDistanceAndCreatedAtRangeAndType(anyString(), anyDouble(), anyDouble(), anyString(), anyString(), anyString()))
+			.thenReturn(mockMarkerPoints);
+
+		// when
+		GeohashMarkerResponse response = markerService.getMarkersGroupedByGeohash(request);
+
+		// then
+		assertNotNull(response);
+		assertThat(response.getMarkersGroupedByGeohash()).isNotEmpty();
+		verify(markerReader, times(1)).findMarkersByGeoDistanceAndCreatedAtRangeAndType(anyString(), anyDouble(), anyDouble(), anyString(), anyString(), anyString());
 	}
 }
 
