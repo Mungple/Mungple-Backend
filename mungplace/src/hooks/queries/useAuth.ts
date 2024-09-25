@@ -14,9 +14,7 @@ function useLogin(mutationOptions?: UseMutationCustomOptions) {
       return accessToken;
     },
     onSuccess: (accessToken: string) => {
-      console.log('onSuccess')
       setHeader('Authorization', `Bearer ${accessToken}`);
-      setHeader('Content-Type', `application/json; charset=utf8`);
     },
     onSettled: () => {
       queryClient.refetchQueries({

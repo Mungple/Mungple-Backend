@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import {Dimensions} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {Dimensions, Text, TouchableOpacity} from 'react-native';
 import styled from 'styled-components/native';
 import IonIcons from 'react-native-vector-icons/Ionicons';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
@@ -14,6 +14,7 @@ import PetList from '@/components/user/PetList';
 import CustomCard from '@/components/common/CustomCard';
 import CustomHeader from '@/components/common/CustomHeader';
 import axiosInstance from '@/api/axios';
+import { getProfile } from '@/api';
 
 type MyPageScreenProps = NativeStackScreenProps<
   SettingStackParamList,
@@ -33,17 +34,16 @@ const MyPageScreen: React.FC<MyPageScreenProps> = ({navigation}) => {
   //   mode: 'single',
   //   onSettled: imageOption.hide,
   // });
-  
-  const handleSettingPress = () => {
-    navigation.navigate(settingNavigations.SETTING)
-  };
-  
-  const handleProfilePress = () => {
-    navigation.navigate(settingNavigations.EDIT_PROFILE)
-  };
-  
-  const handlePetSelect = () => {};
 
+  const handleSettingPress = () => {
+    navigation.navigate(settingNavigations.SETTING);
+  };
+
+  const handleProfilePress = () => {
+    navigation.navigate(settingNavigations.EDIT_PROFILE);
+  };
+
+  const handlePetSelect = () => {};
 
   return (
     <Container>
@@ -78,6 +78,9 @@ const MyPageScreen: React.FC<MyPageScreenProps> = ({navigation}) => {
       {/* 반려견 목록 */}
       <ListContainer>
         <MenuText>나의 반려견</MenuText>
+        <CreatePetButton>
+          <CreatePetText>등록</CreatePetText>
+        </CreatePetButton>
       </ListContainer>
       <MyPetListContainer>
         <MyPetList handlePetSelect={handlePetSelect} />
@@ -114,17 +117,26 @@ const ImageContainer = styled.View`
 `;
 
 const ListContainer = styled.View`
-  padding: 16px;
+  padding: 0 20px;
   align-items: center;
   flex-direction: row;
   justify-content: center;
-  border-bottom-width: 1px;
-  border-bottom-color: ${colors.GRAY_300};
 `;
+
+const CreatePetButton = styled.TouchableOpacity`
+  padding: 10px 16px;
+  border-radius: 8px;
+  background-color: ${colors.ORANGE.BASE};
+`
+
+const CreatePetText = styled.Text`
+  font-weight: bold;
+  color: ${colors.WHITE};
+`
 
 const MenuText = styled.Text`
   flex: 1;
-  font-size: 20px;
+  font-size: 18px;
   font-weight: bold;
   color: ${colors.BLACK};
 `;
