@@ -44,17 +44,21 @@ interface MungZone {
 }
 
 // WebSocket 서버 URI
-const WEBSOCKET_URI = 'ws://localhost:8080/ws';
+const WEBSOCKET_URI = 'wss://j11e106.p.ssafy.io/api/ws';
 
 // JWT 토큰을 가져오는 함수
 const getJwtToken = async () => {
   try {
     const response = await axios.post(
-      `http://localhost:8080/manager/login?username=manager`,
+      `https://j11e106.p.ssafy.io/manager/login`,
+      {
+        username: 'manager',
+      },
     );
+    console.log('JWT Token을 가져오는 데 성공했습니다.');
     return response.data.accessToken;
   } catch (error) {
-    console.error('Error fetching JWT token:', error);
+    console.error('JWT Token을 가져오는 데 실패했습니다.', error);
     throw error;
   }
 };
@@ -74,7 +78,7 @@ const useWebSocket = (explorationId: number = -1, userId: number = -1) => {
 
         const socket = new Client({
           webSocketFactory: () =>
-            new WebSocket(`${WEBSOCKET_URI}?token=${token}`),
+            new WebSocket(`${WEBSOCKET_URI}?Authorization=${token}`),
           debug: str => {
             console.log(str);
           },
