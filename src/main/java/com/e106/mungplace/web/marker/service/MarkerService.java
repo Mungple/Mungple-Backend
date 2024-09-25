@@ -10,12 +10,11 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.locationtech.spatial4j.io.GeohashUtils;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.elasticsearch.core.geo.GeoPoint;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.e106.mungplace.common.map.dto.Point;
 import com.e106.mungplace.common.transaction.GlobalTransactional;
 import com.e106.mungplace.domain.exploration.entity.Exploration;
 import com.e106.mungplace.domain.exploration.impl.ExplorationReader;
@@ -40,7 +39,6 @@ import com.e106.mungplace.web.marker.dto.MarkerPayload;
 import com.e106.mungplace.web.marker.dto.MarkerPointResponse;
 import com.e106.mungplace.web.marker.dto.MarkerSearchRequest;
 import com.e106.mungplace.web.marker.dto.RequestMarkerType;
-import com.e106.mungplace.web.marker.dto.SimpleMarkerInfoResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -241,12 +239,11 @@ public class MarkerService {
 
 		List<String> imageNames = imageInfos.stream()
 			.map(ImageInfo::getImageName)
-			.collect(Collectors.toList());
+			.toList();
 
 		return MarkerInfoResponse.builder()
 			.id(marker.getId())
-			.longitude(marker.getLon())
-			.latitude(marker.getLat())
+			.point(new Point(marker.getLon(), marker.getLat()))
 			.title(marker.getTitle())
 			.content(marker.getContent())
 			.type(marker.getType().name())
