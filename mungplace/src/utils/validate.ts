@@ -17,7 +17,7 @@ function validateInputUser(values: {nickname: string}) {
 function validateInputPet(values: {
   petName: string,
   petBirth: string,
-  petGender: string,
+  petGender: 'Male' | 'Female',
   petWeight: string,
 }) {
   const errors = {

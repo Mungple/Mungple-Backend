@@ -23,7 +23,7 @@ type ResponsePetProfile = {
 };
 
 // 반려견 정보 등록 함수
-const createPetProfile = async (body: RequestPetProfile): Promise<ResponsePetProfile> => {
+const createPetProfile = async (body: RequestPetProfile) => {
   const { data } = await axiosInstance.post(`/users/dogs`, body);
   return data;
 };

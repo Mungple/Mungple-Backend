@@ -1,37 +1,32 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import {colors} from '@/constants';
 import useForm from '@/hooks/useForm';
-import {Keyboard} from 'react-native';
+import {Keyboard, Text} from 'react-native';
 import useModal from '@/hooks/useModal';
-import {validateInputPet} from '@/utils';
-import useAuth from '@/hooks/queries/useAuth';
-import {useAppStore} from '@/state/useAppStore';
 import useImagePicker from '@/hooks/useImagePicker';
 import CustomButton from '@/components/common/CustomButton';
 import CustomInputField from '@/components/common/CustomInputField';
 import EditProfileImageOption from '@/components/setting/EditProfileImageOption';
-import {PetProfile} from '@/types';
+import { createPetProfile } from '@/api';
+import RadioButtonGroup from '../common/RadioButtonGroup';
 
 const CreatePet = () => {
   const imageOption = useModal();
-  const {getProfileQuery} = useAuth();
-  const {imageName} = getProfileQuery.data || {};
   const inputUser = useForm({
     initialValue: {
       petName: '',
-      petGender: '',
-      petWeight: '',
+      petGender: 'Male',
+      petWeight: 0,
       petBirth: '',
     },
-    validate: validateInputPet,
   })
 
   // 이미지 선택 기능을 위한 커스텀 훅
   const imagePicker = useImagePicker({
-    initialImages: imageName ? [{uri: imageName}] : [],
+    initialImages: [],
     mode: 'single',
     onSettled: imageOption.hide,
   });
@@ -42,8 +37,12 @@ const CreatePet = () => {
     Keyboard.dismiss();
   };
 
+  const handleGenderChange = (value: string) => {
+    inputUser.handleChangeText('petGender', value);
+  };
+
   const handleSubmit = () => {
-    
+    // createPetProfile()
   };
 
   return (
@@ -67,30 +66,31 @@ const CreatePet = () => {
           placeholder="반려견 이름"
           error={inputUser.errors.petName}
           touched={inputUser.touched.petName}
-          {...inputUser.getTextInputProps('petName')}
         />
         <CustomInputField
           placeholder="생년월일"
-          error={inputUser.errors.birthday}
-          touched={inputUser.touched.birthday}
-          {...inputUser.getTextInputProps('petBirth')}
+          error={inputUser.errors.petBirth}
+          touched={inputUser.touched.petBirth}
         />
-        <CustomInputField
-          placeholder="성별"
-          error={inputUser.errors.gender}
-          touched={inputUser.touched.gender}
-          {...inputUser.getTextInputProps('petGender')}
-        />
+        <RadioButtonGroup
+          selected={inputUser.values.petGender}
+          onSelected={handleGenderChange}>
+          {[
+            {label: '남아', key: 'Male'},
+            {label: '여아', key: 'Female'},
+          ].map((radio) => (
+            <RadioButtonGroup.RadioButtonItem key={radio.key} value={radio.key}>
+              <Text>{radio.label}</Text>
+            </RadioButtonGroup.RadioButtonItem>
+          ))}
+        </RadioButtonGroup>
         <CustomInputField
           placeholder="몸무게"
-          error={inputUser.errors.weight}
-          touched={inputUser.touched.weight}
-          {...inputUser.getTextInputProps('petWeight')}
+          error={inputUser.errors.petWeight}
+          touched={inputUser.touched.petWeight}
+          keyboardType="numeric"
         />
-        <CustomButton
-          label="등록 완료"
-          onPress={handleSubmit}
-        />
+        <CustomButton label="등록 완료" onPress={handleSubmit} />
       </InputContainer>
 
       {/* 프로필 이미지 수정 모달 옵션 */}

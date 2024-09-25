@@ -1,10 +1,9 @@
-import React, {useEffect, useState} from 'react';
-import {Dimensions, Text, TouchableOpacity} from 'react-native';
+import React, {useState} from 'react';
+import {Dimensions} from 'react-native';
 import styled from 'styled-components/native';
 import IonIcons from 'react-native-vector-icons/Ionicons';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 
-import useModal from '@/hooks/useModal';
 import useAuth from '@/hooks/queries/useAuth';
 import {colors, settingNavigations} from '@/constants';
 import useImagePicker from '@/hooks/useImagePicker';
@@ -16,7 +15,6 @@ import CustomHeader from '@/components/common/CustomHeader';
 import CustomModal from '@/components/common/CustomModal';
 import CustomModalHeader from '@/components/common/CustomModalHeader';
 import CreatePet from '@/components/user/CreatePet';
-import useGetPet from '@/hooks/queries/useGetPet';
 
 type MyPageScreenProps = NativeStackScreenProps<
   SettingStackParamList,
@@ -29,7 +27,6 @@ const MyPageScreen: React.FC<MyPageScreenProps> = ({navigation}) => {
   // const imageOption = useModal();
   const {getProfileQuery} = useAuth();
   const {nickname, imageName} = getProfileQuery.data || {};
-  const [dogs] = useGetPet().data?.pets || [];
   const [modalVisible, setModalVisible] = useState(false)
 
   // 이미지 선택 기능을 위한 커스텀 훅

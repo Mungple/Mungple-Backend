@@ -4,6 +4,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 
 import {colors} from '@/constants';
 import styled from 'styled-components/native';
+import CustomModalHeader from './CustomModalHeader';
 
 interface CustomBottomSheetProps {
   setModalVisible: (visible: boolean) => void;
@@ -103,12 +104,10 @@ const CustomBottomSheet: React.FC<CustomBottomSheetProps> = ({
           {...panResponders.panHandlers}
         >
           {/* 상단 헤더 */}
-          <HeaderContainer>
-            <MenuText>{menuName}</MenuText>
-            <CloseButton onPress={closeModal}>
-              <Icon name={'close-outline'} size={32} color={colors.BLACK} />
-            </CloseButton>
-          </HeaderContainer>
+          <CustomModalHeader 
+            title={menuName}
+            closeButton={closeModal}
+          />
 
           {/* 콘텐츠 영역 */}
           <ContentContainer>

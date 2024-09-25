@@ -56,6 +56,8 @@ const CustomInputField = forwardRef(
   },
 );
 
+CustomInputField.displayName = 'CustomInputField';
+
 const Container = styled.View<{
   multiline?: boolean;
   hasError?: boolean;
@@ -77,7 +79,7 @@ const InnerContainer = styled.View<{hasIcon?: boolean}>`
   `}
 `;
 
-const StyledTextInput = styled(TextInput).attrs<{isEditable?: boolean}>(
+const StyledTextInput = styled.TextInput.attrs<{isEditable?: boolean}>(
   props => ({editable: props.editable}),
 )<{isEditable?: boolean}>`
   padding: 0;
