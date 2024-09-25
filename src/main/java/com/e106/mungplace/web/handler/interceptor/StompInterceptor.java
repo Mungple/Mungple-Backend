@@ -3,17 +3,15 @@ package com.e106.mungplace.web.handler.interceptor;
 import java.util.Map;
 import java.util.Objects;
 
-import com.e106.mungplace.domain.exploration.entity.Exploration;
-import com.e106.mungplace.domain.exploration.impl.ExplorationHelper;
-import com.e106.mungplace.domain.exploration.impl.ExplorationReader;
-import com.e106.mungplace.web.util.JwtAuthenticationHelper;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
+import com.e106.mungplace.domain.exploration.entity.Exploration;
+import com.e106.mungplace.domain.exploration.impl.ExplorationHelper;
+import com.e106.mungplace.domain.exploration.impl.ExplorationReader;
 import com.e106.mungplace.web.exception.ApplicationException;
 import com.e106.mungplace.web.exception.dto.ApplicationError;
 
@@ -25,7 +23,6 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class StompInterceptor implements ChannelInterceptor {
 
-	private final JwtAuthenticationHelper jwtAuthenticationHelper;
 	private final ExplorationReader explorationReader;
 	private final ExplorationHelper explorationHelper;
 
@@ -52,13 +49,6 @@ public class StompInterceptor implements ChannelInterceptor {
 		log.debug("--- SOCKET CONNECT ---");
 		log.debug("CONNECT username: {}", accessor.getUser());
 		log.debug("CONNECT attr: {}", accessor.getSessionAttributes());
-
-		String token = accessor.getNativeHeader("Authorization").get(0);
-
-		if (token != null && token.startsWith("Bearer ")) {
-			token = token.substring(7);
-			jwtAuthenticationHelper.storeAuthenticationInContext(token);
-		}
 	}
 
 	private void handleSubscribe(StompHeaderAccessor accessor) {
@@ -107,7 +97,8 @@ public class StompInterceptor implements ChannelInterceptor {
 
 	private void endExplorationProcess(Long explorationId) {
 		Exploration exploration = explorationReader.get(explorationId);
-		if(exploration.isEnded()) return;
+		if (exploration.isEnded())
+			return;
 		explorationHelper.updateExplorationIsEnded(exploration);
 	}
 }

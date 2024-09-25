@@ -12,7 +12,7 @@ public record HeatmapRequest(
 	Integer side
 ) {
 
-	public HeatmapQueryEvent toEvent(Long userId, HeatmapQueryType queryType) {
+	public HeatmapQueryEvent toEvent(Long userId, HeatmapQueryType queryType, LocalDateTime from, LocalDateTime to) {
 		Point nw = GeoUtils.calculateNorthWestPoint(point, side);
 		Point se = GeoUtils.calculateSouthEastPoint(point, side);
 
@@ -23,6 +23,8 @@ public record HeatmapRequest(
 			.leftTop(nw)
 			.rightBottom(se)
 			.createdAt(LocalDateTime.now())
+			.from(from)
+			.to(to)
 			.build();
 	}
 }

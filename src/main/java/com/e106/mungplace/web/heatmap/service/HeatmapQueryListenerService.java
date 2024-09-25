@@ -1,7 +1,7 @@
 package com.e106.mungplace.web.heatmap.service;
 
-import com.e106.mungplace.web.exception.ApplicationSocketException;
-import com.e106.mungplace.web.exception.dto.ApplicationSocketError;
+import java.time.LocalDateTime;
+
 import org.apache.kafka.clients.admin.NewTopic;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
@@ -9,8 +9,9 @@ import org.springframework.stereotype.Service;
 import com.e106.mungplace.domain.heatmap.event.HeatmapQueryEvent;
 import com.e106.mungplace.domain.heatmap.event.HeatmapQueryType;
 import com.e106.mungplace.domain.heatmap.impl.HeatmapChunkConsumer;
+import com.e106.mungplace.web.exception.ApplicationSocketException;
+import com.e106.mungplace.web.exception.dto.ApplicationSocketError;
 import com.e106.mungplace.web.heatmap.dto.HeatmapRequest;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,23 +21,28 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class HeatmapQueryListenerService {
 
-	private final ObjectMapper objectMapper;
 	private final KafkaTemplate<String, Object> kafkaTemplate;
 	private final HeatmapChunkConsumer heatmapChunkConsumer;
 	private final NewTopic heatMapTopic;
 
 	public void userBluezoneQueryProcess(Long userId, HeatmapRequest request) {
-		emitHitMapQueryEvent(request.toEvent(userId, HeatmapQueryType.USER_BLUEZONE));
+		LocalDateTime to = LocalDateTime.now();
+		LocalDateTime from = to.minusMonths(1);
+		emitHitMapQueryEvent(request.toEvent(userId, HeatmapQueryType.USER_BLUEZONE, from, to));
 		heatmapChunkConsumer.consume(userId, HeatmapQueryType.USER_BLUEZONE);
 	}
 
 	public void bluezoneQueryProcess(Long userId, HeatmapRequest request) {
-		emitHitMapQueryEvent(request.toEvent(userId, HeatmapQueryType.BLUEZONE));
+		LocalDateTime to = LocalDateTime.now();
+		LocalDateTime from = to.minusMonths(6);
+		emitHitMapQueryEvent(request.toEvent(userId, HeatmapQueryType.BLUEZONE, from, to));
 		heatmapChunkConsumer.consume(userId, HeatmapQueryType.BLUEZONE);
 	}
 
 	public void redzoneQueryProcess(Long userId, HeatmapRequest request) {
-		emitHitMapQueryEvent(request.toEvent(userId, HeatmapQueryType.REDZONE));
+		LocalDateTime to = LocalDateTime.now();
+		LocalDateTime from = to.minusMonths(6);
+		emitHitMapQueryEvent(request.toEvent(userId, HeatmapQueryType.REDZONE, from, to));
 		heatmapChunkConsumer.consume(userId, HeatmapQueryType.REDZONE);
 	}
 

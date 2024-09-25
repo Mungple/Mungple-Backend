@@ -26,8 +26,7 @@ public class SecurityConfig {
 		"/oauth2/callback/*",
 		"/h2-console/**",
 		"/manager/**",
-		"/error/**",
-		"/ws/**"
+		"/error/**"
 	};
 
 	@Bean

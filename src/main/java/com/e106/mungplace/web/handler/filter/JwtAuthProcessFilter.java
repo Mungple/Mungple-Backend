@@ -18,13 +18,19 @@ public class JwtAuthProcessFilter extends OncePerRequestFilter {
 	@Override
 	public void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 		throws ServletException, IOException {
-
+		String authorizationParameter = request.getParameter("Authorization");
 		String authorizationHeader = request.getHeader("Authorization");
 
+		String token = null;
 		if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-			String token = authorizationHeader.substring(7);
-			helper.storeAuthenticationInContext(token);
+			token = authorizationHeader.substring(7);
 		}
+
+		if (authorizationParameter != null) {
+			token = authorizationParameter.trim();
+		}
+
+		helper.storeAuthenticationInContext(token);
 
 		filterChain.doFilter(request, response);
 	}
