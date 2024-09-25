@@ -13,21 +13,19 @@ import useImagePicker from '@/hooks/useImagePicker';
 import CustomButton from '@/components/common/CustomButton';
 import CustomInputField from '@/components/common/CustomInputField';
 import EditProfileImageOption from '@/components/setting/EditProfileImageOption';
+import {PetProfile} from '@/types';
 
-const PostProfilePetScreen = () => {
+const CreatePet = () => {
   const imageOption = useModal();
-  const {getProfileQuery} = useAuth();
-  const {imageName} = getProfileQuery.data || {};
   const inputUser = useForm({
     initialValue: {
       petName: '',
-      birthday: '',
-      gender: '',
-      weight: '',
+      petGender: '',
+      petWeight: '',
+      petBirth: '',
     },
     validate: validateInputPet,
   })
-  const setLogin = useAppStore((state) => state.setLogin);
 
   // 이미지 선택 기능을 위한 커스텀 훅
   const imagePicker = useImagePicker({
@@ -43,7 +41,7 @@ const PostProfilePetScreen = () => {
   };
 
   const handleSubmit = () => {
-    setLogin(true);
+    
   };
 
   return (
@@ -73,25 +71,23 @@ const PostProfilePetScreen = () => {
           placeholder="생년월일"
           error={inputUser.errors.birthday}
           touched={inputUser.touched.birthday}
-          {...inputUser.getTextInputProps('birthday')}
+          {...inputUser.getTextInputProps('PetBirth')}
         />
         <CustomInputField
           placeholder="성별"
           error={inputUser.errors.gender}
           touched={inputUser.touched.gender}
-          {...inputUser.getTextInputProps('gender')}
+          {...inputUser.getTextInputProps('petGender')}
         />
         <CustomInputField
           placeholder="몸무게"
           error={inputUser.errors.weight}
           touched={inputUser.touched.weight}
-          {...inputUser.getTextInputProps('weight')}
+          {...inputUser.getTextInputProps('petWeight')}
         />
         <CustomButton
           label="등록 완료"
-          onPress={() => {
-            handleSubmit()
-          }}
+          onPress={handleSubmit}
         />
       </InputContainer>
 
@@ -105,7 +101,7 @@ const PostProfilePetScreen = () => {
   );
 };
 
-const Container = styled.SafeAreaView`
+const Container = styled.View`
   flex: 1;
   justify-content: center;
   padding: 20px;
@@ -137,4 +133,4 @@ const InputContainer = styled.View`
   gap: 20px;
 `;
 
-export default PostProfilePetScreen;
+export default CreatePet;

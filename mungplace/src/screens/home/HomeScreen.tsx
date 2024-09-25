@@ -6,11 +6,11 @@ import * as HS from './HomeScreenStyle';
 import {Dimensions} from 'react-native';
 import PetList from '@/components/user/PetList';
 import {useAppStore} from '@/state/useAppStore';
-import {colors, mapNavigations} from '@/constants';
-import IonIcons from 'react-native-vector-icons/Ionicons';
+import {mapNavigations} from '@/constants';
 import CustomModal from '@/components/common/CustomModal';
 import CustomButton from '@/components/common/CustomButton';
 import {MapStackParamList} from '@/navigations/stack/MapStackNavigator';
+import CustomModalHeader from '@/components/common/CustomModalHeader';
 
 const windowHeight = Dimensions.get('window').height;
 
@@ -20,9 +20,14 @@ const HomeScreen: React.FC = () => {
   const [selectedPets, setSelectedPets] = useState<number[]>([]);
   const navigation = useNavigation<NativeStackNavigationProp<MapStackParamList>>();
 
-  const handleModalVisible = () => {
-    setModalVisible(!modalVisible);
-  };
+
+  const handleModalVisivle = () => {
+    if (modalVisible) {
+      setModalVisible(false)
+    } else {
+      setModalVisible(true)
+    }
+  }
 
   const handleWalkingStart = () => {
     setModalVisible(false);
@@ -60,7 +65,7 @@ const HomeScreen: React.FC = () => {
         </HS.Col>
       </HS.DogInfo>
 
-      <CustomButton label="산책 시작하기" onPress={handleModalVisible} />
+      <CustomButton label="산책 시작하기" onPress={handleModalVisivle} />
 
       {/* 산책 시작 확인 모달 */}
       <CustomModal
@@ -68,14 +73,10 @@ const HomeScreen: React.FC = () => {
         height={windowHeight * 0.7}
         modalVisible={modalVisible}
         setModalVisible={setModalVisible}>
-        {/* 상단 헤더 */}
-        <HS.HeaderContainer>
-          <HS.MenuText>반려견 선택</HS.MenuText>
-          <HS.CloseButton onPress={handleModalVisible}>
-            <IonIcons name={'close'} size={32} color={colors.BLACK} />
-          </HS.CloseButton>
-        </HS.HeaderContainer>
-        {/* 반려견 목록 */}
+        <CustomModalHeader
+          title='반려견 선택'
+          closeButton={handleModalVisivle}
+        />
         <PetList selectedPets={selectedPets} handlePetSelect={handlePetSelect}>
           <CustomButton label="산책 시작하기" onPress={handleWalkingStart} />
         </PetList>

@@ -15,6 +15,9 @@ import CustomCard from '@/components/common/CustomCard';
 import CustomHeader from '@/components/common/CustomHeader';
 import axiosInstance from '@/api/axios';
 import { getProfile } from '@/api';
+import CustomModal from '@/components/common/CustomModal';
+import CustomModalHeader from '@/components/common/CustomModalHeader';
+import CreatePet from '@/components/user/CreatePet';
 
 type MyPageScreenProps = NativeStackScreenProps<
   SettingStackParamList,
@@ -27,6 +30,7 @@ const MyPageScreen: React.FC<MyPageScreenProps> = ({navigation}) => {
   // const imageOption = useModal();
   const {getProfileQuery} = useAuth();
   const {nickname, imageName} = getProfileQuery.data || {};
+  const [modalVisible, setModalVisible] = useState(false)
 
   // 이미지 선택 기능을 위한 커스텀 훅
   // const imagePicker = useImagePicker({
@@ -42,6 +46,14 @@ const MyPageScreen: React.FC<MyPageScreenProps> = ({navigation}) => {
   const handleProfilePress = () => {
     navigation.navigate(settingNavigations.EDIT_PROFILE);
   };
+
+  const handleAddPetButtonPress = () => {
+    if (modalVisible) {
+      setModalVisible(false)
+    } else {
+      setModalVisible(true)
+    }
+  }
 
   const handlePetSelect = () => {};
 
@@ -70,7 +82,7 @@ const MyPageScreen: React.FC<MyPageScreenProps> = ({navigation}) => {
           )}
         </ImageContainer> */}
         <InfoContainer>
-          <Nickname>{nickname}</Nickname>
+          <Nickname>{nickname ? nickname : '로그인 해주세요'}</Nickname>
           <SecondaryInfo>128 포인트</SecondaryInfo>
         </InfoContainer>
       </ProfileCard>
@@ -78,13 +90,24 @@ const MyPageScreen: React.FC<MyPageScreenProps> = ({navigation}) => {
       {/* 반려견 목록 */}
       <ListContainer>
         <MenuText>나의 반려견</MenuText>
-        <CreatePetButton>
+        <CreatePetButton onPress={handleAddPetButtonPress}>
           <CreatePetText>등록</CreatePetText>
         </CreatePetButton>
       </ListContainer>
       <MyPetListContainer>
         <MyPetList handlePetSelect={handlePetSelect} />
       </MyPetListContainer>
+
+      <CustomModal
+        isWide={true}
+        modalVisible={modalVisible}
+        setModalVisible={setModalVisible}>
+        <CustomModalHeader
+          title='반려견 등록'
+          closeButton={handleAddPetButtonPress}
+        />
+        <CreatePet />
+      </CustomModal>
     </Container>
   );
 };
