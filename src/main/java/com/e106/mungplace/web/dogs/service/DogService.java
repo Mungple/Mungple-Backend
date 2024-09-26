@@ -4,22 +4,27 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import com.e106.mungplace.domain.exploration.repository.DogExplorationRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.e106.mungplace.common.image.ImageRepository;
+import com.e106.mungplace.common.image.ImageStore;
+import com.e106.mungplace.common.transaction.GlobalTransactional;
 import com.e106.mungplace.domain.dogs.entity.Dog;
 import com.e106.mungplace.domain.dogs.repository.DogRepository;
+import com.e106.mungplace.domain.exploration.repository.DogExplorationRepository;
+import com.e106.mungplace.domain.user.entity.User;
 import com.e106.mungplace.domain.user.impl.UserHelper;
-import com.e106.mungplace.domain.user.repository.UserRepository;
 import com.e106.mungplace.web.dogs.dto.DogCreateRequest;
 import com.e106.mungplace.web.dogs.dto.DogResponse;
 import com.e106.mungplace.web.dogs.dto.DogUpdateRequest;
 import com.e106.mungplace.web.exception.ApplicationException;
 import com.e106.mungplace.web.exception.dto.ApplicationError;
+import com.e106.mungplace.web.user.dto.ImageNameResponse;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -30,17 +35,16 @@ public class DogService {
 
 	private final DogRepository dogRepository;
 	private final DogExplorationRepository dogExplorationRepository;
-	private final UserRepository userRepository;
+	private final ImageRepository imageRepository;
+	private final ImageStore imageStore;
 	private final UserHelper userHelper;
 
 	@Transactional
 	public void createDogProcess(DogCreateRequest dogCreateRequest) {
-		Long userId = userHelper.getCurrentUserId();
-		int size = isAcceptableSize(userId);
-
+		User user = userHelper.getCurrentUser();
+		int size = isAcceptableSize(user.getUserId());
 		Dog dog = dogCreateRequest.toEntity();
-		userRepository.findById(userId).ifPresent(dog::updateDogOwner);
-
+		dog.updateDogOwner(user);
 		dog.updateDefaultDog(size == 0);
 		dogRepository.save(dog);
 	}
@@ -104,4 +108,18 @@ public class DogService {
 				.orElseThrow(() -> new ApplicationException(ApplicationError.EXCEED_DOG_CAPACITY));
 	}
 
+	@GlobalTransactional
+	public ImageNameResponse updateDogImageProcess(Long dogId, MultipartFile imageFile) {
+		User user = userHelper.getCurrentUser();
+		Dog dog = checkDogExists(dogId);
+		validateDogOwner(dog, user.getUserId());
+
+		if (dog.getImageName() != null) {
+			imageRepository.deleteImageById(dog.getImageName());
+		}
+		String imageName = imageStore.saveImage(imageFile);
+
+		dog.updateImageName(imageName);
+		return new ImageNameResponse(imageName);
+	}
 }
