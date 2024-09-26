@@ -43,4 +43,8 @@ public class User extends BaseTime {
 	private String nickname;
 
 	private String imageName;
+
+	public void updateImageName(String imageName) {
+		this.imageName = imageName;
+	}
 }
