@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components/native';
-import {Dimensions, TouchableOpacity} from 'react-native';
+import {Dimensions, TextInput, TouchableOpacity} from 'react-native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
-
+import { managerLogin } from '@/components/common/ManagerLogin';
 import {authNavigations} from '@/constants';
 import Logo from '@/assets/mungple_logo.png';
 import kakaoLogo from '@/assets/kakao_login_button.png';
@@ -10,14 +10,21 @@ import naverLogo from '@/assets/naver_login_button.png';
 import googleLogo from '@/assets/google_login_button.png';
 import {AuthStackParamList} from '@/navigations/stack/AuthStackNavigator';
 import CustomButton from '@/components/common/CustomButton';
-import {useAppStore} from '@/state/useAppStore';
 
 type AuthHomeScreenProps = NativeStackScreenProps<AuthStackParamList, typeof authNavigations.AUTH_HOME>;
 
 const width = Dimensions.get('screen').width
 
 const AuthHomeScreen: React.FC<AuthHomeScreenProps> = ({navigation}) => {
-  const setLogin = useAppStore((state) => state.setLogin);
+  const [username, setUsername ] = useState('')
+
+  const handleLoginPress = () => {
+    if (username.trim()) {
+      managerLogin(username)
+    } else {
+      console.error('유저이름은 필수입니다')
+    }
+  }
   return (
     <Container>
       <LogoContainer >
@@ -36,8 +43,12 @@ const AuthHomeScreen: React.FC<AuthHomeScreenProps> = ({navigation}) => {
         <LoginButton onPress={() => navigation.navigate(authNavigations.SOCIAL_LOGIN, {provider:'google'})}>
           <ButtonImage source={googleLogo} />
         </LoginButton>
-        
-        <CustomButton label='빠른 로그인' onPress={() => {setLogin(true)}} />
+        <TextInput
+          value={username}
+          onChangeText={setUsername}
+          placeholder='매니저 이름'
+        />
+        <CustomButton label='매니저 로그인' onPress={handleLoginPress} />
       </ButtonsContainer>
     </Container>
   );
