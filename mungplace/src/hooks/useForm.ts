@@ -1,9 +1,7 @@
 import {useEffect, useState} from 'react';
 
 interface UseFormProps<T> {
-  // 폼의 초기값 설정
   initialValue: T;
-  // 폼 값에 대한 유효성 검사
   validate: (values: T) => Record<keyof T, string>;
 }
 
@@ -12,15 +10,15 @@ const useForm = <T>({initialValue, validate}: UseFormProps<T>) => {
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  // 입력을 변경할 때 호출 (name에 해당하는 필드 값 업데이트)
-  const handleChangeText = (name: keyof T, text: string) => {
+  // 입력을 변경할 때 호출
+  const handleChangeText = (name: keyof T, value: string) => {
     setValues({
       ...values,
-      [name]: text,
+      [name]: value,
     });
   };
 
-  // 필드에서 포커스를 벗어났을 때 호출 (해당 필드가 포커스를 잃었음을 기록)
+  // 필드에서 포커스를 벗어났을 때 호출
   const handleBlur = (name: keyof T) => {
     setTouched({
       ...touched,
@@ -28,7 +26,7 @@ const useForm = <T>({initialValue, validate}: UseFormProps<T>) => {
     });
   };
 
-  // 입력 필드와 관련된 props 반환 (value, onChangeText, onBlur 포함)
+  // 입력 필드와 관련된 props 반환
   const getTextInputProps = (name: keyof T) => {
     const value = values[name];
     const onChangeText = (text: string) => handleChangeText(name, text);
@@ -41,9 +39,9 @@ const useForm = <T>({initialValue, validate}: UseFormProps<T>) => {
   useEffect(() => {
     const newErrors = validate(values);
     setErrors(newErrors);
-  }, [validate, values]);
+  }, [values]);
 
-  return {values, errors, touched, getTextInputProps};
+  return {values, errors, touched, getTextInputProps, handleChangeText};
 };
 
 export default useForm;

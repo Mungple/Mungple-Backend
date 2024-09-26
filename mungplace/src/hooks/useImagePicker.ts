@@ -19,11 +19,11 @@ const useImagePicker = ({
   onSettled,
 }: UseImagePickerProps) => {
   const uploadImages = useMutateImages();
-  const [imageUris, setImageUris] = useState<ImageUri[]>(initialImages);
+  const [imageNames, setImageUris] = useState<ImageUri[]>(initialImages);
 
   // 새로운 이미지 URI들을 추가하는 함수
   const addImageUris = (uris: string[]) => {
-    if (imageUris.length + uris.length > 5) {
+    if (imageNames.length + uris.length > 5) {
       Alert.alert('이미지 개수 초과', '추가 가능한 이미지는 최대 5개입니다.');
       return;
     }
@@ -41,13 +41,13 @@ const useImagePicker = ({
 
   // 특정 이미지 URI를 삭제하는 함수
   const deleteImageUri = (uri: string) => {
-    const newImageUris = imageUris.filter(image => image.uri !== uri);
+    const newImageUris = imageNames.filter(image => image.uri !== uri);
     setImageUris(newImageUris);
   };
 
   // 이미지 URI의 순서를 변경하는 함수
   const changeImageUrisOrder = (fromIndex: number, toIndex: number) => {
-    const copyImageUris = [...imageUris];
+    const copyImageUris = [...imageNames];
     const [removedImage] = copyImageUris.splice(fromIndex, 1);
     copyImageUris.splice(toIndex, 0, removedImage);
     setImageUris(copyImageUris);
@@ -88,7 +88,7 @@ const useImagePicker = ({
 
   // 훅에서 제공하는 값과 함수들 반환
   return {
-    imageUris,                           // 현재 이미지 URI 배열
+    imageNames,                           // 현재 이미지 URI 배열
     handleChange,                        // 이미지 선택 및 업로드 함수
     delete: deleteImageUri,              // 이미지 삭제 함수
     changeOrder: changeImageUrisOrder,   // 이미지 순서 변경 함수

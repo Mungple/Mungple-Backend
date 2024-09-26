@@ -29,7 +29,7 @@ const useUserLocation = (): {userLocation: LatLng; isUserLocationError: boolean}
       },
       {
         enableHighAccuracy: true,
-        timeout: 15000,
+        timeout: 5000,
         maximumAge: 10000,
       },
     );

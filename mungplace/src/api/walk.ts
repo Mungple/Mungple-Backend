@@ -1,9 +1,19 @@
 import axiosInstance from './axios';
 
+
 // 산책 시작 함수
-const startWalk = async () => {
-  const {data} = await axiosInstance.post(`/explorations`);
-  return data;
+const startWalk = async (JSON: string) => {
+  try {
+    const {data} = await axiosInstance.post(`/explorations`, JSON, {
+      headers: {
+        'Content-Type': `application/json; charset=utf8`,
+      },
+    });
+    return data;
+  } catch (error) {
+    console.log('반려견 정보 등록 실패 :', error)
+    throw error
+  }
 };
 
 // 산책 종료 함수

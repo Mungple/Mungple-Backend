@@ -3,44 +3,41 @@ import styled from 'styled-components/native';
 import {WebView, WebViewNavigation} from 'react-native-webview';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 
-import {authNavigations} from '@/constants';
-import useAuth from '@/hooks/queries/useAuth';
+import useAuth from "@/hooks/queries/useAuth";
+import {useAppStore} from '@/state/useAppStore';
 import {AuthStackParamList} from '@/navigations/stack/AuthStackNavigator';
 
-type SocialLoginScreenProps = NativeStackScreenProps<
-  AuthStackParamList,
-  'SocialLogin'
->;
+type SocialLoginScreenProps = NativeStackScreenProps<AuthStackParamList, 'SocialLogin'>;
 
-const SocialLoginScreen: React.FC<SocialLoginScreenProps> = ({route, navigation}) => {
+const SocialLoginScreen: React.FC<SocialLoginScreenProps> = ({route}) => {
   const {provider} = route.params;
-  const {socialLoginMutation} = useAuth();
-  const getAuthUrl = (provider: string) => `http://10.0.2.2:8080/api/users/login/${provider}`;
-  const getCallbackUrl = (provider: string, domain: string = 'localhost') => {
+  const {setLogin} = useAppStore();
+  const {loginMutation} = useAuth();
+  const [nowPath, setNowPath] = useState<string>(
+    `http://10.0.2.2:8080/api/users/login/${provider}`
+  );
+
+  const getCallbackPath = (provider: string, domain: string) => {
     return `http://${domain}:8080/oauth2/callback/${provider}`;
   };
-  const getTokenUrl =  `http://localhost:8080/auth/oauth-response/`;
-  const [currentUrl, setCurrentUrl] = useState<string>(getAuthUrl(provider));
 
   const handleNavigationStateChange = (event: WebViewNavigation) => {
     const url = event.url;
-    setCurrentUrl(url);
-
-    if (url.startsWith(`${getCallbackUrl(provider)}?code=`)) {
+    setNowPath(url);
+    
+    if (url.startsWith(`${getCallbackPath(provider, 'localhost')}?code=`)) {
       const queryParams = url.split('?')[1];
-      setCurrentUrl(`${getCallbackUrl(provider, '10.0.2.2')}?${queryParams}`);
-    } else if (url.startsWith(getTokenUrl)) {
-      const pathSegments = url.split('/');
-      const token = pathSegments[pathSegments.length - 1];
-      socialLoginMutation.mutate(token);
-      navigation.navigate(authNavigations.POST_PROFILE);
+      setNowPath(`${getCallbackPath(provider, '10.0.2.2')}?${queryParams}`);
+    } else if (url.startsWith(`http://localhost:8080/auth/oauth-response/`)) {
+      loginMutation.mutate(url)
+      setLogin(true)
     }
   };
 
   return (
     <Container>
       <WebViewContainer
-        source={{uri: currentUrl}}
+        source={{uri: nowPath}}
         onNavigationStateChange={handleNavigationStateChange}
         startInLoadingState
         javaScriptEnabled

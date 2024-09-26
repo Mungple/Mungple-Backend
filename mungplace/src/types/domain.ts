@@ -36,12 +36,40 @@ interface Profile {
   imageName: string | null;
 }
 
-// 반려견 프로필 정보를 정의한 타입
-interface PetProfile {
+// 반려견 프로필 등록 요청을 정의한 타입
+interface RequestPetProfile {
   petName: string;
-  petGender: 'Male' | 'Female';
+  petGender: string;
   petWeight: number;
-  petBirth: Date;
+  petBirth: string;
 }
 
-export type {MarkerColor, Category, ImageUri, PetProfile, Profile, Marker, Post};
+// 반려견 프로필 조회 응답을 정의한 타입
+interface ResponsePetProfile {
+  id: number;
+  default: boolean;
+  name: string;
+  gender: string;
+  weight: number;
+  birth: string;
+  photoId: string | null;
+};
+
+interface Exploration {
+  explorationId: number;
+  distance: number;
+  startAt: Date;
+  endAt: Date;
+}
+
+export type {
+  Post,
+  Marker,
+  Profile,
+  ImageUri,
+  Category,
+  Exploration,
+  MarkerColor,
+  RequestPetProfile,
+  ResponsePetProfile,
+};
