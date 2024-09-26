@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React from 'react';
 import styled from 'styled-components/native';
 import {WebView, WebViewNavigation} from 'react-native-webview';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
@@ -13,22 +13,11 @@ const SocialLoginScreen: React.FC<SocialLoginScreenProps> = ({route}) => {
   const {provider} = route.params;
   const {setLogin} = useAppStore();
   const {loginMutation} = useAuth();
-  const [nowPath, setNowPath] = useState<string>(
-    `http://10.0.2.2:8080/api/users/login/${provider}`
-  );
-
-  const getCallbackPath = (provider: string, domain: string) => {
-    return `http://${domain}:8080/oauth2/callback/${provider}`;
-  };
 
   const handleNavigationStateChange = (event: WebViewNavigation) => {
     const url = event.url;
-    setNowPath(url);
-    
-    if (url.startsWith(`${getCallbackPath(provider, 'localhost')}?code=`)) {
-      const queryParams = url.split('?')[1];
-      setNowPath(`${getCallbackPath(provider, '10.0.2.2')}?${queryParams}`);
-    } else if (url.startsWith(`http://localhost:8080/auth/oauth-response/`)) {
+    if (url.startsWith(`https://j11e106.p.ssafy.io/api/auth/oauth-response/`)) {
+      console.log('hi')
       loginMutation.mutate(url)
       setLogin(true)
     }
@@ -37,7 +26,7 @@ const SocialLoginScreen: React.FC<SocialLoginScreenProps> = ({route}) => {
   return (
     <Container>
       <WebViewContainer
-        source={{uri: nowPath}}
+        source={{uri: `https://j11e106.p.ssafy.io/api/api/users/login/${provider}`}}
         onNavigationStateChange={handleNavigationStateChange}
         startInLoadingState
         javaScriptEnabled
