@@ -15,39 +15,6 @@ const ImageCard = styled(CustomCard)`
   flex: 2;
 `;
 
-const DogInfo = styled(CustomCard)`
-  flex: 1;
-  background-color: ${colors.BEIGE.LIGHTER};
-  padding: 30px;
-  flex-direction: row;
-  align-items: center;
-`;
-
-const Col = styled.View`
-  flex: 1;
-`;
-
-const Row = styled.View`
-  flex-direction: row;
-  justify-content: space-between;
-  margin-bottom: 20px;
-`;
-
-const HeaderText = styled.Text`
-  font-size: 20px;
-  color: ${colors.BLACK};
-`;
-
-const RightText = styled.Text`
-  font-size: 20px;
-  color: ${colors.BLACK};
-`;
-
-const RightTextBold = styled(RightText)`
-  font-weight: bold;
-  text-align: right;
-`;
-
 // Modal 부분
 
 const HeaderContainer = styled.View`
@@ -74,15 +41,9 @@ const CloseButton = styled(TouchableOpacity)`
 `;
 
 export {
-  Col,
-  Row,
-  DogInfo,
   MenuText,
   Container,
   ImageCard,
-  RightText,
-  HeaderText,
   CloseButton,
-  RightTextBold,
   HeaderContainer,
 };

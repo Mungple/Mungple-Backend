@@ -1,39 +1,42 @@
-import {useEffect} from 'react';
+import {useMutation, useQuery} from '@tanstack/react-query';
+
+import {queryKeys, storageKeys} from '@/constants';
 import queryClient from '@/api/queryClient';
-import {MutationFunction, UseQueryOptions, useMutation, useQuery} from '@tanstack/react-query';
-import {numbers, queryKeys, storageKeys} from '@/constants';
-import type {
-  ResponseError,
-  UseMutationCustomOptions,
-  UseQueryCustomOptions,
-} from '@/types/common';
-import {
-  removeEncryptStorage,
-  removeHeader,
-  setEncryptStorage,
-  setHeader,
-} from '@/utils';
+import {removeHeader, setEncryptStorage, setHeader} from '@/utils';
 import {
   getProfile,
   editProfile,
   logout,
-  getAccessToken,
-  socialLogin,
-  ResponseToken,
   ResponseProfile,
   RequestProfile,
+  socialLogin,
 } from '@/api/auth';
+import type {ResponseError, UseMutationCustomOptions, UseQueryCustomOptions} from '@/types/common';
+import { JwtPayload, jwtDecode } from 'jwt-decode';
+import { useUserStore } from '@/state/useUserStore';
+import { getPetProfiles } from '@/api';
+
+interface CustomJwtPayload extends JwtPayload {
+  userId: number;
+}
 
 // 로그인 커스텀 훅
-function useLogin<T>(
-  loginAPI: MutationFunction<ResponseToken, T>,
-  mutationOptions?: UseMutationCustomOptions,
-) {
+function useLogin(mutationOptions?: UseMutationCustomOptions) {
   return useMutation({
-    mutationFn: loginAPI,
-    onSuccess: ({accessToken, refreshToken}) => {
+    mutationFn: (loginUrl: string) => socialLogin(loginUrl),
+    onSuccess: ({accessToken}) => {
+      const {setUserId, setPetData} = useUserStore.getState();
       setHeader('Authorization', `Bearer ${accessToken}`);
-      setEncryptStorage(storageKeys.REFRESH_TOKEN, refreshToken);
+      setEncryptStorage(storageKeys.REFRESH_TOKEN, accessToken);
+      
+      const decoded = jwtDecode<CustomJwtPayload>(`${accessToken}`)
+      setUserId(decoded.userId)
+      
+      const getPetProfile = async () => {
+        const data = await getPetProfiles(decoded.userId);
+        setPetData(data)
+      }
+      getPetProfile()
     },
     onSettled: () => {
       queryClient.refetchQueries({
@@ -48,58 +51,31 @@ function useLogin<T>(
   });
 }
 
-function useSocialLogin(mutationOptions?: UseMutationCustomOptions) {
-  return useLogin(socialLogin, mutationOptions);
-}
-
-// 리프레시 토큰 가져오기 훅
-function useGetRefreshToken() {
-  const {data, isSuccess, isError} = useQuery({
-    queryKey: [queryKeys.AUTH, queryKeys.GET_ACCESS_TOKEN],
-    queryFn: getAccessToken,
-    staleTime: numbers.ACCESS_TOKEN_REFRESH_TIME,
-    refetchInterval: numbers.ACCESS_TOKEN_REFRESH_TIME,
-    refetchOnReconnect: true,
-    refetchIntervalInBackground: true,
-  });
-
-  // 성공적으로 액세스 토큰을 가져왔을 때 헤더와 저장소에 저장
-  useEffect(() => {
-    if (isSuccess) {
-      setHeader('Authorization', `Bearer ${data.accessToken}`);
-      setEncryptStorage(storageKeys.REFRESH_TOKEN, data.refreshToken);
-    }
-  }, [isSuccess]);
-
-  // 오류 발생 시 헤더와 저장소에서 토큰 삭제
-  useEffect(() => {
-    if (isError) {
-      removeHeader('Authorization');
-      removeEncryptStorage(storageKeys.REFRESH_TOKEN);
-    }
-  }, [isError]);
-
-  return {isSuccess, isError}; // 성공 및 오류 여부 반환
-}
-
 // 프로필 정보 가져오기 훅
 function useGetProfile(
-  userId: number, 
-  queryOptions?: UseQueryOptions<ResponseProfile, Error>
+  userId: number,
+  queryOptions?: UseQueryCustomOptions<ResponseProfile>
 ) {
-  return useQuery<ResponseProfile, Error>({
+  return useQuery({
     queryFn: () => getProfile(userId),
-    queryKey: [queryKeys.AUTH, queryKeys.GET_PROFILE, userId],
+    queryKey: [queryKeys.AUTH, queryKeys.GET_PROFILE],
     ...queryOptions,
   });
 }
 
 // 프로필 정보 변경 훅
 function useUpdateProfile(mutationOptions?: UseMutationCustomOptions) {
-  return useMutation<ResponseProfile, ResponseError, { userId: number; body: RequestProfile }>({
+  return useMutation<
+    ResponseProfile,
+    ResponseError,
+    {userId: number; body: RequestProfile}
+  >({
     mutationFn: ({userId, body}) => editProfile(userId, body),
     onSuccess: newProfile => {
-      queryClient.setQueryData([queryKeys.AUTH, queryKeys.GET_PROFILE], newProfile);
+      queryClient.setQueryData(
+        [queryKeys.AUTH, queryKeys.GET_PROFILE],
+        newProfile,
+      );
     },
     ...mutationOptions,
   });
@@ -111,7 +87,6 @@ function useLogout(mutationOptions?: UseMutationCustomOptions) {
     mutationFn: logout,
     onSuccess: () => {
       removeHeader('Authorization');
-      removeEncryptStorage(storageKeys.REFRESH_TOKEN);
     },
     onSettled: () => {
       queryClient.invalidateQueries({queryKey: [queryKeys.AUTH]});
@@ -121,19 +96,15 @@ function useLogout(mutationOptions?: UseMutationCustomOptions) {
 }
 
 function useAuth() {
+  const loginMutation = useLogin();
   const logoutMutation = useLogout();
   const profileMutation = useUpdateProfile();
-  const socialLoginMutation = useSocialLogin();
-  const refreshTokenQuery = useGetRefreshToken();
-  const getProfileQuery = useGetProfile({enabled: refreshTokenQuery.isSuccess});
-  const isLogin = getProfileQuery.isSuccess;
 
   return {
-    isLogin,
+    loginMutation,
     logoutMutation,
     profileMutation,
-    getProfileQuery,
-    socialLoginMutation,
+    useGetProfile,
   };
 }
 

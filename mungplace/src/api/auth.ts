@@ -5,7 +5,6 @@ import type {Profile} from '@/types/domain';
 // 로그인 후 응답받는 토큰 데이터 타입
 type ResponseToken = {
   accessToken: string;
-  refreshToken: string;
 };
 
 // 사용자 프로필 요청 타입
@@ -18,20 +17,32 @@ type ResponseProfile = {
   imageName: string | null;
 };
 
-// 소셜 로그인 요청 함수
-const socialLogin = async (provider: string): Promise<ResponseToken> => {
-  const {data} = await axiosInstance.post(`/api/users/login/${provider}`);
-  return data;
-};
+const socialLogin = async (url: string): Promise<ResponseToken> => {
+  const pathSegments = url.split('/');
+  const accessToken = pathSegments[pathSegments.length - 1]
+  return {accessToken}
+}
 
 // 프로필 정보 요청 함수
 const getProfile = async (userId: number): Promise<ResponseProfile> => {
-  const {data} = await axiosInstance.get(`/users/${userId}`);
-  return data;
+  try {
+    const {data} = await axiosInstance.get(`/users/${userId}`, {
+      headers: {
+        'Content-Type': `application/json; charset=utf8`,
+      },
+    });
+    return data;
+  } catch (error) {
+    console.error('프로필 정보 요청 실패 :', error);
+    throw error;
+  }
 };
 
 // 프로필 정보 변경 함수
-const editProfile = async (userId: number, body: RequestProfile): Promise<ResponseProfile> => {
+const editProfile = async (
+  userId: number,
+  body: RequestProfile,
+): Promise<ResponseProfile> => {
   const {data} = await axiosInstance.patch(`/users/${userId}`, body);
   return data;
 };
