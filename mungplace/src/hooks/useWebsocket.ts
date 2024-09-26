@@ -12,13 +12,13 @@ interface Cell {
   weight: number;
 }
 
-// 산책 위치 정보
+// SEND: 산책 위치 정보
 interface ToLocation {
-  latitude: number;
-  longitude: number;
+  lat: number;
+  lon: number;
   recordedAt: string;
 }
-// 개인 블루존, 블루존, 레드존 조회 정보
+// SEND: 개인 블루존, 블루존, 레드존
 interface ToZone {
   side: number;
   point: {
@@ -26,7 +26,7 @@ interface ToZone {
     lon: number;
   };
 }
-
+// RECEIVE: 개인 블루존, 블루존, 레드존
 interface FromZone {
   cells: Cell[];
 }
@@ -34,7 +34,7 @@ interface FromZone {
 interface MungZone {
   points: Point[];
 }
-
+// RECEIVE: 에러 메시지
 interface ErrorMessage {
   errorCode: string;
   message: string;
@@ -49,14 +49,14 @@ const getJwtToken = async () => {
     const response = await axios.post(
       `https://j11e106.p.ssafy.io/api/manager/login?username=manager`,
     );
-    console.log('JWT Token을 가져오는 데 성공했습니다.');
+    console.log('JWT Token을 가져오기 성공했습니다.');
     return response.data.accessToken;
   } catch (error) {
     console.error('JWT Token을 가져오는 데 실패했습니다.', error);
   }
 };
 
-const useWebSocket = (explorationId: number = -1, userId: number = -1) => {
+const useWebSocket = (explorationId: number = -1) => {
   const [clientSocket, setClientSocket] = useState<Client | null>(null);
   const [explorations, setExplorations] = useState<ErrorMessage | null>(null);
   const [myBlueZone, setMyBlueZone] = useState<FromZone | null>(null);
@@ -67,7 +67,21 @@ const useWebSocket = (explorationId: number = -1, userId: number = -1) => {
   useEffect(() => {
     const connectWebsocket = async () => {
       try {
-        const token = await getJwtToken();
+        let token = await getJwtToken();
+        let tries = 0;
+
+        while (!token && tries < 3) {
+          console.log('토큰이 없습니다. 재시도 중...');
+          token = await getJwtToken();
+          tries++;
+        }
+
+        if (!token) {
+          console.error(
+            '토큰을 가져올 수 없어 소켓 연결을 시도할 수 없습니다.',
+          );
+          return;
+        }
 
         const socket = new Client({
           webSocketFactory: () =>
@@ -107,9 +121,9 @@ const useWebSocket = (explorationId: number = -1, userId: number = -1) => {
               },
             );
             // 개인 블루존 조회
-            socket.subscribe(`/user/sub/users/${userId}/bluezone`, message => {
+            socket.subscribe('/user/sub/users/bluezone', message => {
               try {
-                const parsedMessage = JSON.parse(message.body) as Zone;
+                const parsedMessage = JSON.parse(message.body) as FromZone;
                 setMyBlueZone(parsedMessage);
               } catch (e) {
                 console.log(e);
@@ -119,6 +133,7 @@ const useWebSocket = (explorationId: number = -1, userId: number = -1) => {
             socket.subscribe('/user/sub/bluezone', message => {
               try {
                 const parsedMessage = JSON.parse(message.body) as FromZone;
+                console.log(parsedMessage);
                 setAllBlueZone(parsedMessage);
               } catch (e) {
                 console.log(e);
@@ -164,7 +179,7 @@ const useWebSocket = (explorationId: number = -1, userId: number = -1) => {
       };
     };
     connectWebsocket();
-  }, [explorationId, userId]);
+  }, [explorationId]);
 
   const sendLocation = useCallback(
     (explorationId: number, location: ToLocation) => {

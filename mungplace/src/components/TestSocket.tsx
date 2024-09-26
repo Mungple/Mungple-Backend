@@ -18,8 +18,28 @@ const TestSocket = () => {
   return (
     <View>
       <Text>Test Socket</Text>
-      <Button title="sendLocation" onPress={() => sendLocation} />
-      <Button title="checkMyBlueZone" onPress={() => checkMyBlueZone} />
+      <Button
+        title="sendLocation"
+        onPress={() =>
+          sendLocation(1, {
+            lat: 35.06005,
+            lon: 129.0145,
+            recordedAt: '2021-09-01T00:00:00',
+          })
+        }
+      />
+      <Button
+        title="checkMyBlueZone"
+        onPress={() =>
+          checkMyBlueZone({
+            side: 1000,
+            point: {
+              lat: 35.06005,
+              lon: 129.0145,
+            },
+          })
+        }
+      />
       <Button
         title="checkAllUserZone"
         onPress={() =>
