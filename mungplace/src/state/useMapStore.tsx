@@ -10,14 +10,29 @@ export interface Zone {
 
 // 마커 데이터 인터페이스
 export interface MarkerData {
-  id: string
+  markerId: string
   latitude: number
   longitude: number
   title: string
   body: string
   imageUri?: string // 마커에 사용될 이미지 uri도 선택적임
   explorationId?: number // 있으면 산책임
-  type: 'blue' | 'red'
+  type: 'BLUE' | 'RED'
+}
+
+// 마커 상세 정보 인터페이스
+export interface MarkerDetails {
+  markerId: string;
+  userId: number;
+  point: {
+    lat: number;
+    lon: number;
+  };
+  title: string;
+  content: string;
+  type: string;
+  images: string[];
+  createdAt: string;
 }
 
 // 맵 화면의 상태 정의

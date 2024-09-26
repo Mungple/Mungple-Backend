@@ -15,12 +15,14 @@ import DogInfoBox from '@/components/user/DogInfoBox';
 
 const windowHeight = Dimensions.get('window').height;
 
+
 const HomeScreen: React.FC = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const setWalkingStart = useAppStore(state => state.setWalkingStart);
+  const navigation = useNavigation<NativeStackNavigationProp<MapStackParamList>>();
+  const accessToken = useAppStore((state) => state.token)
+  console.log("어 형이야", accessToken)
   const [selectedPets, setSelectedPets] = useState<number[]>([]);
-  const navigation =
-    useNavigation<NativeStackNavigationProp<MapStackParamList>>();
   // const {explorationId, startAt} = useAppStore(state => state.exploration);
 
   const handleModalVisivle = () => {
