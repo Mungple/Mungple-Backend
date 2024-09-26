@@ -2,13 +2,13 @@ import {create} from 'zustand';
 import {Exploration} from '@/types';
 
 interface AppState {
-  token: string;
   isLogin: boolean;
   exploration: Exploration;
   walkingStart: boolean;
   setToken: (value: string) => void;
   setLogin: (value: boolean) => void;
   setWalkingStart: (value: boolean) => void;
+  token : string | null
 }
 
 export const useAppStore = create<AppState>(set => ({
