@@ -133,7 +133,7 @@ const useWebSocket = (explorationId: number = -1) => {
             socket.subscribe('/user/sub/bluezone', message => {
               try {
                 const parsedMessage = JSON.parse(message.body) as FromZone;
-                console.log(parsedMessage);
+                // console.log(parsedMessage);
                 setAllBlueZone(parsedMessage);
               } catch (e) {
                 console.log(e);
