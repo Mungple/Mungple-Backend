@@ -114,6 +114,7 @@ public class MarkerService {
 			return Optional.empty();
 		}
 	}
+
 	private void validateImageFileCount(List<MultipartFile> imageFiles) {
 		if (imageFiles != null && imageFiles.size() > MAX_IMAGE_FILE_COUNT) {
 			throw new ApplicationException(ApplicationError.IMAGE_COUNT_EXCEEDS_LIMIT);
@@ -180,7 +181,8 @@ public class MarkerService {
 
 		// 타입에 따라 MarkerReader 호출
 		if (markerType == RequestMarkerType.ALL) {
-			return markerReader.findMarkersByGeoDistanceAndCreatedAtRange(distance, latitude, longitude, timeRange[0], timeRange[1]);
+			return markerReader.findMarkersByGeoDistanceAndCreatedAtRange(distance, latitude, longitude, timeRange[0],
+				timeRange[1]);
 		}
 
 		return markerReader.findMarkersByGeoDistanceAndCreatedAtRangeAndType(
@@ -191,7 +193,7 @@ public class MarkerService {
 		LocalDateTime now = LocalDateTime.now();
 		LocalDateTime fromTime = now.minusDays(MARKER_SEARCH_DAY_RANGE);
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_TIME_FORMAT);
-		return new String[]{ fromTime.format(formatter), now.format(formatter) };
+		return new String[] {fromTime.format(formatter), now.format(formatter)};
 	}
 
 	// 마커 목록을 Geohash로 그룹화하는 메서드

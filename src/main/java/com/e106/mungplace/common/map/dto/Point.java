@@ -1,5 +1,6 @@
 package com.e106.mungplace.common.map.dto;
 
+import org.locationtech.spatial4j.io.GeohashUtils;
 import org.springframework.data.elasticsearch.core.geo.GeoPoint;
 
 import co.elastic.clients.elasticsearch._types.GeoLocation;
@@ -24,5 +25,17 @@ public record Point(
 
 	public GeoLocation toGeoLocation() {
 		return GeoLocation.of(b -> b.latlon(LatLonGeoLocation.of(ll -> ll.lat(lat).lon(lon))));
+	}
+
+	public static String toUserCurrentGeoHash(String latitude, String longitude) {
+		return GeohashUtils.encodeLatLon(Double.parseDouble(latitude), Double.parseDouble(longitude), 9);
+	}
+
+	public static String toConstantGeoHash(String latitude, String longitude) {
+		return GeohashUtils.encodeLatLon(Double.parseDouble(latitude), Double.parseDouble(longitude), 8);
+	}
+
+	public static String toMungGeoHash(String latitude, String longitude) {
+		return GeohashUtils.encodeLatLon(Double.parseDouble(latitude), Double.parseDouble(longitude), 7);
 	}
 }

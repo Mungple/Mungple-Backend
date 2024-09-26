@@ -9,7 +9,8 @@ public enum ProviderName {
 	KAKAO("kakao"),
 	GOOGLE("google"),
 	NAVER("naver"),
-	MANAGER("manager"),;
+	MANAGER("manager"),
+	;
 
 	private final String providerName;
 }

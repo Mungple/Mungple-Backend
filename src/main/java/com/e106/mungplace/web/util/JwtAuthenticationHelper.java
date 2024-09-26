@@ -67,13 +67,13 @@ public class JwtAuthenticationHelper {
 			Long userId = extractUserIdFromToken(token);
 
 			UserDetails user = User.builder()
-					.username(userId.toString())
-					.password("")
-					.authorities(List.of())
-					.build();
+				.username(userId.toString())
+				.password("")
+				.authorities(List.of())
+				.build();
 
 			Authentication authentication = new UsernamePasswordAuthenticationToken(
-					user, "", user.getAuthorities());
+				user, "", user.getAuthorities());
 
 			SecurityContextHolder.getContext().setAuthentication(authentication);
 		}

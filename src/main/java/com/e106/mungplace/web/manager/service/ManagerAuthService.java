@@ -20,6 +20,8 @@ public class ManagerAuthService {
 	@Transactional
 	public LoginResponse managerLoginProcess(String providerId) {
 		User manager = managerReader.findOrCreateManager(providerId);
-		return LoginResponse.builder().accessToken(jwtAuthenticationHelper.createAccessToken(manager.getUserId())).build();
+		return LoginResponse.builder()
+			.accessToken(jwtAuthenticationHelper.createAccessToken(manager.getUserId()))
+			.build();
 	}
 }

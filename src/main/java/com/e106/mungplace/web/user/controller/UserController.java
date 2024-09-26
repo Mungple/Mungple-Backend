@@ -30,7 +30,8 @@ public class UserController {
 	}
 
 	@PostMapping(value = "/image", consumes = "multipart/form-data")
-	public ResponseEntity<ImageNameResponse> updateUserImage(@RequestPart(name = "image", required = true) MultipartFile imageFile) {
+	public ResponseEntity<ImageNameResponse> updateUserImage(
+		@RequestPart(name = "image", required = true) MultipartFile imageFile) {
 		return ResponseEntity.ok(userService.updateUserImage(imageFile));
 	}
 }

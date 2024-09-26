@@ -10,7 +10,7 @@ public record NaverUserInfo(
 
 	@Override
 	public String getProviderId() {
-		Map<String, Object> response = (Map<String, Object>) attributes.get("response");
+		Map<String, Object> response = (Map<String, Object>)attributes.get("response");
 		return response.get("id").toString();
 	}
 
@@ -21,7 +21,7 @@ public record NaverUserInfo(
 
 	@Override
 	public String getNickname() {
-		Map<String, Object> properties = (Map<String, Object>) attributes.get("response");
+		Map<String, Object> properties = (Map<String, Object>)attributes.get("response");
 		return properties.get("name").toString();
 	}
 }

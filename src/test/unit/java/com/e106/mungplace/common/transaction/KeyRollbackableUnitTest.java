@@ -81,7 +81,6 @@ class KeyRollbackableUnitTest {
 		service.callProcess();
 		service.addData("key2", "value2");
 
-
 		// when
 		service.rollback();
 

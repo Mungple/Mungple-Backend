@@ -63,7 +63,8 @@ class MarkerConsumerTest {
 		// Mock MarkerEvent 생성
 		event = MarkerEvent.builder()
 			.uuid(UUID.randomUUID())
-			.payload("{\"markerId\":1,\"userId\":1,\"title\":\"Test Marker\",\"lat\":37.5665,\"lon\":126.978,\"type\":\"BLUE\",\"explorationId\":null}")
+			.payload(
+				"{\"markerId\":1,\"userId\":1,\"title\":\"Test Marker\",\"lat\":37.5665,\"lon\":126.978,\"type\":\"BLUE\",\"explorationId\":null}")
 			.createdAt(LocalDateTime.now())
 			.build();
 	}
@@ -86,10 +87,13 @@ class MarkerConsumerTest {
 	@Test
 	void testHandleHeatmapQueryEventProcess_Failure() throws Exception {
 		// given
-		when(objectMapper.readValue(anyString(), eq(MarkerPayload.class))).thenThrow(new JsonProcessingException("JSON 오류") {});
+		when(objectMapper.readValue(anyString(), eq(MarkerPayload.class))).thenThrow(
+			new JsonProcessingException("JSON 오류") {
+			});
 
 		// when
-		ThrowableAssert.ThrowingCallable expectedThrow = () -> markerConsumer.saveMarkerEventProcess(event, acknowledgment);
+		ThrowableAssert.ThrowingCallable expectedThrow = () -> markerConsumer.saveMarkerEventProcess(event,
+			acknowledgment);
 
 		// then
 		assertThatThrownBy(expectedThrow);

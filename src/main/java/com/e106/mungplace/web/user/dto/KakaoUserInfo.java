@@ -20,7 +20,7 @@ public record KakaoUserInfo(
 
 	@Override
 	public String getNickname() {
-		Map<String, Object> properties = (Map<String, Object>) attributes.get("properties");
+		Map<String, Object> properties = (Map<String, Object>)attributes.get("properties");
 		return properties.get("nickname").toString();
 	}
 }

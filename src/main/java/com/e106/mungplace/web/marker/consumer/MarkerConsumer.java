@@ -28,7 +28,8 @@ public class MarkerConsumer {
 
 	private final ObjectMapper objectMapper;
 
-	public MarkerConsumer(NewTopic markerTopic, MarkerPointRepository markerPointRepository, ObjectMapper objectMapper) {
+	public MarkerConsumer(NewTopic markerTopic, MarkerPointRepository markerPointRepository,
+		ObjectMapper objectMapper) {
 		this.topic = markerTopic.name();
 		this.markerPointRepository = markerPointRepository;
 		this.objectMapper = objectMapper;

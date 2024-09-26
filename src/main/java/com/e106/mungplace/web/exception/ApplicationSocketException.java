@@ -1,6 +1,7 @@
 package com.e106.mungplace.web.exception;
 
 import com.e106.mungplace.web.exception.dto.ApplicationSocketError;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -8,10 +9,10 @@ import lombok.Getter;
 @AllArgsConstructor
 public class ApplicationSocketException extends RuntimeException {
 
-    private ApplicationSocketError error;
+	private ApplicationSocketError error;
 
-    public ApplicationSocketException(Throwable cause, ApplicationSocketError error) {
-        super(cause);
-        this.error = error;
-    }
+	public ApplicationSocketException(Throwable cause, ApplicationSocketError error) {
+		super(cause);
+		this.error = error;
+	}
 }

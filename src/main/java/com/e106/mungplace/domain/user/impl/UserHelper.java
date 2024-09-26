@@ -30,10 +30,10 @@ public class UserHelper {
 
 	public UserDetails getAuthenticatedUser() {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		if(authentication == null) {
+		if (authentication == null) {
 			throw new ApplicationException(ApplicationError.AUTHENTICATION_ERROR);
 		}
-		return (UserDetails) authentication.getPrincipal();
+		return (UserDetails)authentication.getPrincipal();
 	}
 
 	public Long getCurrentUserId() {

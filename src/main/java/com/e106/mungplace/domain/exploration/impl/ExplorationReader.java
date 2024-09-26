@@ -2,15 +2,15 @@ package com.e106.mungplace.domain.exploration.impl;
 
 import java.time.LocalDateTime;
 
-import com.e106.mungplace.web.exception.ApplicationSocketException;
-import com.e106.mungplace.web.exception.dto.ApplicationSocketError;
 import org.springframework.stereotype.Component;
 
 import com.e106.mungplace.domain.exploration.entity.Exploration;
 import com.e106.mungplace.domain.exploration.repository.ExplorationRepository;
 import com.e106.mungplace.domain.user.entity.User;
 import com.e106.mungplace.web.exception.ApplicationException;
+import com.e106.mungplace.web.exception.ApplicationSocketException;
 import com.e106.mungplace.web.exception.dto.ApplicationError;
+import com.e106.mungplace.web.exception.dto.ApplicationSocketError;
 
 import lombok.RequiredArgsConstructor;
 
@@ -25,16 +25,15 @@ public class ExplorationReader {
 	}
 
 	public Exploration get(Long explorationId) {
-		return explorationRepository.findById(explorationId).orElseThrow(() -> new ApplicationException(
-			ApplicationError.EXPLORATION_NOT_FOUND));
+		return explorationRepository.findById(explorationId)
+			.orElseThrow(() -> new ApplicationException(ApplicationError.EXPLORATION_NOT_FOUND));
 	}
 
 	public Exploration getDuringExploring(Long explorationId) {
 		return explorationRepository.findById(explorationId).map(result -> {
-			if (result.isEnded()) throw new ApplicationSocketException(ApplicationSocketError.IS_ENDED_EXPLORATION);
-			// TODO <이현수> : 세션 삭제하기
+			if (result.isEnded())
+				throw new ApplicationSocketException(ApplicationSocketError.IS_ENDED_EXPLORATION);
 			return result;
 		}).orElseThrow(() -> new ApplicationSocketException(ApplicationSocketError.EXPLORATION_NOT_FOUND));
-		// TODO <이현수> : 세션 삭제하기
 	}
 }

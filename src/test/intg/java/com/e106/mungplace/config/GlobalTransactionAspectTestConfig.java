@@ -1,9 +1,7 @@
 package com.e106.mungplace.config;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.mockito.Mockito;
 import org.springframework.boot.test.context.TestConfiguration;

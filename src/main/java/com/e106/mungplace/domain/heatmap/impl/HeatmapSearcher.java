@@ -3,8 +3,6 @@ package com.e106.mungplace.domain.heatmap.impl;
 import java.util.List;
 import java.util.Optional;
 
-import com.e106.mungplace.web.exception.ApplicationSocketException;
-import com.e106.mungplace.web.exception.dto.ApplicationSocketError;
 import org.springframework.data.elasticsearch.client.elc.ElasticsearchAggregation;
 import org.springframework.data.elasticsearch.client.elc.ElasticsearchAggregations;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
@@ -19,8 +17,8 @@ import com.e106.mungplace.common.map.dto.Point;
 import com.e106.mungplace.domain.exploration.entity.ExplorePoint;
 import com.e106.mungplace.domain.heatmap.dto.HeatmapCell;
 import com.e106.mungplace.domain.heatmap.dto.HeatmapSearchCondition;
-import com.e106.mungplace.web.exception.ApplicationException;
-import com.e106.mungplace.web.exception.dto.ApplicationError;
+import com.e106.mungplace.web.exception.ApplicationSocketException;
+import com.e106.mungplace.web.exception.dto.ApplicationSocketError;
 
 import co.elastic.clients.elasticsearch._types.GeoBounds;
 import co.elastic.clients.elasticsearch._types.GeoHashPrecision;
