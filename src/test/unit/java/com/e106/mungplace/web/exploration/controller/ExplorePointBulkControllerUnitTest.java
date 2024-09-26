@@ -19,6 +19,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 import com.e106.mungplace.common.map.dto.Point;
+import com.e106.mungplace.domain.exploration.impl.ExplorationRecorder;
 import com.e106.mungplace.domain.user.repository.UserRepository;
 import com.e106.mungplace.web.handler.interceptor.CustomWebSocketHandlerDecorator;
 import com.e106.mungplace.web.manager.controller.ExplorePointBulkController;
@@ -35,6 +36,9 @@ class ExplorePointBulkControllerUnitTest {
 
 	@Autowired
 	private ObjectMapper objectMapper;
+
+	@MockBean
+	private ExplorationRecorder explorationRecorder;
 
 	@MockBean
 	private UserRepository userRepository;

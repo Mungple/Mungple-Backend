@@ -10,7 +10,7 @@ import lombok.Builder;
 
 @Builder
 public record MarkerInfoResponse(
-	
+
 	UUID id,
 	long userId,
 	Point point,
@@ -19,4 +19,5 @@ public record MarkerInfoResponse(
 	String type,
 	List<String> images,
 	LocalDateTime createdAt
-) {}
+) {
+}

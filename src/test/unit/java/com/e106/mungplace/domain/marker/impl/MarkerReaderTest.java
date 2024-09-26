@@ -40,11 +40,13 @@ class MarkerReaderTest {
 	@Test
 	void testFindMarkersByGeoDistanceAndCreatedAtRange() {
 		// given
-		when(markerPointRepository.findMarkersByGeoDistanceAndCreatedAtRange(anyString(), anyDouble(), anyDouble(), anyString(), anyString()))
+		when(markerPointRepository.findMarkersByGeoDistanceAndCreatedAtRange(anyString(), anyDouble(), anyDouble(),
+			anyString(), anyString()))
 			.thenReturn(markerPoints);
 
 		// when
-		List<MarkerPoint> result = markerReader.findMarkersByGeoDistanceAndCreatedAtRange("500m", 35.08968679527971, 128.85403312444654, "2023-09-23", "2023-09-24");
+		List<MarkerPoint> result = markerReader.findMarkersByGeoDistanceAndCreatedAtRange("500m", 35.08968679527971,
+			128.85403312444654, "2023-09-23", "2023-09-24");
 
 		// then
 		assertNotNull(result);
@@ -57,11 +59,13 @@ class MarkerReaderTest {
 	@Test
 	void testFindMarkersByGeoDistanceAndCreatedAtRangeAndType() {
 		// given
-		when(markerPointRepository.findMarkersByGeoDistanceAndCreatedAtRangeAndType(anyString(), anyDouble(), anyDouble(), anyString(), anyString(), anyString()))
+		when(markerPointRepository.findMarkersByGeoDistanceAndCreatedAtRangeAndType(anyString(), anyDouble(),
+			anyDouble(), anyString(), anyString(), anyString()))
 			.thenReturn(markerPoints);
 
 		// when
-		List<MarkerPoint> result = markerReader.findMarkersByGeoDistanceAndCreatedAtRangeAndType("500m", 35.08968679527971, 128.85403312444654, "2023-09-23", "2023-09-24", "RED");
+		List<MarkerPoint> result = markerReader.findMarkersByGeoDistanceAndCreatedAtRangeAndType("500m",
+			35.08968679527971, 128.85403312444654, "2023-09-23", "2023-09-24", "RED");
 
 		// then
 		assertNotNull(result);
@@ -69,6 +73,7 @@ class MarkerReaderTest {
 		assertEquals(MarkerType.RED, result.get(0).getType());
 
 		verify(markerPointRepository, times(1))
-			.findMarkersByGeoDistanceAndCreatedAtRangeAndType(anyString(), anyDouble(), anyDouble(), anyString(), anyString(), anyString());
+			.findMarkersByGeoDistanceAndCreatedAtRangeAndType(anyString(), anyDouble(), anyDouble(), anyString(),
+				anyString(), anyString());
 	}
 }

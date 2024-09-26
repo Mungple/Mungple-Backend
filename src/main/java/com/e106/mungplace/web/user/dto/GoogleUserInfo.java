@@ -4,7 +4,7 @@ import java.util.Map;
 
 import com.e106.mungplace.domain.user.entity.ProviderName;
 
-public record GoogleUserInfo (
+public record GoogleUserInfo(
 	Map<String, Object> attributes
 ) implements OAuth2UserInfo {
 

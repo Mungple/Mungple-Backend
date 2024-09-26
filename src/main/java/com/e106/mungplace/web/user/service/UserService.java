@@ -41,7 +41,7 @@ public class UserService {
 	public ImageNameResponse updateUserImage(MultipartFile imageFile) {
 		User user = userHelper.getCurrentUser();
 		String currentImageName = user.getImageName();
-		if(currentImageName != null) {
+		if (currentImageName != null) {
 			imageRepository.deleteImageById(currentImageName);
 		}
 		String userImage = imageStore.saveImage(imageFile);

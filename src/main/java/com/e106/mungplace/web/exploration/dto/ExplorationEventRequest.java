@@ -1,28 +1,29 @@
 package com.e106.mungplace.web.exploration.dto;
 
+import java.time.LocalDateTime;
+
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
+import lombok.Setter;
 
 @Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class ExplorationEventRequest {
 
-    @NotNull
-    private Long userId;
+	private Long userId;
 
-    @NotNull
-    private String latitude;
+	@NotNull
+	private String latitude;
 
-    @NotNull
-    private String longitude;
+	@NotNull
+	private String longitude;
 
-    @NotNull
-    private LocalDateTime recordedAt;
+	@NotNull
+	private LocalDateTime recordedAt;
 }

@@ -40,16 +40,18 @@ public class DogService {
 	private final UserHelper userHelper;
 
 	@Transactional
-	public void createDogProcess(DogCreateRequest dogCreateRequest) {
+	public DogResponse createDogProcess(DogCreateRequest dogCreateRequest) {
 		User user = userHelper.getCurrentUser();
 		int size = isAcceptableSize(user.getUserId());
 		Dog dog = dogCreateRequest.toEntity();
 		dog.updateDogOwner(user);
 		dog.updateDefaultDog(size == 0);
-		dogRepository.save(dog);
+		Dog saveDog = dogRepository.save(dog);
+
+		return DogResponse.of(saveDog);
 	}
 
-    @Transactional(readOnly = true)
+	@Transactional(readOnly = true)
 	public List<DogResponse> findDogsProcess(Long userId) {
 		List<Dog> dogs = dogRepository.findByUserUserId(userId);
 		return dogs.stream()
@@ -98,14 +100,15 @@ public class DogService {
 
 	private void validateExploring(Long dogId) {
 		dogExplorationRepository.findLatestByDogId(dogId).ifPresent(dogExploration -> {
-			if (!dogExploration.isEnded()) throw new ApplicationException(ApplicationError.DOG_IS_EXPLORING);
+			if (!dogExploration.isEnded())
+				throw new ApplicationException(ApplicationError.DOG_IS_EXPLORING);
 		});
 	}
 
 	private int isAcceptableSize(Long userId) {
 		return Optional.of(dogRepository.countDogsByUserUserId(userId))
-				.filter(size -> size < MAX_DOG_CAPACITY)
-				.orElseThrow(() -> new ApplicationException(ApplicationError.EXCEED_DOG_CAPACITY));
+			.filter(size -> size < MAX_DOG_CAPACITY)
+			.orElseThrow(() -> new ApplicationException(ApplicationError.EXCEED_DOG_CAPACITY));
 	}
 
 	@GlobalTransactional

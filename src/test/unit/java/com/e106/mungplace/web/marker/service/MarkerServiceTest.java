@@ -88,7 +88,8 @@ class MarkerServiceTest {
 		);
 
 		// when
-		ThrowableAssert.ThrowingCallable expectThrow = () -> markerService.createMarkerProcess(markerInfoJson, imageFiles);
+		ThrowableAssert.ThrowingCallable expectThrow = () -> markerService.createMarkerProcess(markerInfoJson,
+			imageFiles);
 
 		// then
 		Assertions.assertThatThrownBy(expectThrow).isInstanceOf(ApplicationException.class);
@@ -240,7 +241,8 @@ class MarkerServiceTest {
 
 		List<MarkerPoint> mockMarkerPoints = List.of(markerPoint1, markerPoint2);
 
-		when(markerReader.findMarkersByGeoDistanceAndCreatedAtRange(anyString(), anyDouble(), anyDouble(), anyString(), anyString()))
+		when(markerReader.findMarkersByGeoDistanceAndCreatedAtRange(anyString(), anyDouble(), anyDouble(), anyString(),
+			anyString()))
 			.thenReturn(mockMarkerPoints);
 
 		// when
@@ -249,7 +251,8 @@ class MarkerServiceTest {
 		// then
 		assertNotNull(response);
 		assertThat(response.markersGroupedByGeohash()).isNotEmpty();
-		verify(markerReader, times(1)).findMarkersByGeoDistanceAndCreatedAtRange(anyString(), anyDouble(), anyDouble(), anyString(), anyString());
+		verify(markerReader, times(1)).findMarkersByGeoDistanceAndCreatedAtRange(anyString(), anyDouble(), anyDouble(),
+			anyString(), anyString());
 	}
 
 	@DisplayName("모든 RED타입의 마커 조회")
@@ -270,7 +273,8 @@ class MarkerServiceTest {
 			.build();
 
 		List<MarkerPoint> mockMarkerPoints = List.of(markerPoint);
-		when(markerReader.findMarkersByGeoDistanceAndCreatedAtRangeAndType(anyString(), anyDouble(), anyDouble(), anyString(), anyString(), anyString()))
+		when(markerReader.findMarkersByGeoDistanceAndCreatedAtRangeAndType(anyString(), anyDouble(), anyDouble(),
+			anyString(), anyString(), anyString()))
 			.thenReturn(mockMarkerPoints);
 
 		// when
@@ -279,7 +283,8 @@ class MarkerServiceTest {
 		// then
 		assertNotNull(response);
 		assertThat(response.markersGroupedByGeohash()).isNotEmpty();
-		verify(markerReader, times(1)).findMarkersByGeoDistanceAndCreatedAtRangeAndType(anyString(), anyDouble(), anyDouble(), anyString(), anyString(), anyString());
+		verify(markerReader, times(1)).findMarkersByGeoDistanceAndCreatedAtRangeAndType(anyString(), anyDouble(),
+			anyDouble(), anyString(), anyString(), anyString());
 	}
 }
 

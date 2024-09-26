@@ -33,10 +33,9 @@ public class DogController {
 
 	private final DogService dogService;
 
-	@ResponseStatus(HttpStatus.CREATED)
 	@PostMapping("/dogs")
-	public void findUserInfo(@RequestBody DogCreateRequest dogCreateRequest) {
-		dogService.createDogProcess(dogCreateRequest);
+	public ResponseEntity<DogResponse> findUserInfo(@RequestBody DogCreateRequest dogCreateRequest) {
+		return ResponseEntity.status(HttpStatus.CREATED).body(dogService.createDogProcess(dogCreateRequest));
 	}
 
 	@GetMapping("/{userId}/dogs")

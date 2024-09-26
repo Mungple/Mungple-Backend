@@ -20,10 +20,11 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 	private final JwtAuthenticationHelper jwtAuthenticationHelper;
 
 	@Override
-	public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws
+	public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
+		Authentication authentication) throws
 		IOException {
 
-		CustomOAuth2User oAuth2User = (CustomOAuth2User) authentication.getPrincipal();
+		CustomOAuth2User oAuth2User = (CustomOAuth2User)authentication.getPrincipal();
 		User user = oAuth2User.getUser();
 
 		String accessToken = jwtAuthenticationHelper.createAccessToken(user.getUserId());

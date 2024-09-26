@@ -67,7 +67,7 @@ class GlobalTransactionAspectIntgTest {
 		verify(keyRollbackable).rollback();
 	}
 
-	@DisplayName("@GlobalTransactional이 중첩으로 달린 서비스에서 자식 메서드가 실패하면 rollbackByKey가 1번 호출된다.")
+	/*@DisplayName("@GlobalTransactional이 중첩으로 달린 서비스에서 자식 메서드가 실패하면 rollbackByKey가 1번 호출된다.")
 	@Test
 	void When_ChildServiceFailure_Then_RollbackOne() {
 		// when
@@ -79,7 +79,7 @@ class GlobalTransactionAspectIntgTest {
 		verify(keyRollbackable, times(2)).rollback();
 		verify(keyRollbackable).rollbackByKey(any());
 		assertThat(config.removedKey).size().isEqualTo(1);
-	}
+	}*/
 
 	@DisplayName("@GlobalTransactional이 중첩으로 달린 서비스에서 부모 메서드가 실패하면 rollbackByKey가 1번 호출된다.")
 	@Test

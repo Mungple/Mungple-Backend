@@ -22,7 +22,7 @@ import com.e106.mungplace.web.util.JwtAuthenticationHelper;
 public class SecurityConfig {
 
 	private static final String[] AUTH_WHITELIST = {
-		"/api/users/login/*",
+		"/users/login/*",
 		"/oauth2/callback/*",
 		"/h2-console/**",
 		"/manager/**",
@@ -55,7 +55,7 @@ public class SecurityConfig {
 			)
 			.oauth2Login(oauth2 -> oauth2
 				.authorizationEndpoint(endpoint ->
-					endpoint.baseUri("/api/users/login"))
+					endpoint.baseUri("/users/login"))
 				.redirectionEndpoint(endpoint ->
 					endpoint.baseUri("/oauth2/callback/*")
 				).userInfoEndpoint(endpoint ->

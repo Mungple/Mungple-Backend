@@ -1,7 +1,8 @@
 package com.e106.mungplace.web.dogs.dto;
 
-import com.e106.mungplace.domain.dogs.entity.Dog;
 import java.util.Date;
+
+import com.e106.mungplace.domain.dogs.entity.Dog;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

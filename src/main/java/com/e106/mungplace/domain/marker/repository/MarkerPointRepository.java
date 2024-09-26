@@ -13,64 +13,67 @@ import com.e106.mungplace.web.marker.dto.RequestMarkerType;
 public interface MarkerPointRepository extends ElasticsearchRepository<MarkerPoint, UUID> {
 
 	List<MarkerPoint> findByPointNear(GeoPoint point, String distance);
+
 	List<MarkerPoint> findByPointNearAndType(GeoPoint point, String distance, RequestMarkerType type);
 
 	@Query("""
-        {
-          "bool": {
-            "must": [
-              {
-                "geo_distance": {
-                  "distance": "?0",
-                  "point": {
-                    "lat": ?1,
-                    "lon": ?2
-                  }
-                }
-              },
-              {
-                "range": {
-                  "createdAt": {
-                    "gte": "?3",
-                    "lte": "?4"
-                  }
-                }
-              }
-            ]
-          }
-        }
-    """)
-	List<MarkerPoint> findMarkersByGeoDistanceAndCreatedAtRange(String distance, double lat, double lon, String gte, String lte);
+		    {
+		      "bool": {
+		        "must": [
+		          {
+		            "geo_distance": {
+		              "distance": "?0",
+		              "point": {
+		                "lat": ?1,
+		                "lon": ?2
+		              }
+		            }
+		          },
+		          {
+		            "range": {
+		              "createdAt": {
+		                "gte": "?3",
+		                "lte": "?4"
+		              }
+		            }
+		          }
+		        ]
+		      }
+		    }
+		""")
+	List<MarkerPoint> findMarkersByGeoDistanceAndCreatedAtRange(String distance, double lat, double lon, String gte,
+		String lte);
 
 	@Query("""
-    {
-	  "bool": {
-		"must": [
-		  {
-			"geo_distance": {
-			  "distance": "?0",
-			  "point": {
-				"lat": ?1,
-				"lon": ?2
+		   {
+		  "bool": {
+			"must": [
+			  {
+				"geo_distance": {
+				  "distance": "?0",
+				  "point": {
+					"lat": ?1,
+					"lon": ?2
+				  }
+				}
+			  },
+			  {
+				"range": {
+				  "createdAt": {
+					"gte": "?3",
+					"lte": "?4"
+				  }
+				}
+			  },
+			  {
+				"term": {
+				  "type": "?5"
+				}
 			  }
-			}
-		  },
-		  {
-			"range": {
-			  "createdAt": {
-				"gte": "?3",
-				"lte": "?4"
-			  }
-			}
-		  },
-		  {
-			"term": {
-			  "type": "?5"
-			}
+			]
 		  }
-		]
-	  }
-	}
-	""")
-	List<MarkerPoint> findMarkersByGeoDistanceAndCreatedAtRangeAndType(String distance, double lat, double lon, String gte, String lte, String type);
+		}
+		""")
+	List<MarkerPoint> findMarkersByGeoDistanceAndCreatedAtRangeAndType(String distance, double lat, double lon,
+		String gte, String lte, String type);
 }

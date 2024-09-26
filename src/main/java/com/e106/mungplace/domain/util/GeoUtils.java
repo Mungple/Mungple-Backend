@@ -2,6 +2,7 @@ package com.e106.mungplace.domain.util;
 
 import org.gavaghan.geodesy.Ellipsoid;
 import org.gavaghan.geodesy.GeodeticCalculator;
+import org.gavaghan.geodesy.GeodeticCurve;
 import org.gavaghan.geodesy.GlobalCoordinates;
 import org.locationtech.spatial4j.context.SpatialContext;
 import org.locationtech.spatial4j.io.GeohashUtils;
@@ -27,6 +28,18 @@ public interface GeoUtils {
 	static Point calculateGeohashCenterPoint(String geoHashString) {
 		var center = GeohashUtils.decode(geoHashString, SpatialContext.GEO);
 		return new Point(center.getLat(), center.getLon());
+	}
+
+	static Double calculateDistance(Point previousPoint, Point currentPoint) {
+		GeodeticCalculator calculator = new GeodeticCalculator();
+
+		Ellipsoid reference = Ellipsoid.WGS84;
+		GlobalCoordinates start = new GlobalCoordinates(previousPoint.lat(), previousPoint.lon());
+		GlobalCoordinates end = new GlobalCoordinates(currentPoint.lat(), currentPoint.lon());
+
+		GeodeticCurve geoCurve = calculator.calculateGeodeticCurve(reference, start, end);
+
+		return geoCurve.getEllipsoidalDistance();
 	}
 
 	private static GlobalCoordinates calculateOffset(GlobalCoordinates center, double bearing, double distanceMeters) {

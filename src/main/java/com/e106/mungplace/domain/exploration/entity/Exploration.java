@@ -7,7 +7,15 @@ import java.util.List;
 import com.e106.mungplace.common.audit.BaseTime;
 import com.e106.mungplace.domain.user.entity.User;
 
-import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -45,6 +53,7 @@ public class Exploration extends BaseTime {
 		this.user = user;
 		this.startAt = startAt;
 	}
+
 	public void end(Long distance) {
 		this.distance = distance;
 		this.endAt = LocalDateTime.now();
@@ -53,6 +62,7 @@ public class Exploration extends BaseTime {
 	public void updateId(Long id) {
 		this.id = id;
 	}
+
 	public boolean isEnded() {
 		return endAt != null;
 	}

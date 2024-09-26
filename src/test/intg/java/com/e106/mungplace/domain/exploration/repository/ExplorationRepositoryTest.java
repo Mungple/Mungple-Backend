@@ -69,7 +69,8 @@ class ExplorationRepositoryTest {
 		explorationRepository.save(exploration);
 
 		// when
-		List<Exploration> response = explorationRepository.findByUserIdAndStartAtBetween(user.getUserId(), startDate, endDate);
+		List<Exploration> response = explorationRepository.findByUserIdAndStartAtBetween(user.getUserId(), startDate,
+			endDate);
 
 		// then
 		assertThat(response).hasSize(1);
@@ -87,7 +88,8 @@ class ExplorationRepositoryTest {
 		explorationRepository.save(ongoingExploration);
 
 		// when
-		List<Exploration> response = explorationRepository.findByUserIdAndStartAtBetween(user.getUserId(), startDate, endDate);
+		List<Exploration> response = explorationRepository.findByUserIdAndStartAtBetween(user.getUserId(), startDate,
+			endDate);
 
 		// then
 		assertThat(response).hasSize(1);

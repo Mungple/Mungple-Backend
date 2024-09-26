@@ -47,7 +47,8 @@ public class MarkerController {
 	}
 
 	@GetMapping()
-	public ResponseEntity<GeohashMarkerResponse> getGroupedMarkers(@RequestBody MarkerSearchRequest markerSearchRequest) {
+	public ResponseEntity<GeohashMarkerResponse> getGroupedMarkers(
+		@RequestBody MarkerSearchRequest markerSearchRequest) {
 		return ResponseEntity.ok(markerService.getMarkersGroupedByGeohash(markerSearchRequest));
 	}
 
