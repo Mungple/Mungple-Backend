@@ -1,47 +1,58 @@
 // useMarkersWithinRadius.ts
 import axiosInstance from "@/api/axios";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useMapStore } from "@/state/useMapStore";
+import useUserLocation from "@/hooks/useUserLocation";
 
-const useMarkersWithinRadius = (latitude: number, longitude: number) => {
-  const [loading, setLoading] = useState(true);
-  const setNearbyMarkers = useMapStore((state) => state.setNearbyMarkers); // 상태 업데이트 함수 가져오기
+const nearbyMarkers = () => {
+  // 상태 관리 훅
+  const { setNearbyMarkers, myMarkers } = useMapStore((state) => ({
+    setNearbyMarkers : state.setNearbyMarkers,
+    myMarkers: state.markers,
+  }))
 
-  useEffect(() => {
-    const fetchMarkers = async () => {
-      setLoading(true);
-      try {
-        const response = await axiosInstance.post('/your-endpoint', {
-          radius: 500,
-          latitude,
-          longitude,
-          markerType: "ALL",
-        });
+  // 사용자 위치 설정
+  const { userLocation } = useUserLocation()
 
-        // 마커 데이터 가공
-        const fetchedMarkers = Object.values(response.data.markersGroupedByGeohash).flatMap(group =>
-          group.markers.map(marker => ({
-            markerId: marker.markerId,
-            latitude: group.geohashCenter.lat,
-            longitude: group.geohashCenter.lon,
-            type: marker.type,
-            // 필요에 따라 title, body 추가
-          }))
-        );
+  // 주변 마커 가져오기
+  const fetchNearbyMarkers = async () => {
+    try {
+      const response = await axiosInstance.get('/markers', {
+        headers : {
+          'Content-Type' : 'application/json; charset=utf8',
+        },
+        data : {
+          radius: 500, // 값을 뭘 주든 500m 참조함
+          latitude : userLocation.latitude,
+          longitude : userLocation.longitude,
+          markerType : 'ALL'
+        },
+      })
 
-        // Zustand 상태에 저장
-        setNearbyMarkers(fetchedMarkers);
-      } catch (error) {
-        console.error('마커 가져오기 실패', error);
-      } finally {
-        setLoading(false);
+      const nearbyMarkersFromServer = response.data.markerGroupedByGeohash
+      const flattenedMarkers = []
+
+      // 마커 데이터 평탄화 
+      for (const geohash in nearbyMarkersFromServer) {
+        flattenedMarkers.push(...nearbyMarkersFromServer[geohash].markers)
       }
-    };
 
-    fetchMarkers();
-  }, [latitude, longitude, setNearbyMarkers]);
+      // 내 마커와 서버에서 가져온 마커를 통합
+      const allMarkers = [...myMarkers, ...flattenedMarkers]
 
-  return { loading };
-};
+      // 상태 업데이트
+      setNearbyMarkers(allMarkers)
+    } catch (error) {
+      console.error("주변 마커 조회에 실패함", error)
+    }
+  }
 
-export default useMarkersWithinRadius;
+  // 컴포넌트 마운트 시 주변 마커 조회
+  useEffect(() => {
+    fetchNearbyMarkers()
+  }, [])
+
+  return null // 여기선 상태 관리만 하니까 렌더링 필요 x
+}
+
+export default nearbyMarkers
