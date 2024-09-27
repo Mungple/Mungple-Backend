@@ -14,12 +14,7 @@ interface AppState {
 export const useAppStore = create<AppState>(set => ({
   token: '',
   isLogin: false,
-  exploration: {
-    explorationId: 0,
-    distance: 0,
-    startAt: new Date(2000, 1, 1),
-    endAt: new Date(2000, 1, 1),
-  },
+  exploration: {explorationId: 0, distance: 0, startAt: '', endAt: ''},
   walkingStart: false,
   setToken: (value: string) => set({token: value}),
   setLogin: (value: boolean) => set({isLogin: value}),

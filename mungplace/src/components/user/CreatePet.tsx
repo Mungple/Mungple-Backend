@@ -5,28 +5,30 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import {colors} from '@/constants';
 import useForm from '@/hooks/useForm';
 import {Keyboard, KeyboardAvoidingView, Text} from 'react-native';
-import {createPetProfile} from '@/api';
+import {createPetProfile, editPetProfile} from '@/api';
 import useModal from '@/hooks/useModal';
 import useImagePicker from '@/hooks/useImagePicker';
 import CustomButton from '@/components/common/CustomButton';
 import CustomInputField from '@/components/common/CustomInputField';
 import EditProfileImageOption from '@/components/setting/EditProfileImageOption';
 import RadioButtonGroup from '../common/RadioButtonGroup';
-import { validateInputPet } from '@/utils';
+import {validateInputPet} from '@/utils';
+import {ResponsePetProfile} from '@/types';
 
 type CreatePetProps = {
-  modalVisible: boolean;
-  setModalVisible: (visible: boolean) => void; 
+  setModalVisible: (visible: boolean) => void;
+  isEdit?: boolean;
+  petData?: Partial<ResponsePetProfile>;
 }
 
-const CreatePet = ({modalVisible, setModalVisible}: CreatePetProps) => {
+const CreatePet = ({setModalVisible, isEdit = false, petData}: CreatePetProps) => {
   const imageOption = useModal();
   const inputUser = useForm({
     initialValue: {
-      petName: '',
-      petGender: 'MALE',
-      petWeight: 0,
-      petBirth: '',
+      petName: petData?.name || '',
+      petGender: petData?.gender || 'MALE',
+      petWeight: petData?.weight || 0,
+      petBirth: petData?.birth || '',
     },
     validate: validateInputPet,
   })
@@ -53,8 +55,11 @@ const CreatePet = ({modalVisible, setModalVisible}: CreatePetProps) => {
       ...inputUser.values,
       petWeight: Number(inputUser.values.petWeight),
     });
-    console.log(submitData)
-    createPetProfile(submitData);
+    if (isEdit && petData?.id) {
+      editPetProfile(petData.id, submitData)
+    } else {
+      createPetProfile(submitData);
+    }
     setModalVisible(false)
   };
 

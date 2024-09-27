@@ -70,7 +70,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
   const [isDisabled, setIsDisabled] = useState(true);
   const {isUserLocationError} = useUserLocation();
   const [isSettingModalVisible, setIsSettingModalVisible] = useState(false) // 환경 설정에 쓰는 모달 가시성
-
+  const { loading } = useMarkersWithinRadius(userLocation.latitude, userLocation.longitude)
   // Fetch zones data
   useEffect(() => {
     fetchAllZones(userLocation);
