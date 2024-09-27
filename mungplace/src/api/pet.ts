@@ -1,4 +1,4 @@
-import {RequestPetProfile, ResponsePetProfile} from '@/types';
+import {ResponsePetProfile} from '@/types';
 import axiosInstance from './axios';
 
 // 반려견 정보 등록 함수
@@ -32,12 +32,18 @@ const getPetProfiles = async (userId: number): Promise<ResponsePetProfile[]> => 
 };
 
 // 반려견 정보 수정 함수
-const editPetProfile = async (
-  dogId: number,
-  body: Partial<RequestPetProfile>,
-): Promise<ResponsePetProfile[]> => {
-  const {data} = await axiosInstance.patch(`/users/dogs/${dogId}`, body);
-  return data;
+const editPetProfile = async (dogId: number, JSON: string): Promise<ResponsePetProfile[]> => {
+  try {
+    const {data} = await axiosInstance.put(`/users/dogs/${dogId}`, JSON, {
+      headers: {
+        'Content-Type': `application/json; charset=utf8`,
+      },
+    });
+    return data;
+  } catch (error) {
+    console.log('반려견 정보 변경 실패 :', error);
+    throw error;
+  };
 };
 
 // 반려견 정보 삭제 함수

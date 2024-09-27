@@ -58,8 +58,8 @@ interface ResponsePetProfile {
 interface Exploration {
   explorationId: number;
   distance: number;
-  startAt: Date;
-  endAt: Date;
+  startAt: string;
+  endAt: string;
 }
 
 export type {

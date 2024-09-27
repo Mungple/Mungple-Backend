@@ -11,7 +11,7 @@ const startWalk = async (JSON: string) => {
     });
     return data;
   } catch (error) {
-    console.log('반려견 정보 등록 실패 :', error)
+    console.log('산책 시작 실패 :', error)
     throw error
   }
 };
