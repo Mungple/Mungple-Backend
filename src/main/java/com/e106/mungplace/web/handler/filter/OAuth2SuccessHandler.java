@@ -2,6 +2,7 @@ package com.e106.mungplace.web.handler.filter;
 
 import java.io.IOException;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
@@ -17,6 +18,11 @@ import lombok.RequiredArgsConstructor;
 @Component
 public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
+	static final String REDIRECT_URI = "/auth/oauth-response";
+
+	@Value("${server.back-uri}")
+	private String serverUrl;
+
 	private final JwtAuthenticationHelper jwtAuthenticationHelper;
 
 	@Override
@@ -29,7 +35,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
 		String accessToken = jwtAuthenticationHelper.createAccessToken(user.getUserId());
 		// TODO: <홍성우> 프로튼와 합의해서 변경 임시
-		String redirectUrl = "http://localhost:8080" + "/auth/oauth-response";
+		String redirectUrl = serverUrl + REDIRECT_URI;
 		response.setHeader("Authorization", "Bearer " + accessToken);
 		response.sendRedirect(redirectUrl);
 
