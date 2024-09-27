@@ -2,81 +2,95 @@ import {useState, useEffect, useCallback} from 'react';
 import {Client} from '@stomp/stompjs';
 import axios from 'axios';
 
-interface ToLocation {
-  latitude: number;
-  longitude: number;
-  timestamp: number;
-}
-
-interface ToMyBlueZone {
-  userId: number;
-  latitude: number;
-  longitude: number;
-  radius: number;
-  year: number;
-  month: number;
-}
-
-interface ToAllUserZone {
-  latitude: number;
-  longitude: number;
-  radius: number;
-}
-
-interface ErrorMessage {
-  errorCode: string;
-  message: string;
-}
-
 interface Point {
   latitude: number;
   longitude: number;
+}
+
+interface Cell {
+  point: Point;
   weight: number;
 }
 
-interface Zone {
-  radius: number; // 단위는 미터(m)
-  points: Point[];
+// SEND: 산책 위치 정보
+interface ToLocation {
+  lat: number;
+  lon: number;
+  recordedAt: string;
+}
+// SEND: 개인 블루존, 블루존, 레드존
+interface ToZone {
+  side: number;
+  point: {
+    lat: number;
+    lon: number;
+  };
+}
+// RECEIVE: 개인 블루존, 블루존, 레드존
+interface FromZone {
+  cells: Cell[];
 }
 
 interface MungZone {
   points: Point[];
 }
+// RECEIVE: 에러 메시지
+interface ErrorMessage {
+  errorCode: string;
+  message: string;
+}
 
 // WebSocket 서버 URI
-const WEBSOCKET_URI = 'ws://localhost:8080/ws';
+const WEBSOCKET_URI = 'wss://j11e106.p.ssafy.io/api/ws';
 
 // JWT 토큰을 가져오는 함수
 const getJwtToken = async () => {
   try {
     const response = await axios.post(
-      `http://localhost:8080/manager/login?username=manager`,
+      `https://j11e106.p.ssafy.io/api/manager/login?username=manager`,
     );
+    console.log('JWT Token을 가져오기 성공했습니다.');
     return response.data.accessToken;
   } catch (error) {
-    console.error('Error fetching JWT token:', error);
-    throw error;
+    console.error('JWT Token을 가져오는 데 실패했습니다.', error);
   }
 };
 
-const useWebSocket = (explorationId: number = -1, userId: number = -1) => {
+const useWebSocket = (explorationId: number = -1) => {
   const [clientSocket, setClientSocket] = useState<Client | null>(null);
   const [explorations, setExplorations] = useState<ErrorMessage | null>(null);
-  const [myBlueZone, setMyBlueZone] = useState<Zone | null>(null);
-  const [allBlueZone, setAllBlueZone] = useState<Zone | null>(null);
-  const [allRedZone, setAllRedZone] = useState<Zone | null>(null);
+  const [myBlueZone, setMyBlueZone] = useState<FromZone | null>(null);
+  const [allBlueZone, setAllBlueZone] = useState<FromZone | null>(null);
+  const [allRedZone, setAllRedZone] = useState<FromZone | null>(null);
   const [mungZone, setMungZone] = useState<MungZone | null>(null);
 
   useEffect(() => {
     const connectWebsocket = async () => {
       try {
-        const token = await getJwtToken();
+        let token = await getJwtToken();
+        let tries = 0;
+
+        while (!token && tries < 3) {
+          console.log('토큰이 없습니다. 재시도 중...');
+          token = await getJwtToken();
+          tries++;
+        }
+
+        if (!token) {
+          console.error(
+            '토큰을 가져올 수 없어 소켓 연결을 시도할 수 없습니다.',
+          );
+          return;
+        }
 
         const socket = new Client({
           webSocketFactory: () =>
-            new WebSocket(`${WEBSOCKET_URI}?token=${token}`),
+            new WebSocket(`${WEBSOCKET_URI}?Authorization=${token}`),
           debug: str => {
             console.log(str);
+          },
+          beforeConnect: () => {
+            console.log('소켓 연결 시도 중');
           },
           appendMissingNULLonIncoming: true, // 서버로부터 받은 메시지에 NULL 문자가 없을 때 추가(RN Polyfill)
           forceBinaryWSFrames: true, // WebSocket 프레임을 항상 바이너리로 설정(RN Polyfill)
@@ -87,44 +101,55 @@ const useWebSocket = (explorationId: number = -1, userId: number = -1) => {
           onConnect: () => {
             console.log('소켓 연결 성공');
             setClientSocket(socket);
-            // 산책 기록 위치 수집
-            socket.subscribe(`sub/explorations/${explorationId}`, message => {
-              try {
-                const parsedMessage = JSON.parse(message.body) as ErrorMessage;
-                setExplorations(parsedMessage);
-              } catch (e) {
-                console.log(e);
-              }
+            // 에러 메시지 수신
+            socket.subscribe('/user/sub/errors', message => {
+              console.error('Error message received:', message.body);
             });
+
+            // 산책 기록 위치 수집
+            socket.subscribe(
+              `/user/sub/exploration/${explorationId}`,
+              message => {
+                try {
+                  const parsedMessage = JSON.parse(
+                    message.body,
+                  ) as ErrorMessage;
+                  setExplorations(parsedMessage);
+                } catch (e) {
+                  console.log(e);
+                }
+              },
+            );
             // 개인 블루존 조회
-            socket.subscribe(`sub/users/${userId}/bluezone`, message => {
+            socket.subscribe('/user/sub/users/bluezone', message => {
               try {
-                const parsedMessage = JSON.parse(message.body) as Zone;
+                const parsedMessage = JSON.parse(message.body) as FromZone;
                 setMyBlueZone(parsedMessage);
               } catch (e) {
                 console.log(e);
               }
             });
             // 전체 블루존 조회
-            socket.subscribe('sub/bluezone', message => {
+            socket.subscribe('/user/sub/bluezone', message => {
               try {
-                const parsedMessage = JSON.parse(message.body) as Zone;
+                const parsedMessage = JSON.parse(message.body) as FromZone;
+                // console.log(parsedMessage);
                 setAllBlueZone(parsedMessage);
               } catch (e) {
                 console.log(e);
               }
             });
             // 전체 레드존 조회
-            socket.subscribe('sub/redzone', message => {
+            socket.subscribe('/user/sub/redzone', message => {
               try {
-                const parsedMessage = JSON.parse(message.body) as Zone;
+                const parsedMessage = JSON.parse(message.body) as FromZone;
                 setAllRedZone(parsedMessage);
               } catch (e) {
                 console.log(e);
               }
             });
             // 멍플 조회
-            socket.subscribe('sub/mungplace', message => {
+            socket.subscribe('/user/sub/mungplace', message => {
               try {
                 const parsedMessage = JSON.parse(message.body) as MungZone;
                 setMungZone(parsedMessage);
@@ -154,13 +179,13 @@ const useWebSocket = (explorationId: number = -1, userId: number = -1) => {
       };
     };
     connectWebsocket();
-  }, [explorationId, userId]);
+  }, [explorationId]);
 
   const sendLocation = useCallback(
     (explorationId: number, location: ToLocation) => {
       if (clientSocket && clientSocket.connected) {
         clientSocket.publish({
-          destination: `pub/explorations/${explorationId}`,
+          destination: `/user/pub/explorations/${explorationId}`,
           body: JSON.stringify(location),
         });
       } else {
@@ -171,10 +196,10 @@ const useWebSocket = (explorationId: number = -1, userId: number = -1) => {
   );
 
   const checkMyBlueZone = useCallback(
-    (myBlueZone: ToMyBlueZone) => {
+    (myBlueZone: ToZone) => {
       if (clientSocket && clientSocket.connected) {
         clientSocket.publish({
-          destination: `pub/users/${myBlueZone.userId}/bluezone`,
+          destination: '/user/pub/users/bluezone',
           body: JSON.stringify(myBlueZone),
         });
       } else {
@@ -185,12 +210,12 @@ const useWebSocket = (explorationId: number = -1, userId: number = -1) => {
   );
 
   const checkAllUserZone = useCallback(
-    (zoneType: number, allUserZone: ToAllUserZone) => {
+    (zoneType: number, allUserZone: ToZone) => {
       if (clientSocket && clientSocket.connected) {
         // zoneType: 0(블루존), 1(레드존)
         if (zoneType === 0) {
           clientSocket.publish({
-            destination: 'pub/bluezone',
+            destination: '/pub/bluezone',
             body: JSON.stringify(allUserZone),
           });
         } else if (zoneType === 1) {
@@ -207,10 +232,10 @@ const useWebSocket = (explorationId: number = -1, userId: number = -1) => {
   );
 
   const checkMungPlace = useCallback(
-    (allUserZone: ToAllUserZone) => {
+    (allUserZone: ToZone) => {
       if (clientSocket && clientSocket.connected) {
         clientSocket.publish({
-          destination: 'pub/mungplace',
+          destination: '/user/pub/mungplace',
           body: JSON.stringify(allUserZone),
         });
       } else {
