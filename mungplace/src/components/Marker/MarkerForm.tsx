@@ -103,7 +103,10 @@ const MarkerForm: React.FC<MarkerFormProps> = ({ isVisible, onSubmit, onClose, l
   
 
   return (
-    <CustomModal modalVisible={isVisible}>
+    <CustomModal 
+      modalVisible={isVisible}
+      setModalVisible={onClose}
+    >
       <View>
         <View>
           <TextInput

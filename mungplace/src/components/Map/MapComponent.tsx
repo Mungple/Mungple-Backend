@@ -1,5 +1,5 @@
 import React, {useRef, useEffect, useState} from 'react';
-import {Animated, StyleSheet, Image, Text, FlatList, TouchableOpacity, View, Button } from 'react-native';
+import {Animated, StyleSheet, Image } from 'react-native';
 import MapView, {
   Marker,
   Polyline,
@@ -7,7 +7,6 @@ import MapView, {
 } from 'react-native-maps';
 import HeatmapLayer from './HeatmapLayer'; // 히트맵
 import ClusteredMapView from 'react-native-map-clustering' // 클러스터링 라이브러리
-import useMarkersWithinRadius from './NearbyMarkers';
 import styled from 'styled-components/native';
 import { useMapStore, MarkerData} from '@/state/useMapStore'; // zustand
 import usePermission from '@/hooks/usePermission'; // 퍼미션
@@ -53,6 +52,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
     globalBlueZones,
     redZones,
     mungPlaces,
+    nearbyMarkers,
     //markers,
     addMarker,
     fetchPersonalBlueZone,
@@ -62,20 +62,15 @@ const MapComponent: React.FC<MapComponentProps> = ({
   } = useMapStore();
 
   const navigation = useNavigation()
-  const markers = useMapStore((state) => state.markers)
   const mapRef = useRef<MapView | null>(null);
   const [isMenuVisible, setIsMenuVisible] = useState(false);
-  // const [selectedCluster, setSelectedCluster ] = useState<UserMarker[] | null>(null) // 클러스터 
-  // const [selectedMarker, setSelectedMarker ] = useState<UserMarker[] | null>(null) // 클러스터 리스트 내에서 선택된 마커
-  // const [ isClusterModalVisible, setClusterModalVisible ] = useState(false) // 클러스터 클릭 시 모달 가시성 여부
-  // const [ isMarkerModalVisible, setMarkerModalVisible ] = useState(false) // 마커 상세 정보 모달 가시성 여부 
   const [formVisible, setFormVisible] = useState(false); // 마커폼 가시성 함수
   const translateY = useRef(new Animated.Value(0)).current;
   const opacity = useRef(new Animated.Value(0)).current;
   const [isDisabled, setIsDisabled] = useState(true);
   const {isUserLocationError} = useUserLocation();
   const [isSettingModalVisible, setIsSettingModalVisible] = useState(false) // 환경 설정에 쓰는 모달 가시성
-  const { loading } = useMarkersWithinRadius(userLocation.latitude, userLocation.longitude)
+
   // Fetch zones data
   useEffect(() => {
     fetchAllZones(userLocation);
@@ -109,6 +104,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
   // 마커 클릭 시 호출되는 함수 (상세정보 호출)
   const handleMarkerClick = (markerId : string ) => {
     navigation.navigate(mapNavigations.MARKERDETAIL, { markerId })
+    console.log(`마커 클릭 : ${markerId}`)
   }
 
   // 메뉴 햄버거 바 클릭 시 호출되는 함수
@@ -160,18 +156,16 @@ const MapComponent: React.FC<MapComponentProps> = ({
         clusteringEnabled={true}
         clusterColor={colors.ORANGE.DARKER}
         >
-        {markers && markers.length > 0 && markers.map((markerGroup) => (
+        {nearbyMarkers && nearbyMarkers.length > 0 && nearbyMarkers.map((marker) => (
         <Marker
-          key={markerGroup.markerId}
+          key={marker.markerId}
           coordinate={{
-            latitude: markerGroup.latitude,
-            longitude: markerGroup.longitude
+            latitude: marker.latitude,
+            longitude: marker.longitude,
           }}
-          onPress={() => {
-            console.log('상세 모달 열기') 
-            handleMarkerClick(markerGroup.markerId)}}
+          onPress={() => handleMarkerClick(marker.markerId)}
         >
-          <Image source={markerGroup.type === 'BLUE' ? blueMarker : redMarker } style={styles.markerImage} />
+          <Image source={marker.type === 'BLUE' ? blueMarker : redMarker } style={styles.markerImage} />
         </ Marker>
         ))}
 
