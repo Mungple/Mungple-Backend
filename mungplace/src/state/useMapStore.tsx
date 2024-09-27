@@ -56,6 +56,7 @@ interface MapState {
   fetchRedZone: (latitude: number, longitude: number) => void;
   fetchMungPlace: (latitude: number, longitude: number) => void;
   addMarker: (marker: MarkerData) => void; // 마커 추가용 함수
+  setNearbyMarkers: (markers: MarkerData[]) => void // 주변 마커 설정 함수인데 수정필요할듯
 }
 
 
@@ -141,4 +142,6 @@ export const useMapStore = create<MapState>((set) => ({
   addMarker: (marker) => set((state) => ({
     markers: [...state.markers, marker],
   })),
+
+  setNearbyMarkers: (nearbyMarkers) => set({ markers: nearbyMarkers }) // 주변 마커 설정
 }));
