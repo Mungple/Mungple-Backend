@@ -18,7 +18,7 @@ import lombok.RequiredArgsConstructor;
 @Component
 public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
-	static final String REDIRECT_URI = "/api/auth/oauth-response";
+	static final String REDIRECT_URI = "/api/auth/oauth-response-";
 
 	@Value("${server.back-uri}")
 	private String serverUrl;
@@ -27,17 +27,14 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
 	@Override
 	public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
-		Authentication authentication) throws
-		IOException {
+		Authentication authentication) throws IOException {
 
 		CustomOAuth2User oAuth2User = (CustomOAuth2User)authentication.getPrincipal();
 		User user = oAuth2User.getUser();
 
 		String accessToken = jwtAuthenticationHelper.createAccessToken(user.getUserId());
-		// TODO: <홍성우> 프로튼와 합의해서 변경 임시
 		String redirectUrl = serverUrl + REDIRECT_URI;
-		response.setHeader("Authorization", "Bearer " + accessToken);
-		response.sendRedirect(redirectUrl);
 
+		response.sendRedirect(redirectUrl  + accessToken);
 	}
 }
