@@ -46,7 +46,8 @@ interface MapState {
   globalBlueZones: Zone[];
   redZones: Zone[];
   mungPlaces: Zone[];
-  markers: MarkerData[] // 마커를 따로 추가할거임
+  markers: MarkerData[] // 이게 myMarkers랑 동일함, 즉 내 마커
+  nearbyMarkers: MarkerData[] // 주변 마커, 마커랑 통합할 지 고민
   togglePersonalBlueZone: () => void; // toggle이 붙은 함수 => 토글할거임
   toggleGlobalBlueZone: () => void;
   toggleRedZone: () => void;
@@ -57,6 +58,7 @@ interface MapState {
   fetchMungPlace: (latitude: number, longitude: number) => void;
   addMarker: (marker: MarkerData) => void; // 마커 추가용 함수
   setNearbyMarkers: (markers: MarkerData[]) => void // 주변 마커 설정 함수인데 수정필요할듯
+  setMarkers: (markers: MarkerData[] ) => void
 }
 
 
@@ -71,7 +73,8 @@ export const useMapStore = create<MapState>((set) => ({
   globalBlueZones: [],
   redZones: [],
   mungPlaces: [],
-  markers: [], 
+  markers: [], // 내 마커
+  nearbyMarkers: [], // 주변 마커 (내 마커 + 다른 사용자 마커)
 
   togglePersonalBlueZone: () => set((state) => ({ showPersonalBlueZone: !state.showPersonalBlueZone })),
   toggleGlobalBlueZone: () => set((state) => ({ showGlobalBlueZone: !state.showGlobalBlueZone })),
@@ -141,7 +144,9 @@ export const useMapStore = create<MapState>((set) => ({
 
   addMarker: (marker) => set((state) => ({
     markers: [...state.markers, marker],
+    nearbyMarkers: [...state.nearbyMarkers, marker],
   })),
 
-  setNearbyMarkers: (nearbyMarkers) => set({ markers: nearbyMarkers }) // 주변 마커 설정
+  setNearbyMarkers: (markers) => set({ nearbyMarkers: markers }), // 주변 마커 설정
+  setMarkers: (markers) => set({ markers: markers})
 }));
