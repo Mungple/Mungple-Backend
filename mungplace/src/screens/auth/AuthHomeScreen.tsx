@@ -10,7 +10,7 @@ import naverLogo from '@/assets/naver_login_button.png';
 import googleLogo from '@/assets/google_login_button.png';
 import {AuthStackParamList} from '@/navigations/stack/AuthStackNavigator';
 import CustomButton from '@/components/common/CustomButton';
-import { useAppStore } from '@/state/useAppStore';
+import {useAppStore} from '@/state/useAppStore';
 
 type AuthHomeScreenProps = NativeStackScreenProps<AuthStackParamList, typeof authNavigations.AUTH_HOME>;
 
