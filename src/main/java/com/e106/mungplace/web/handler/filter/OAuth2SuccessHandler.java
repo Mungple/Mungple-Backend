@@ -18,7 +18,7 @@ import lombok.RequiredArgsConstructor;
 @Component
 public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
-	static final String REDIRECT_URI = "/auth/oauth-response";
+	static final String REDIRECT_URI = "/api/auth/oauth-response";
 
 	@Value("${server.back-uri}")
 	private String serverUrl;
