@@ -1,11 +1,14 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import {useFocusEffect} from '@react-navigation/native';
+
 import styled from 'styled-components/native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 import {colors} from '@/constants';
 import Calendar from '@/components/calender/Calendar';
 import {getMonthYearDetails, getNewMonthYear} from '@/utils/date';
+
+import MonthStatistics from '@/components/record/MonthStatistics';
 import CustomHeader from '@/components/common/CustomHeader';
 
 import {getMonthWalks} from '@/api/walk';
@@ -72,39 +75,9 @@ const RecordScreen = () => {
       />
 
       <Footer>
-        <FooterText>산책 정보</FooterText>
+        <FooterText>월간 통계</FooterText>
       </Footer>
-      <InfoContainer>
-        <InfoItem>
-          <InfoHeader>
-            <MaterialIcons name="timer" size={24} color={colors.ORANGE.BASE} />
-            <InfoText>소요 시간</InfoText>
-          </InfoHeader>
-          <InfoDetail>45m 32s</InfoDetail>
-        </InfoItem>
-        <InfoItem>
-          <InfoHeader>
-            <MaterialIcons
-              name="directions-walk"
-              size={24}
-              color={colors.ORANGE.BASE}
-            />
-            <InfoText>산책 거리</InfoText>
-          </InfoHeader>
-          <InfoDetail>2.5km</InfoDetail>
-        </InfoItem>
-        <InfoItem>
-          <InfoHeader>
-            <MaterialIcons
-              name="pin-drop"
-              size={24}
-              color={colors.ORANGE.BASE}
-            />
-            <InfoText>등록 마커</InfoText>
-          </InfoHeader>
-          <InfoDetail>2개</InfoDetail>
-        </InfoItem>
-      </InfoContainer>
+      <MonthStatistics />
     </Container>
   );
 };
