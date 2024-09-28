@@ -22,13 +22,13 @@ const DateBox = ({
   onPressDate,
 }: DateBoxProps) => {
   return (
-    <DatePressable isSelected={selectedDate === date} onPress={() => onPressDate(date)}>
+    <DatePressable
+      isSelected={selectedDate === date}
+      onPress={() => onPressDate(date)}>
       {date > 0 && (
         <>
           <DateContainer isToday={isToday}>
-            <DateText
-              isToday={isToday}
-              isSelected={selectedDate === date}>
+            <DateText isToday={isToday} isSelected={selectedDate === date}>
               {date}
             </DateText>
           </DateContainer>
@@ -44,7 +44,8 @@ const DatePressable = styled(Pressable)<{isSelected: boolean}>`
   border-radius: 8px;
   width: ${deviceWidth / 7}px;
   height: ${deviceWidth / 7 + 12}px;
-  border: ${({isSelected}) =>isSelected ? `2px solid ${colors.ORANGE.BASE}` : 'none'};
+  border: ${({isSelected}) =>
+    isSelected ? `2px solid ${colors.ORANGE.BASE}` : 'none'};
 `;
 
 const DateContainer = styled.View<{isToday: boolean}>`
@@ -54,13 +55,15 @@ const DateContainer = styled.View<{isToday: boolean}>`
   width: 28px;
   height: 32px;
   border-radius: 8px;
-  background-color: ${({isToday}) => isToday ? colors.ORANGE.BASE : 'transparent'};
+  background-color: ${({isToday}) =>
+    isToday ? colors.ORANGE.BASE : 'transparent'};
 `;
 
-const DateText = styled.Text<{isToday: boolean; isSelected: boolean;}>`
+const DateText = styled.Text<{isToday: boolean; isSelected: boolean}>`
   font-size: 17px;
-  color: ${({isToday}) => isToday ? colors.WHITE : colors.BLACK};
-  font-weight: ${({isToday, isSelected}) => isToday || isSelected ? 'bold' : 'normal'};
+  color: ${({isToday}) => (isToday ? colors.WHITE : colors.BLACK)};
+  font-weight: ${({isToday, isSelected}) =>
+    isToday || isSelected ? 'bold' : 'normal'};
 `;
 
 const ScheduleIndicator = styled.View`

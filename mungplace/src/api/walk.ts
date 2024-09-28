@@ -1,8 +1,8 @@
 import axiosInstance from './axios';
 
 interface MonthWorks {
-  month: number;
   year: number;
+  month: number;
 }
 
 // 산책 시작 함수

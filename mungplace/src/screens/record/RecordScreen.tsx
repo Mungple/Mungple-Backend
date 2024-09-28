@@ -5,7 +5,7 @@ import styled from 'styled-components/native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 import {colors} from '@/constants';
-import Calendar from '@/components/calender/Calendar';
+import Calendar from '@/components/record/Calendar';
 import {getMonthYearDetails, getNewMonthYear} from '@/utils/date';
 
 import MonthStatistics from '@/components/record/MonthStatistics';
