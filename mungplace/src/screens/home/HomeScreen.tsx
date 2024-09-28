@@ -3,7 +3,7 @@ import {useNavigation} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 
 import * as HS from './HomeScreenStyle';
-import {Dimensions} from 'react-native';
+import {Alert, Dimensions} from 'react-native';
 import {mapNavigations} from '@/constants';
 import PetList from '@/components/user/PetList';
 import {useAppStore} from '@/state/useAppStore';
@@ -27,31 +27,32 @@ const HomeScreen: React.FC = () => {
   const handleModalVisivle = () => {
     setModalVisible(!modalVisible);
   };
-
-  // 산책 시작 함수
-  const handleWalkingStart = () => {
-    if (!isUserLocationError && selectedPets.length > 0) {
-      const walkData = {
-        latitude: userLocation.latitude.toString(),
-        longitude: userLocation.longitude.toString(),
-        dogIds: selectedPets,
-      };
-
-      console.log(JSON.stringify(walkData));
-    }
-
-    setModalVisible(false);
-    setWalkingStart(true);
-    navigation.navigate(mapNavigations.WALKING);
-  };
-
+  
   // 반려견 선택 로직
   const handlePetSelect = (dogId: number) => {
     setSelectedPets(prev =>
       prev.includes(dogId) ? prev.filter(id => id !== dogId) : [...prev, dogId],
-    );
-  };
+      );
+    };
 
+  // 산책 시작 함수
+  const handleWalkingStart = () => {
+    if (!isUserLocationError && selectedPets.length > 0) {
+      const walkData = JSON.stringify({
+        latitude: userLocation.latitude.toString(),
+        longitude: userLocation.longitude.toString(),
+        dogIds: selectedPets,
+      });
+      setModalVisible(false);
+      setWalkingStart(true);
+      navigation.navigate(mapNavigations.WALKING);
+    } else if (isUserLocationError) {
+      Alert.alert('Error', '위치 권한을 허용해주세요')
+    } else {
+      Alert.alert('Error', '반려견을 선택해주세요')
+    }
+  };
+    
   return (
     <HS.Container>
       <HS.ImageCard />

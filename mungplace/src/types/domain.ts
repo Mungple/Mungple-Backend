@@ -55,6 +55,11 @@ interface ResponsePetProfile {
   photo: string | null;
 };
 
+interface StartExplorate {
+  explorationId: number;
+  startAt: Date;
+}
+
 interface Exploration {
   explorationId: number;
   distance: number;
@@ -70,6 +75,7 @@ export type {
   Category,
   Exploration,
   MarkerColor,
+  StartExplorate,
   RequestPetProfile,
   ResponsePetProfile,
 };
