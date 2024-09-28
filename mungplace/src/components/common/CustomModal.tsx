@@ -48,7 +48,7 @@ const Overlay = styled.Pressable`
   background-color: rgba(0, 0, 0, 0.5);
 `;
 
-const ModalContainer = styled.View<{isWide: boolean; height?: number;}>`
+const ModalContainer = styled.Pressable<{isWide: boolean; height?: number;}>`
   flex: 1;
   position: absolute;
   align-items: center;

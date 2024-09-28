@@ -1,40 +1,49 @@
-import React, {useCallback} from 'react';
-import {FlatList, Text, Image as RNImage} from 'react-native';
+import React from 'react';
 import styled from 'styled-components/native';
+import {FlatList, Text, Image as RNImage} from 'react-native';
 
-import {colors} from '@/constants';
 import {ResponsePetProfile} from '@/types';
 import CustomCard from '../common/CustomCard';
 import {useUserStore} from '@/state/useUserStore';
 import DefaultImage from '@/assets/profile-image.png';
+import {colors, settingNavigations} from '@/constants';
+import {SettingStackParamList} from '@/navigations/stack/SettingStackNavigator';
+import { NavigationProp } from '@react-navigation/native';
 
-interface PetListProps {
+type PetListProps = {
+  navigation?: NavigationProp<SettingStackParamList>;
   selectedPets?: number[];
-  handlePetSelect: (dogId: number) => void;
-}
+  homeScreenPress?: (dogId: number) => void;
+};
 
 const PetList: React.FC<PetListProps> = ({
-  handlePetSelect,
+  navigation,
   selectedPets = [],
+  homeScreenPress,
 }) => {
   const data = useUserStore(state => state.petData);
 
-  const renderItem = useCallback(({item}: {item: ResponsePetProfile}) => {
-      const isSelected = selectedPets.includes(item.id);
-      const lastWalkDate = item.birth.slice(0, 10);
+  const renderItem = ({item}: {item: ResponsePetProfile}) => {
+    const isSelected = selectedPets.includes(item.id);
+    const lastWalkDate = item.birth.slice(0, 10);
+    const onPress = () => {
+      if (homeScreenPress) {
+        homeScreenPress(item.id);
+      } else {
+        navigation ? navigation.navigate(settingNavigations.PET_DETAIL, { petData: item }) : null;
+      }
+    };
 
-      return (
-        <DogCard isSelected={isSelected} onPress={() => handlePetSelect(item.id)}>
-          <Image source={item.photo ? {uri: item.photo} : DefaultImage} />
-          <Context>
-            <Title>{item.name}</Title>
-            <Text>마지막 산책일 {lastWalkDate}</Text>
-          </Context>
-        </DogCard>
-      );
-    },
-    [selectedPets, handlePetSelect],
-  );
+    return (
+      <DogCard isSelected={isSelected} onPress={onPress}>
+        <Image source={item.photo ? {uri: item.photo} : DefaultImage} />
+        <Context>
+          <Title>{item.name}</Title>
+          <Text>마지막 산책일 {lastWalkDate}</Text>
+        </Context>
+      </DogCard>
+    );
+  };
 
   return (
     <List
@@ -42,6 +51,7 @@ const PetList: React.FC<PetListProps> = ({
       renderItem={renderItem}
       showsVerticalScrollIndicator={false}
       keyExtractor={item => String(item.id)}
+      contentContainerStyle={{paddingBottom: 10}}
     />
   );
 };
@@ -53,7 +63,7 @@ const List = styled.FlatList`
 ` as unknown as typeof FlatList;
 
 const DogCard = styled(CustomCard)<{isSelected: boolean}>`
-  padding: 14px 20px;
+  padding: 13px 20px;
   align-items: center;
   margin-bottom: 10px;
   flex-direction: row;
@@ -70,13 +80,13 @@ const Image = styled(RNImage)`
 `;
 
 const Context = styled.View`
+  gap: 10px;
   flex-direction: column;
 `;
 
 const Title = styled.Text`
   font-size: 18px;
   font-weight: bold;
-  margin-bottom: 8px;
   color: ${colors.BLACK};
 `;
 

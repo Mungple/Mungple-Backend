@@ -5,19 +5,19 @@ import IonIcons from 'react-native-vector-icons/Ionicons';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 
 import useAuth from '@/hooks/queries/useAuth';
-import {colors, numbers, settingNavigations} from '@/constants';
+import PetList from '@/components/user/PetList';
+import {useUserStore} from '@/state/useUserStore';
+import CreatePet from '@/components/user/CreatePet';
 import useImagePicker from '@/hooks/useImagePicker';
 import ProfileImage from '@/assets/profile-image.png';
-import {SettingStackParamList} from '@/navigations/stack/SettingStackNavigator';
-import PetList from '@/components/user/PetList';
+import {colors, settingNavigations} from '@/constants';
 import CustomCard from '@/components/common/CustomCard';
-import CustomHeader from '@/components/common/CustomHeader';
 import CustomModal from '@/components/common/CustomModal';
+import CustomHeader from '@/components/common/CustomHeader';
 import CustomModalHeader from '@/components/common/CustomModalHeader';
-import CreatePet from '@/components/user/CreatePet';
-import { useUserStore } from '@/state/useUserStore';
+import {SettingStackParamList} from '@/navigations/stack/SettingStackNavigator';
 
-type MyPageScreenProps = NativeStackScreenProps<
+export type MyPageScreenProps = NativeStackScreenProps<
   SettingStackParamList,
   typeof settingNavigations.MY_PAGE
 >;
@@ -28,8 +28,8 @@ const MyPageScreen: React.FC<MyPageScreenProps> = ({navigation}) => {
   // const imageOption = useModal();
   const {useGetProfile} = useAuth();
   const userId = useUserStore(state => state.userId);
+  const [modalVisible, setModalVisible] = useState(false);
   const nickname = userId ? useGetProfile(userId).data?.nickname : '로그인 해주세요';
-  const [modalVisible, setModalVisible] = useState(false)
 
   // 이미지 선택 기능을 위한 커스텀 훅
   // const imagePicker = useImagePicker({
@@ -46,15 +46,13 @@ const MyPageScreen: React.FC<MyPageScreenProps> = ({navigation}) => {
     navigation.navigate(settingNavigations.EDIT_PROFILE);
   };
 
-  const handleAddPetButtonPress = () => {
+  const handleAddPet = () => {
     if (modalVisible) {
-      setModalVisible(false)
+      setModalVisible(false);
     } else {
-      setModalVisible(true)
+      setModalVisible(true);
     }
-  }
-
-  const handlePetSelect = () => {};
+  };
 
   return (
     <Container>
@@ -67,6 +65,7 @@ const MyPageScreen: React.FC<MyPageScreenProps> = ({navigation}) => {
           onPress={handleSettingPress}
         />
       </CustomHeader>
+
       <ProfileCard onPress={handleProfilePress}>
         {/* <ImageContainer>
           {imagePicker.imageNames.length === 0 ? (
@@ -87,24 +86,22 @@ const MyPageScreen: React.FC<MyPageScreenProps> = ({navigation}) => {
       </ProfileCard>
 
       {/* 반려견 목록 */}
-      <ListContainer>
+      <HeaderBox>
         <MenuText>나의 반려견</MenuText>
-        <CreatePetButton onPress={handleAddPetButtonPress}>
-          <CreatePetText>등록</CreatePetText>
-        </CreatePetButton>
-      </ListContainer>
-      <MyPetListContainer>
-        <MyPetList handlePetSelect={handlePetSelect} />
-      </MyPetListContainer>
+        <AddPetButton onPress={handleAddPet}>
+          <AddPetText>등록</AddPetText>
+        </AddPetButton>
+      </HeaderBox>
+
+      <PetListBox>
+        <PetList navigation={navigation}/>
+      </PetListBox>
 
       <CustomModal
         isWide={true}
         modalVisible={modalVisible}
         setModalVisible={setModalVisible}>
-        <CustomModalHeader
-          title='반려견 등록'
-          closeButton={handleAddPetButtonPress}
-        />
+        <CustomModalHeader title="반려견 등록" closeButton={handleAddPet} />
         <CreatePet
           modalVisible={modalVisible}
           setModalVisible={setModalVisible}
@@ -142,23 +139,23 @@ const ImageContainer = styled.View`
   border-radius: 30px;
 `;
 
-const ListContainer = styled.View`
+const HeaderBox = styled.View`
   padding: 0 20px;
   align-items: center;
   flex-direction: row;
   justify-content: center;
 `;
 
-const CreatePetButton = styled.TouchableOpacity`
+const AddPetButton = styled.TouchableOpacity`
   padding: 10px 16px;
   border-radius: 8px;
   background-color: ${colors.ORANGE.BASE};
-`
+`;
 
-const CreatePetText = styled.Text`
+const AddPetText = styled.Text`
   font-weight: bold;
   color: ${colors.WHITE};
-`
+`;
 
 const MenuText = styled.Text`
   flex: 1;
@@ -167,14 +164,9 @@ const MenuText = styled.Text`
   color: ${colors.BLACK};
 `;
 
-const MyPetListContainer = styled.View`
+const PetListBox = styled.View`
+  width: 100%;
   height: ${windowHeight * 0.7}px;
-  width: 100%;
-`;
-
-const MyPetList = styled(PetList)`
-  flex: 1;
-  width: 100%;
 `;
 
 const InfoContainer = styled.View`

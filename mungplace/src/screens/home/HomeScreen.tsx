@@ -74,9 +74,8 @@ const HomeScreen: React.FC = () => {
           title="반려견 선택"
           closeButton={handleModalVisivle}
         />
-        <PetList selectedPets={selectedPets} handlePetSelect={handlePetSelect}>
-          <CustomButton label="산책 시작하기" onPress={handleWalkingStart} />
-        </PetList>
+        <PetList selectedPets={selectedPets} homeScreenPress={handlePetSelect} />
+        <HS.StartButton label="산책 시작하기" onPress={handleWalkingStart} />
       </CustomModal>
     </HS.Container>
   );
