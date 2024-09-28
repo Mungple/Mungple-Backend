@@ -47,12 +47,12 @@ interface RequestPetProfile {
 // 반려견 프로필 조회 응답을 정의한 타입
 interface ResponsePetProfile {
   id: number;
-  default: boolean;
+  isDefault: boolean;
   name: string;
   gender: string;
   weight: number;
   birth: string;
-  photoId: string | null;
+  photo: string | null;
 };
 
 interface Exploration {

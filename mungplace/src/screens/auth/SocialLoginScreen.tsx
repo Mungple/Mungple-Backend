@@ -8,29 +8,30 @@ import {useAppStore} from '@/state/useAppStore';
 import {AuthStackParamList} from '@/navigations/stack/AuthStackNavigator';
 
 type SocialLoginScreenProps = NativeStackScreenProps<AuthStackParamList, 'SocialLogin'>;
+type CustomWebViewNavigation = Omit<WebViewNavigation, 'headers'>
+const domain = 'https://j11e106.p.ssafy.io'
 
 const SocialLoginScreen: React.FC<SocialLoginScreenProps> = ({route}) => {
   const {provider} = route.params;
   const {setLogin} = useAppStore();
   const {loginMutation} = useAuth();
-
-  const handleNavigationStateChange = (event: WebViewNavigation) => {
+  
+  const handleNavigationStateChange = (event: CustomWebViewNavigation) => {
     const url = event.url;
-    if (url.startsWith(`https://j11e106.p.ssafy.io/api/auth/oauth-response/`)) {
-      console.log('hi')
-      loginMutation.mutate(url)
-      setLogin(true)
+    console.log(url)
+    
+    if (url.startsWith(`${domain}/api/auth/oauth-response`)) {
+        loginMutation.mutate(url)
+        console.log(event)
+        setLogin(true)
     }
-  };
+  }
 
   return (
     <Container>
       <WebViewContainer
-        source={{uri: `https://j11e106.p.ssafy.io/api/api/users/login/${provider}`}}
+        source={{uri: `${domain}/api/users/login/${provider}`}}
         onNavigationStateChange={handleNavigationStateChange}
-        startInLoadingState
-        javaScriptEnabled
-        domStorageEnabled
       />
     </Container>
   );
