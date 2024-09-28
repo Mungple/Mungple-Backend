@@ -121,12 +121,13 @@ const Container = styled.SafeAreaView`
 
 const ProfileCard = styled(CustomCard)`
   width: 90%;
+  margin: 20px;
+  border-width: 1px;
   padding: 12px 20px;
   flex-direction: row;
   align-items: center;
   justify-content: space-around;
-  border-width: 1px;
-  border-color: ${colors.GRAY_300};
+  border-color: ${colors.GRAY_200};
 `;
 
 const MyImage = styled.Image`

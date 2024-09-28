@@ -47,10 +47,11 @@ const DogInfoBox = () => {
 
 const Container = styled(CustomCard)`
   flex: 1;
-  background-color: ${colors.BEIGE.LIGHTER};
+  margin: 20px;
   padding: 30px;
   flex-direction: row;
   align-items: center;
+  background-color: ${colors.BEIGE.LIGHTER};
 `;
 
 const Col = styled.View`

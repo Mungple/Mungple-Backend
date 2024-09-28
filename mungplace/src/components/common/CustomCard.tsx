@@ -20,9 +20,8 @@ const CustomCard: React.FC<CustomCardProps> = ({style, children, onPress}) => {
 const CardContainer = styled.TouchableOpacity`
   background-color: ${colors.WHITE};
   border-radius: 16px;
-  padding: 20px;
   max-width: 600px;
-  margin: 20px;
+  padding: 20px;
   width: 100%;
 `;
 
