@@ -11,15 +11,24 @@ const startWalk = async (JSON: string) => {
     });
     return data;
   } catch (error) {
-    console.log('반려견 정보 등록 실패 :', error)
+    console.log('산책 시작 실패 :', error)
     throw error
   }
 };
 
 // 산책 종료 함수
 const exitWalk = async (explorationId: number) => {
-  const {data} = await axiosInstance.post(`/explorations/${explorationId}`);
-  return data;
+  try {
+    const {data} = await axiosInstance.post(`/explorations/${explorationId}`, {
+      headers: {
+        'Content-Type': `application/json; charset=utf8`,
+      },
+    });
+    return data;
+  } catch (error) {
+    console.log('산책 종료 실패 :', error)
+    throw error
+  }
 };
 
 // 월간 산책 기록 목록 조회 함수
