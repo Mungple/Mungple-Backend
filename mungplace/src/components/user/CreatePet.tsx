@@ -4,8 +4,8 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import {colors} from '@/constants';
 import useForm from '@/hooks/useForm';
-import {Keyboard, KeyboardAvoidingView, Text} from 'react-native';
-import {createPetProfile} from '@/api';
+import {Alert, Keyboard, KeyboardAvoidingView, Text} from 'react-native';
+import {createPetProfile, getPetProfiles} from '@/api';
 import useModal from '@/hooks/useModal';
 import useImagePicker from '@/hooks/useImagePicker';
 import CustomButton from '@/components/common/CustomButton';
@@ -13,6 +13,7 @@ import CustomInputField from '@/components/common/CustomInputField';
 import EditProfileImageOption from '@/components/setting/EditProfileImageOption';
 import RadioButtonGroup from '../common/RadioButtonGroup';
 import { validateInputPet } from '@/utils';
+import { useUserStore } from '@/state/useUserStore';
 
 type CreatePetProps = {
   modalVisible: boolean;
@@ -21,6 +22,7 @@ type CreatePetProps = {
 
 const CreatePet = ({modalVisible, setModalVisible}: CreatePetProps) => {
   const imageOption = useModal();
+  const {userId, setPetData} = useUserStore.getState()
   const inputUser = useForm({
     initialValue: {
       petName: '',
@@ -48,14 +50,19 @@ const CreatePet = ({modalVisible, setModalVisible}: CreatePetProps) => {
     inputUser.handleChangeText('petGender', value);
   };
 
-  const handleSubmit = () => {
-    const submitData = JSON.stringify({
-      ...inputUser.values,
-      petWeight: Number(inputUser.values.petWeight),
-    });
-    console.log(submitData)
-    createPetProfile(submitData);
-    setModalVisible(false)
+  const handleSubmit = async () => {
+    if (userId) {
+      const submitData = JSON.stringify({
+        ...inputUser.values,
+        petWeight: Number(inputUser.values.petWeight),
+      });
+      createPetProfile(submitData);
+      setModalVisible(false)
+      setPetData(await getPetProfiles(userId))
+      Alert.alert('Complete', '반려견 등록이 완료되었습니다')
+    } else {
+      Alert.alert('Error', '로그인 해주세요')
+    }
   };
 
   return (

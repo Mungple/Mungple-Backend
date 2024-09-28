@@ -27,7 +27,7 @@ const windowHeight = Dimensions.get('window').height;
 const MyPageScreen: React.FC<MyPageScreenProps> = ({navigation}) => {
   // const imageOption = useModal();
   const {useGetProfile} = useAuth();
-  const {userId} = useUserStore.getState()
+  const userId = useUserStore(state => state.userId);
   const nickname = userId ? useGetProfile(userId).data?.nickname : '로그인 해주세요';
   const [modalVisible, setModalVisible] = useState(false)
 

@@ -12,7 +12,7 @@ interface PetListProps {
 }
 
 const PetList: React.FC<PetListProps> = ({children, marginBlock = 0, handlePetSelect, selectedPets = []}) => {
-  const petData = useUserStore((state) => state.petData)
+  const petData = useUserStore(state => state.petData);
 
   return (
     <PL.Container marginBlock={marginBlock}>

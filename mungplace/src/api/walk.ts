@@ -19,7 +19,7 @@ const startWalk = async (JSON: string) => {
 // 산책 종료 함수
 const exitWalk = async (explorationId: number) => {
   try {
-    const {data} = await axiosInstance.post(`/explorations/${explorationId}`, {
+    const {data} = await axiosInstance.patch(`/explorations/${explorationId}`, {
       headers: {
         'Content-Type': `application/json; charset=utf8`,
       },

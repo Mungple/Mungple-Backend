@@ -1,4 +1,4 @@
-import { ResponsePetProfile } from '@/types';
+import {ResponsePetProfile} from '@/types';
 import {create} from 'zustand';
 
 interface UserState {
@@ -6,7 +6,7 @@ interface UserState {
   petData: ResponsePetProfile[];
 
   setUserId: (value: number) => void;
-  setPetData: (value: ResponsePetProfile[]) => void
+  setPetData: (value: ResponsePetProfile[]) => void;
 }
 
 export const useUserStore = create<UserState>(set => ({

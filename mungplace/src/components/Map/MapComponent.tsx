@@ -64,10 +64,6 @@ const MapComponent: React.FC<MapComponentProps> = ({
   const markers = useMapStore((state) => state.markers)
   const mapRef = useRef<MapView | null>(null);
   const [isMenuVisible, setIsMenuVisible] = useState(false);
-  // const [selectedCluster, setSelectedCluster ] = useState<UserMarker[] | null>(null) // 클러스터 
-  // const [selectedMarker, setSelectedMarker ] = useState<UserMarker[] | null>(null) // 클러스터 리스트 내에서 선택된 마커
-  // const [ isClusterModalVisible, setClusterModalVisible ] = useState(false) // 클러스터 클릭 시 모달 가시성 여부
-  // const [ isMarkerModalVisible, setMarkerModalVisible ] = useState(false) // 마커 상세 정보 모달 가시성 여부 
   const [formVisible, setFormVisible] = useState(false); // 마커폼 가시성 함수
   const translateY = useRef(new Animated.Value(0)).current;
   const opacity = useRef(new Animated.Value(0)).current;
