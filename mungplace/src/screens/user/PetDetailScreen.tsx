@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {Alert} from 'react-native';
 import styled from 'styled-components/native';
 
@@ -6,15 +6,17 @@ import {colors} from '@/constants';
 import {calculateAge} from '@/hooks/usePetAge';
 import {RouteProp, useRoute, useNavigation} from '@react-navigation/native';
 import {SettingStackParamList} from '@/navigations/stack/SettingStackNavigator';
+import CustomModal from '@/components/common/CustomModal';
+import CustomModalHeader from '@/components/common/CustomModalHeader';
+import PetForm from '@/components/user/PetForm';
 
 type PetDetailRouteProp = RouteProp<SettingStackParamList, 'PetDetail'>;
 
 const PetDetailScreen: React.FC = () => {
+  const [modalVisible, setModalVisible] = useState(false);
   const route = useRoute<PetDetailRouteProp>();
   const navigation = useNavigation();
   const {petData} = route.params;
-
-  const handleEdit = () => {};
 
   const handleDelete = () => {
     // 삭제 (Delete) 버튼 클릭 시 동작
@@ -58,13 +60,18 @@ const PetDetailScreen: React.FC = () => {
         </Row>
       </Content>
       <ButtonContainer>
-        <ActionButton onPress={handleEdit}>
+        <ActionButton onPress={() => setModalVisible(true)}>
           <ButtonText>변경</ButtonText>
         </ActionButton>
         <ActionButton onPress={handleDelete} danger>
           <ButtonText>삭제</ButtonText>
         </ActionButton>
       </ButtonContainer>
+
+      <CustomModal isWide={true} modalVisible={modalVisible} setModalVisible={setModalVisible}>
+        <CustomModalHeader title="반려견 정보 변경" closeButton={() => setModalVisible(false)} />
+        <PetForm isEdit setModalVisible={setModalVisible} />
+      </CustomModal>
     </Container>
   );
 };

@@ -7,7 +7,7 @@ import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import useAuth from '@/hooks/queries/useAuth';
 import PetList from '@/components/user/PetList';
 import {useUserStore} from '@/state/useUserStore';
-import CreatePet from '@/components/user/CreatePet';
+import PetForm from '@/components/user/PetForm';
 import useImagePicker from '@/hooks/useImagePicker';
 import ProfileImage from '@/assets/profile-image.png';
 import {colors, settingNavigations} from '@/constants';
@@ -102,10 +102,7 @@ const MyPageScreen: React.FC<MyPageScreenProps> = ({navigation}) => {
         modalVisible={modalVisible}
         setModalVisible={setModalVisible}>
         <CustomModalHeader title="반려견 등록" closeButton={handleAddPet} />
-        <CreatePet
-          modalVisible={modalVisible}
-          setModalVisible={setModalVisible}
-        />
+        <PetForm setModalVisible={setModalVisible} />
       </CustomModal>
     </Container>
   );

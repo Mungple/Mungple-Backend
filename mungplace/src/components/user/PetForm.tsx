@@ -15,12 +15,12 @@ import RadioButtonGroup from '../common/RadioButtonGroup';
 import { validateInputPet } from '@/utils';
 import { useUserStore } from '@/state/useUserStore';
 
-type CreatePetProps = {
-  modalVisible: boolean;
+type PetFormProps = {
+  isEdit?: boolean;
   setModalVisible: (visible: boolean) => void; 
 }
 
-const CreatePet = ({modalVisible, setModalVisible}: CreatePetProps) => {
+const PetForm = ({setModalVisible, isEdit = false}: PetFormProps) => {
   const imageOption = useModal();
   const {userId, setPetData} = useUserStore.getState()
   const inputUser = useForm({
@@ -162,4 +162,4 @@ const InputContainer = styled.View`
   gap: 20px;
 `;
 
-export default CreatePet;
+export default PetForm;
