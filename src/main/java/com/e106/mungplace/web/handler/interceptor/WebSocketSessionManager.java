@@ -1,7 +1,11 @@
 package com.e106.mungplace.web.handler.interceptor;
 
 import java.io.IOException;
+import java.security.Principal;
+import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -14,13 +18,13 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@Getter // 테스트에서 HashMap 접근하기 위한 Getter
+@Getter
 @Component
-public class CustomWebSocketHandlerDecorator extends WebSocketHandlerDecorator {
+public class WebSocketSessionManager extends WebSocketHandlerDecorator {
 
 	private ConcurrentHashMap<String, WebSocketSession> sessionStore = new ConcurrentHashMap<>();
 
-	public CustomWebSocketHandlerDecorator(@Qualifier("customWebSocketHandlerDecorator") WebSocketHandler delegate) {
+	public WebSocketSessionManager(@Qualifier("subProtocolWebSocketHandler") WebSocketHandler delegate) {
 		super(delegate);
 	}
 
@@ -41,7 +45,13 @@ public class CustomWebSocketHandlerDecorator extends WebSocketHandlerDecorator {
 		if (session != null && session.isOpen()) {
 			session.close();
 		}
+	}
 
-		log.info("현재 유지되고 있는 Session 의 수 : {}", sessionStore.size());
+	public Set<String> getConnectedUserIds() {
+		return sessionStore.values().stream()
+			.map(WebSocketSession::getPrincipal)
+			.filter(Objects::nonNull)
+			.map(Principal::getName)
+			.collect(Collectors.toSet());
 	}
 }

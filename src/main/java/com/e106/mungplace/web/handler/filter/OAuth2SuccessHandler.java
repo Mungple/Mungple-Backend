@@ -20,7 +20,6 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
 	static final String REDIRECT_URI = "/api/auth/oauth-response/";
 
-
 	@Value("${server.back-uri}")
 	private String serverUrl;
 
@@ -36,6 +35,6 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 		String accessToken = jwtAuthenticationHelper.createAccessToken(user.getUserId());
 		String redirectUrl = serverUrl + REDIRECT_URI;
 
-		response.sendRedirect(redirectUrl  + accessToken);
+		response.sendRedirect(redirectUrl + accessToken);
 	}
 }

@@ -30,7 +30,6 @@ public class ExplorationHelper {
 	private final DogRepository dogRepository;
 	private final ExplorationRepository explorationRepository;
 	private final DogExplorationRepository dogExplorationRepository;
-	private final ExplorationRecorder explorationRecorder;
 
 	public void createDogsInExploration(ExplorationStartWithDogsRequest dogIds, Exploration exploration) {
 		dogIds.dogIds().stream()
@@ -47,16 +46,6 @@ public class ExplorationHelper {
 	public ExplorationPayload createExplorationEventPayload(ExplorationEventRequest request) {
 		Point point = getPoint(request.getLatitude(), request.getLongitude());
 		return ExplorationPayload.of(point, request.getRecordedAt());
-	}
-
-	public void updateWhenExplorationEnded(Long userId, Exploration exploration) {
-		Long totalDistance = explorationRecorder.endRecord(userId.toString());
-		exploration.end(totalDistance);
-		explorationRepository.save(exploration);
-
-		dogExplorationRepository.findDogExplorationsByExplorationId(exploration.getId()).stream()
-			.peek(dogExploration -> dogExploration.updateIsEnded(true))
-			.forEach(dogExplorationRepository::save);
 	}
 
 	public List<ExplorationResponse> getExplorationInfos(Long userId, LocalDate date, String type) {

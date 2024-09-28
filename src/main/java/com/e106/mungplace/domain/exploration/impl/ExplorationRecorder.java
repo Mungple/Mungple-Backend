@@ -1,5 +1,7 @@
 package com.e106.mungplace.domain.exploration.impl;
 
+import static com.e106.mungplace.web.exception.dto.ApplicationSocketError.*;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
@@ -8,166 +10,205 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import com.e106.mungplace.common.map.dto.Point;
+import com.e106.mungplace.domain.exploration.entity.Exploration;
+import com.e106.mungplace.domain.exploration.repository.DogExplorationRepository;
+import com.e106.mungplace.domain.exploration.repository.ExplorationRepository;
 import com.e106.mungplace.domain.util.GeoUtils;
 import com.e106.mungplace.web.exception.ApplicationSocketException;
-import com.e106.mungplace.web.exception.dto.ApplicationSocketError;
+import com.e106.mungplace.web.exception.dto.ErrorResponse;
+import com.e106.mungplace.web.handler.interceptor.WebSocketSessionManager;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 @RequiredArgsConstructor
 @Component
 public class ExplorationRecorder {
 
+	private final ExplorationRepository explorationRepository;
 	private final RedisTemplate<String, String> redisTemplate;
+	private final WebSocketSessionManager sessionManager;
+	private final SimpMessagingTemplate messagingTemplate;
 
-	private static final int GEOHASH_INDEX = 0;
-	private static final int DISTANCE_INDEX = 1;
 	private static final int MAX_DISTANCE_CAPACITY = 3;
+	private final DogExplorationRepository dogExplorationRepository;
 
-	public void initRecord(String userId, String latitude, String longitude) {
+	public void initRecord(String explorationId, String userId, String latitude, String longitude) {
 		String userCurrentGeoHash = Point.toUserCurrentGeoHash(latitude, longitude);
 		String constantGeoHash = Point.toConstantGeoHash(latitude, longitude);
 
-		redisTemplate.delete(getUserKey(userId));
-		redisTemplate.delete(getDistanceKey(userId));
-		redisTemplate.delete(getPrePointKey(userId));
+		deleteAllValue(userId);
 
-		redisTemplate.opsForValue().set(getPrePointKey(userId), latitude + "," + longitude);
+		redisTemplate.opsForValue().set(getUserKey(userId), userCurrentGeoHash, 60, TimeUnit.SECONDS);
 		redisTemplate.opsForValue().set(getConstantKey(userId), constantGeoHash, 30, TimeUnit.MINUTES);
-		redisTemplate.opsForSet().add(getActiveUserKey(), userId);
+		redisTemplate.opsForValue().set(getTotalDistanceKey(userId), "0");
+		redisTemplate.opsForValue().set(getPrePointKey(userId), latitude + "," + longitude);
+		redisTemplate.opsForList().rightPush(getThreePointDistanceKey(userId), "0");
+		redisTemplate.opsForSet().add(getActiveUsersKey(), userId + ":" + explorationId);
+	}
 
-		redisTemplate.opsForList()
-			.rightPushAll(getUserKey(userId), userCurrentGeoHash, "0", userCurrentGeoHash.substring(0, 7));
-		redisTemplate.expire(getUserKey(userId), 60, TimeUnit.SECONDS);
+	public void endRecord(String userId, String explorationId) {
+		Long explorationTotalDistance = getExplorationTotalDistance(userId);
+		Exploration exploration = explorationRepository.findById(Long.parseLong(explorationId))
+			.orElseThrow(() -> new ApplicationSocketException(EXPLORATION_NOT_FOUND));
+
+		if (exploration.isEnded()) {
+			throw new ApplicationSocketException(IS_ENDED_EXPLORATION);
+		}
+
+		exploration.end(explorationTotalDistance);
+
+		explorationRepository.save(exploration);
+		dogExplorationRepository.findDogExplorationsByExplorationId(exploration.getId()).stream()
+			.peek(dogExploration -> dogExploration.updateIsEnded(true))
+			.forEach(dogExplorationRepository::save);
+
+		redisTemplate.opsForSet().remove(getActiveUsersKey(), userId + ":" + explorationId);
+		redisTemplate.opsForValue().setIfPresent(getTotalDistanceKey(userId), "0", 1, TimeUnit.MILLISECONDS);
+		deleteAllValue(userId);
 	}
 
 	public void recordCurrentUserGeoHash(String userId, String latitude, String longitude) {
-		List<String> userRecord = redisTemplate.opsForList().range(getUserKey(userId), 0, -1);
-		if (userRecord == null || userRecord.isEmpty() || userRecord.get(GEOHASH_INDEX) == null) {
-			throw new ApplicationSocketException(ApplicationSocketError.DONT_SEND_ANY_REQUEST);
-		}
+		String previousGeoHash = getValidatedUserGeoHash(userId);
+		String currentGeoHash = Point.toUserCurrentGeoHash(latitude, longitude);
+		redisTemplate.opsForValue().set(getUserKey(userId), currentGeoHash, 60, TimeUnit.SECONDS);
 
-		String userPreviousGeoHash = userRecord.get(GEOHASH_INDEX);
-		String userCurrentGeoHash = Point.toUserCurrentGeoHash(latitude, longitude);
+		validateUserIdWhenGeoHashIsDifference(userId, previousGeoHash, currentGeoHash);
 
-		redisTemplate.opsForList().set(getUserKey(userId), GEOHASH_INDEX, userCurrentGeoHash);
-		validateUserIdWhenGeoHashIsDifference(userId, userPreviousGeoHash, userCurrentGeoHash);
-		calculateAndRecordDistance(userId, latitude, longitude);
-
-		redisTemplate.expire(getUserKey(userId), 60, TimeUnit.SECONDS);
+		String totalDistance = calculateDistance(userId, latitude, longitude);
+		redisTemplate.opsForValue().set(getTotalDistanceKey(userId), totalDistance);
 	}
 
-	public Long endRecord(String userId) {
-		List<String> userRecord = redisTemplate.opsForList().range(getUserKey(userId), 0, -1);
-
-		if (userRecord == null)
-			return 0L;
-
-		Long explorationTotalDistance = getExplorationTotalDistance(userRecord);
-
-		redisTemplate.delete(getUserKey(userId));
-		redisTemplate.delete(getDistanceKey(userId));
-		redisTemplate.delete(getPrePointKey(userId));
-		redisTemplate.opsForSet().remove(getActiveUserKey(), userId);
-
-		return explorationTotalDistance;
-	}
-
-	private void calculateAndRecordDistance(String userId, String latitude, String longitude) {
-		String[] previousLatLon = redisTemplate.opsForValue().get(getPrePointKey(userId)).split(",");
-
-		Point previousPoint = new Point(Double.parseDouble(previousLatLon[0]), Double.parseDouble(previousLatLon[1]));
-		Point currentPoint = new Point(Double.parseDouble(latitude), Double.parseDouble(longitude));
-
-		String amountDistanceString = redisTemplate.opsForList().index(getUserKey(userId), DISTANCE_INDEX);
-
-		double distance = GeoUtils.calculateDistance(previousPoint, currentPoint);
-		double amountDistance = Double.parseDouble(amountDistanceString) + distance;
-
-		if (redisTemplate.opsForList().size(getDistanceKey(userId)) >= MAX_DISTANCE_CAPACITY) {
-			redisTemplate.opsForList().leftPop(getDistanceKey(userId));
-		}
-		redisTemplate.opsForList().rightPush(getDistanceKey(userId), String.valueOf(distance));
-		redisTemplate.opsForValue().set(getPrePointKey(userId), latitude + "," + longitude);
-
-		if (getDistance(userId) >= 90.00) {
-			throw new ApplicationSocketException(ApplicationSocketError.TOO_FAST_EXPLORING);
-		}
-
-		redisTemplate.opsForList().set(getUserKey(userId), DISTANCE_INDEX, String.valueOf(amountDistance));
-	}
-
-	private void validateUserIdWhenGeoHashIsDifference(String userId, String userPreviousGeoHash,
+	private boolean validateUserIdWhenGeoHashIsDifference(String userId, String userPreviousGeoHash,
 		String userCurrentGeoHash) {
 		if (!Objects.equals(userPreviousGeoHash, userCurrentGeoHash)) {
-			return;
+			return false;
 		}
 
 		String previous = redisTemplate.opsForValue().get(getConstantKey(userId));
 		String current = userCurrentGeoHash.substring(0, 8);
 
 		if (previous == null) {
-			throw new ApplicationSocketException(ApplicationSocketError.DONT_MOVE_ANY_PLACE);
+			throw new ApplicationSocketException(DONT_MOVE_ANY_PLACE);
 		}
 
 		if (!Objects.equals(previous, current)) {
 			redisTemplate.opsForValue().set(getConstantKey(userId), current, 30, TimeUnit.MINUTES);
 		}
+
+		return true;
 	}
 
-	public void validateActiveUsers(String currentUserId) {
-		Set<String> activeUsers = redisTemplate.opsForSet().members(getActiveUserKey());
-		if (!activeUsers.contains(currentUserId) || activeUsers == null || activeUsers.isEmpty())
-			return;
+	private String calculateDistance(String userId, String latitude, String longitude) {
+		String[] previousLatLon = redisTemplate.opsForValue().get(getPrePointKey(userId)).split(",");
+		String previousUserTotalDistance = redisTemplate.opsForValue().get(getTotalDistanceKey(userId));
 
-		activeUsers.forEach(userId -> {
-			if (Objects.equals(userId, currentUserId)
-				&& redisTemplate.opsForList().index(getUserKey(userId), GEOHASH_INDEX) == null) {
-				throw new ApplicationSocketException(ApplicationSocketError.DONT_SEND_ANY_REQUEST);
-			}
-		});
-	}
+		double distance = getDistanceBetweenPoints(latitude, longitude, previousLatLon);
+		double amountDistance = Double.parseDouble(previousUserTotalDistance) + distance;
 
-	private double getDistance(String userId) {
-		List<String> distances = redisTemplate.opsForList().range(getDistanceKey(userId), 0, -1);
-		if (distances == null || distances.isEmpty()) {
-			return 0.0;
+		if (redisTemplate.opsForList().size(getThreePointDistanceKey(userId)) >= MAX_DISTANCE_CAPACITY) {
+			redisTemplate.opsForList().leftPop(getThreePointDistanceKey(userId));
+		}
+		redisTemplate.opsForList().rightPush(getThreePointDistanceKey(userId), String.valueOf(distance));
+		redisTemplate.opsForValue().set(getPrePointKey(userId), latitude + "," + longitude);
+
+		double calculateNineSecondsDistance = getCalculateNineSecondsDistance(userId);
+		if (calculateNineSecondsDistance >= 90.00) {
+
+			throw new ApplicationSocketException(TOO_FAST_EXPLORING);
 		}
 
-		return BigDecimal.valueOf(distances.stream()
-				.mapToDouble(Double::parseDouble)
-				.sum())
+		return String.valueOf(amountDistance);
+	}
+
+	@Scheduled(fixedRate = 60000)
+	public void validateActiveUsers() {
+		Set<String> connectedUserIds = sessionManager.getConnectedUserIds();
+		Set<String> activeUserInfos = redisTemplate.opsForSet().members(getActiveUsersKey());
+
+		if (activeUserInfos == null || activeUserInfos.isEmpty()) {
+			return;
+		}
+
+		ErrorResponse response = ErrorResponse.of(DONT_SEND_ANY_REQUEST);
+		activeUserInfos.stream()
+			.filter(activeUserInfo -> {
+				String userId = activeUserInfo.split(":")[0]; // userId만 추출
+				return !connectedUserIds.contains(userId); // 연결된 userId가 아닌 경우 필터링
+			})
+			.forEach(activeUserInfo -> {
+				String[] info = activeUserInfo.split(":");
+				String userId = info[0];
+				String explorationId = info[1];
+
+				messagingTemplate.convertAndSendToUser(userId, "/sub/errors", response);
+				endRecord(userId, explorationId);
+			});
+	}
+
+	private static double getDistanceBetweenPoints(String latitude, String longitude, String[] previousLatLon) {
+		Point previousPoint = new Point(Double.parseDouble(previousLatLon[0]), Double.parseDouble(previousLatLon[1]));
+		Point currentPoint = new Point(Double.parseDouble(latitude), Double.parseDouble(longitude));
+		return GeoUtils.calculateDistance(previousPoint, currentPoint);
+	}
+
+	private double getCalculateNineSecondsDistance(String userId) {
+		List<String> distances = redisTemplate.opsForList().range(getThreePointDistanceKey(userId), 0, -1);
+
+		return BigDecimal.valueOf(distances.stream().mapToDouble(Double::parseDouble).sum())
 			.setScale(2, RoundingMode.HALF_UP)
 			.doubleValue();
 	}
 
-	private Long getExplorationTotalDistance(List<String> userRecord) {
-		String[] distance = userRecord.get(DISTANCE_INDEX).split("\\.");
-		return Long.parseLong(distance[0]);
+	private String getValidatedUserGeoHash(String userId) {
+		String geoHash = redisTemplate.opsForValue().get(getUserKey(userId));
+		if (geoHash == null) {
+			throw new ApplicationSocketException(DONT_SEND_ANY_REQUEST);
+		}
+		return geoHash;
 	}
 
-	private String getActiveUserKey() {
-		return "activeUsers";
+	private Long getExplorationTotalDistance(String userId) {
+		String recordedDistance = redisTemplate.opsForValue().get(getTotalDistanceKey(userId));
+		if (recordedDistance == null)
+			return 0L;
+
+		String distance = recordedDistance.split("\\.")[0];
+		return Long.parseLong(distance);
+	}
+
+	private String getActiveUsersKey() {
+		return "active_users";
 	}
 
 	private String getUserKey(String userId) {
-		return "users:" + userId;
+		return "users:" + userId + ":geohash";
 	}
 
 	private String getConstantKey(String userId) {
 		return "users:" + userId + ":constant";
 	}
 
-	private String getDistanceKey(String userId) {
-		return "users:" + userId + ":distances";
+	private String getTotalDistanceKey(String userId) {
+		return "users:" + userId + ":total_distance";
+	}
+
+	private String getThreePointDistanceKey(String userId) {
+		return "users:" + userId + ":point_distance";
 	}
 
 	private String getPrePointKey(String userId) {
 		return "users:" + userId + ":prePoint";
+	}
+
+	private void deleteAllValue(String userId) {
+		redisTemplate.delete(getUserKey(userId));
+		redisTemplate.delete(getConstantKey(userId));
+		redisTemplate.delete(getThreePointDistanceKey(userId));
+		redisTemplate.delete(getPrePointKey(userId));
 	}
 }
