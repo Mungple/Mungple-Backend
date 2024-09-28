@@ -11,9 +11,9 @@ import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 import org.springframework.web.socket.config.annotation.WebSocketTransportRegistration;
 
-import com.e106.mungplace.web.handler.interceptor.CustomWebSocketHandlerDecorator;
 import com.e106.mungplace.web.handler.interceptor.StompExceptionHandler;
 import com.e106.mungplace.web.handler.interceptor.StompInterceptor;
+import com.e106.mungplace.web.handler.interceptor.WebSocketSessionManager;
 
 import lombok.RequiredArgsConstructor;
 
@@ -27,7 +27,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
 	@Override
 	public void configureWebSocketTransport(WebSocketTransportRegistration registry) {
-		registry.addDecoratorFactory(this::customWebSocketHandlerDecorator);
+		registry.addDecoratorFactory(this::webSocketSessionManager);
 	}
 
 	@Override
@@ -48,8 +48,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 	}
 
 	@Bean
-	public CustomWebSocketHandlerDecorator customWebSocketHandlerDecorator(
+	public WebSocketSessionManager webSocketSessionManager(
 		@Qualifier("subProtocolWebSocketHandler") WebSocketHandler webSocketHandler) {
-		return new CustomWebSocketHandlerDecorator(webSocketHandler);
+		return new WebSocketSessionManager(webSocketHandler);
 	}
 }

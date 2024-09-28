@@ -1,5 +1,7 @@
 package com.e106.mungplace.web.exploration.service;
 
+import static com.e106.mungplace.web.exception.dto.ApplicationError.*;
+
 import java.security.Principal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -16,6 +18,7 @@ import com.e106.mungplace.domain.exploration.impl.ExplorationReader;
 import com.e106.mungplace.domain.exploration.impl.ExplorationRecorder;
 import com.e106.mungplace.domain.user.entity.User;
 import com.e106.mungplace.domain.user.impl.UserHelper;
+import com.e106.mungplace.web.exception.ApplicationException;
 import com.e106.mungplace.web.exploration.dto.ExplorationEventRequest;
 import com.e106.mungplace.web.exploration.dto.ExplorationPayload;
 import com.e106.mungplace.web.exploration.dto.ExplorationPoint;
@@ -49,7 +52,8 @@ public class ExplorationService {
 		Exploration exploration = explorationReader.create(new User(userId), LocalDateTime.now());
 		explorationHelper.validateExplorationWithDogs(request);
 		explorationHelper.createDogsInExploration(request, exploration);
-		explorationRecorder.initRecord(userId.toString(), request.latitude(), request.longitude());
+		explorationRecorder.initRecord(exploration.getId().toString(), userId.toString(), request.latitude(),
+			request.longitude());
 
 		return ExplorationStartResponse.of(exploration);
 	}
@@ -58,12 +62,15 @@ public class ExplorationService {
 	public void endExplorationProcess(Long explorationId) {
 		Long userId = userHelper.getCurrentUserId();
 		Exploration exploration = explorationReader.get(explorationId);
-
-		if (exploration.isEnded())
-			return;
-
 		explorationHelper.validateIsUsersExploration(userId, exploration);
-		explorationHelper.updateWhenExplorationEnded(userId, exploration);
+
+		if (exploration.isEnded()) {
+			log.info("ERROR CODE : {}, ERROR MESSAGE : {}", IS_ENDED_EXPLORATION.getErrorCode(),
+				IS_ENDED_EXPLORATION.getMessage());
+			throw new ApplicationException(IS_ENDED_EXPLORATION);
+		}
+
+		explorationRecorder.endRecord(userId.toString(), explorationId.toString());
 	}
 
 	@Transactional(readOnly = true)

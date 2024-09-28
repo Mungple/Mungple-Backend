@@ -8,4 +8,8 @@ public record ErrorResponse(
 	public static ErrorResponse of(ApplicationError error) {
 		return new ErrorResponse(error.getErrorCode(), error.getMessage());
 	}
+
+	public static ErrorResponse of(ApplicationSocketError error) {
+		return new ErrorResponse(error.getErrorCode(), error.getMessage());
+	}
 }
