@@ -31,7 +31,7 @@ const Item = styled.View`
 `;
 
 const DayText = styled.Text`
-  font-size: 13px;
+  font-size: ${deviceWidth * 0.04}px;
   color: ${colors.BLACK};
 `;
 

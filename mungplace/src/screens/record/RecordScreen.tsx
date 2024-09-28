@@ -1,5 +1,6 @@
+import React, {useCallback, useEffect, useState} from 'react';
+import {useFocusEffect} from '@react-navigation/native';
 import styled from 'styled-components/native';
-import React, {useEffect, useState} from 'react';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 import {colors} from '@/constants';
@@ -7,10 +8,29 @@ import Calendar from '@/components/calender/Calendar';
 import {getMonthYearDetails, getNewMonthYear} from '@/utils/date';
 import CustomHeader from '@/components/common/CustomHeader';
 
+import {getMonthWalks} from '@/api/walk';
+
+// 산책 목록 인터페이스
+interface ExplorationInfo {
+  startTime: string; // ISO 8601 형식의 날짜 문자열
+  endTime: string; // ISO 8601 형식의 날짜 문자열
+  distance: number; // 산책 거리 (예: 미터)
+  togetherDogIds: number[]; // 함께한 개의 ID 배열
+  points: number | null; // 포인트 (null일 수 있음)
+}
+// 월간 산책 정보 인터페이스
+interface MonthRecords {
+  year: number; // 연도
+  month: number; // 월
+  totalExplorations: number; // 총 산책 횟수
+  explorationInfos: ExplorationInfo[]; // ExplorationInfo 객체 배열
+}
+
 const RecordScreen = () => {
   const [selectedDate, setSelectedDate] = useState(0);
   const currentMonthYear = getMonthYearDetails(new Date());
   const [monthYear, setMonthYear] = useState(currentMonthYear);
+  const [records, setRecords] = useState({} as MonthRecords);
 
   const moveToToday = () => {
     setSelectedDate(new Date().getDate());
@@ -25,13 +45,17 @@ const RecordScreen = () => {
     setMonthYear(prev => getNewMonthYear(prev, increment));
   };
 
-  useEffect(() => {
-    moveToToday();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      moveToToday();
+      getMonthWalks(2024, 9);
+      return () => {};
+    }, []),
+  );
 
   return (
     <Container>
-      <CustomHeader title='월간 산책'>
+      <CustomHeader title="월간 산책">
         <DropdownContainer>
           <DropdownText>뭉치1</DropdownText>
           <MaterialIcons name="keyboard-arrow-down" size={20} />
@@ -60,14 +84,22 @@ const RecordScreen = () => {
         </InfoItem>
         <InfoItem>
           <InfoHeader>
-            <MaterialIcons name="directions-walk" size={24} color={colors.ORANGE.BASE} />
+            <MaterialIcons
+              name="directions-walk"
+              size={24}
+              color={colors.ORANGE.BASE}
+            />
             <InfoText>산책 거리</InfoText>
           </InfoHeader>
           <InfoDetail>2.5km</InfoDetail>
         </InfoItem>
         <InfoItem>
           <InfoHeader>
-            <MaterialIcons name="pin-drop" size={24} color={colors.ORANGE.BASE} />
+            <MaterialIcons
+              name="pin-drop"
+              size={24}
+              color={colors.ORANGE.BASE}
+            />
             <InfoText>등록 마커</InfoText>
           </InfoHeader>
           <InfoDetail>2개</InfoDetail>
