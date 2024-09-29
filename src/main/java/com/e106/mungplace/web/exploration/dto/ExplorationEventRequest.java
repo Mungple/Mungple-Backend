@@ -19,10 +19,10 @@ public class ExplorationEventRequest {
 	private Long userId;
 
 	@NotNull
-	private String latitude;
+	private String lat;
 
 	@NotNull
-	private String longitude;
+	private String lon;
 
 	@NotNull
 	private LocalDateTime recordedAt;

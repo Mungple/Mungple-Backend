@@ -1,18 +1,19 @@
 package com.e106.mungplace.web.exploration.dto;
 
-import java.time.LocalDateTime;
-
 import lombok.Builder;
 
 @Builder
 public record ExplorationPoint(
-	LocalDateTime timestamp,
-	double latitude,
-	double longitude
+
+	// LocalDateTime recordedAt,
+	double lat,
+	double lon
 ) {
-	public static ExplorationPoint of() {
+	public static ExplorationPoint of(double lat, double lon) {
 		return ExplorationPoint.builder()
-			// TODO : <이현수> elastic Search 조회 매핑
+			// .recordedAt(recordedAt)
+			.lat(lat)
+			.lon(lon)
 			.build();
 	}
 }

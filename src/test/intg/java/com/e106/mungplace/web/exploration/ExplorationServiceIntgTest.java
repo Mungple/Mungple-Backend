@@ -79,8 +79,8 @@ class ExplorationServiceIntgTest {
 
         ExplorationEventRequest request = ExplorationEventRequest.builder()
             .userId(1L)
-            .latitude("32.153321")
-            .longitude("32.153321")
+            .lat("32.153321")
+            .lon("32.153321")
             .recordedAt(LocalDateTime.now())
             .build();
 

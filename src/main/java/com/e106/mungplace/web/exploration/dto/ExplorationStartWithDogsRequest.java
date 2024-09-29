@@ -9,10 +9,10 @@ import lombok.Builder;
 public record ExplorationStartWithDogsRequest(
 
 	@NotNull
-	String latitude,
+	String lat,
 
 	@NotNull
-	String longitude,
+	String lon,
 
 	@NotNull
 	List<Long> dogIds

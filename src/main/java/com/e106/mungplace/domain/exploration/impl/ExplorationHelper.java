@@ -4,6 +4,10 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 
+import com.e106.mungplace.domain.exploration.entity.ExplorePoint;
+import com.e106.mungplace.domain.exploration.repository.ExplorePointRepository;
+import com.e106.mungplace.web.exploration.dto.*;
+
 import org.springframework.stereotype.Component;
 
 import com.e106.mungplace.common.map.dto.Point;
@@ -15,10 +19,6 @@ import com.e106.mungplace.domain.exploration.repository.ExplorationRepository;
 import com.e106.mungplace.domain.user.entity.User;
 import com.e106.mungplace.web.exception.ApplicationException;
 import com.e106.mungplace.web.exception.dto.ApplicationError;
-import com.e106.mungplace.web.exploration.dto.ExplorationEventRequest;
-import com.e106.mungplace.web.exploration.dto.ExplorationPayload;
-import com.e106.mungplace.web.exploration.dto.ExplorationResponse;
-import com.e106.mungplace.web.exploration.dto.ExplorationStartWithDogsRequest;
 import com.e106.mungplace.web.util.DateRange;
 
 import lombok.RequiredArgsConstructor;
@@ -27,8 +27,10 @@ import lombok.RequiredArgsConstructor;
 @Component
 public class ExplorationHelper {
 
-	private final DogRepository dogRepository;
 	private final ExplorationRepository explorationRepository;
+	private final ExplorePointRepository explorePointRepository;
+
+	private final DogRepository dogRepository;
 	private final DogExplorationRepository dogExplorationRepository;
 
 	public void createDogsInExploration(ExplorationStartWithDogsRequest dogIds, Exploration exploration) {
@@ -44,7 +46,7 @@ public class ExplorationHelper {
 	}
 
 	public ExplorationPayload createExplorationEventPayload(ExplorationEventRequest request) {
-		Point point = getPoint(request.getLatitude(), request.getLongitude());
+		Point point = getPoint(request.getLat(), request.getLon());
 		return ExplorationPayload.of(point, request.getRecordedAt());
 	}
 
@@ -59,6 +61,13 @@ public class ExplorationHelper {
 				List<Long> togetherDogIds = getTogetherDogIds(exploration);
 				return ExplorationResponse.of(exploration, togetherDogIds);
 			})
+			.toList();
+	}
+
+	public List<ExplorationPoint> getExplorationPath(Long explorationId) {
+		List<ExplorePoint> explorePoints = explorePointRepository.findByExplorationId(explorationId);
+		return explorePoints.stream()
+			.map(point -> ExplorationPoint.of(point.getPoint().getLat(), point.getPoint().getLon()))
 			.toList();
 	}
 
@@ -87,7 +96,7 @@ public class ExplorationHelper {
 		return true;
 	}
 
-	private Point getPoint(String latitude, String longitude) {
-		return new Point(Double.parseDouble(latitude), Double.parseDouble(longitude));
+	private Point getPoint(String lat, String lon) {
+		return new Point(Double.parseDouble(lat), Double.parseDouble(lon));
 	}
 }
