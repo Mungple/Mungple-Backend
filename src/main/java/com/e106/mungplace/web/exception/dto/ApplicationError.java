@@ -43,6 +43,9 @@ public enum ApplicationError {
 	MARKER_NOT_FOUND("E401", BAD_REQUEST, "마커가 존재하지 않습니다."),
 	MARKER_REQUEST_NOT_VALID("E402", BAD_REQUEST, "유효하지 않은 마커 요청 형식입니다."),
 
+	// facility
+	FACILITY_NOT_FOUND("E501", BAD_REQUEST, "시설을 찾을 수 없습니다."),
+
 	// socket
 	SOCKET_SESSION_NOT_FOUND("E802", FORBIDDEN, "소켓 세션이 존재하지 않습니다."),
 	STOMP_COMMAND_NOT_VALID("E803", BAD_REQUEST, "STOMP 커맨드가 올바르지 않습니다."),
