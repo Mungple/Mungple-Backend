@@ -10,10 +10,9 @@ import org.springframework.stereotype.Component;
 
 import com.e106.mungplace.domain.marker.entity.MarkerEvent;
 import com.e106.mungplace.domain.marker.entity.MarkerPoint;
-import com.e106.mungplace.domain.marker.entity.MarkerType;
+import com.e106.mungplace.domain.marker.impl.MarkerSerializer;
 import com.e106.mungplace.domain.marker.repository.MarkerPointRepository;
 import com.e106.mungplace.web.marker.dto.MarkerPayload;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.extern.slf4j.Slf4j;
@@ -26,20 +25,20 @@ public class MarkerConsumer {
 
 	private final MarkerPointRepository markerPointRepository;
 
-	private final ObjectMapper objectMapper;
+	private final MarkerSerializer markerSerializer;
 
-	public MarkerConsumer(NewTopic markerTopic, MarkerPointRepository markerPointRepository,
-		ObjectMapper objectMapper) {
+	public MarkerConsumer(NewTopic markerTopic, MarkerPointRepository markerPointRepository, ObjectMapper objectMapper,
+		MarkerSerializer markerSerializer) {
 		this.topic = markerTopic.name();
 		this.markerPointRepository = markerPointRepository;
-		this.objectMapper = objectMapper;
+		this.markerSerializer = markerSerializer;
 	}
 
 	@KafkaListener(topics = "#{__listener.topic}", groupId = "#{__listener.topic}-create-group")
 	public void saveMarkerEventProcess(MarkerEvent event, Acknowledgment ack) {
 
 		String markerPayloadString = event.getPayload();
-		Optional<MarkerPayload> markerPayloadOptional = deserializeMarker(markerPayloadString);
+		Optional<MarkerPayload> markerPayloadOptional = markerSerializer.deserializeMarker(markerPayloadString);
 
 		markerPayloadOptional.ifPresentOrElse(markerPayload -> {
 			GeoPoint geoPoint = new GeoPoint(markerPayload.getLat(), markerPayload.getLon());
@@ -50,7 +49,7 @@ public class MarkerConsumer {
 				.explorationId(markerPayload.getExplorationId() != null ? markerPayload.getExplorationId() : null)
 				.point(geoPoint)
 				.createdAt(event.getCreatedAt())
-				.type(MarkerType.valueOf(markerPayload.getType()))
+				.type(markerPayload.getType())
 				.build();
 
 			markerPointRepository.save(markerPoint);
@@ -61,17 +60,5 @@ public class MarkerConsumer {
 			throw new RuntimeException();
 		});
 		ack.acknowledge();
-	}
-
-	private Optional<MarkerPayload> deserializeMarker(String payload) {
-		try {
-			if (payload.startsWith("\"") && payload.endsWith("\"")) {
-				payload = objectMapper.readValue(payload, String.class);
-			}
-			return Optional.of(objectMapper.readValue(payload, MarkerPayload.class));
-		} catch (JsonProcessingException e) {
-			log.error("JSON 문자열을 Marker 객체로 변환하는 중 오류 발생: {}", payload, e);
-			return Optional.empty();
-		}
 	}
 }

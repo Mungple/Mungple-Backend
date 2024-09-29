@@ -2,6 +2,8 @@ package com.e106.mungplace.web.marker.dto;
 
 import java.util.UUID;
 
+import com.e106.mungplace.domain.marker.entity.MarkerType;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,6 +20,6 @@ public class MarkerPayload {
 	private String title;
 	private Double lat;
 	private Double lon;
-	private String type;
+	private MarkerType type;
 	private Long explorationId;
 }

@@ -66,7 +66,7 @@ class HeatmapChunkConsumerIntgTest {
 		assertThat(sentChunk.cells()).containsAll(cells);
 
 		// teardown
-		taskExecutor.shutdown();
+		taskExecutor.getThreadPoolExecutor().shutdownNow();
 	}
 
 	private HeatmapCell generateHeatmapCell() {

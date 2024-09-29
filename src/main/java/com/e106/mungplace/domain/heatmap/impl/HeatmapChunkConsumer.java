@@ -26,7 +26,7 @@ public class HeatmapChunkConsumer {
 	@Async("taskExecutor")
 	public void consume(Long userId, HeatmapQueryType queryType) {
 		String key = generateQueueKey(userId, queryType);
-		String destination = generateDestination(userId, queryType);
+		String destination = generateDestination(queryType);
 
 		long endTime = System.currentTimeMillis() + QUEUE_WAIT_TIME * 1000;
 
@@ -44,7 +44,7 @@ public class HeatmapChunkConsumer {
 		return String.format("users:%s:%s", userId, queryType.getValue());
 	}
 
-	private String generateDestination(Long userId, HeatmapQueryType queryType) {
+	private String generateDestination(HeatmapQueryType queryType) {
 		return switch (queryType) {
 			case USER_BLUEZONE -> "/sub/users/bluezone";
 			case BLUEZONE -> "/sub/bluezone";
