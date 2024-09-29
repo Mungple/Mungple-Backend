@@ -1,7 +1,7 @@
 import axiosInstance from './axios';
 
 // 프로필 이미지를 추가하는 함수
-const postImage = async (body: FormData): Promise<string> => {
+const addImage = async (body: FormData): Promise<string> => {
   // 서버에 POST 요청을 보내고 응답 데이터에서 'data'를 추출
   const {data} = await axiosInstance.post('/users/images', body, {
     headers: {
@@ -22,7 +22,7 @@ const editImage = async (body: FormData): Promise<string> => {
 };
 
 // 반려견 프로필 이미지를 추가하는 함수
-const postPetImage = async (dogId: number, body: FormData): Promise<string> => {
+const addPetImage = async (dogId: number, body: FormData): Promise<string> => {
   const {data} = await axiosInstance.post(`/users/dogs/${dogId}/images`, body, {
     headers: {
       'Content-Type': 'multipart/form-data; charset=utf8',
@@ -41,4 +41,5 @@ const editPetImage = async (dogId: number, body: FormData): Promise<string> => {
   return data;
 };
 
-export {postImage, editImage, postPetImage, editPetImage};
+export { addImage, addPetImage, editImage, editPetImage };
+

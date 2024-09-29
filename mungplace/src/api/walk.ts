@@ -56,4 +56,5 @@ const getWalkDetail = async (explorationId: number) => {
 };
 
 
-export {startWalk, exitWalk, getMonthWalks, getDateWalks, getStatistics, getWalkDetail};
+export { exitWalk, getDateWalks, getMonthWalks, getStatistics, getWalkDetail, startWalk };
+

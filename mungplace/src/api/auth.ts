@@ -1,6 +1,6 @@
+import type { UserProfile } from '@/types/domain';
+import { getEncryptStorage } from '@/utils';
 import axiosInstance from './axios';
-import {getEncryptStorage} from '@/utils';
-import type {Profile} from '@/types/domain';
 
 // 로그인 후 응답받는 토큰 데이터 타입
 type ResponseToken = {
@@ -8,7 +8,7 @@ type ResponseToken = {
 };
 
 // 사용자 프로필 요청 타입
-type RequestProfile = Omit<Profile, 'userId' | 'nickname' | 'imageName'>;
+type RequestProfile = Omit<UserProfile, 'nickname' | 'imageName'>;
 
 // 사용자 프로필 반환 타입
 type ResponseProfile = {
@@ -62,5 +62,6 @@ const logout = async () => {
   await axiosInstance.post('/users/logout');
 };
 
-export {getProfile, editProfile, logout, getAccessToken, socialLogin};
-export type {ResponseToken, RequestProfile, ResponseProfile};
+export { editProfile, getAccessToken, getProfile, logout, socialLogin };
+export type { RequestProfile, ResponseProfile, ResponseToken };
+

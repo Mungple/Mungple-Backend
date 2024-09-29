@@ -1,21 +1,20 @@
-import React, {useState} from 'react';
-import {Dimensions} from 'react-native';
-import styled from 'styled-components/native';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import React, { useState } from 'react';
+import { Dimensions, Image as RNImage, Text } from 'react-native';
 import IonIcons from 'react-native-vector-icons/Ionicons';
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
+import styled from 'styled-components/native';
 
-import useAuth from '@/hooks/queries/useAuth';
-import PetList from '@/components/user/PetList';
-import {useUserStore} from '@/state/useUserStore';
-import PetForm from '@/components/user/PetForm';
-import useImagePicker from '@/hooks/useImagePicker';
-import ProfileImage from '@/assets/profile-image.png';
-import {colors, settingNavigations} from '@/constants';
+import DefaultImage from '@/assets/profile-image.png';
 import CustomCard from '@/components/common/CustomCard';
-import CustomModal from '@/components/common/CustomModal';
 import CustomHeader from '@/components/common/CustomHeader';
+import CustomModal from '@/components/common/CustomModal';
 import CustomModalHeader from '@/components/common/CustomModalHeader';
-import {SettingStackParamList} from '@/navigations/stack/SettingStackNavigator';
+import PetForm from '@/components/user/PetForm';
+import PetList from '@/components/user/PetList';
+import { colors, settingNavigations } from '@/constants';
+import useAuth from '@/hooks/queries/useAuth';
+import { SettingStackParamList } from '@/navigations/stack/SettingStackNavigator';
+import { useUserStore } from '@/state/useUserStore';
 
 export type MyPageScreenProps = NativeStackScreenProps<
   SettingStackParamList,
@@ -25,18 +24,18 @@ export type MyPageScreenProps = NativeStackScreenProps<
 const windowHeight = Dimensions.get('window').height;
 
 const MyPageScreen: React.FC<MyPageScreenProps> = ({navigation}) => {
-  // const imageOption = useModal();
-  const {useGetProfile} = useAuth();
   const userId = useUserStore(state => state.userId);
+  const {useGetProfile} = useAuth();
+  const userData = useUserStore(state => state.userData);
+  const setUserData = useUserStore(state => state.setUserData);
   const [modalVisible, setModalVisible] = useState(false);
-  const nickname = userId ? useGetProfile(userId).data?.nickname : '로그인 해주세요';
-
-  // 이미지 선택 기능을 위한 커스텀 훅
-  // const imagePicker = useImagePicker({
-  //   initialImages: imageName ? [{uri: imageName}] : [],
-  //   mode: 'single',
-  //   onSettled: imageOption.hide,
-  // });
+  
+  if (userId) {
+    const {data} = useGetProfile(userId);
+    if (data) {
+      setUserData(data);
+    }
+  }
 
   const handleSettingPress = () => {
     navigation.navigate(settingNavigations.SETTING);
@@ -47,11 +46,7 @@ const MyPageScreen: React.FC<MyPageScreenProps> = ({navigation}) => {
   };
 
   const handleAddPet = () => {
-    if (modalVisible) {
-      setModalVisible(false);
-    } else {
-      setModalVisible(true);
-    }
+    setModalVisible(prev => !prev);
   };
 
   return (
@@ -67,22 +62,13 @@ const MyPageScreen: React.FC<MyPageScreenProps> = ({navigation}) => {
       </CustomHeader>
 
       <ProfileCard onPress={handleProfilePress}>
-        {/* <ImageContainer>
-          {imagePicker.imageNames.length === 0 ? (
-            <MyImage source={ProfileImage} />
-          ) : (
-            <MyImage
-              source={{
-                uri: `http://10.0.2.2:3030/${imagePicker.imageNames[0]?.uri}`,
-              }}
-              resizeMode="cover"
-            />
-          )}
-        </ImageContainer> */}
-        <InfoContainer>
-          <Nickname>{nickname}</Nickname>
-          <SecondaryInfo>128 포인트</SecondaryInfo>
-        </InfoContainer>
+        <Image
+          source={userData.imageName ? {uri: userData.imageName} : DefaultImage}
+        />
+        <Context>
+          <Title>{userData.nickname}</Title>
+          <Text>128 포인트</Text>
+        </Context>
       </ProfileCard>
 
       {/* 반려견 목록 */}
@@ -94,7 +80,7 @@ const MyPageScreen: React.FC<MyPageScreenProps> = ({navigation}) => {
       </HeaderBox>
 
       <PetListBox>
-        <PetList navigation={navigation}/>
+        <PetList navigation={navigation} />
       </PetListBox>
 
       <CustomModal
@@ -109,31 +95,37 @@ const MyPageScreen: React.FC<MyPageScreenProps> = ({navigation}) => {
 };
 
 const Container = styled.SafeAreaView`
-  background-color: ${colors.WHITE};
+  flex: 1;
   align-items: center;
+  background-color: ${colors.WHITE};
 `;
 
 const ProfileCard = styled(CustomCard)`
   width: 90%;
   margin: 20px;
   border-width: 1px;
-  padding: 12px 20px;
-  flex-direction: row;
+  padding: 13px 20px;
   align-items: center;
+  flex-direction: row;
   justify-content: space-around;
   border-color: ${colors.GRAY_200};
 `;
 
-const MyImage = styled.Image`
-  width: 100%;
-  height: 100%;
-  border-radius: 75px;
+const Image = styled(RNImage)`
+  width: 70px;
+  height: 70px;
+  border-radius: 35px;
 `;
 
-const ImageContainer = styled.View`
-  width: 60px;
-  height: 60px;
-  border-radius: 30px;
+const Context = styled.View`
+  gap: 10px;
+  flex-direction: column;
+`;
+
+const Title = styled.Text`
+  font-size: 18px;
+  font-weight: bold;
+  color: ${colors.BLACK};
 `;
 
 const HeaderBox = styled.View`
@@ -164,22 +156,6 @@ const MenuText = styled.Text`
 const PetListBox = styled.View`
   width: 100%;
   height: ${windowHeight * 0.7}px;
-`;
-
-const InfoContainer = styled.View`
-  flex-direction: column;
-`;
-
-const Nickname = styled.Text`
-  font-size: 18px;
-  font-weight: bold;
-  margin-bottom: 8px;
-  color: ${colors.BLACK};
-`;
-
-const SecondaryInfo = styled.Text`
-  font-size: 14px;
-  color: ${colors.GRAY_300};
 `;
 
 export default MyPageScreen;

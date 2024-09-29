@@ -1,7 +1,7 @@
+import { colors } from '@/constants';
 import React from 'react';
+import { StyleProp, ViewStyle } from 'react-native';
 import styled from 'styled-components/native';
-import {ViewStyle, StyleProp} from 'react-native';
-import {colors} from '@/constants';
 
 interface CustomCardProps {
   onPress?: () => void;

@@ -30,7 +30,7 @@ interface Post extends Marker {
 }
 
 // 사용자 프로필 정보를 정의한 타입
-interface Profile {
+interface UserProfile {
   userId: number;
   nickname: string;
   imageName: string | null;
@@ -68,14 +68,7 @@ interface Exploration {
 }
 
 export type {
-  Post,
-  Marker,
-  Profile,
-  ImageUri,
-  Category,
-  Exploration,
-  MarkerColor,
-  StartExplorate,
-  RequestPetProfile,
-  ResponsePetProfile,
+  Category, Exploration, ImageUri, Marker, MarkerColor, Post, RequestPetProfile,
+  ResponsePetProfile, StartExplorate, UserProfile
 };
+

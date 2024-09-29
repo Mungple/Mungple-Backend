@@ -1,4 +1,4 @@
-import {RequestPetProfile, ResponsePetProfile} from '@/types';
+import { RequestPetProfile, ResponsePetProfile } from '@/types';
 import axiosInstance from './axios';
 
 // 반려견 정보 등록 함수
@@ -51,9 +51,6 @@ const setDefaultPetProfile = async (dogId: number): Promise<void> => {
 };
 
 export {
-  createPetProfile,
-  getPetProfiles,
-  editPetProfile,
-  deletePetProfile,
-  setDefaultPetProfile,
+  createPetProfile, deletePetProfile, editPetProfile, getPetProfiles, setDefaultPetProfile
 };
+

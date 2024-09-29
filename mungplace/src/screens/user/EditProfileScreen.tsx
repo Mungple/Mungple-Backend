@@ -1,34 +1,24 @@
 import React from 'react';
-import {Keyboard} from 'react-native';
-import styled from 'styled-components/native';
+import { Alert, Keyboard } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import styled from 'styled-components/native';
 
-import {colors} from '@/constants';
-import useForm from '@/hooks/useForm';
-import useModal from '@/hooks/useModal';
-import {validateInputUser} from '@/utils';
-import useAuth from '@/hooks/queries/useAuth';
-import useImagePicker from '@/hooks/useImagePicker';
 import CustomButton from '@/components/common/CustomButton';
-import CustomInputField from '@/components/common/CustomInputField';
 import EditProfileImageOption from '@/components/setting/EditProfileImageOption';
+import { colors } from '@/constants';
+import useImagePicker from '@/hooks/useImagePicker';
+import useModal from '@/hooks/useModal';
 
 const EditProfileScreen = () => {
   const imageOption = useModal();
-  const {getProfileQuery} = useAuth();
-  const {nickname, imageName} = getProfileQuery.data || {};
 
   // 이미지 선택 기능을 위한 커스텀 훅
   const imagePicker = useImagePicker({
-    initialImages: imageName ? [{uri: imageName}] : [],
-    mode: 'single',
-    onSettled: imageOption.hide,
-  });
-
-  // 닉네임 수정 폼을 위한 훅
-  const editProfile = useForm({
-    initialValue: {nickname: nickname ?? ''},
-    validate: validateInputUser,
+    image: '',
+    onSettled: () => {
+      imageOption.hide()
+      Alert.alert('업로드 완료', '이미지 업로드가 완료되었습니다.');
+    }
   });
 
   // 프로필 이미지 클릭 시 모달을 열고 키보드를 숨김
@@ -38,6 +28,7 @@ const EditProfileScreen = () => {
   };
 
   const handleSubmit = () => {
+
   };
 
   return (
@@ -45,20 +36,12 @@ const EditProfileScreen = () => {
       {/* 프로필 이미지 영역 */}
       <ProfileContainer>
         <ImageContainer onPress={handlePressImage}>
-          {imagePicker.imageNames.length === 0
+          {imagePicker.imageName === ''
             ? <Ionicons name="camera-outline" size={40} color={colors.GRAY_400} />
-            : <MyImage source={{uri: `http://10.0.2.2:3030/${imagePicker.imageNames[0]?.uri}`}} resizeMode="cover" />
+            : <MyImage source={{uri: imagePicker.imageName}} resizeMode="cover" />
           }
         </ImageContainer>
       </ProfileContainer>
-      
-      {/* 닉네임 입력 필드 */}
-      <CustomInputField
-        {...editProfile.getTextInputProps('nickname')}
-        error={editProfile.errors.nickname}
-        touched={editProfile.touched.nickname}
-        placeholder="닉네임을 입력해주세요."
-      />
 
       {/* 제출 버튼 */}
       <SubmitButton label='완료' onPress={handleSubmit} />
