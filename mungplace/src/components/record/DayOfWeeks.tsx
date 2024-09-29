@@ -9,7 +9,7 @@ const deviceWidth = Dimensions.get('window').width;
 const DayOfWeeks = () => {
   return (
     <Container>
-      {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((dayOfWeek, i) => {
+      {['일', '월', '화', '수', '목', '금', '토'].map((dayOfWeek, i) => {
         return (
           <Item key={i}>
             <DayText>{dayOfWeek}</DayText>

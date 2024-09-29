@@ -27,7 +27,10 @@ interface StatCardProps {
 const ICON_SIZE = DEVICE_WIDTH * 0.1;
 const FONT_SIZE = DEVICE_WIDTH * 0.04;
 
-const MonthStatistics = () => {
+const MonthStatistics: React.FC<{year: number; month: number}> = ({
+  year,
+  month,
+}) => {
   const [statistics, setStatistics] = useState<Statistics | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -36,9 +39,8 @@ const MonthStatistics = () => {
     useCallback(() => {
       const getData = async () => {
         try {
-          setLoading(true); // 로딩 상태 시작
-          const response = await getStatistics(2024, 9);
-          // year와 month를 props로 받음
+          setLoading(true);
+          const response = await getStatistics(year, month);
           setStatistics(response);
           console.log(response);
         } catch (err) {
@@ -56,7 +58,7 @@ const MonthStatistics = () => {
       getData();
 
       return () => {};
-    }, []),
+    }, [year, month]),
   );
 
   if (loading) {
