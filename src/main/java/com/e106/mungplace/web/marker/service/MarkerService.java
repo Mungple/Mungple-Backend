@@ -5,7 +5,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -25,6 +24,7 @@ import com.e106.mungplace.domain.marker.entity.MarkerPoint;
 import com.e106.mungplace.domain.marker.entity.OperationType;
 import com.e106.mungplace.domain.marker.entity.PublishStatus;
 import com.e106.mungplace.domain.marker.impl.MarkerReader;
+import com.e106.mungplace.domain.marker.impl.MarkerSerializer;
 import com.e106.mungplace.domain.marker.impl.MarkerWriter;
 import com.e106.mungplace.domain.user.impl.UserHelper;
 import com.e106.mungplace.domain.util.GeoUtils;
@@ -62,6 +62,7 @@ public class MarkerService {
 	private final MarkerWriter markerWriter;
 	private final MarkerReader markerReader;
 	private final UserHelper userHelper;
+	private final MarkerSerializer markerSerializer;
 	private final ObjectMapper objectMapper;
 
 	@GlobalTransactional
@@ -84,12 +85,12 @@ public class MarkerService {
 			.title(marker.getTitle())
 			.lat(marker.getLat())
 			.lon(marker.getLon())
-			.type(marker.getType().name())
+			.type(marker.getType())
 			.explorationId(marker.getExploration() != null ? marker.getExploration().getId() : null)
 			.build();
 
 		// MarkerPayload를 JSON으로 직렬화
-		String payload = serializeMarker(markerPayload).orElseThrow(RuntimeException::new);
+		String payload = markerSerializer.serializeMarker(markerPayload).orElseThrow(RuntimeException::new);
 
 		MarkerEvent outboxEntry = MarkerEvent.builder()
 			.createdAt(LocalDateTime.now())
@@ -104,15 +105,6 @@ public class MarkerService {
 		markerWriter.createMarkerEvent(outboxEntry);
 
 		return new CreateMarkerResponse(marker.getId());
-	}
-
-	private Optional<String> serializeMarker(MarkerPayload markerPayload) {
-		try {
-			return Optional.of(objectMapper.writeValueAsString(markerPayload));
-		} catch (JsonProcessingException e) {
-			log.error("MarkerPayload 객체를 JSON으로 변환하는 중 오류 발생: {}", markerPayload.getMarkerId(), e);
-			return Optional.empty();
-		}
 	}
 
 	private void validateImageFileCount(List<MultipartFile> imageFiles) {

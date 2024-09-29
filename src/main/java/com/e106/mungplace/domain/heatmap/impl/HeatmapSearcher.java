@@ -17,6 +17,7 @@ import com.e106.mungplace.common.map.dto.Point;
 import com.e106.mungplace.domain.exploration.entity.ExplorePoint;
 import com.e106.mungplace.domain.heatmap.dto.HeatmapCell;
 import com.e106.mungplace.domain.heatmap.dto.HeatmapSearchCondition;
+import com.e106.mungplace.domain.heatmap.dto.RedzonePoint;
 import com.e106.mungplace.web.exception.ApplicationSocketException;
 import com.e106.mungplace.web.exception.dto.ApplicationSocketError;
 
@@ -44,20 +45,20 @@ public class HeatmapSearcher {
 	public List<HeatmapCell> findBluezone(Long userId, HeatmapSearchCondition condition) {
 		Criteria criteria = Criteria.where(RECORDED_AT_FIELD).between(condition.start(), condition.end())
 			.and(Criteria.where(USER_ID_FIELD).is(userId));
-		return searchWithCriteria(criteria, condition.nw(), condition.se());
+		return searchWithCriteria(criteria, condition.nw(), condition.se(), ExplorePoint.class);
 	}
 
 	public List<HeatmapCell> findBluezone(HeatmapSearchCondition condition) {
 		Criteria criteria = Criteria.where(RECORDED_AT_FIELD).between(condition.start(), condition.end());
-		return searchWithCriteria(criteria, condition.nw(), condition.se());
+		return searchWithCriteria(criteria, condition.nw(), condition.se(), ExplorePoint.class);
 	}
 
-	// TODO <fosong98> Redzone 조회 로직 작성 필요
 	public List<HeatmapCell> findRedzone(HeatmapSearchCondition condition) {
-		return List.of();
+		Criteria criteria = Criteria.where(RECORDED_AT_FIELD).between(condition.start(), condition.end());
+		return searchWithCriteria(criteria, condition.nw(), condition.se(), RedzonePoint.class);
 	}
 
-	private List<HeatmapCell> searchWithCriteria(Criteria criteria, Point nw, Point se) {
+	private <T> List<HeatmapCell> searchWithCriteria(Criteria criteria, Point nw, Point se, Class<T> clazz) {
 		Aggregation aggregation = heatmapAggregation(nw, se);
 		CriteriaQuery criteriaQuery = new CriteriaQuery(criteria);
 
@@ -65,11 +66,11 @@ public class HeatmapSearcher {
 			.withAggregation(GEO_HASH_AGGREGATION, aggregation)
 			.build();
 
-		return executeHeatMapQuery(query);
+		return executeHeatMapQuery(query, clazz);
 	}
 
-	private List<HeatmapCell> executeHeatMapQuery(Query query) {
-		ElasticsearchAggregations aggregations = fetchAggregations(query);
+	private <T> List<HeatmapCell> executeHeatMapQuery(Query query, Class<T> clazz) {
+		ElasticsearchAggregations aggregations = fetchAggregations(query, clazz);
 		ElasticsearchAggregation aggregation = aggregations.get(GEO_HASH_AGGREGATION);
 
 		if (aggregation == null) {
@@ -93,8 +94,8 @@ public class HeatmapSearcher {
 	}
 
 	// TODO <fosong98> Kafka Consume 에러 처리 구현 필요
-	private ElasticsearchAggregations fetchAggregations(Query query) {
-		return Optional.ofNullable(operations.search(query, ExplorePoint.class).getAggregations())
+	private <T> ElasticsearchAggregations fetchAggregations(Query query, Class<T> clazz) {
+		return Optional.ofNullable(operations.search(query, clazz).getAggregations())
 			.map(ElasticsearchAggregations.class::cast)
 			.orElseThrow(() -> new ApplicationSocketException(ApplicationSocketError.COULD_NOT_LOAD_DATA));
 	}

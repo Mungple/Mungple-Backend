@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.apache.kafka.clients.admin.NewTopic;
@@ -18,9 +19,10 @@ import org.springframework.kafka.support.Acknowledgment;
 
 import com.e106.mungplace.domain.marker.entity.MarkerEvent;
 import com.e106.mungplace.domain.marker.entity.MarkerPoint;
+import com.e106.mungplace.domain.marker.entity.MarkerType;
+import com.e106.mungplace.domain.marker.impl.MarkerSerializer;
 import com.e106.mungplace.domain.marker.repository.MarkerPointRepository;
 import com.e106.mungplace.web.marker.dto.MarkerPayload;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @ExtendWith(MockitoExtension.class)
@@ -38,6 +40,9 @@ class MarkerConsumerTest {
 	@Mock
 	private NewTopic markerTopic;
 
+	@Mock
+	private MarkerSerializer markerSerializer;
+
 	private MarkerConsumer markerConsumer;
 
 	private MarkerEvent event;
@@ -47,7 +52,7 @@ class MarkerConsumerTest {
 	void setUp() {
 		when(markerTopic.name()).thenReturn("marker");
 
-		markerConsumer = new MarkerConsumer(markerTopic, markerPointRepository, objectMapper);
+		markerConsumer = new MarkerConsumer(markerTopic, markerPointRepository, objectMapper, markerSerializer);
 
 		// Mock MarkerPayload 생성
 		markerPayload = MarkerPayload.builder()
@@ -56,7 +61,7 @@ class MarkerConsumerTest {
 			.title("Test Marker")
 			.lat(37.5665)
 			.lon(126.978)
-			.type("BLUE")
+			.type(MarkerType.BLUE)
 			.explorationId(null)
 			.build();
 
@@ -73,7 +78,7 @@ class MarkerConsumerTest {
 	@Test
 	void testHandleHeatmapQueryEventProcess_Success() throws Exception {
 		// given
-		when(objectMapper.readValue(anyString(), eq(MarkerPayload.class))).thenReturn(markerPayload);
+		when(markerSerializer.deserializeMarker(any())).thenReturn(Optional.of(markerPayload));
 
 		// when
 		markerConsumer.saveMarkerEventProcess(event, acknowledgment);
@@ -87,9 +92,7 @@ class MarkerConsumerTest {
 	@Test
 	void testHandleHeatmapQueryEventProcess_Failure() throws Exception {
 		// given
-		when(objectMapper.readValue(anyString(), eq(MarkerPayload.class))).thenThrow(
-			new JsonProcessingException("JSON 오류") {
-			});
+		when(markerSerializer.deserializeMarker(any())).thenReturn(Optional.empty());
 
 		// when
 		ThrowableAssert.ThrowingCallable expectedThrow = () -> markerConsumer.saveMarkerEventProcess(event,

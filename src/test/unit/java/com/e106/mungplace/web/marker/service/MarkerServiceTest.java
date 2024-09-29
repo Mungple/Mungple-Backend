@@ -7,6 +7,7 @@ import static org.mockito.Mockito.*;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import org.assertj.core.api.Assertions;
 import org.assertj.core.api.ThrowableAssert;
@@ -29,6 +30,7 @@ import com.e106.mungplace.domain.marker.entity.MarkerEvent;
 import com.e106.mungplace.domain.marker.entity.MarkerPoint;
 import com.e106.mungplace.domain.marker.entity.MarkerType;
 import com.e106.mungplace.domain.marker.impl.MarkerReader;
+import com.e106.mungplace.domain.marker.impl.MarkerSerializer;
 import com.e106.mungplace.domain.marker.impl.MarkerWriter;
 import com.e106.mungplace.domain.user.entity.ProviderName;
 import com.e106.mungplace.domain.user.entity.User;
@@ -56,6 +58,9 @@ class MarkerServiceTest {
 	@Mock
 	private UserHelper userHelper;
 
+	@Mock
+	private MarkerSerializer markerSerializer;
+
 	@Spy
 	private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -72,20 +77,12 @@ class MarkerServiceTest {
 	@Test
 	void testCreateMarkerProcess_WhenImageCountExceeds_ThrowsException() throws Exception {
 		// given
-		String markerInfoJson = "{"
-			+ "\"title\": \"markerTitle\","
-			+ "\"content\": \"markerContent\","
-			+ "\"markerType\": \"BLUE\","
-			+ "\"lat\": 36.9369,"
-			+ "\"lon\": 22.2222"
-			+ "}";
+		String markerInfoJson =
+			"{" + "\"title\": \"markerTitle\"," + "\"content\": \"markerContent\"," + "\"markerType\": \"BLUE\","
+				+ "\"lat\": 36.9369," + "\"lon\": 22.2222" + "}";
 
-		List<MultipartFile> imageFiles = Arrays.asList(
-			mock(MultipartFile.class),
-			mock(MultipartFile.class),
-			mock(MultipartFile.class),
-			mock(MultipartFile.class)
-		);
+		List<MultipartFile> imageFiles = Arrays.asList(mock(MultipartFile.class), mock(MultipartFile.class),
+			mock(MultipartFile.class), mock(MultipartFile.class));
 
 		// when
 		ThrowableAssert.ThrowingCallable expectThrow = () -> markerService.createMarkerProcess(markerInfoJson,
@@ -106,13 +103,9 @@ class MarkerServiceTest {
 			.imageName("profileImage.png")
 			.build();
 
-		String markerInfoJson = "{"
-			+ "\"title\": \"markerTitle\","
-			+ "\"content\": \"markerContent\","
-			+ "\"markerType\": \"BLUE\","
-			+ "\"lat\": 36.9369,"
-			+ "\"lon\": 22.2222"
-			+ "}";
+		String markerInfoJson =
+			"{" + "\"title\": \"markerTitle\"," + "\"content\": \"markerContent\"," + "\"markerType\": \"BLUE\","
+				+ "\"lat\": 36.9369," + "\"lon\": 22.2222" + "}";
 
 		// MarkerCreateRequest 객체를 생성하는 실제 파싱
 		MarkerCreateRequest request = MarkerCreateRequest.builder()
@@ -123,11 +116,8 @@ class MarkerServiceTest {
 			.lon(22.2222)
 			.build();
 
-		List<MultipartFile> imageFiles = Arrays.asList(
-			mock(MultipartFile.class),
-			mock(MultipartFile.class),
-			mock(MultipartFile.class)
-		);
+		List<MultipartFile> imageFiles = Arrays.asList(mock(MultipartFile.class), mock(MultipartFile.class),
+			mock(MultipartFile.class));
 
 		// Marker 객체 생성
 		Marker marker = Marker.builder()
@@ -145,7 +135,7 @@ class MarkerServiceTest {
 			.title(marker.getTitle())
 			.lat(marker.getLat())
 			.lon(marker.getLon())
-			.type(marker.getType().name())
+			.type(marker.getType())
 			.explorationId(null)
 			.build();
 
@@ -155,7 +145,7 @@ class MarkerServiceTest {
 		// when
 		when(userHelper.getCurrentUser()).thenReturn(user);
 		when(objectMapper.readValue(markerInfoJson, MarkerCreateRequest.class)).thenReturn(request);
-		when(objectMapper.writeValueAsString(any(MarkerPayload.class))).thenReturn(serializedPayload);
+		when(markerSerializer.serializeMarker(any(MarkerPayload.class))).thenReturn(Optional.of(serializedPayload));
 
 		// then
 		markerService.createMarkerProcess(markerInfoJson, imageFiles);
@@ -171,10 +161,7 @@ class MarkerServiceTest {
 		User user = new User(1L);
 		Exploration exploration = new Exploration();
 
-		List<MultipartFile> imageFiles = Arrays.asList(
-			mock(MultipartFile.class),
-			mock(MultipartFile.class)
-		);
+		List<MultipartFile> imageFiles = Arrays.asList(mock(MultipartFile.class), mock(MultipartFile.class));
 
 		Marker marker = Marker.builder()
 			.lat(36.9369)
@@ -186,13 +173,9 @@ class MarkerServiceTest {
 			.user(user)
 			.build();
 
-		String markerInfoJson = "{"
-			+ "\"title\": \"markerTitle\","
-			+ "\"content\": \"markerContent\","
-			+ "\"markerType\": \"BLUE\","
-			+ "\"lat\": 36.9369,"
-			+ "\"lon\": 22.2222"
-			+ "}";
+		String markerInfoJson =
+			"{" + "\"title\": \"markerTitle\"," + "\"content\": \"markerContent\"," + "\"markerType\": \"BLUE\","
+				+ "\"lat\": 36.9369," + "\"lon\": 22.2222" + "}";
 
 		// MarkerPayload 객체 생성
 		MarkerPayload markerPayload = MarkerPayload.builder()
@@ -201,9 +184,14 @@ class MarkerServiceTest {
 			.title(marker.getTitle())
 			.lat(marker.getLat())
 			.lon(marker.getLon())
-			.type(marker.getType().name())
+			.type(marker.getType())
 			.explorationId(exploration.getId()) // 탐험 ID 설정
 			.build();
+
+		String serializedMarkerPayload = objectMapper.writeValueAsString(markerPayload);
+
+		when(markerSerializer.serializeMarker(any(MarkerPayload.class))).thenReturn(
+			Optional.of(serializedMarkerPayload));
 
 		// when
 		when(userHelper.getCurrentUser()).thenReturn(user);
@@ -242,8 +230,7 @@ class MarkerServiceTest {
 		List<MarkerPoint> mockMarkerPoints = List.of(markerPoint1, markerPoint2);
 
 		when(markerReader.findMarkersByGeoDistanceAndCreatedAtRange(anyString(), anyDouble(), anyDouble(), anyString(),
-			anyString()))
-			.thenReturn(mockMarkerPoints);
+			anyString())).thenReturn(mockMarkerPoints);
 
 		// when
 		GeohashMarkerResponse response = markerService.getMarkersGroupedByGeohash(request);
@@ -274,8 +261,7 @@ class MarkerServiceTest {
 
 		List<MarkerPoint> mockMarkerPoints = List.of(markerPoint);
 		when(markerReader.findMarkersByGeoDistanceAndCreatedAtRangeAndType(anyString(), anyDouble(), anyDouble(),
-			anyString(), anyString(), anyString()))
-			.thenReturn(mockMarkerPoints);
+			anyString(), anyString(), anyString())).thenReturn(mockMarkerPoints);
 
 		// when
 		GeohashMarkerResponse response = markerService.getMarkersGroupedByGeohash(request);
