@@ -29,11 +29,7 @@ public class UserService {
 
 	public UserInfoResponse readUserInfo(Long userId) {
 		return userRepository.findById(userId)
-			.map(targetUser -> UserInfoResponse.builder()
-				.userId(targetUser.getUserId())
-				.nickname(targetUser.getNickname())
-				.imageName(targetUser.getImageName())
-				.build())
+			.map(UserInfoResponse::of)
 			.orElseThrow(() -> new ApplicationException(ApplicationError.USER_NOT_FOUND));
 	}
 
