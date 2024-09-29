@@ -1,8 +1,9 @@
 import React from 'react';
 import {Dimensions, Pressable} from 'react-native';
+import styled from 'styled-components/native';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 import {colors} from '@/constants';
-import styled from 'styled-components/native';
 
 interface DateBoxProps {
   date: number;
@@ -31,6 +32,11 @@ const DateBox = ({
             <DateText isToday={isToday} isSelected={selectedDate === date}>
               {date}
             </DateText>
+            <MaterialIcons
+              name="check-circle"
+              size={14}
+              color={colors.ORANGE.BASE}
+            />
           </DateContainer>
           {hasAttendance && <ScheduleIndicator />}
         </>
@@ -39,7 +45,9 @@ const DateBox = ({
   );
 };
 
-const DatePressable = styled(Pressable)<{isSelected: boolean}>`
+const DatePressable = styled(Pressable)<{
+  isSelected: boolean;
+}>`
   align-items: center;
   border-radius: 8px;
   width: ${deviceWidth / 7}px;

@@ -49,8 +49,20 @@ const RecordScreen = () => {
 
   useFocusEffect(
     useCallback(() => {
+      const getData = async () => {
+        try {
+          const response: MonthRecords = await getMonthWalks(
+            monthYear.year,
+            monthYear.month,
+          );
+          console.log(response);
+        } catch (err) {
+          console.error(err);
+        }
+      };
+
       moveToToday();
-      getMonthWalks(2024, 9);
+      getData();
       return () => {};
     }, []),
   );
