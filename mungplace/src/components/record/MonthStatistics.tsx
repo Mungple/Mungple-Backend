@@ -1,5 +1,5 @@
-import React, {useState, useEffect, useCallback} from 'react';
-import {View, Text, ActivityIndicator, ScrollView} from 'react-native';
+import React, {useState, useCallback} from 'react';
+import {Text, ActivityIndicator, ScrollView} from 'react-native';
 import {useFocusEffect} from '@react-navigation/native';
 import styled from 'styled-components/native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
@@ -18,43 +18,51 @@ interface Statistics {
   bestTime: number;
 }
 
+interface StatCardProps {
+  icon: string;
+  label: string;
+  value: string;
+}
+
 const ICON_SIZE = DEVICE_WIDTH * 0.1;
 const FONT_SIZE = DEVICE_WIDTH * 0.04;
 
 const MonthStatistics = () => {
   const [statistics, setStatistics] = useState<Statistics | null>(null);
-  const [loading, setLoading] = useState(true); // 로딩 상태 추가
-  const [error, setError] = useState<string | null>(null); // 에러 상태 추가
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useFocusEffect(
     useCallback(() => {
       const getData = async () => {
         try {
           setLoading(true); // 로딩 상태 시작
-          const response = await getStatistics(2024, 9); // year와 month를 props로 받음
+          const response = await getStatistics(2024, 9);
+          // year와 month를 props로 받음
           setStatistics(response);
           console.log(response);
         } catch (err) {
-          console.error(err);
-          setError(err.message || '통계 조회에 실패했습니다.'); // 에러 메시지 설정
+          if (err instanceof Error) {
+            console.error(err);
+            setError(err.message);
+          } else {
+            setError('산책 통계 기록을 불러오지 못했습니다.');
+          }
         } finally {
-          setLoading(false); // 로딩 상태 종료
+          setLoading(false);
         }
       };
 
       getData();
 
-      // Clean up function if needed
-      return () => {
-        // 필요한 경우 리소스를 정리하는 코드
-      };
-    }, []), // year와 month가 변경될 때마다 호출
+      return () => {};
+    }, []),
   );
 
   if (loading) {
     return (
       <LoadingContainer>
-        <ActivityIndicator size="large" color="#0000ff" />
+        <ActivityIndicator />
       </LoadingContainer>
     );
   }
@@ -62,7 +70,7 @@ const MonthStatistics = () => {
   if (error) {
     return (
       <ErrorContainer>
-        <Text>통계 기록을 불러오지 못했습니다.</Text>
+        <Text>{error}</Text>
       </ErrorContainer>
     );
   }
@@ -110,7 +118,7 @@ const MonthStatistics = () => {
   );
 };
 
-const StatCard = ({icon, label, value}) => (
+const StatCard: React.FC<StatCardProps> = ({icon, label, value}) => (
   <Card>
     <CardContent>
       <StatIcon>
