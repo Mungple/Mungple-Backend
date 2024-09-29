@@ -2,7 +2,7 @@ import { ResponsePetProfile, UserProfile } from '@/types';
 import { create } from 'zustand';
 
 interface UserState {
-  userId: number | null;
+  userId: number;
   petData: ResponsePetProfile[];
   userData: UserProfile;
 
@@ -12,7 +12,7 @@ interface UserState {
 }
 
 export const useUserStore = create<UserState>(set => ({
-  userId: null,
+  userId: 0,
   petData: [],
   userData: {
     userId: 0,

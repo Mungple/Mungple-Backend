@@ -1,5 +1,5 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Dimensions, Image as RNImage, Text } from 'react-native';
 import IonIcons from 'react-native-vector-icons/Ionicons';
 import styled from 'styled-components/native';
@@ -29,13 +29,13 @@ const MyPageScreen: React.FC<MyPageScreenProps> = ({navigation}) => {
   const userData = useUserStore(state => state.userData);
   const setUserData = useUserStore(state => state.setUserData);
   const [modalVisible, setModalVisible] = useState(false);
+  const {data} = useGetProfile(userId);
   
-  if (userId) {
-    const {data} = useGetProfile(userId);
+  useEffect(() => {
     if (data) {
       setUserData(data);
     }
-  }
+  }, [data, setUserData]);
 
   const handleSettingPress = () => {
     navigation.navigate(settingNavigations.SETTING);
@@ -48,6 +48,7 @@ const MyPageScreen: React.FC<MyPageScreenProps> = ({navigation}) => {
   const handleAddPet = () => {
     setModalVisible(prev => !prev);
   };
+  
 
   return (
     <Container>
@@ -63,7 +64,9 @@ const MyPageScreen: React.FC<MyPageScreenProps> = ({navigation}) => {
 
       <ProfileCard onPress={handleProfilePress}>
         <Image
-          source={userData.imageName ? {uri: userData.imageName} : DefaultImage}
+          source={userData.imageName
+            ? {uri: `http://j11e106.p.ssafy.io:9000/images/${userData.imageName}`}
+            : DefaultImage}
         />
         <Context>
           <Title>{userData.nickname}</Title>
