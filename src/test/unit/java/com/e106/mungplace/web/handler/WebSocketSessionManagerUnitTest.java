@@ -12,11 +12,11 @@ import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.WebSocketSession;
 
-import com.e106.mungplace.web.handler.interceptor.CustomWebSocketHandlerDecorator;
+import com.e106.mungplace.web.handler.interceptor.WebSocketSessionManager;
 
-class CustomWebSocketHandlerDecoratorUnitTest {
+class WebSocketSessionManagerUnitTest {
 
-	private CustomWebSocketHandlerDecorator decorator;
+	private WebSocketSessionManager sessionManager;
 
 	private WebSocketHandler mockHandler;
 	private WebSocketSession mockSession;
@@ -25,14 +25,14 @@ class CustomWebSocketHandlerDecoratorUnitTest {
 	public void setUp() {
 		mockHandler = mock(WebSocketHandler.class);
 		mockSession = mock(WebSocketSession.class);
-		decorator = new CustomWebSocketHandlerDecorator(mockHandler);
+		sessionManager = new WebSocketSessionManager(mockHandler);
 
 		when(mockSession.getId()).thenReturn("test-session");
 	}
 
 	@AfterEach
 	public void tearDown() throws Exception {
-		decorator.afterConnectionClosed(mockSession, CloseStatus.NORMAL);
+		sessionManager.afterConnectionClosed(mockSession, CloseStatus.NORMAL);
 	}
 
 	@Test
@@ -41,10 +41,10 @@ class CustomWebSocketHandlerDecoratorUnitTest {
 		// given
 
 		// when
-		decorator.afterConnectionEstablished(mockSession);
+		sessionManager.afterConnectionEstablished(mockSession);
 
 		// then
-		ConcurrentHashMap<String, WebSocketSession> sessionStore = decorator.getSessionStore();
+		ConcurrentHashMap<String, WebSocketSession> sessionStore = sessionManager.getSessionStore();
 		assert (sessionStore.containsKey("test-session")); // 세션이 저장되어 있는지 확인
 		verify(mockHandler).afterConnectionEstablished(mockSession);
 	}
@@ -53,13 +53,13 @@ class CustomWebSocketHandlerDecoratorUnitTest {
 	@DisplayName("소켓 연결이 끊길때 map 에 세션이 삭제되어야 한다.")
 	void Test_After_Connection_Closed() throws Exception {
 		// given
-		decorator.afterConnectionEstablished(mockSession);
+		sessionManager.afterConnectionEstablished(mockSession);
 
 		// when
-		decorator.afterConnectionClosed(mockSession, CloseStatus.NORMAL);
+		sessionManager.afterConnectionClosed(mockSession, CloseStatus.NORMAL);
 
 		// then
-		ConcurrentHashMap<String, WebSocketSession> sessionStore = decorator.getSessionStore();
+		ConcurrentHashMap<String, WebSocketSession> sessionStore = sessionManager.getSessionStore();
 		assert (!sessionStore.containsKey("test-session")); // 세션이 삭제되어 있는지 확인
 		verify(mockHandler).afterConnectionClosed(mockSession, CloseStatus.NORMAL);
 	}
@@ -69,10 +69,10 @@ class CustomWebSocketHandlerDecoratorUnitTest {
 	void Test_Close_Session() throws Exception {
 		// given
 		when(mockSession.isOpen()).thenReturn(true);
-		decorator.afterConnectionEstablished(mockSession);
+		sessionManager.afterConnectionEstablished(mockSession);
 
 		// when
-		decorator.closeSession("test-session");
+		sessionManager.closeSession("test-session");
 
 		// then
 		verify(mockSession).close(); // 세션이 닫혀야 함

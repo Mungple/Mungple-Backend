@@ -29,7 +29,7 @@ public class ExplorationReader {
 			.orElseThrow(() -> new ApplicationException(ApplicationError.EXPLORATION_NOT_FOUND));
 	}
 
-	public Exploration getDuringExploring(Long explorationId) {
+	public Exploration isValidExploration(Long explorationId) {
 		return explorationRepository.findById(explorationId).map(result -> {
 			if (result.isEnded())
 				throw new ApplicationSocketException(ApplicationSocketError.IS_ENDED_EXPLORATION);

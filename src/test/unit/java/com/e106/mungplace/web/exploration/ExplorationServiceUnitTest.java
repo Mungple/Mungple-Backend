@@ -136,12 +136,12 @@ class ExplorationServiceUnitTest {
 
 		ExplorationEventRequest request = ExplorationEventRequest.builder()
 			.userId(1L)
-			.latitude("37.5665")
-			.longitude("126.978")
+			.lat("37.5665")
+			.lon("126.978")
 			.recordedAt(LocalDateTime.now())
 			.build();
 
-		when(explorationReader.getDuringExploring(any())).thenThrow(
+		when(explorationReader.isValidExploration(any())).thenThrow(
 			new ApplicationSocketException(ApplicationSocketError.IS_ENDED_EXPLORATION));
 
 		// when
@@ -161,8 +161,8 @@ class ExplorationServiceUnitTest {
 
 		ExplorationEventRequest request = ExplorationEventRequest.builder()
 				.userId(1L)
-				.latitude("37.5665")
-				.longitude("126.978")
+				.lat("37.5665")
+				.lon("126.978")
 				.recordedAt(LocalDateTime.now())
 				.build();
 

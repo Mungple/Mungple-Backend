@@ -27,15 +27,15 @@ public record Point(
 		return GeoLocation.of(b -> b.latlon(LatLonGeoLocation.of(ll -> ll.lat(lat).lon(lon))));
 	}
 
-	public static String toUserCurrentGeoHash(String latitude, String longitude) {
-		return GeohashUtils.encodeLatLon(Double.parseDouble(latitude), Double.parseDouble(longitude), 9);
+	public static String toUserCurrentGeoHash(String lat, String lon) {
+		return GeohashUtils.encodeLatLon(Double.parseDouble(lat), Double.parseDouble(lon), 9);
 	}
 
-	public static String toConstantGeoHash(String latitude, String longitude) {
-		return GeohashUtils.encodeLatLon(Double.parseDouble(latitude), Double.parseDouble(longitude), 8);
+	public static String toConstantGeoHash(String lat, String lon) {
+		return GeohashUtils.encodeLatLon(Double.parseDouble(lat), Double.parseDouble(lon), 8);
 	}
 
-	public static String toMungGeoHash(String latitude, String longitude) {
-		return GeohashUtils.encodeLatLon(Double.parseDouble(latitude), Double.parseDouble(longitude), 7);
+	public static String toMungGeoHash(String lat, String lon) {
+		return GeohashUtils.encodeLatLon(Double.parseDouble(lat), Double.parseDouble(lon), 7);
 	}
 }

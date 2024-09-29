@@ -31,7 +31,7 @@ import com.e106.mungplace.web.exploration.dto.ExplorationStartWithDogsRequest;
 import com.e106.mungplace.web.exploration.dto.ExplorationStatisticResponse;
 import com.e106.mungplace.web.exploration.dto.ExplorationsResponse;
 import com.e106.mungplace.web.exploration.service.ExplorationService;
-import com.e106.mungplace.web.handler.interceptor.CustomWebSocketHandlerDecorator;
+import com.e106.mungplace.web.handler.interceptor.WebSocketSessionManager;
 import com.e106.mungplace.web.util.StatisticUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -55,7 +55,7 @@ class ExplorationControllerUnitTest {
 	private SimpMessagingTemplate simpMessagingTemplate;
 
 	@MockBean
-	private CustomWebSocketHandlerDecorator decorator;
+	private WebSocketSessionManager sessionManager;
 
 	@Autowired
 	private ObjectMapper objectMapper;
@@ -85,8 +85,8 @@ class ExplorationControllerUnitTest {
 
 		ExplorationStartResponse response = ExplorationStartResponse.of(exploration);
 		ExplorationStartWithDogsRequest isInDog = ExplorationStartWithDogsRequest.builder()
-			.latitude("50.00000")
-			.longitude("129.00000")
+			.lat("50.00000")
+			.lon("129.00000")
 			.dogIds(togetherDogIds)
 			.build();
 		String dogsJson = objectMapper.writeValueAsString(isInDog);

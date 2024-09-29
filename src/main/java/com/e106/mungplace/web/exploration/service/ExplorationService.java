@@ -5,7 +5,6 @@ import static com.e106.mungplace.web.exception.dto.ApplicationError.*;
 import java.security.Principal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -52,8 +51,8 @@ public class ExplorationService {
 		Exploration exploration = explorationReader.create(new User(userId), LocalDateTime.now());
 		explorationHelper.validateExplorationWithDogs(request);
 		explorationHelper.createDogsInExploration(request, exploration);
-		explorationRecorder.initRecord(exploration.getId().toString(), userId.toString(), request.latitude(),
-			request.longitude());
+		explorationRecorder.initRecord(exploration.getId().toString(), userId.toString(), request.lat(),
+			request.lon());
 
 		return ExplorationStartResponse.of(exploration);
 	}
@@ -91,11 +90,11 @@ public class ExplorationService {
 	@Transactional(readOnly = true)
 	public ExplorationResponse findExplorationProcess(Long explorationId) {
 		Long userId = userHelper.getCurrentUserId();
-		Exploration exploration = explorationReader.get(explorationId);
-		List<Long> togetherDogIds = explorationHelper.getTogetherDogIds(exploration);
 		explorationHelper.validateIsEndedExploration(userId);
 
-		List<ExplorationPoint> points = new ArrayList<>(); // TODO : <이현수> elastic search 조회 매핑
+		Exploration exploration = explorationReader.get(explorationId);
+		List<Long> togetherDogIds = explorationHelper.getTogetherDogIds(exploration);
+		List<ExplorationPoint> points = explorationHelper.getExplorationPath(explorationId);
 
 		return ExplorationResponse.of(exploration, togetherDogIds, points);
 	}
@@ -114,8 +113,8 @@ public class ExplorationService {
 		String userId = principal.getName();
 		eventRequest.setUserId(Long.parseLong(userId));
 
-		explorationReader.getDuringExploring(explorationId);
-		explorationRecorder.recordCurrentUserGeoHash(userId, eventRequest.getLatitude(), eventRequest.getLongitude());
+		explorationReader.isValidExploration(explorationId);
+		explorationRecorder.recordExploration(userId, eventRequest.getLat(), eventRequest.getLon());
 
 		ExplorationPayload payload = explorationHelper.createExplorationEventPayload(eventRequest);
 		ExplorationEvent event = ExplorationEvent.of(eventRequest, explorationId, payload);

@@ -37,16 +37,16 @@ public class ExplorationRecorder {
 	private static final int MAX_DISTANCE_CAPACITY = 3;
 	private final DogExplorationRepository dogExplorationRepository;
 
-	public void initRecord(String explorationId, String userId, String latitude, String longitude) {
-		String userCurrentGeoHash = Point.toUserCurrentGeoHash(latitude, longitude);
-		String constantGeoHash = Point.toConstantGeoHash(latitude, longitude);
+	public void initRecord(String explorationId, String userId, String lat, String lon) {
+		String userCurrentGeoHash = Point.toUserCurrentGeoHash(lat, lon);
+		String constantGeoHash = Point.toConstantGeoHash(lat, lon);
 
 		deleteAllValue(userId);
 
 		redisTemplate.opsForValue().set(getUserKey(userId), userCurrentGeoHash, 60, TimeUnit.SECONDS);
 		redisTemplate.opsForValue().set(getConstantKey(userId), constantGeoHash, 30, TimeUnit.MINUTES);
 		redisTemplate.opsForValue().set(getTotalDistanceKey(userId), "0");
-		redisTemplate.opsForValue().set(getPrePointKey(userId), latitude + "," + longitude);
+		redisTemplate.opsForValue().set(getPrePointKey(userId), lat + "," + lon);
 		redisTemplate.opsForList().rightPush(getThreePointDistanceKey(userId), "0");
 		redisTemplate.opsForSet().add(getActiveUsersKey(), userId + ":" + explorationId);
 	}
@@ -72,14 +72,14 @@ public class ExplorationRecorder {
 		deleteAllValue(userId);
 	}
 
-	public void recordCurrentUserGeoHash(String userId, String latitude, String longitude) {
+	public void recordExploration(String userId, String lat, String lon) {
 		String previousGeoHash = getValidatedUserGeoHash(userId);
-		String currentGeoHash = Point.toUserCurrentGeoHash(latitude, longitude);
+		String currentGeoHash = Point.toUserCurrentGeoHash(lat, lon);
 		redisTemplate.opsForValue().set(getUserKey(userId), currentGeoHash, 60, TimeUnit.SECONDS);
 
 		validateUserIdWhenGeoHashIsDifference(userId, previousGeoHash, currentGeoHash);
 
-		String totalDistance = calculateDistance(userId, latitude, longitude);
+		String totalDistance = calculateDistance(userId, lat, lon);
 		redisTemplate.opsForValue().set(getTotalDistanceKey(userId), totalDistance);
 	}
 
@@ -103,18 +103,18 @@ public class ExplorationRecorder {
 		return true;
 	}
 
-	private String calculateDistance(String userId, String latitude, String longitude) {
+	private String calculateDistance(String userId, String lat, String lon) {
 		String[] previousLatLon = redisTemplate.opsForValue().get(getPrePointKey(userId)).split(",");
 		String previousUserTotalDistance = redisTemplate.opsForValue().get(getTotalDistanceKey(userId));
 
-		double distance = getDistanceBetweenPoints(latitude, longitude, previousLatLon);
+		double distance = getDistanceBetweenPoints(lat, lon, previousLatLon);
 		double amountDistance = Double.parseDouble(previousUserTotalDistance) + distance;
 
 		if (redisTemplate.opsForList().size(getThreePointDistanceKey(userId)) >= MAX_DISTANCE_CAPACITY) {
 			redisTemplate.opsForList().leftPop(getThreePointDistanceKey(userId));
 		}
 		redisTemplate.opsForList().rightPush(getThreePointDistanceKey(userId), String.valueOf(distance));
-		redisTemplate.opsForValue().set(getPrePointKey(userId), latitude + "," + longitude);
+		redisTemplate.opsForValue().set(getPrePointKey(userId), lat + "," + lon);
 
 		double calculateNineSecondsDistance = getCalculateNineSecondsDistance(userId);
 		if (calculateNineSecondsDistance >= 90.00) {
@@ -150,9 +150,9 @@ public class ExplorationRecorder {
 			});
 	}
 
-	private static double getDistanceBetweenPoints(String latitude, String longitude, String[] previousLatLon) {
+	private static double getDistanceBetweenPoints(String lat, String lon, String[] previousLatLon) {
 		Point previousPoint = new Point(Double.parseDouble(previousLatLon[0]), Double.parseDouble(previousLatLon[1]));
-		Point currentPoint = new Point(Double.parseDouble(latitude), Double.parseDouble(longitude));
+		Point currentPoint = new Point(Double.parseDouble(lat), Double.parseDouble(lon));
 		return GeoUtils.calculateDistance(previousPoint, currentPoint);
 	}
 

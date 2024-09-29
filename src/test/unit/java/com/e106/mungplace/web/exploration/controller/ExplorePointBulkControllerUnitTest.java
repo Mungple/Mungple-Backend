@@ -21,7 +21,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import com.e106.mungplace.common.map.dto.Point;
 import com.e106.mungplace.domain.exploration.impl.ExplorationRecorder;
 import com.e106.mungplace.domain.user.repository.UserRepository;
-import com.e106.mungplace.web.handler.interceptor.CustomWebSocketHandlerDecorator;
+import com.e106.mungplace.web.handler.interceptor.WebSocketSessionManager;
 import com.e106.mungplace.web.manager.controller.ExplorePointBulkController;
 import com.e106.mungplace.web.manager.dto.ManagerExplorePointCreateRequest;
 import com.e106.mungplace.web.manager.service.ManagerExplorePointService;
@@ -44,7 +44,7 @@ class ExplorePointBulkControllerUnitTest {
 	private UserRepository userRepository;
 
 	@MockBean
-	private CustomWebSocketHandlerDecorator decorator;
+	private WebSocketSessionManager sessionManager;
 
 	@MockBean
 	private SimpMessagingTemplate messagingTemplate;

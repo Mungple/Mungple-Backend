@@ -72,7 +72,7 @@ public class ExplorationController {
 		return ResponseEntity.ok(explorationService.findExplorationStatisticsProcess(year, month));
 	}
 
-	@MessageMapping("/exploration/{explorationId}")
+	@MessageMapping("/explorations/{explorationId}")
 	public void createExplorationEvent(@Valid ExplorationEventRequest eventRequest,
 		@DestinationVariable Long explorationId, Principal principal) {
 		explorationService.createExplorationEventProcess(eventRequest, explorationId, principal);
