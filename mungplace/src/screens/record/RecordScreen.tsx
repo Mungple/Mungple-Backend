@@ -20,6 +20,7 @@ interface ExplorationInfo {
   togetherDogIds: number[]; // 함께한 개의 ID 배열
   points: number | null; // 포인트 (null일 수 있음)
 }
+
 // 월간 산책 정보 인터페이스
 interface MonthRecords {
   year: number; // 연도
@@ -33,6 +34,7 @@ const currentMonthYear = getMonthYearDetails(new Date());
 const RecordScreen = () => {
   const [selectedDate, setSelectedDate] = useState(0);
   const [monthYear, setMonthYear] = useState(currentMonthYear);
+  const [attendance, setAttendance] = useState<number[]>([]);
 
   const moveToToday = () => {
     setSelectedDate(new Date().getDate());
@@ -47,6 +49,16 @@ const RecordScreen = () => {
     setMonthYear(prev => getNewMonthYear(prev, increment));
   };
 
+  const processAttendance = (explorationInfos: ExplorationInfo[]) => {
+    // endTime에서 날짜(day) 추출하고 중복 제거
+    const days = [
+      ...new Set(
+        explorationInfos.map(info => new Date(info.endTime).getDate()),
+      ),
+    ];
+    setAttendance(days);
+  };
+
   useFocusEffect(
     useCallback(() => {
       const getData = async () => {
@@ -55,6 +67,7 @@ const RecordScreen = () => {
             monthYear.year,
             monthYear.month,
           );
+          processAttendance(response.explorationInfos);
           console.log(response);
         } catch (err) {
           console.error(err);

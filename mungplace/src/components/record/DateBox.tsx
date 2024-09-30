@@ -32,13 +32,14 @@ const DateBox = ({
             <DateText isToday={isToday} isSelected={selectedDate === date}>
               {date}
             </DateText>
+          </DateContainer>
+          {!hasAttendance && (
             <MaterialIcons
               name="check-circle"
               size={14}
               color={colors.ORANGE.BASE}
             />
-          </DateContainer>
-          {hasAttendance && <ScheduleIndicator />}
+          )}
         </>
       )}
     </DatePressable>
@@ -72,14 +73,6 @@ const DateText = styled.Text<{isToday: boolean; isSelected: boolean}>`
   color: ${({isToday}) => (isToday ? colors.WHITE : colors.BLACK)};
   font-weight: ${({isToday, isSelected}) =>
     isToday || isSelected ? 'bold' : 'normal'};
-`;
-
-const ScheduleIndicator = styled.View`
-  margin-top: 2px;
-  width: 6px;
-  height: 6px;
-  border-radius: 6px;
-  background-color: ${colors.GRAY_500};
 `;
 
 export default DateBox;
