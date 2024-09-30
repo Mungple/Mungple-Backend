@@ -1,20 +1,23 @@
+import {JwtPayload, jwtDecode} from 'jwt-decode';
 import {useMutation, useQuery} from '@tanstack/react-query';
 
-import {queryKeys, storageKeys} from '@/constants';
-import queryClient from '@/api/queryClient';
-import {removeHeader, setEncryptStorage, setHeader} from '@/utils';
 import {
-  getProfile,
-  editProfile,
-  logout,
-  ResponseProfile,
   RequestProfile,
+  ResponseProfile,
+  editProfile,
+  getProfile,
+  logout,
   socialLogin,
 } from '@/api/auth';
-import type {ResponseError, UseMutationCustomOptions, UseQueryCustomOptions} from '@/types/common';
-import { JwtPayload, jwtDecode } from 'jwt-decode';
-import { useUserStore } from '@/state/useUserStore';
-import { getPetProfiles } from '@/api';
+import queryClient from '@/api/queryClient';
+import {queryKeys} from '@/constants';
+import {useUserStore} from '@/state/useUserStore';
+import type {
+  ResponseError,
+  UseMutationCustomOptions,
+  UseQueryCustomOptions,
+} from '@/types/common';
+import {removeHeader, setHeader} from '@/utils';
 
 interface CustomJwtPayload extends JwtPayload {
   userId: number;
@@ -25,18 +28,12 @@ function useLogin(mutationOptions?: UseMutationCustomOptions) {
   return useMutation({
     mutationFn: (loginUrl: string) => socialLogin(loginUrl),
     onSuccess: ({accessToken}) => {
-      const {setUserId, setPetData} = useUserStore.getState();
+      const {setUserId} = useUserStore.getState();
       setHeader('Authorization', `Bearer ${accessToken}`);
-      setEncryptStorage(storageKeys.REFRESH_TOKEN, accessToken);
-      
-      const decoded = jwtDecode<CustomJwtPayload>(`${accessToken}`)
-      setUserId(decoded.userId)
-      
-      const getPetProfile = async () => {
-        const data = await getPetProfiles(decoded.userId);
-        setPetData(data)
-      }
-      getPetProfile()
+      // setEncryptStorage(storageKeys.REFRESH_TOKEN, accessToken);
+
+      const decoded = jwtDecode<CustomJwtPayload>(`${accessToken}`);
+      setUserId(decoded.userId);
     },
     onSettled: () => {
       queryClient.refetchQueries({
@@ -54,11 +51,12 @@ function useLogin(mutationOptions?: UseMutationCustomOptions) {
 // 프로필 정보 가져오기 훅
 function useGetProfile(
   userId: number,
-  queryOptions?: UseQueryCustomOptions<ResponseProfile>
+  queryOptions?: UseQueryCustomOptions<ResponseProfile>,
 ) {
   return useQuery({
     queryFn: () => getProfile(userId),
     queryKey: [queryKeys.AUTH, queryKeys.GET_PROFILE],
+    enabled: !!userId,
     ...queryOptions,
   });
 }

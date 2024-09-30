@@ -1,11 +1,11 @@
 import React, {useRef, useEffect, useState} from 'react';
 import {Animated, StyleSheet, Image } from 'react-native';
 import MapView, {
+  Heatmap,
   Marker,
   Polyline,
   PROVIDER_GOOGLE,
 } from 'react-native-maps';
-import HeatmapLayer from './HeatmapLayer'; // 히트맵
 import ClusteredMapView from 'react-native-map-clustering' // 클러스터링 라이브러리
 import styled from 'styled-components/native';
 import { useMapStore, MarkerData} from '@/state/useMapStore'; // zustand
@@ -20,7 +20,9 @@ import PolygonLayer from './PolygonLayer'; // 멍플 지오해시
 import MarkerForm from '../marker/MarkerForm';
 import { useNavigation } from '@react-navigation/native';
 import { mapNavigations } from '@/constants';
-// import ClusterMarkerList from '../marker/ClusterMarkerList' // 클러스터 마커 리스트
+import useMarkersWithinRadius from '@/hooks/useMarkersWithinRadius'; // 주변 위치 조회 훅
+import useWebSocket from '@/hooks/useWebsocket' // 웹소켓에서 블루, 레드 멍플 가져올거임
+
 
 interface MapComponentProps {
   userLocation: {latitude: number; longitude: number};
@@ -38,29 +40,19 @@ const MapComponent: React.FC<MapComponentProps> = ({
   userLocation,
   bottomOffset = 0,
   path = [],
-  // userMarkers,
-  // nearbyMarkers,
   onFormClose,
   // onAddMarker,
 }) => {
-  const {
-    showPersonalBlueZone,
-    showGlobalBlueZone,
-    showRedZone,
-    showMungPlace,
-    personalBlueZones,
-    globalBlueZones,
-    redZones,
-    mungPlaces,
-    nearbyMarkers,
-    //markers,
-    addMarker,
-    fetchPersonalBlueZone,
-    fetchGlobalBlueZone,
-    fetchRedZone,
-    fetchMungPlace,
-  } = useMapStore();
 
+  useMarkersWithinRadius()
+  const {
+    myBlueZone,
+    allBlueZone,
+    allRedZone,
+    mungZone,
+  } = useWebSocket();
+  const { addMarker } = useMapStore();
+  const nearbyMarkers = useMapStore((state) => state.nearbyMarkers) // 상태에서 nearbyMarkers 가져오기
   const navigation = useNavigation()
   const mapRef = useRef<MapView | null>(null);
   const [isMenuVisible, setIsMenuVisible] = useState(false);
@@ -70,18 +62,13 @@ const MapComponent: React.FC<MapComponentProps> = ({
   const [isDisabled, setIsDisabled] = useState(true);
   const {isUserLocationError} = useUserLocation();
   const [isSettingModalVisible, setIsSettingModalVisible] = useState(false) // 환경 설정에 쓰는 모달 가시성
-  const { loading } = useMarkersWithinRadius(userLocation.latitude, userLocation.longitude)
   // Fetch zones data
   useEffect(() => {
-    fetchAllZones(userLocation);
-  }, [userLocation]);
-
-  const fetchAllZones = (location: {latitude: number; longitude: number}) => {
-    fetchPersonalBlueZone(location.latitude, location.longitude);
-    fetchGlobalBlueZone(location.latitude, location.longitude);
-    fetchRedZone(location.latitude, location.longitude);
-    fetchMungPlace(location.latitude, location.longitude);
-  };
+    console.log('나의 블루존:', myBlueZone)
+    console.log('블루존:', allBlueZone)
+    console.log('레드존:', allRedZone)
+    console.log('멍플:', mungZone)
+  }, [myBlueZone, allBlueZone, allRedZone, mungZone]); 
 
   // 유저의 위치를 호출하는 함수
   const handlePressUserLocation = () => {
@@ -178,23 +165,42 @@ const MapComponent: React.FC<MapComponentProps> = ({
           />
         )}
 
-        {/* 히트맵 */}
-        {showPersonalBlueZone && (
-          <HeatmapLayer zones={personalBlueZones} />
+        {/* 개인 블루존 히트맵 */}
+        {myBlueZone?.cells?.length > 0 && (
+          <Heatmap
+            points={myBlueZone.cells.map(cell => ({
+              latitude: cell.point.latitude,
+              longitude: cell.point.longitude,
+              weight: cell.weight,
+            }))}
+          />
         )}
-        {showGlobalBlueZone && (
-          <HeatmapLayer zones={globalBlueZones} />
-        )}
-        {showRedZone && (
-          <HeatmapLayer
-            zones={redZones}
-            radius={50}
-            opacity={0.6}
+        {/* 전체 블루존 히트맵 */}
+        {allBlueZone?.cells?.length > 0 && (
+          <Heatmap
+            points={allBlueZone.cells.map(cell => ({
+              latitude: cell.point.latitude,
+              longitude: cell.point.longitude,
+              weight: cell.weight,
+            }))}
           />
         )}
 
-        {/* 멍플 */}
-        {showMungPlace && <PolygonLayer mungPlaces={mungPlaces} />}
+        {/* 전체 레드존 히트맵 */}
+        {allRedZone?.cells?.length > 0 && (
+          <Heatmap
+            points={allRedZone.cells.map(cell => ({
+              latitude: cell.point.latitude,
+              longitude: cell.point.longitude,
+              weight: cell.weight,
+            }))}
+            gradient={{
+              colors: ['red', 'darkred'], // 레드존 색상 설정
+              startPoints: [0.2, 1.0],
+              colorMapSize: 256,
+            }}
+          />
+        )}
 
       </ClusteredMapView>
       

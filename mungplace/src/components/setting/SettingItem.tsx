@@ -1,10 +1,10 @@
 import React, {ReactNode} from 'react';
-import {PressableProps} from 'react-native';
+import {TouchableOpacityProps} from 'react-native';
 import styled from 'styled-components/native';
 
 import {colors} from '@/constants';
 
-interface SettingItemProps extends PressableProps {
+interface SettingItemProps extends TouchableOpacityProps {
   title: string;
   subTitle?: string;
   icon?: ReactNode;
@@ -32,7 +32,7 @@ function SettingItem({
   );
 }
 
-const Container = styled.Pressable`
+const Container = styled.TouchableOpacity`
   flex-direction: row;
   align-items: center;
   gap: 10px;

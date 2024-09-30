@@ -3,6 +3,7 @@ import {TouchableOpacity} from 'react-native';
 
 import {colors} from '@/constants';
 import CustomCard from '@/components/common/CustomCard';
+import CustomButton from '@/components/common/CustomButton';
 
 const Container = styled.View`
   flex: 1;
@@ -40,10 +41,15 @@ const CloseButton = styled(TouchableOpacity)`
   right: 20px;
 `;
 
+const StartButton = styled(CustomButton)`
+  margin: 20px;
+`
+
 export {
   MenuText,
   Container,
   ImageCard,
+  StartButton,
   CloseButton,
   HeaderContainer,
 };

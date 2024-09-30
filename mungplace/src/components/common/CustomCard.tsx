@@ -1,7 +1,7 @@
+import { colors } from '@/constants';
 import React from 'react';
+import { StyleProp, ViewStyle } from 'react-native';
 import styled from 'styled-components/native';
-import {ViewStyle, StyleProp} from 'react-native';
-import {colors} from '@/constants';
 
 interface CustomCardProps {
   onPress?: () => void;
@@ -20,9 +20,8 @@ const CustomCard: React.FC<CustomCardProps> = ({style, children, onPress}) => {
 const CardContainer = styled.TouchableOpacity`
   background-color: ${colors.WHITE};
   border-radius: 16px;
-  padding: 20px;
   max-width: 600px;
-  margin: 20px;
+  padding: 20px;
   width: 100%;
 `;
 

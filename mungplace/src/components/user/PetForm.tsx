@@ -4,39 +4,38 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import {colors} from '@/constants';
 import useForm from '@/hooks/useForm';
-import {Keyboard, KeyboardAvoidingView, Text} from 'react-native';
-import {createPetProfile, editPetProfile} from '@/api';
+import {Alert, Keyboard, KeyboardAvoidingView, Text} from 'react-native';
+import {createPetProfile, getPetProfiles} from '@/api';
 import useModal from '@/hooks/useModal';
 import useImagePicker from '@/hooks/useImagePicker';
 import CustomButton from '@/components/common/CustomButton';
 import CustomInputField from '@/components/common/CustomInputField';
 import EditProfileImageOption from '@/components/setting/EditProfileImageOption';
 import RadioButtonGroup from '../common/RadioButtonGroup';
-import {validateInputPet} from '@/utils';
-import {ResponsePetProfile} from '@/types';
+import { validateInputPet } from '@/utils';
+import { useUserStore } from '@/state/useUserStore';
 
-type CreatePetProps = {
-  setModalVisible: (visible: boolean) => void;
+type PetFormProps = {
   isEdit?: boolean;
-  petData?: Partial<ResponsePetProfile>;
+  setModalVisible: (visible: boolean) => void; 
 }
 
-const CreatePet = ({setModalVisible, isEdit = false, petData}: CreatePetProps) => {
+const PetForm = ({setModalVisible, isEdit = false}: PetFormProps) => {
   const imageOption = useModal();
+  const {userId, setPetData} = useUserStore.getState()
   const inputUser = useForm({
     initialValue: {
-      petName: petData?.name || '',
-      petGender: petData?.gender || 'MALE',
-      petWeight: petData?.weight || 0,
-      petBirth: petData?.birth || '',
+      petName: '',
+      petGender: 'MALE',
+      petWeight: 0,
+      petBirth: '',
     },
     validate: validateInputPet,
   })
 
   // 이미지 선택 기능을 위한 커스텀 훅
   const imagePicker = useImagePicker({
-    initialImages: [],
-    mode: 'single',
+    image: '',
     onSettled: imageOption.hide,
   });
 
@@ -50,17 +49,19 @@ const CreatePet = ({setModalVisible, isEdit = false, petData}: CreatePetProps) =
     inputUser.handleChangeText('petGender', value);
   };
 
-  const handleSubmit = () => {
-    const submitData = JSON.stringify({
-      ...inputUser.values,
-      petWeight: Number(inputUser.values.petWeight),
-    });
-    if (isEdit && petData?.id) {
-      editPetProfile(petData.id, submitData)
-    } else {
+  const handleSubmit = async () => {
+    if (userId) {
+      const submitData = JSON.stringify({
+        ...inputUser.values,
+        petWeight: Number(inputUser.values.petWeight),
+      });
       createPetProfile(submitData);
+      setModalVisible(false)
+      setPetData(await getPetProfiles(userId))
+      Alert.alert('Complete', '반려견 등록이 완료되었습니다')
+    } else {
+      Alert.alert('Error', '로그인 해주세요')
     }
-    setModalVisible(false)
   };
 
   return (
@@ -72,13 +73,10 @@ const CreatePet = ({setModalVisible, isEdit = false, petData}: CreatePetProps) =
         <ProfileContainer>
           <ImageContainer onPress={handlePressImage}>
             {/* 이미지가 없을 때 기본 아이콘 표시 */}
-            {imagePicker.imageNames.length === 0 && (
-              <Ionicons name="camera-outline" size={40} color={colors.GRAY_400} />
-            )}
-            {/* 이미지가 있을 때 해당 이미지 표시 */}
-            {imagePicker.imageNames.length > 0 && (
-              <MyImage source={{uri: `http://10.0.2.2:3030/${imagePicker.imageNames[0]?.uri}`}} resizeMode="cover" />
-            )}
+            {imagePicker.imageName === ''
+              ? <Ionicons name="camera-outline" size={40} color={colors.GRAY_400} />
+              : <MyImage source={{uri: `http://10.0.2.2:3030/${imagePicker.imageName}`}} resizeMode="cover" />
+            }
           </ImageContainer>
         </ProfileContainer>
 
@@ -160,4 +158,4 @@ const InputContainer = styled.View`
   gap: 20px;
 `;
 
-export default CreatePet;
+export default PetForm;
