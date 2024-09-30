@@ -1,14 +1,16 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import {Alert} from 'react-native';
 import styled from 'styled-components/native';
+import {RouteProp, useRoute, useNavigation} from '@react-navigation/native';
 
 import {colors} from '@/constants';
+import {addPetImage, deletePetProfile} from '@/api';
 import {calculateAge} from '@/hooks/usePetAge';
-import {RouteProp, useRoute, useNavigation} from '@react-navigation/native';
-import {SettingStackParamList} from '@/navigations/stack/SettingStackNavigator';
+import PetForm from '@/components/user/PetForm';
 import CustomModal from '@/components/common/CustomModal';
 import CustomModalHeader from '@/components/common/CustomModalHeader';
-import PetForm from '@/components/user/PetForm';
+import {SettingStackParamList} from '@/navigations/stack/SettingStackNavigator';
+import ImagePicker from '@/components/common/ImagePicker';
 
 type PetDetailRouteProp = RouteProp<SettingStackParamList, 'PetDetail'>;
 
@@ -19,7 +21,6 @@ const PetDetailScreen: React.FC = () => {
   const {petData} = route.params;
 
   const handleDelete = () => {
-    // 삭제 (Delete) 버튼 클릭 시 동작
     Alert.alert(
       '삭제 확인',
       '정말로 이 반려동물을 삭제하시겠습니까?',
@@ -29,8 +30,7 @@ const PetDetailScreen: React.FC = () => {
           text: '삭제',
           style: 'destructive',
           onPress: () => {
-            // 실제 삭제 로직을 여기에 추가
-            console.log('Pet deleted');
+            deletePetProfile(petData.id);
             navigation.goBack();
           },
         },
@@ -41,7 +41,8 @@ const PetDetailScreen: React.FC = () => {
 
   return (
     <Container>
-      <Content>
+      <ImagePicker petId={petData.id} uploadFunction={addPetImage}/>
+      <Column>
         <Row>
           <Title>이름</Title>
           <Context>{petData.name}</Context>
@@ -58,7 +59,7 @@ const PetDetailScreen: React.FC = () => {
           <Title>몸무게</Title>
           <Context>{petData.weight}kg</Context>
         </Row>
-      </Content>
+      </Column>
       <ButtonContainer>
         <ActionButton onPress={() => setModalVisible(true)}>
           <ButtonText>변경</ButtonText>
@@ -68,8 +69,14 @@ const PetDetailScreen: React.FC = () => {
         </ActionButton>
       </ButtonContainer>
 
-      <CustomModal isWide={true} modalVisible={modalVisible} setModalVisible={setModalVisible}>
-        <CustomModalHeader title="반려견 정보 변경" closeButton={() => setModalVisible(false)} />
+      <CustomModal
+        isWide={true}
+        modalVisible={modalVisible}
+        setModalVisible={setModalVisible}>
+        <CustomModalHeader
+          title="반려견 정보 변경"
+          closeButton={() => setModalVisible(false)}
+        />
         <PetForm isEdit setModalVisible={setModalVisible} />
       </CustomModal>
     </Container>
@@ -79,18 +86,20 @@ const PetDetailScreen: React.FC = () => {
 const Container = styled.View`
   flex: 1;
   padding: 20px;
-  justify-content: space-between;
+  align-items: center;
+  justify-content: center;
   background-color: ${colors.WHITE};
 `;
 
-const Content = styled.View`
+const Column = styled.View`
   flex: 1;
 `;
 
 const Row = styled.View`
+  gap: 100px;
+  margin: 10px 0;
   flex-direction: row;
   justify-content: space-between;
-  margin: 10px 0;
 `;
 
 const Title = styled.Text`
@@ -113,15 +122,16 @@ const ActionButton = styled.TouchableOpacity<{danger?: boolean}>`
   flex: 1;
   padding: 15px;
   margin: 0 5px;
-  background-color: ${props => props.danger ? colors.RED.BASE : colors.ORANGE.BASE};
+  background-color: ${props =>
+    props.danger ? colors.RED.BASE : colors.ORANGE.BASE};
   border-radius: 8px;
   align-items: center;
 `;
 
 const ButtonText = styled.Text`
-font-size: 18px;
-font-weight: bold;
-color: ${colors.WHITE};
+  font-size: 18px;
+  font-weight: bold;
+  color: ${colors.WHITE};
 `;
 
 export default PetDetailScreen;

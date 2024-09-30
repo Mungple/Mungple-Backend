@@ -59,7 +59,12 @@ const getAccessToken = async (): Promise<ResponseToken> => {
 
 // 로그아웃 요청 함수
 const logout = async () => {
-  await axiosInstance.post('/users/logout');
+  try {
+    await axiosInstance.post('/users/logout');
+  } catch (error) {
+    console.error('로그아웃 실패 :', error);
+    throw error;
+  }
 };
 
 export { editProfile, getAccessToken, getProfile, logout, socialLogin };

@@ -1,7 +1,7 @@
 import axiosInstance from './axios';
 
 // 프로필 이미지를 추가하는 함수
-const addImage = async (formData: FormData) => {
+const addImage = async (formData: FormData): Promise<string> => {
   try {
     const {data} = await axiosInstance.post('/users/image', formData, {
       headers: {
@@ -27,19 +27,24 @@ const editImage = async (body: FormData): Promise<string> => {
 };
 
 // 반려견 프로필 이미지를 추가하는 함수
-const addPetImage = async (dogId: number, body: FormData): Promise<string> => {
-  const {data} = await axiosInstance.post(`/users/dogs/${dogId}/images`, body, {
-    headers: {
-      'Content-Type': 'multipart/form-data; charset=utf8',
-    },
-  });
-  return data;
+const addPetImage = async (body: FormData, petId?: number): Promise<string> => {
+  if (petId) {
+    const {data} = await axiosInstance.post(`/users/dogs/${petId}/images`, body, {
+      headers: {
+        'Content-Type': 'multipart/form-data; charset=utf8',
+      },
+    });
+    return data;
+  } else {
+    console.log(`petId가 없습니다`)
+    throw Error
+  }
 };
 
 // 반려견 프로필 이미지를 수정하는 함수
-const editPetImage = async (dogId: number, body: FormData): Promise<string> => {
+const editPetImage = async (petId: number, body: FormData): Promise<string> => {
   const {data} = await axiosInstance.patch(
-    `/users/dogs/${dogId}/images`,
+    `/users/dogs/${petId}/images`,
     body,
     {
       headers: {

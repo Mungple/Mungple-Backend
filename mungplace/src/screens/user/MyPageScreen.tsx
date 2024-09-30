@@ -41,10 +41,6 @@ const MyPageScreen: React.FC<MyPageScreenProps> = ({navigation}) => {
     navigation.navigate(settingNavigations.SETTING);
   };
 
-  const handleProfilePress = () => {
-    navigation.navigate(settingNavigations.EDIT_PROFILE);
-  };
-
   const handleAddPet = () => {
     setModalVisible(prev => !prev);
   };
@@ -62,7 +58,7 @@ const MyPageScreen: React.FC<MyPageScreenProps> = ({navigation}) => {
         />
       </CustomHeader>
 
-      <ProfileCard onPress={handleProfilePress}>
+      <ProfileCard>
         <Image
           source={userData.imageName
             ? {uri: `http://j11e106.p.ssafy.io:9000/images/${userData.imageName}`}

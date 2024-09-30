@@ -28,6 +28,7 @@ const SocialLoginScreen: React.FC<SocialLoginScreenProps> = ({route}) => {
   return (
     <Container>
       <WebViewContainer
+        style={{flex: 1}}
         source={{uri: `${domain}/api/users/login/${provider}`}}
         onNavigationStateChange={handleNavigationStateChange}
       />
@@ -37,10 +38,10 @@ const SocialLoginScreen: React.FC<SocialLoginScreenProps> = ({route}) => {
 
 const Container = styled.SafeAreaView`
   flex: 1;
+  
 `;
 
 const WebViewContainer = styled(WebView)`
-  flex: 1;
 `;
 
 export default SocialLoginScreen;
