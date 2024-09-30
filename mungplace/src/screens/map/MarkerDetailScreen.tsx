@@ -19,6 +19,8 @@ const MarkerDetailScreen: React.FC = () => {
     fetchMarkerDetails(markerId);
   }, [markerId]);
 
+  const BASE_IMAGE_URL = 'http://j11e106.p.ssafy.io:9000/images/'
+
   const fetchMarkerDetails = async (markerId: string) => {
     setLoading(true);
     setError(null);
@@ -30,13 +32,22 @@ const MarkerDetailScreen: React.FC = () => {
         },
       });
       console.log("서버 응답:", response.data);
-      setMarkerDetails(response.data);
+
+      const imageWithUrl = response.data.images.map(imageName => BASE_IMAGE_URL + imageName)
+
+      setMarkerDetails({...response.data, images: imageWithUrl});
     } catch (err) {
       setError('마커 디테일을 가져오는 데 실패');
     } finally {
       setLoading(false);
     }
   };
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString)
+    const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false }
+    return date.toLocaleString('ko-KR', options).replace(',', '') // 한국어 형식 변환
+  }
 
   if (loading) {
     return <ActivityIndicator size="large" color="#0000ff" />;
@@ -54,7 +65,7 @@ const MarkerDetailScreen: React.FC = () => {
     <View style={styles.container}>
       <Text style={styles.title}>{markerDetails.title}</Text>
       <Text style={styles.content}>{markerDetails.content}</Text>
-      <Text style={styles.date}>{`Created at: ${markerDetails.createdAt}`}</Text>
+      <Text style={styles.date}>{`${formatDate(markerDetails.createdAt)}에 생성됨`}</Text>
       {markerDetails.images.length > 0 && (
         <View style={styles.imageContainer}>
           {markerDetails.images.map((imageUri, index) => (
@@ -62,8 +73,7 @@ const MarkerDetailScreen: React.FC = () => {
           ))}
         </View>
       )}
-      <Text style={styles.type}>Type: {markerDetails.type}</Text>
-      <Text style={styles.userId}>Created by user: {markerDetails.userId}</Text>
+      <Text style={styles.userId}>작성자: {markerDetails.userId}</Text>
       <Button title="Back" onPress={() => navigation.goBack()} />
     </View>
   );
