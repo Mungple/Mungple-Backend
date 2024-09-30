@@ -41,7 +41,6 @@ const MapComponent: React.FC<MapComponentProps> = ({
   bottomOffset = 0,
   path = [],
   onFormClose,
-  // onAddMarker,
 }) => {
 
   useMarkersWithinRadius()
@@ -63,7 +62,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
   const {isUserLocationError} = useUserLocation();
   const [isSettingModalVisible, setIsSettingModalVisible] = useState(false) // 환경 설정에 쓰는 모달 가시성
 
-  // Fetch zones data
+  // 존 체크 용임 지울거임 나중에
   useEffect(() => {
     console.log('나의 블루존:', myBlueZone)
     console.log('블루존:', allBlueZone)
@@ -93,6 +92,10 @@ const MapComponent: React.FC<MapComponentProps> = ({
   const handleMarkerClick = (markerId : string ) => {
     navigation.navigate(mapNavigations.MARKERDETAIL, { markerId })
     console.log(`마커 클릭 : ${markerId}`)
+  }
+
+  const handleClusterPress = (nearbyMarkers) => {
+    console.log('클러스터 클릭')
   }
 
   // 메뉴 햄버거 바 클릭 시 호출되는 함수
@@ -143,6 +146,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
         style={{flex : 1}}
         clusteringEnabled={true}
         clusterColor={colors.ORANGE.DARKER}
+        onClusterPress={(cluster) => handleClusterPress(cluster.nativeEvent.markers)}
         >
         {nearbyMarkers && nearbyMarkers.length > 0 && nearbyMarkers.map((marker) => (
         <Marker

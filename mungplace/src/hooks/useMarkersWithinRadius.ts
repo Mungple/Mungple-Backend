@@ -21,7 +21,7 @@ const useMarkersWithinRadius = () => {
           radius: 500,
           latitude: userLocation.latitude,
           longitude: userLocation.longitude,
-          markerType: 'BLUE',
+          markerType: 'ALL',
         },
       });
       console.log("근처 마커 조회 응답:", response.data);
