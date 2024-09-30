@@ -1,8 +1,10 @@
-package com.e106.mungplace.web.mungple;
+package com.e106.mungplace.web.mungple.producer;
 
 import org.apache.kafka.clients.admin.NewTopic;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
+
+import com.e106.mungplace.domain.mungple.entity.MungpleEvent;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

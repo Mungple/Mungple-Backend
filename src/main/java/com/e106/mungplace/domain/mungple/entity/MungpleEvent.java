@@ -1,4 +1,4 @@
-package com.e106.mungplace.web.mungple;
+package com.e106.mungplace.domain.mungple.entity;
 
 import java.time.LocalDateTime;
 

@@ -2,7 +2,6 @@ package com.e106.mungplace.web.handler.filter;
 
 import java.io.IOException;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
@@ -20,7 +19,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
 	static final String REDIRECT_URI = "/api/auth/oauth-response/";
 
-	@Value("${server.back-uri}")
+	// @Value("${server.back-uri}")
 	private String serverUrl;
 
 	private final JwtAuthenticationHelper jwtAuthenticationHelper;
@@ -33,7 +32,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 		User user = oAuth2User.getUser();
 
 		String accessToken = jwtAuthenticationHelper.createAccessToken(user.getUserId());
-		String redirectUrl = serverUrl + REDIRECT_URI;
+		String redirectUrl = "localhost:8080" + REDIRECT_URI;
 
 		response.sendRedirect(redirectUrl + accessToken);
 	}
