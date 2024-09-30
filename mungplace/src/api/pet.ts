@@ -53,7 +53,16 @@ const editPetProfile = async (
 
 // 반려견 정보 삭제 함수
 const deletePetProfile = async (dogId: number): Promise<void> => {
-  await axiosInstance.delete(`/users/dogs/${dogId}`);
+  try {
+    await axiosInstance.delete(`/users/dogs/${dogId}`, {
+      headers: {
+        'Content-Type': `application/json; charset=utf8`,
+      },
+    });
+  } catch (error) {
+    console.log('반려견 정보 삭제 실패 :', error);
+    throw error;
+  }
 };
 
 // 반려견 기본 프로필 설정 함수

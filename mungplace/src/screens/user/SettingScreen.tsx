@@ -2,22 +2,34 @@ import React from 'react';
 import {ScrollView} from 'react-native';
 import styled from 'styled-components/native';
 
-import {colors} from '@/constants';
+import {useNavigation} from '@react-navigation/native';
+import {colors, settingNavigations} from '@/constants';
 import SettingItem from '@/components/setting/SettingItem';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import {SettingStackParamList} from '@/navigations/stack/SettingStackNavigator';
+import useAuth from '@/hooks/queries/useAuth';
+import { useAppStore } from '@/state/useAppStore';
 
 const SettingScreen = () => {
+  const {logoutMutation} = useAuth()
+  const setLogin = useAppStore(state => state.setLogin)
+  const navigation = useNavigation<NativeStackNavigationProp<SettingStackParamList>>();
+
+  const handleProfilePress = () => {
+    navigation.navigate(settingNavigations.EDIT_PROFILE);
+  };
+
+  const handleLogoutPress = () => {
+    logoutMutation.mutate(null)
+    setLogin(false)
+  }
+
   return (
     <Container>
       <ScrollView>
         <Space />
-        <SettingItem title="설정1" onPress={() => {}} />
-        <SettingItem title="설정2" onPress={() => {}} />
-        <SettingItem title="설정3" subTitle="부제목" onPress={() => {}} />
-        <SettingItem
-          title="설정4"
-          onPress={() => {}}
-          color={colors.RED.DARKER}
-        />
+        <SettingItem title="프로필 사진 변경" onPress={handleProfilePress} />
+        <SettingItem title="로그아웃" onPress={handleLogoutPress} color={colors.RED.DARKER} />
       </ScrollView>
     </Container>
   );

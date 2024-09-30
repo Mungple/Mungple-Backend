@@ -6,7 +6,7 @@ import {useUserStore} from '@/state/useUserStore';
 import {calculateAge} from '@/hooks/usePetAge';
 
 const DogInfoBox = () => {
-  const {petData} = useUserStore.getState();
+  const petData = useUserStore(state => state.petData);
   const defaultPet = petData.find(pet => pet.isDefault === true);
   const age = defaultPet ? calculateAge(defaultPet.birth) : undefined
 

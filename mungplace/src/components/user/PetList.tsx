@@ -8,7 +8,7 @@ import {useUserStore} from '@/state/useUserStore';
 import DefaultImage from '@/assets/profile-image.png';
 import {colors, settingNavigations} from '@/constants';
 import {SettingStackParamList} from '@/navigations/stack/SettingStackNavigator';
-import { NavigationProp } from '@react-navigation/native';
+import {NavigationProp} from '@react-navigation/native';
 
 type PetListProps = {
   navigation?: NavigationProp<SettingStackParamList>;
@@ -30,13 +30,15 @@ const PetList: React.FC<PetListProps> = ({
       if (homeScreenPress) {
         homeScreenPress(item.id);
       } else {
-        navigation ? navigation.navigate(settingNavigations.PET_DETAIL, { petData: item }) : null;
+        if (navigation) {
+          navigation.navigate(settingNavigations.PET_DETAIL, {petData: item})
+        }
       }
     };
 
     return (
       <DogCard isSelected={isSelected} onPress={onPress}>
-        <Image source={item.photo ? {uri: item.photo} : DefaultImage} />
+        <Image source={item.photo ? {uri: `http://j11e106.p.ssafy.io:9000/images/${item.photo}`} : DefaultImage} />
         <Context>
           <Title>{item.name}</Title>
           <Text>마지막 산책일 {lastWalkDate}</Text>

@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {useNavigation} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 
@@ -14,16 +14,30 @@ import CustomModal from '@/components/common/CustomModal';
 import CustomButton from '@/components/common/CustomButton';
 import CustomModalHeader from '@/components/common/CustomModalHeader';
 import {MapStackParamList} from '@/navigations/stack/MapStackNavigator';
+import {getPetProfiles} from '@/api';
+import { useUserStore } from '@/state/useUserStore';
 
 const windowHeight = Dimensions.get('window').height;
 
 const HomeScreen: React.FC = () => {
+  const userId = useUserStore(state => state.userId)
+  const setPetData = useUserStore(state => state.setPetData)
   const [modalVisible, setModalVisible] = useState(false);
   const {userLocation, isUserLocationError} = useUserLocation();
   const [selectedPets, setSelectedPets] = useState<number[]>([]);
   const setWalkingStart = useAppStore(state => state.setWalkingStart);
   const setStartExplorate = useAppStore(state => state.setStartExplorate);
-  const navigation = useNavigation<NativeStackNavigationProp<MapStackParamList>>();
+  const navigation =
+    useNavigation<NativeStackNavigationProp<MapStackParamList>>();
+
+  const getPetProfile = async () => {
+    const data = await getPetProfiles(userId);
+    setPetData(data);
+  };
+
+  useEffect(() => {
+    getPetProfile();
+  });
 
   // 산책 시작 모달
   const handleModalVisivle = () => {
@@ -49,8 +63,8 @@ const HomeScreen: React.FC = () => {
       setModalVisible(false);
       setWalkingStart(true);
       setStartExplorate(await startWalk(walkData));
-      console.log('산책 시작')
-      console.log(useAppStore.getState().startExplorate)
+      console.log('산책 시작');
+      console.log(useAppStore.getState().startExplorate);
       navigation.navigate(mapNavigations.WALKING);
     } else if (isUserLocationError) {
       Alert.alert('Error', '위치 권한을 허용해주세요');
@@ -74,7 +88,10 @@ const HomeScreen: React.FC = () => {
           title="반려견 선택"
           closeButton={handleModalVisivle}
         />
-        <PetList selectedPets={selectedPets} homeScreenPress={handlePetSelect} />
+        <PetList
+          selectedPets={selectedPets}
+          homeScreenPress={handlePetSelect}
+        />
         <HS.StartButton label="산책 시작하기" onPress={handleWalkingStart} />
       </CustomModal>
     </HS.Container>
