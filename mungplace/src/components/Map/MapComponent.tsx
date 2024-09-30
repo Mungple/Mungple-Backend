@@ -167,7 +167,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
         )}
 
         {/* 개인 블루존 히트맵 */}
-        {myBlueZone?.cells?.length > 0 && (
+        {myBlueZone && myBlueZone.cells.length > 0 && (
           <Heatmap
             points={myBlueZone.cells.map(cell => ({
               latitude: cell.point.latitude,
@@ -177,7 +177,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
           />
         )}
         {/* 전체 블루존 히트맵 */}
-        {allBlueZone?.cells?.length > 0 && (
+        {allBlueZone && allBlueZone.cells.length > 0 && (
           <Heatmap
             points={allBlueZone.cells.map(cell => ({
               latitude: cell.point.latitude,
@@ -188,7 +188,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
         )}
 
         {/* 전체 레드존 히트맵 */}
-        {allRedZone?.cells?.length > 0 && (
+        {allRedZone && allRedZone.cells.length > 0 && (
           <Heatmap
             points={allRedZone.cells.map(cell => ({
               latitude: cell.point.latitude,

@@ -4,8 +4,10 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import {useNavigation} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 
+import {exitWalk} from '@/api/walk';
 import * as WS from './WalkingScreenStyle';
 import {useAppStore} from '@/state/useAppStore';
+import {useMapStore} from '@/state/useMapStore';
 import {colors, mapNavigations} from '@/constants';
 import useUserLocation from '@/hooks/useUserLocation';
 import MapComponent from '@/components/map/MapComponent';
@@ -13,8 +15,6 @@ import CustomModal from '@/components/common/CustomModal';
 import ElapsedTime from '@/components/walking/ElapsedTime';
 import CustomButton from '@/components/common/CustomButton';
 import {MapStackParamList} from '@/navigations/stack/MapStackNavigator';
-import { exitWalk } from '@/api/walk';
-import { useMapStore } from '@/state/useMapStore';
 
 const bottomBlockHeight = (Dimensions.get('window').height * 1) / 5;
 const bottomBlockWidth = Dimensions.get('window').width - 40;
@@ -27,9 +27,10 @@ const WalkingScreen = () => {
   const startExplorate = useAppStore(state => state.startExplorate);
   const setWalkingStart = useAppStore(state => state.setWalkingStart);
   const [path, setPath] = useState<{latitude: number; longitude: number}[]>([]);
-  const markers = useMapStore(state => state.markers)
+  const markers = useMapStore(state => state.markers);
 
-  const navigation = useNavigation<NativeStackNavigationProp<MapStackParamList>>();
+  const navigation =
+    useNavigation<NativeStackNavigationProp<MapStackParamList>>();
 
   const handleWalkingEnd = () => {
     setModalVisible(true);
@@ -45,14 +46,14 @@ const WalkingScreen = () => {
 
   const confirmEndWalking = () => {
     if (startExplorate) {
-      console.log(startExplorate.explorationId)
-      exitWalk(startExplorate.explorationId)
+      console.log(startExplorate.explorationId);
+      exitWalk(startExplorate.explorationId);
       setWalkingStart(false);
       setModalVisible(false);
-      console.log('산책 종료')
+      console.log('산책 종료');
       navigation.navigate(mapNavigations.HOME);
     } else {
-      Alert.alert('Error', '산책 정보가 업데이트 불가합니다')
+      Alert.alert('Error', '산책 정보가 업데이트 불가합니다');
     }
   };
 

@@ -2,26 +2,26 @@ import React, {useEffect, useState} from 'react';
 import {useNavigation} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 
+import {getPetProfiles} from '@/api';
 import {startWalk} from '@/api/walk';
 import * as HS from './HomeScreenStyle';
 import {mapNavigations} from '@/constants';
 import {Alert, Dimensions} from 'react-native';
 import PetList from '@/components/user/PetList';
 import {useAppStore} from '@/state/useAppStore';
+import {useUserStore} from '@/state/useUserStore';
 import DogInfoBox from '@/components/user/DogInfoBox';
 import useUserLocation from '@/hooks/useUserLocation';
 import CustomModal from '@/components/common/CustomModal';
 import CustomButton from '@/components/common/CustomButton';
 import CustomModalHeader from '@/components/common/CustomModalHeader';
 import {MapStackParamList} from '@/navigations/stack/MapStackNavigator';
-import {getPetProfiles} from '@/api';
-import { useUserStore } from '@/state/useUserStore';
 
 const windowHeight = Dimensions.get('window').height;
 
 const HomeScreen: React.FC = () => {
-  const userId = useUserStore(state => state.userId)
-  const setPetData = useUserStore(state => state.setPetData)
+  const userId = useUserStore(state => state.userId);
+  const setPetData = useUserStore(state => state.setPetData);
   const [modalVisible, setModalVisible] = useState(false);
   const {userLocation, isUserLocationError} = useUserLocation();
   const [selectedPets, setSelectedPets] = useState<number[]>([]);
@@ -33,7 +33,7 @@ const HomeScreen: React.FC = () => {
   const getPetProfile = async () => {
     const data = await getPetProfiles(userId);
     setPetData(data);
-  };
+  }; 
 
   useEffect(() => {
     getPetProfile();
@@ -55,10 +55,11 @@ const HomeScreen: React.FC = () => {
   const handleWalkingStart = async () => {
     if (!isUserLocationError && selectedPets.length > 0) {
       const walkData = JSON.stringify({
-        latitude: userLocation.latitude.toString(),
-        longitude: userLocation.longitude.toString(),
+        lat: userLocation.latitude.toString(),
+        lon: userLocation.longitude.toString(),
         dogIds: selectedPets,
       });
+      console.log(walkData);
 
       setModalVisible(false);
       setWalkingStart(true);
