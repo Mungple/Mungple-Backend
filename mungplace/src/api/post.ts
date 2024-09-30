@@ -1,5 +1,5 @@
+import { ImageUri, Post } from '@/types';
 import axiosInstance from './axios';
-import {ImageUri, Post} from '@/types';
 
 // Post 타입에 이미지 리스트(images)를 추가한 타입 정의
 type ResponsePost = Post & {images: ImageUri[]};
@@ -79,19 +79,12 @@ const getCalendarPosts = async (
 };
 
 export {
-  getPost,
-  getPosts,
   createPost,
-  deletePost,
-  updatePost,
-  getSearchPosts,
-  getCalendarPosts,
+  deletePost, getCalendarPosts, getPost,
+  getPosts, getSearchPosts, updatePost
 };
 export type {
-  CalendarPost,
-  ResponsePost,
-  RequestCreatePost,
-  RequestUpdatePost,
-  ResponseSinglePost,
-  ResponseCalendarPost,
+  CalendarPost, RequestCreatePost,
+  RequestUpdatePost, ResponseCalendarPost, ResponsePost, ResponseSinglePost
 };
+

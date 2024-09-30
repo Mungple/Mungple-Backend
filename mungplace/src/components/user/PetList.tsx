@@ -1,48 +1,93 @@
 import React from 'react';
-import {FlatList, StyleSheet} from 'react-native';
+import styled from 'styled-components/native';
+import {FlatList, Text, Image as RNImage} from 'react-native';
 
-import * as PL from './PetListStyle';
-import { useUserStore } from '@/state/useUserStore';
+import {ResponsePetProfile} from '@/types';
+import CustomCard from '../common/CustomCard';
+import {useUserStore} from '@/state/useUserStore';
+import DefaultImage from '@/assets/profile-image.png';
+import {colors, settingNavigations} from '@/constants';
+import {SettingStackParamList} from '@/navigations/stack/SettingStackNavigator';
+import { NavigationProp } from '@react-navigation/native';
 
-interface PetListProps {
-  marginBlock?: number;
+type PetListProps = {
+  navigation?: NavigationProp<SettingStackParamList>;
   selectedPets?: number[];
-  children?: React.ReactNode;
-  handlePetSelect: (dogId: number) => void;
-}
+  homeScreenPress?: (dogId: number) => void;
+};
 
-const PetList: React.FC<PetListProps> = ({children, marginBlock = 0, handlePetSelect, selectedPets = []}) => {
-  const petData = useUserStore((state) => state.petData)
+const PetList: React.FC<PetListProps> = ({
+  navigation,
+  selectedPets = [],
+  homeScreenPress,
+}) => {
+  const data = useUserStore(state => state.petData);
+
+  const renderItem = ({item}: {item: ResponsePetProfile}) => {
+    const isSelected = selectedPets.includes(item.id);
+    const lastWalkDate = item.birth.slice(0, 10);
+    const onPress = () => {
+      if (homeScreenPress) {
+        homeScreenPress(item.id);
+      } else {
+        navigation ? navigation.navigate(settingNavigations.PET_DETAIL, { petData: item }) : null;
+      }
+    };
+
+    return (
+      <DogCard isSelected={isSelected} onPress={onPress}>
+        <Image source={item.photo ? {uri: item.photo} : DefaultImage} />
+        <Context>
+          <Title>{item.name}</Title>
+          <Text>마지막 산책일 {lastWalkDate}</Text>
+        </Context>
+      </DogCard>
+    );
+  };
 
   return (
-    <PL.Container marginBlock={marginBlock}>
-      <FlatList
-        style={styles.scrollContainer}
-        showsVerticalScrollIndicator={false}
-        data={petData}
-        renderItem={({item}) => (
-          <PL.DogCard
-            isSelected={selectedPets.includes(item.id)}
-            onPress={() => handlePetSelect(item.id)}>
-            <PL.ImageContainer />
-            <PL.InfoContainer>
-              <PL.DogName>{item.name}</PL.DogName>
-              <PL.SecondaryInfo>마지막 산책일  {item.birth.slice(0,10)}</PL.SecondaryInfo>
-            </PL.InfoContainer>
-          </PL.DogCard>
-        )}
-        keyExtractor={(item) => String(item.id)}
-      />
-      {children}
-    </PL.Container>
+    <List
+      data={data}
+      renderItem={renderItem}
+      showsVerticalScrollIndicator={false}
+      keyExtractor={item => String(item.id)}
+      contentContainerStyle={{paddingBottom: 10}}
+    />
   );
 };
 
-const styles = StyleSheet.create({
-  scrollContainer: {
-    width: '100%',
-    marginVertical: 10,
-  },
-});
+const List = styled.FlatList`
+  flex: 1;
+  width: 100%;
+  padding: 20px;
+` as unknown as typeof FlatList;
 
-export default PetList;
+const DogCard = styled(CustomCard)<{isSelected: boolean}>`
+  padding: 13px 20px;
+  align-items: center;
+  margin-bottom: 10px;
+  flex-direction: row;
+  justify-content: space-around;
+  border-width: ${({isSelected}) => (isSelected ? 3 : 1)}px;
+  border-color: ${({isSelected}) =>
+    isSelected ? colors.ORANGE.BASE : colors.GRAY_200};
+`;
+
+const Image = styled(RNImage)`
+  width: 70px;
+  height: 70px;
+  border-radius: 35px;
+`;
+
+const Context = styled.View`
+  gap: 10px;
+  flex-direction: column;
+`;
+
+const Title = styled.Text`
+  font-size: 18px;
+  font-weight: bold;
+  color: ${colors.BLACK};
+`;
+
+export default React.memo(PetList);

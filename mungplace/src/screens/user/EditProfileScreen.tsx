@@ -1,34 +1,26 @@
+// components/EditProfileScreen.tsx
 import React from 'react';
-import {Keyboard} from 'react-native';
-import styled from 'styled-components/native';
+import { Alert, Keyboard } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import styled from 'styled-components/native';
 
-import {colors} from '@/constants';
-import useForm from '@/hooks/useForm';
-import useModal from '@/hooks/useModal';
-import {validateInputUser} from '@/utils';
-import useAuth from '@/hooks/queries/useAuth';
-import useImagePicker from '@/hooks/useImagePicker';
 import CustomButton from '@/components/common/CustomButton';
-import CustomInputField from '@/components/common/CustomInputField';
 import EditProfileImageOption from '@/components/setting/EditProfileImageOption';
+import { colors } from '@/constants';
+import useImagePicker from '@/hooks/useImagePicker';
+import useModal from '@/hooks/useModal';
+import { useUserStore } from '@/state/useUserStore';
 
 const EditProfileScreen = () => {
   const imageOption = useModal();
-  const {getProfileQuery} = useAuth();
-  const {nickname, imageName} = getProfileQuery.data || {};
+  const {imageName} = useUserStore(state => state.userData);
 
   // 이미지 선택 기능을 위한 커스텀 훅
   const imagePicker = useImagePicker({
-    initialImages: imageName ? [{uri: imageName}] : [],
-    mode: 'single',
-    onSettled: imageOption.hide,
-  });
-
-  // 닉네임 수정 폼을 위한 훅
-  const editProfile = useForm({
-    initialValue: {nickname: nickname ?? ''},
-    validate: validateInputUser,
+    image: imageName ? `http://j11e106.p.ssafy.io:9000/images/${imageName}` : '',
+    onSettled: () => {
+      imageOption.hide();
+    }
   });
 
   // 프로필 이미지 클릭 시 모달을 열고 키보드를 숨김
@@ -38,6 +30,8 @@ const EditProfileScreen = () => {
   };
 
   const handleSubmit = () => {
+    // 필요한 제출 로직을 여기에 구현하세요.
+    Alert.alert('제출', '프로필이 성공적으로 업데이트되었습니다.');
   };
 
   return (
@@ -45,23 +39,24 @@ const EditProfileScreen = () => {
       {/* 프로필 이미지 영역 */}
       <ProfileContainer>
         <ImageContainer onPress={handlePressImage}>
-          {imagePicker.imageNames.length === 0
+          {imagePicker.imageName === ''
             ? <Ionicons name="camera-outline" size={40} color={colors.GRAY_400} />
-            : <MyImage source={{uri: `http://10.0.2.2:3030/${imagePicker.imageNames[0]?.uri}`}} resizeMode="cover" />
+            : <MyImage source={{ uri: imagePicker.imageName }} resizeMode="cover" />
           }
+          {imagePicker.isUploading && (
+            <LoadingOverlay>
+              <LoadingIndicator />
+            </LoadingOverlay>
+          )}
         </ImageContainer>
       </ProfileContainer>
-      
-      {/* 닉네임 입력 필드 */}
-      <CustomInputField
-        {...editProfile.getTextInputProps('nickname')}
-        error={editProfile.errors.nickname}
-        touched={editProfile.touched.nickname}
-        placeholder="닉네임을 입력해주세요."
-      />
 
       {/* 제출 버튼 */}
-      <SubmitButton label='완료' onPress={handleSubmit} />
+      <SubmitButton 
+        label='완료' 
+        onPress={handleSubmit} 
+        disabled={imagePicker.isUploading} 
+      />
 
       {/* 프로필 이미지 수정 모달 옵션 */}
       <EditProfileImageOption
@@ -77,6 +72,7 @@ const Container = styled.SafeAreaView`
   flex: 1;
   padding: 20px;
   justify-content: center;
+  background-color: ${colors.WHITE};
 `;
 
 const ProfileContainer = styled.View`
@@ -86,23 +82,39 @@ const ProfileContainer = styled.View`
 `;
 
 const MyImage = styled.Image`
-  width: 100%;
-  height: 100%;
-  border-radius: 50px;
+  width: 150px;
+  height: 150px;
+  border-radius: 75px;
 `;
 
 const ImageContainer = styled.Pressable`
-width: 150px;
-height: 150px;
-border-radius: 75px;
-justify-content: center;
-align-items: center;
-border-color: ${colors.GRAY_300};
-border-width: 1px;
+  width: 150px;
+  height: 150px;
+  border-radius: 75px;
+  justify-content: center;
+  align-items: center;
+  border-color: ${colors.GRAY_300};
+  border-width: 1px;
+  overflow: hidden;
 `;
 
 const SubmitButton = styled(CustomButton)`
   margin-top: 20px;
 `;
+
+const LoadingOverlay = styled.View`
+  position: absolute;
+  width: 150px;
+  height: 150px;
+  border-radius: 75px;
+  background-color: rgba(0, 0, 0, 0.5);
+  justify-content: center;
+  align-items: center;
+`;
+
+const LoadingIndicator = styled.ActivityIndicator.attrs({
+  size: 'large',
+  color: colors.WHITE,
+})``;
 
 export default EditProfileScreen;

@@ -1,20 +1,20 @@
-import {useMutation, useQuery} from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 
-import {queryKeys, storageKeys} from '@/constants';
-import queryClient from '@/api/queryClient';
-import {removeHeader, setEncryptStorage, setHeader} from '@/utils';
+import { getPetProfiles } from '@/api';
 import {
-  getProfile,
-  editProfile,
-  logout,
-  ResponseProfile,
   RequestProfile,
+  ResponseProfile,
+  editProfile,
+  getProfile,
+  logout,
   socialLogin,
 } from '@/api/auth';
-import type {ResponseError, UseMutationCustomOptions, UseQueryCustomOptions} from '@/types/common';
-import { JwtPayload, jwtDecode } from 'jwt-decode';
+import queryClient from '@/api/queryClient';
+import { queryKeys } from '@/constants';
 import { useUserStore } from '@/state/useUserStore';
-import { getPetProfiles } from '@/api';
+import type { ResponseError, UseMutationCustomOptions, UseQueryCustomOptions } from '@/types/common';
+import { removeHeader, setHeader } from '@/utils';
+import { JwtPayload, jwtDecode } from 'jwt-decode';
 
 interface CustomJwtPayload extends JwtPayload {
   userId: number;
@@ -27,7 +27,7 @@ function useLogin(mutationOptions?: UseMutationCustomOptions) {
     onSuccess: ({accessToken}) => {
       const {setUserId, setPetData} = useUserStore.getState();
       setHeader('Authorization', `Bearer ${accessToken}`);
-      setEncryptStorage(storageKeys.REFRESH_TOKEN, accessToken);
+      // setEncryptStorage(storageKeys.REFRESH_TOKEN, accessToken);
       
       const decoded = jwtDecode<CustomJwtPayload>(`${accessToken}`)
       setUserId(decoded.userId)
@@ -59,6 +59,7 @@ function useGetProfile(
   return useQuery({
     queryFn: () => getProfile(userId),
     queryKey: [queryKeys.AUTH, queryKeys.GET_PROFILE],
+    enabled: !!userId,
     ...queryOptions,
   });
 }

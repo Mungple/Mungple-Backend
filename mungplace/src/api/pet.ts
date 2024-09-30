@@ -17,7 +17,9 @@ const createPetProfile = async (JSON: string): Promise<void> => {
 };
 
 // 반려견 정보 조회 함수
-const getPetProfiles = async (userId: number): Promise<ResponsePetProfile[]> => {
+const getPetProfiles = async (
+  userId: number,
+): Promise<ResponsePetProfile[]> => {
   try {
     const {data} = await axiosInstance.get(`/users/${userId}/dogs`, {
       headers: {
@@ -32,7 +34,10 @@ const getPetProfiles = async (userId: number): Promise<ResponsePetProfile[]> => 
 };
 
 // 반려견 정보 수정 함수
-const editPetProfile = async (dogId: number, JSON: string): Promise<ResponsePetProfile[]> => {
+const editPetProfile = async (
+  dogId: number,
+  JSON: string,
+): Promise<ResponsePetProfile[]> => {
   try {
     const {data} = await axiosInstance.put(`/users/dogs/${dogId}`, JSON, {
       headers: {
@@ -43,7 +48,7 @@ const editPetProfile = async (dogId: number, JSON: string): Promise<ResponsePetP
   } catch (error) {
     console.log('반려견 정보 변경 실패 :', error);
     throw error;
-  };
+  }
 };
 
 // 반려견 정보 삭제 함수
@@ -58,8 +63,8 @@ const setDefaultPetProfile = async (dogId: number): Promise<void> => {
 
 export {
   createPetProfile,
-  getPetProfiles,
-  editPetProfile,
   deletePetProfile,
+  editPetProfile,
+  getPetProfiles,
   setDefaultPetProfile,
 };

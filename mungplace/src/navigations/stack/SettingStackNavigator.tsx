@@ -1,6 +1,7 @@
 import React from 'react';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 
+import {ResponsePetProfile} from '@/types';
 import {settingNavigations} from '@/constants';
 import MyPageScreen from '@/screens/user/MyPageScreen';
 import SettingScreen from '@/screens/user/SettingScreen';
@@ -10,7 +11,7 @@ import EditProfileScreen from '@/screens/user/EditProfileScreen';
 export type SettingStackParamList = {
   [settingNavigations.SETTING]: undefined;
   [settingNavigations.MY_PAGE]: undefined;
-  [settingNavigations.PET_DETAIL]: undefined;
+  [settingNavigations.PET_DETAIL]: {petData: ResponsePetProfile};
   [settingNavigations.EDIT_PROFILE]: undefined;
   [settingNavigations.DELETE_ACCOUNT]: undefined;
 };

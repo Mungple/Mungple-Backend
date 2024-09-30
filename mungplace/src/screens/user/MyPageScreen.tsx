@@ -1,37 +1,41 @@
-import React, {useState} from 'react';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import React, { useEffect, useState } from 'react';
+import { Dimensions, Image as RNImage, Text } from 'react-native';
 import IonIcons from 'react-native-vector-icons/Ionicons';
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
+import styled from 'styled-components/native';
 
-import * as MS from './MyPageScreenStyle';
-import useAuth from '@/hooks/queries/useAuth';
-import {useUserStore} from '@/state/useUserStore';
-import CreatePet from '@/components/user/CreatePet';
-import {colors, settingNavigations} from '@/constants';
-import CustomModal from '@/components/common/CustomModal';
+import DefaultImage from '@/assets/profile-image.png';
+import CustomCard from '@/components/common/CustomCard';
 import CustomHeader from '@/components/common/CustomHeader';
+import CustomModal from '@/components/common/CustomModal';
 import CustomModalHeader from '@/components/common/CustomModalHeader';
-import {SettingStackParamList} from '@/navigations/stack/SettingStackNavigator';
+import PetForm from '@/components/user/PetForm';
+import PetList from '@/components/user/PetList';
+import { colors, settingNavigations } from '@/constants';
+import useAuth from '@/hooks/queries/useAuth';
+import { SettingStackParamList } from '@/navigations/stack/SettingStackNavigator';
+import { useUserStore } from '@/state/useUserStore';
 
-type MyPageScreenProps = NativeStackScreenProps<
+export type MyPageScreenProps = NativeStackScreenProps<
   SettingStackParamList,
   typeof settingNavigations.MY_PAGE
 >;
 
-const MyPageScreen: React.FC<MyPageScreenProps> = ({navigation}) => {
-  // const imageOption = useModal();
-  const {useGetProfile} = useAuth();
-  const {userId, petData} = useUserStore.getState();
-  const [currentPetData, setCurrentPetData] = useState({});
-  const [modalAddVisible, setModalAddVisible] = useState(false);
-  const [modalEditVisible, setModalEditVisible] = useState(false);
-  const nickname = userId ? useGetProfile(userId).data?.nickname : '로그인 해주세요';
+const windowHeight = Dimensions.get('window').height;
 
-  // 이미지 선택 기능을 위한 커스텀 훅
-  // const imagePicker = useImagePicker({
-  //   initialImages: imageName ? [{uri: imageName}] : [],
-  //   mode: 'single',
-  //   onSettled: imageOption.hide,
-  // });
+const MyPageScreen: React.FC<MyPageScreenProps> = ({navigation}) => {
+  const userId = useUserStore(state => state.userId);
+  const {useGetProfile} = useAuth();
+  const userData = useUserStore(state => state.userData);
+  const setUserData = useUserStore(state => state.setUserData);
+  const [modalVisible, setModalVisible] = useState(false);
+  const {data} = useGetProfile(userId);
+  
+  useEffect(() => {
+    if (data) {
+      setUserData(data);
+    }
+  }, [data, setUserData]);
 
   const handleSettingPress = () => {
     navigation.navigate(settingNavigations.SETTING);
@@ -41,30 +45,13 @@ const MyPageScreen: React.FC<MyPageScreenProps> = ({navigation}) => {
     navigation.navigate(settingNavigations.EDIT_PROFILE);
   };
 
-  const handlePetSelect = (petId: number) => {
-    const currentPetData = petData.map((pet) => pet.id === petId)
-    setCurrentPetData(currentPetData); // 선택한 반려견의 데이터 저장
-    setModalEditVisible(true);  // 수정 모달 열기
+  const handleAddPet = () => {
+    setModalVisible(prev => !prev);
   };
-
-  const handleAddPetButtonPress = () => {
-    if (modalAddVisible) {
-      setModalAddVisible(false);
-    } else {
-      setModalAddVisible(true);
-    }
-  };
-
-  const handleEditPetButtonPress = () => {
-    if (modalEditVisible) {
-      setModalEditVisible(false);
-    } else {
-      setModalEditVisible(true);
-    }
-  };
+  
 
   return (
-    <MS.Container>
+    <Container>
       {/* 프로필 영역 */}
       <CustomHeader title="내 정보">
         <IonIcons
@@ -74,61 +61,104 @@ const MyPageScreen: React.FC<MyPageScreenProps> = ({navigation}) => {
           onPress={handleSettingPress}
         />
       </CustomHeader>
-      <MS.ProfileCard onPress={handleProfilePress}>
-        {/* <ImageContainer>
-          {imagePicker.imageNames.length === 0 ? (
-            <MyImage source={ProfileImage} />
-          ) : (
-            <MyImage
-              source={{
-                uri: `http://10.0.2.2:3030/${imagePicker.imageNames[0]?.uri}`,
-              }}
-              resizeMode="cover"
-            />
-          )}
-        </ImageContainer> */}
-        <MS.InfoContainer>
-          <MS.Nickname>{nickname}</MS.Nickname>
-          <MS.SecondaryInfo>128 포인트</MS.SecondaryInfo>
-        </MS.InfoContainer>
-      </MS.ProfileCard>
+
+      <ProfileCard onPress={handleProfilePress}>
+        <Image
+          source={userData.imageName
+            ? {uri: `http://j11e106.p.ssafy.io:9000/images/${userData.imageName}`}
+            : DefaultImage}
+        />
+        <Context>
+          <Title>{userData.nickname}</Title>
+          <Text>128 포인트</Text>
+        </Context>
+      </ProfileCard>
 
       {/* 반려견 목록 */}
-      <MS.ListContainer>
-        <MS.MenuText>나의 반려견</MS.MenuText>
-        <MS.CreatePetButton onPress={handleAddPetButtonPress}>
-          <MS.CreatePetText>등록</MS.CreatePetText>
-        </MS.CreatePetButton>
-      </MS.ListContainer>
-      <MS.MyPetListContainer>
-        <MS.MyPetList handlePetSelect={handlePetSelect} />
-      </MS.MyPetListContainer>
+      <HeaderBox>
+        <MenuText>나의 반려견</MenuText>
+        <AddPetButton onPress={handleAddPet}>
+          <AddPetText>등록</AddPetText>
+        </AddPetButton>
+      </HeaderBox>
 
-      {/* 반려견 등록 모달 */}
+      <PetListBox>
+        <PetList navigation={navigation} />
+      </PetListBox>
+
       <CustomModal
         isWide={true}
-        modalVisible={modalAddVisible}
-        setModalVisible={setModalAddVisible}>
-        <CustomModalHeader
-          title="반려견 등록"
-          closeButton={handleAddPetButtonPress}
-        />
-        <CreatePet setModalVisible={setModalAddVisible} />
+        modalVisible={modalVisible}
+        setModalVisible={setModalVisible}>
+        <CustomModalHeader title="반려견 등록" closeButton={handleAddPet} />
+        <PetForm setModalVisible={setModalVisible} />
       </CustomModal>
-
-      {/* 빈려견 정보 수정 모달 */}
-      <CustomModal
-        isWide={true}
-        modalVisible={modalEditVisible}
-        setModalVisible={setModalEditVisible}>
-        <CustomModalHeader
-          title="반려견 정보 수정"
-          closeButton={handleEditPetButtonPress}
-        />
-        <CreatePet setModalVisible={setModalEditVisible} isEdit={true} petData={currentPetData}/>
-      </CustomModal>
-    </MS.Container>
+    </Container>
   );
 };
+
+const Container = styled.SafeAreaView`
+  flex: 1;
+  align-items: center;
+  background-color: ${colors.WHITE};
+`;
+
+const ProfileCard = styled(CustomCard)`
+  width: 90%;
+  margin: 20px;
+  border-width: 1px;
+  padding: 13px 20px;
+  align-items: center;
+  flex-direction: row;
+  justify-content: space-around;
+  border-color: ${colors.GRAY_200};
+`;
+
+const Image = styled(RNImage)`
+  width: 70px;
+  height: 70px;
+  border-radius: 35px;
+`;
+
+const Context = styled.View`
+  gap: 10px;
+  flex-direction: column;
+`;
+
+const Title = styled.Text`
+  font-size: 18px;
+  font-weight: bold;
+  color: ${colors.BLACK};
+`;
+
+const HeaderBox = styled.View`
+  padding: 0 20px;
+  align-items: center;
+  flex-direction: row;
+  justify-content: center;
+`;
+
+const AddPetButton = styled.TouchableOpacity`
+  padding: 10px 16px;
+  border-radius: 8px;
+  background-color: ${colors.ORANGE.BASE};
+`;
+
+const AddPetText = styled.Text`
+  font-weight: bold;
+  color: ${colors.WHITE};
+`;
+
+const MenuText = styled.Text`
+  flex: 1;
+  font-size: 18px;
+  font-weight: bold;
+  color: ${colors.BLACK};
+`;
+
+const PetListBox = styled.View`
+  width: 100%;
+  height: ${windowHeight * 0.7}px;
+`;
 
 export default MyPageScreen;

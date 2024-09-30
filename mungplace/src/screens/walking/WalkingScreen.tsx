@@ -1,4 +1,4 @@
-import {Dimensions} from 'react-native';
+import {Alert, Dimensions} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {useNavigation} from '@react-navigation/native';
@@ -13,6 +13,8 @@ import CustomModal from '@/components/common/CustomModal';
 import ElapsedTime from '@/components/walking/ElapsedTime';
 import CustomButton from '@/components/common/CustomButton';
 import {MapStackParamList} from '@/navigations/stack/MapStackNavigator';
+import { exitWalk } from '@/api/walk';
+import { useMapStore } from '@/state/useMapStore';
 
 const bottomBlockHeight = (Dimensions.get('window').height * 1) / 5;
 const bottomBlockWidth = Dimensions.get('window').width - 40;
@@ -22,11 +24,12 @@ const WalkingScreen = () => {
   const [distance, setDistance] = useState(0);
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
+  const startExplorate = useAppStore(state => state.startExplorate);
   const setWalkingStart = useAppStore(state => state.setWalkingStart);
   const [path, setPath] = useState<{latitude: number; longitude: number}[]>([]);
+  const markers = useMapStore(state => state.markers)
 
-  const navigation =
-    useNavigation<NativeStackNavigationProp<MapStackParamList>>();
+  const navigation = useNavigation<NativeStackNavigationProp<MapStackParamList>>();
 
   const handleWalkingEnd = () => {
     setModalVisible(true);
@@ -41,9 +44,16 @@ const WalkingScreen = () => {
   };
 
   const confirmEndWalking = () => {
-    setWalkingStart(false);
-    setModalVisible(false);
-    navigation.navigate(mapNavigations.HOME);
+    if (startExplorate) {
+      console.log(startExplorate.explorationId)
+      exitWalk(startExplorate.explorationId)
+      setWalkingStart(false);
+      setModalVisible(false);
+      console.log('산책 종료')
+      navigation.navigate(mapNavigations.HOME);
+    } else {
+      Alert.alert('Error', '산책 정보가 업데이트 불가합니다')
+    }
   };
 
   const cancelEndWalking = () => {
@@ -69,10 +79,10 @@ const WalkingScreen = () => {
         <>
           <MapComponent
             path={path}
+            markers={markers}
             userLocation={userLocation}
             isFormVisible={isFormVisible}
             onFormClose={handleFormClose}
-            onAddMarker={handleAddMarker}
             bottomOffset={bottomBlockHeight + 20}
           />
 
