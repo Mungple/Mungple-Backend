@@ -4,29 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDoU0R6s2XbF8ucaEzpVDaiQ7G6oUz0-gQ&libraries=geometry,drawing"></script>
-    <title>Document</title>
+    <title>Marker Manager</title>
     <style>
-        /* 텍스트박스 스타일 */
         #nameInputContainer {
             position: absolute;
-            top: 10px; /* 상단 여백 제거 */
-            right: 20px; /* 오른쪽 정렬 */
-            z-index: 1; /* 지도 위에 표시되도록 z-index 설정 */
-            background-color: white; /* 배경색 설정 */
-            padding: 10px; /* 내부 여백 추가 */
-            border-radius: 5px; /* 모서리 둥글게 */
-            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.3); /* 그림자 추가 */
+            top: 10px;
+            right: 20px;
+            z-index: 1;
+            background-color: white;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.3);
         }
-
         #nameInput {
-            width: 200px; /* 텍스트박스 너비 */
-            height: 30px; /* 텍스트박스 높이 */
-            font-size: 16px; /* 텍스트 크기 */
+            width: 200px;
+            height: 30px;
+            font-size: 16px;
         }
-
-        /* 지도 */
         #map {
-            height: 98vh; /* 상단 여백 제거 */
+            height: 98vh;
             width: 100%;
         }
     </style>
@@ -43,50 +39,167 @@
     let drawing = false;
     let points = [];
     let isDKeyPressed = false;
+    let isMousePressed = false; // 마우스가 눌렸는지 확인하기 위한 변수
+    let isRKeyPressed = false;
+    let isBKeyPressed = false;
+    let markerData = []; // CSV 데이터를 저장할 배열
     let baseUrl = window.location.origin + window.location.pathname;
+
+    async function loadCSVData() {
+        try {
+            const response = await fetch('/api/manager/markers/csv');
+            console.log("response url" + response.url)
+            const data = await response.text();
+            parseCSVData(data);
+        } catch (error) {
+            console.error("CSV 파일 로드 중 오류 발생:", error);
+        }
+    }
+
+    function parseCSVData(csvData) {
+        const rows = csvData.split("\n").slice(1); // 헤더는 제외
+        rows.forEach(row => {
+            const [uuid, title, content, markerType] = row.split(",");
+            markerData.push({uuid, title, content, markerType});
+        });
+    }
 
     function initMap() {
         map = new google.maps.Map(document.getElementById("map"), {
             zoom: 17,
             center: {lat: 35.07556, lng: 129.01694},
-            disableDefaultUI: false, // 기본 UI 활성화
-            zoomControl: true, // 줌 컨트롤 추가
+            disableDefaultUI: false,
+            zoomControl: true,
         });
 
-        // 마우스 이동 이벤트 등록
+        // 마우스 이동 이벤트 등록 (기존 선 그리기 기능)
         google.maps.event.addListener(map, "mousemove", (event) => {
-            if (drawing && isDKeyPressed) {  // "D" 키가 눌린 상태에서만 동작
+            if (drawing && isDKeyPressed && isMousePressed) {
                 drawLine(event);
             }
         });
 
-        // 키 다운 이벤트 등록
+        // 키 다운 이벤트 등록 ('r', 'b', 'd' 키)
         window.addEventListener("keydown", (event) => {
-            if (event.key === 'd' || event.key === 'D') {
+            if (event.key === 'r' || event.key === 'R') {
+                isRKeyPressed = true;
+            } else if (event.key === 'b' || event.key === 'B') {
+                isBKeyPressed = true;
+            } else if (event.key === 'd' || event.key === 'D') {
                 isDKeyPressed = true;
-                if (!drawing) {
-                    startDrawing();
-                }
             }
         });
 
         // 키 업 이벤트 등록
         window.addEventListener("keyup", (event) => {
-            if (event.key === 'd' || event.key === 'D') {
+            if (event.key === 'r' || event.key === 'R') {
+                isRKeyPressed = false;
+            } else if (event.key === 'b' || event.key === 'B') {
+                isBKeyPressed = false;
+            } else if (event.key === 'd' || event.key === 'D') {
                 isDKeyPressed = false;
                 if (drawing) {
                     finishDrawing();
                 }
             }
         });
+
+        // 마우스 클릭 이벤트 등록 (그리기 시작)
+        google.maps.event.addListener(map, "mousedown", (event) => {
+            if (isDKeyPressed) {
+                isMousePressed = true;
+                if (!drawing) {
+                    startDrawing();
+                }
+            }
+        });
+
+        // 마우스 버튼을 뗐을 때 이벤트 (그리기 종료)
+        google.maps.event.addListener(map, "mouseup", (event) => {
+            isMousePressed = false;
+            if (drawing) {
+                finishDrawing();
+            }
+        });
+
+        // 지도 클릭 이벤트 (마커 추가)
+        map.addListener('click', (event) => {
+            const lat = event.latLng.lat();
+            const lon = event.latLng.lng();
+            if (isRKeyPressed) {
+                addMarker(lat, lon, "RED");
+            } else if (isBKeyPressed) {
+                addMarker(lat, lon, "BLUE");
+            }
+        });
     }
 
-    // 그리기 시작 함수
+    // 마커 추가 함수
+    function addMarker(lat, lon, markerType) {
+        const markerInfo = getRandomMarker(markerType);
+
+        const marker = new google.maps.Marker({
+            position: { lat: lat, lng: lon },
+            map: map,
+            title: markerInfo.title,
+            icon: markerType === "RED" ? "./images/red-marker.png" : "./images/blue-marker.png"
+        });
+
+        const infoWindow = new google.maps.InfoWindow({
+            content: `<h3>${markerInfo.title}</h3><p>${markerInfo.content}</p>`
+        });
+
+        marker.addListener('click', function() {
+            infoWindow.open(map, marker);
+        });
+
+        sendMarkerToBackend(lat, lon, markerType, markerInfo);
+    }
+
+    // CSV 데이터에서 랜덤한 마커 정보 선택
+    function getRandomMarker(markerType) {
+        const filteredMarkers = markerData.filter(marker => marker.markerType === markerType);
+        return filteredMarkers[Math.floor(Math.random() * filteredMarkers.length)];
+    }
+
+    // 마커 데이터를 서버로 전송하는 함수
+    async function sendMarkerToBackend(lat, lon, markerType, markerInfo) {
+        const managerName = document.getElementById("nameInput").value || "manager";
+        const data = {
+            managerName: managerName,
+            lat: lat,
+            lon: lon,
+            title: markerInfo.title,
+            content: markerInfo.content,
+            explorationId: null,
+            markerType: markerType
+        };
+
+        try {
+            const response = await fetch(`${baseUrl}/../markers`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+
+            if (response.status === 201) {
+                console.log('마커가 성공적으로 생성되었습니다.');
+            } else {
+                console.error('마커 생성 실패:', response.status);
+            }
+        } catch (error) {
+            console.error('서버로 마커 전송 중 오류 발생:', error);
+        }
+    }
+
+    // 그리기 시작 함수 (기존 기능)
     function startDrawing() {
         drawing = true;
-        points = []; // 기존 좌표 초기화
+        points = [];
         if (polyline) {
-            polyline.setMap(null); // 기존 폴리라인 삭제
+            polyline.setMap(null);
             polyline = null;
         }
         polyline = new google.maps.Polyline({
@@ -97,34 +210,30 @@
             strokeOpacity: 1.0,
             strokeWeight: 5,
         });
-        map.setOptions({draggable: false}); // 그리기 중일 때는 지도를 드래그하지 못하게 함
+        map.setOptions({draggable: false});
         console.log('그리기 시작');
     }
 
-    // 선을 그리는 함수
+    // 선을 그리는 함수 (기존 기능)
     function drawLine(event) {
-        points.push(event.latLng); // 마우스 움직임에 따라 좌표 추가
-        polyline.setPath(points);  // 폴리라인 경로 업데이트
+        points.push(event.latLng);
+        polyline.setPath(points);
     }
 
-    // 그리기 종료 함수
+    // 그리기 종료 함수 (기존 기능)
     function finishDrawing() {
         drawing = false;
-        map.setOptions({draggable: true}); // 그리기 종료 후에는 지도를 다시 드래그 가능하게 설정
-
-        // 폴리라인을 지도에서 삭제
+        map.setOptions({draggable: true});
         if (polyline) {
             polyline.setMap(null);
-            polyline = null; // 폴리라인을 완전히 제거
+            polyline = null;
         }
-
-        // 좌표와 사용자 이름을 서버로 전송
         sendPointsToBackend(points);
     }
 
-    // 좌표를 서버로 전송하는 함수
+    // 좌표를 서버로 전송하는 함수 (기존 기능)
     async function sendPointsToBackend(points) {
-        const managerName = document.getElementById("nameInput").value || "manager"; // 이름 필드 값 가져오기, 없으면 "manager" 기본값
+        const managerName = document.getElementById("nameInput").value || "manager";
         const formattedPoints = points.map(point => ({
             lat: point.lat(),
             lon: point.lng()
@@ -132,7 +241,7 @@
 
         const data = {
             managerName: managerName,
-            points: formattedPoints // points로 변경
+            points: formattedPoints
         };
 
         try {
@@ -154,7 +263,10 @@
         }
     }
 
-    window.onload = initMap;
+    window.onload = function() {
+        loadCSVData();
+        initMap();
+    };
 </script>
 </body>
 </html>
