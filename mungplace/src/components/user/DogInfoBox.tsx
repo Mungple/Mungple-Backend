@@ -1,15 +1,28 @@
-import React from 'react'
+import React, {useEffect, useState} from 'react'
 import styled from 'styled-components/native'
-import CustomCard from '../common/CustomCard'
+
 import {colors} from '@/constants'
-import {useUserStore} from '@/state/useUserStore'
+import {getAccessToken} from '@/api'
+import CustomCard from '../common/CustomCard'
+import useAuth from '@/hooks/queries/useAuth'
 import {calculateAge} from '@/hooks/usePetAge'
 import useGetPet from '@/hooks/queries/useGetPet'
 
 const DogInfoBox = () => {
-  const {userId} = useUserStore(state => state)
-  const {data} = useGetPet(userId)
-  const defaultPet = data?.find(pet => pet.isDefault === true)
+  const [token, setToken] = useState<string | null>(null)
+
+  useEffect(() => {
+    const fetchToken = async () => {
+      const token = await getAccessToken()
+      setToken(token)
+    }
+    fetchToken()
+  }, [])
+
+  const {useGetUserId} = useAuth()
+  const {data: userId} = useGetUserId(token)
+  const {data: petData} = useGetPet(Number(userId))
+  const defaultPet = petData?.find(pet => pet.isDefault === true)
   const age = defaultPet ? calculateAge(defaultPet.birth) : undefined
 
   return (

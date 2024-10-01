@@ -4,10 +4,14 @@ import {getPetProfiles} from '@/api'
 import {queryKeys} from '@/constants'
 import {ResponsePetProfile, UseQueryCustomOptions} from '@/types'
 
-function useGetPet(userId: number, queryOptions?: UseQueryCustomOptions<ResponsePetProfile[]>) {
+function useGetPet(
+  userId: number | null,
+  queryOptions?: UseQueryCustomOptions<ResponsePetProfile[]>,
+) {
   return useQuery({
-    queryFn: () => getPetProfiles(userId),
-    queryKey: [queryKeys.AUTH, queryKeys.GET_PETS],
+    queryFn: () => getPetProfiles(Number(userId)),
+    queryKey: [queryKeys.GET_PETS, userId],
+    enabled: Boolean(userId),
     throwOnError: true,
     ...queryOptions,
   })

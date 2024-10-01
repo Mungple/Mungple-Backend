@@ -5,21 +5,23 @@ import {
   ResponseProfile,
   editProfile,
   getProfile,
+  getUserId,
   logout,
   socialLogin,
 } from '@/api/auth'
 import queryClient from '@/api/queryClient'
-import {queryKeys} from '@/constants'
+import {queryKeys, storageKeys} from '@/constants'
 import type {ResponseError, UseMutationCustomOptions, UseQueryCustomOptions} from '@/types/common'
-import {removeHeader, setHeader} from '@/utils'
+import {removeHeader, setEncryptStorage, setHeader} from '@/utils'
 
 // 로그인 커스텀 훅
 function useLogin(mutationOptions?: UseMutationCustomOptions) {
   return useMutation({
     mutationFn: (loginUrl: string) => socialLogin(loginUrl),
-    onSuccess: ({accessToken}) => {
+    onSuccess: accessToken => {
       setHeader('Authorization', `Bearer ${accessToken}`)
-      // setEncryptStorage(storageKeys.REFRESH_TOKEN, accessToken);
+      setEncryptStorage(storageKeys.ACCESS_TOKEN, accessToken)
+      useGetUserId(accessToken)
     },
     onSettled: () => {
       queryClient.refetchQueries({
@@ -34,12 +36,23 @@ function useLogin(mutationOptions?: UseMutationCustomOptions) {
   })
 }
 
+// 유저 아이디 가져오기
+function useGetUserId(token: string | null, queryOptions?: UseQueryCustomOptions<number>) {
+  return useQuery({
+    queryFn: () => getUserId(String(token)),
+    queryKey: [queryKeys.GET_USER_ID, token],
+    enabled: Boolean(token),
+    throwOnError: true,
+    ...queryOptions,
+  })
+}
+
 // 프로필 정보 가져오기 훅
 function useGetProfile(userId: number, queryOptions?: UseQueryCustomOptions<ResponseProfile>) {
   return useQuery({
     queryFn: () => getProfile(userId),
     queryKey: [queryKeys.AUTH, queryKeys.GET_PROFILE],
-    enabled: !!userId,
+    enabled: Boolean(userId),
     ...queryOptions,
   })
 }
@@ -79,6 +92,7 @@ function useAuth() {
     logoutMutation,
     profileMutation,
     useGetProfile,
+    useGetUserId,
   }
 }
 

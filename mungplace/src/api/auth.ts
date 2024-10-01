@@ -2,14 +2,10 @@ import type {UserProfile} from '@/types/domain'
 import {getEncryptStorage} from '@/utils'
 import axiosInstance from './axios'
 import {JwtPayload, jwtDecode} from 'jwt-decode'
+import {storageKeys} from '@/constants'
 
 interface CustomJwtPayload extends JwtPayload {
   userId: number
-}
-
-// 로그인 후 응답받는 토큰 데이터 타입
-type ResponseToken = {
-  accessToken: string
 }
 
 // 사용자 프로필 요청 타입
@@ -23,10 +19,10 @@ type ResponseProfile = {
 }
 
 // 소셜 로그인 함수
-const socialLogin = async (url: string): Promise<ResponseToken> => {
+const socialLogin = async (url: string): Promise<string> => {
   const pathSegments = url.split('/')
   const accessToken = pathSegments[pathSegments.length - 1]
-  return {accessToken}
+  return accessToken
 }
 
 // 유저 아이디 해석 함수
@@ -59,12 +55,9 @@ const editProfile = async (userId: number, body: RequestProfile): Promise<Respon
 }
 
 // 액세스 토큰 요청 함수
-const getAccessToken = async (): Promise<ResponseToken> => {
-  const refreshToken = await getEncryptStorage('refreshToken')
-  const {data} = await axiosInstance.get('/auth/refresh', {
-    headers: {Authorization: `Bearer ${refreshToken}`},
-  })
-  return data
+const getAccessToken = async (): Promise<string> => {
+  const accessToken = await getEncryptStorage(storageKeys.ACCESS_TOKEN)
+  return accessToken
 }
 
 // 로그아웃 요청 함수
@@ -78,4 +71,4 @@ const logout = async () => {
 }
 
 export {editProfile, getAccessToken, getProfile, logout, socialLogin, getUserId}
-export type {RequestProfile, ResponseProfile, ResponseToken}
+export type {RequestProfile, ResponseProfile}
