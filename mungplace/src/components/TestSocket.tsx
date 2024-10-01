@@ -1,6 +1,6 @@
-import React from 'react';
-import {View, Text, Button} from 'react-native';
-import useWebSocket from '@/hooks/useWebsocket';
+import React from 'react'
+import {View, Text, Button} from 'react-native'
+import useWebSocket from '@/hooks/useWebsocket'
 
 const TestSocket = () => {
   const {
@@ -13,7 +13,7 @@ const TestSocket = () => {
     checkMyBlueZone,
     checkAllUserZone,
     checkMungPlace,
-  } = useWebSocket();
+  } = useWebSocket()
 
   return (
     <View>
@@ -66,15 +66,13 @@ const TestSocket = () => {
       />
       <Button title="checkMungPlace" onPress={() => checkMungPlace} />
       {/* 현재 수신된 데이터 출력 */}
-      {explorations && (
-        <Text>Explorations: {JSON.stringify(explorations)}</Text>
-      )}
+      {explorations && <Text>Explorations: {JSON.stringify(explorations)}</Text>}
       {myBlueZone && <Text>My BlueZone: {JSON.stringify(myBlueZone)}</Text>}
       {allBlueZone && <Text>All BlueZone: {JSON.stringify(allBlueZone)}</Text>}
       {allRedZone && <Text>All RedZone: {JSON.stringify(allRedZone)}</Text>}
       {mungZone && <Text>MungZone: {JSON.stringify(mungZone)}</Text>}
     </View>
-  );
-};
+  )
+}
 
-export default TestSocket;
+export default TestSocket

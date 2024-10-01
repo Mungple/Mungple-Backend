@@ -1,24 +1,24 @@
-import React, {useState} from 'react';
-import {Alert} from 'react-native';
-import styled from 'styled-components/native';
-import {RouteProp, useRoute, useNavigation} from '@react-navigation/native';
+import React, {useState} from 'react'
+import {Alert} from 'react-native'
+import styled from 'styled-components/native'
+import {RouteProp, useRoute, useNavigation} from '@react-navigation/native'
 
-import {colors} from '@/constants';
-import {addPetImage, deletePetProfile} from '@/api';
-import {calculateAge} from '@/hooks/usePetAge';
-import PetForm from '@/components/user/PetForm';
-import CustomModal from '@/components/common/CustomModal';
-import CustomModalHeader from '@/components/common/CustomModalHeader';
-import {SettingStackParamList} from '@/navigations/stack/SettingStackNavigator';
-import ImagePicker from '@/components/common/ImagePicker';
+import {colors} from '@/constants'
+import {addPetImage, deletePetProfile} from '@/api'
+import {calculateAge} from '@/hooks/usePetAge'
+import PetForm from '@/components/user/PetForm'
+import CustomModal from '@/components/common/CustomModal'
+import CustomModalHeader from '@/components/common/CustomModalHeader'
+import {SettingStackParamList} from '@/navigations/stack/SettingStackNavigator'
+import ImagePicker from '@/components/common/ImagePicker'
 
-type PetDetailRouteProp = RouteProp<SettingStackParamList, 'PetDetail'>;
+type PetDetailRouteProp = RouteProp<SettingStackParamList, 'PetDetail'>
 
 const PetDetailScreen: React.FC = () => {
-  const [modalVisible, setModalVisible] = useState(false);
-  const route = useRoute<PetDetailRouteProp>();
-  const navigation = useNavigation();
-  const {petData} = route.params;
+  const [modalVisible, setModalVisible] = useState(false)
+  const route = useRoute<PetDetailRouteProp>()
+  const navigation = useNavigation()
+  const {petData} = route.params
 
   const handleDelete = () => {
     Alert.alert(
@@ -30,18 +30,18 @@ const PetDetailScreen: React.FC = () => {
           text: '삭제',
           style: 'destructive',
           onPress: () => {
-            deletePetProfile(petData.id);
-            navigation.goBack();
+            deletePetProfile(petData.id)
+            navigation.goBack()
           },
         },
       ],
       {cancelable: true},
-    );
-  };
+    )
+  }
 
   return (
     <Container>
-      <ImagePicker petId={petData.id} uploadFunction={addPetImage}/>
+      <ImagePicker petId={petData.id} uploadFunction={addPetImage} />
       <Column>
         <Row>
           <Title>이름</Title>
@@ -69,19 +69,13 @@ const PetDetailScreen: React.FC = () => {
         </ActionButton>
       </ButtonContainer>
 
-      <CustomModal
-        isWide={true}
-        modalVisible={modalVisible}
-        setModalVisible={setModalVisible}>
-        <CustomModalHeader
-          title="반려견 정보 변경"
-          closeButton={() => setModalVisible(false)}
-        />
+      <CustomModal isWide={true} modalVisible={modalVisible} setModalVisible={setModalVisible}>
+        <CustomModalHeader title="반려견 정보 변경" closeButton={() => setModalVisible(false)} />
         <PetForm isEdit setModalVisible={setModalVisible} />
       </CustomModal>
     </Container>
-  );
-};
+  )
+}
 
 const Container = styled.View`
   flex: 1;
@@ -89,49 +83,48 @@ const Container = styled.View`
   align-items: center;
   justify-content: center;
   background-color: ${colors.WHITE};
-`;
+`
 
 const Column = styled.View`
   flex: 1;
-`;
+`
 
 const Row = styled.View`
   gap: 100px;
   margin: 10px 0;
   flex-direction: row;
   justify-content: space-between;
-`;
+`
 
 const Title = styled.Text`
   font-size: 20px;
   color: ${colors.BLACK};
-`;
+`
 
 const Context = styled(Title)`
   font-weight: bold;
   text-align: right;
-`;
+`
 
 const ButtonContainer = styled.View`
   flex-direction: row;
   justify-content: space-between;
   margin-top: 20px;
-`;
+`
 
 const ActionButton = styled.TouchableOpacity<{danger?: boolean}>`
   flex: 1;
   padding: 15px;
   margin: 0 5px;
-  background-color: ${props =>
-    props.danger ? colors.RED.BASE : colors.ORANGE.BASE};
+  background-color: ${props => (props.danger ? colors.RED.BASE : colors.ORANGE.BASE)};
   border-radius: 8px;
   align-items: center;
-`;
+`
 
 const ButtonText = styled.Text`
   font-size: 18px;
   font-weight: bold;
   color: ${colors.WHITE};
-`;
+`
 
-export default PetDetailScreen;
+export default PetDetailScreen

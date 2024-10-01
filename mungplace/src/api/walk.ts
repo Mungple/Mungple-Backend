@@ -1,5 +1,4 @@
-import axiosInstance from './axios';
-
+import axiosInstance from './axios'
 
 // 산책 시작 함수
 const startWalk = async (JSON: string) => {
@@ -8,13 +7,13 @@ const startWalk = async (JSON: string) => {
       headers: {
         'Content-Type': `application/json; charset=utf8`,
       },
-    });
-    return data;
+    })
+    return data
   } catch (error) {
     console.log('산책 시작 실패 :', error)
     throw error
   }
-};
+}
 
 // 산책 종료 함수
 const exitWalk = async (explorationId: number) => {
@@ -23,38 +22,36 @@ const exitWalk = async (explorationId: number) => {
       headers: {
         'Content-Type': `application/json; charset=utf8`,
       },
-    });
-    return data;
+    })
+    return data
   } catch (error) {
     console.log('산책 종료 실패 :', error)
     throw error
   }
-};
+}
 
 // 월간 산책 기록 목록 조회 함수
 const getMonthWalks = async () => {
-  const {data} = await axiosInstance.get(`/explorations`);
-  return data;
-};
+  const {data} = await axiosInstance.get(`/explorations`)
+  return data
+}
 
 // 일간 산책 기록 목록 조회 함수
 const getDateWalks = async () => {
-  const {data} = await axiosInstance.get(`/explorations/days`);
-  return data;
-};
+  const {data} = await axiosInstance.get(`/explorations/days`)
+  return data
+}
 
 // 산책 기록 목록 통계 조회 함수
 const getStatistics = async () => {
-  const {data} = await axiosInstance.get(`/explorations/statistics`);
-  return data;
-};
+  const {data} = await axiosInstance.get(`/explorations/statistics`)
+  return data
+}
 
 // 산책 기록 상세 조회 함수
 const getWalkDetail = async (explorationId: number) => {
-  const {data} = await axiosInstance.get(`/explorations/${explorationId}`);
-  return data;
-};
+  const {data} = await axiosInstance.get(`/explorations/${explorationId}`)
+  return data
+}
 
-
-export { exitWalk, getDateWalks, getMonthWalks, getStatistics, getWalkDetail, startWalk };
-
+export {exitWalk, getDateWalks, getMonthWalks, getStatistics, getWalkDetail, startWalk}
