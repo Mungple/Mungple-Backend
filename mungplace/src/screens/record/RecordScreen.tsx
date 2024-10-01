@@ -42,6 +42,7 @@ const RecordScreen = () => {
 
   const handlePressDate = (date: number) => {
     setSelectedDate(date);
+    console.log(date);
   };
 
   const handleUpdateMonth = (increment: number) => {

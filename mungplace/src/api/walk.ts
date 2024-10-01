@@ -68,15 +68,29 @@ const getStatistics = async (year: number, month: number) => {
 };
 
 // 일간 산책 기록 목록 조회 함수
-const getDateWalks = async () => {
-  const {data} = await axiosInstance.get(`/explorations/days`);
-  return data;
+const getDateWalks = async (date: string) => {
+  try {
+    const {data} = await axiosInstance.get(`/explorations/days`, {
+      params: {
+        date: date,
+      },
+    });
+    return data;
+  } catch (error) {
+    console.error('일간 산책 기록 목록 조회 실패 :', error);
+    throw error;
+  }
 };
 
 // 산책 기록 상세 조회 함수
 const getWalkDetail = async (explorationId: number) => {
-  const {data} = await axiosInstance.get(`/explorations/${explorationId}`);
-  return data;
+  try {
+    const {data} = await axiosInstance.get(`/explorations/${explorationId}`);
+    return data;
+  } catch (error) {
+    console.error('산책 기록 상세 조회 실패 :', error);
+    throw error;
+  }
 };
 
 export {
