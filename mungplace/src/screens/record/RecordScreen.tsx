@@ -5,7 +5,7 @@ import styled from 'styled-components/native';
 
 import {colors} from '@/constants';
 import {getMonthYearDetails, getNewMonthYear} from '@/utils/date';
-import {getMonthWalks} from '@/api/walk';
+import {getMonthWalks, getDateWalks, getWalkDetail} from '@/api/walk';
 
 import CustomHeader from '@/components/common/CustomHeader';
 import Calendar from '@/components/record/Calendar';
@@ -40,9 +40,19 @@ const RecordScreen = () => {
     setMonthYear(getMonthYearDetails(new Date()));
   };
 
-  const handlePressDate = (date: number) => {
-    setSelectedDate(date);
-    console.log(date);
+  const handlePressDate = async (date: number) => {
+    // 1자리 날짜를 2자리 형식으로 변환
+    const formattedDate = String(date).padStart(2, '0'); // 01, 02, ..., 10 등으로 변환
+    const dateString = `${monthYear.year}-${monthYear.month}-${formattedDate}`;
+
+    setSelectedDate(date); // 상태를 업데이트
+
+    try {
+      const data = await getDateWalks(dateString); // 비동기적으로 데이터 가져오기
+      console.log(data); // 데이터를 받아온 후 처리
+    } catch (error) {
+      console.error('일간 산책 기록 가져오기 실패:', error);
+    }
   };
 
   const handleUpdateMonth = (increment: number) => {
