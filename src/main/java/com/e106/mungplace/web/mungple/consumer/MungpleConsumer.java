@@ -1,4 +1,4 @@
-package com.e106.mungplace.web.mungple;
+package com.e106.mungplace.web.mungple.consumer;
 
 import java.time.LocalDateTime;
 import java.util.Set;
@@ -12,6 +12,9 @@ import org.springframework.stereotype.Component;
 
 import com.e106.mungplace.common.map.dto.Point;
 import com.e106.mungplace.domain.exploration.entity.ExplorationEvent;
+import com.e106.mungplace.domain.mungple.entity.MungpleEvent;
+import com.e106.mungplace.domain.mungple.entity.MungpleEventType;
+import com.e106.mungplace.web.mungple.producer.MungpleProducer;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -53,6 +56,7 @@ public class MungpleConsumer {
 			// 최초 진입 시 사용자 수 증가
 			increaseGeoHashUserCount(currentGeoHash);
 			setMungplace(null, currentGeoHash);  // 처음에는 이전 위치가 없으므로 null 처리
+
 		} else if (!previousGeoHash.equals(currentGeoHash)) {
 			// 이전 위치와 현재 위치가 다를 경우 처리
 			decreaseGeoHashUserCount(previousGeoHash);
@@ -60,8 +64,8 @@ public class MungpleConsumer {
 			setMungplace(previousGeoHash, currentGeoHash);
 		}
 
-		redisTemplate.opsForValue().set(getUserGeoHashKey(userId), currentGeoHash, 30, TimeUnit.MINUTES);
-		printAllGeoHashUserCounts();
+		redisTemplate.opsForValue().set(getUserGeoHashKey(userId), currentGeoHash, 10, TimeUnit.MINUTES);
+		// printAllGeoHashUserCounts();
 		ack.acknowledge();
 	}
 
@@ -88,7 +92,8 @@ public class MungpleConsumer {
 		}
 
 		markMungpleCreated(currentGeoHash);
-		MungpleEvent event = new MungpleEvent("mungple", currentGeoHash, MungpleEventType.MUNGPLE_CREATED, LocalDateTime.now());
+		MungpleEvent event = new MungpleEvent("mungple", currentGeoHash, MungpleEventType.MUNGPLE_CREATED,
+			LocalDateTime.now());
 		mungpleProducer.sendMungpleEvent(event);
 	}
 

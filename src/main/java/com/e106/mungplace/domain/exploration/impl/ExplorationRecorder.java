@@ -202,7 +202,7 @@ public class ExplorationRecorder {
 	}
 
 	private String getPrePointKey(String userId) {
-		return "users:" + userId + ":prePoint";
+		return "users:" + userId + ":pre_point";
 	}
 
 	private void deleteAllValue(String userId) {
