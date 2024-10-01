@@ -1,5 +1,7 @@
 package com.e106.mungplace.web.mungple.consumer;
 
+import static com.e106.mungplace.web.exception.dto.ApplicationSocketError.*;
+
 import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -14,6 +16,7 @@ import com.e106.mungplace.common.map.dto.Point;
 import com.e106.mungplace.domain.exploration.entity.ExplorationEvent;
 import com.e106.mungplace.domain.mungple.entity.MungpleEvent;
 import com.e106.mungplace.domain.mungple.entity.MungpleEventType;
+import com.e106.mungplace.web.exception.ApplicationSocketException;
 import com.e106.mungplace.web.mungple.producer.MungpleProducer;
 
 import lombok.extern.slf4j.Slf4j;
@@ -43,58 +46,37 @@ public class MungpleConsumer {
 	public void listen(ExplorationEvent receivedEvent, Acknowledgment ack) {
 		String userId = receivedEvent.userId().toString();
 
-		// 현재 GeoHash 계산
 		String currentGeoHash = Point.toMungpleGeoHash(
 			receivedEvent.payload().point().lat().toString(),
 			receivedEvent.payload().point().lon().toString()
 		);
 
-		// Redis에서 사용자의 이전 GeoHash 값 가져오기
+		if (currentGeoHash == null) {
+			throw new ApplicationSocketException(DONT_SEND_ANY_REQUEST);
+		}
+
 		String previousGeoHash = redisTemplate.opsForValue().get(getUserGeoHashKey(userId));
 
 		if (previousGeoHash == null) {
-			// 최초 진입 시 사용자 수 증가
 			increaseGeoHashUserCount(currentGeoHash);
 			setMungplace(null, currentGeoHash);  // 처음에는 이전 위치가 없으므로 null 처리
-
-		} else if (!previousGeoHash.equals(currentGeoHash)) {
-			// 이전 위치와 현재 위치가 다를 경우 처리
-			decreaseGeoHashUserCount(previousGeoHash);
-			increaseGeoHashUserCount(currentGeoHash);
-			setMungplace(previousGeoHash, currentGeoHash);
+		} else {
+			if (!previousGeoHash.equals(currentGeoHash)) {
+				decreaseGeoHashUserCount(previousGeoHash);
+				increaseGeoHashUserCount(currentGeoHash);
+				setMungplace(previousGeoHash, currentGeoHash);
+			}
 		}
 
 		redisTemplate.opsForValue().set(getUserGeoHashKey(userId), currentGeoHash, 10, TimeUnit.MINUTES);
-		// printAllGeoHashUserCounts();
+
+		printAllGeoHashUserCounts();
 		ack.acknowledge();
 	}
 
 	private void setMungplace(String previousGeoHash, String currentGeoHash) {
 		removeMungpleIfNeeded(previousGeoHash);
 		createMungpleIfNeeded(currentGeoHash);
-	}
-
-	private void createMungpleIfNeeded(String currentGeoHash) {
-		String currentUserCountStr = redisTemplate.opsForValue().get(getGeoHashKey(currentGeoHash));
-
-		if (currentUserCountStr == null) {
-			return;
-		}
-
-		int currentUserCount = Integer.parseInt(currentUserCountStr);
-
-		if (currentUserCount < MUNGPLE_THRESHOLD) {
-			return;
-		}
-
-		if (isMungpleCreated(currentGeoHash)) {
-			return;
-		}
-
-		markMungpleCreated(currentGeoHash);
-		MungpleEvent event = new MungpleEvent("mungple", currentGeoHash, MungpleEventType.MUNGPLE_CREATED,
-			LocalDateTime.now());
-		mungpleProducer.sendMungpleEvent(event);
 	}
 
 	private void removeMungpleIfNeeded(String previousGeoHash) {
@@ -121,8 +103,32 @@ public class MungpleConsumer {
 		}
 	}
 
+	private void createMungpleIfNeeded(String currentGeoHash) {
+		// 유저수 가지고 오기
+		String currentUserCountStr = redisTemplate.opsForValue().get(getGeoHashKey(currentGeoHash));
+
+		if (currentUserCountStr == null) {
+			return;
+		}
+
+		int currentUserCount = Integer.parseInt(currentUserCountStr);
+
+		if (currentUserCount < MUNGPLE_THRESHOLD) {
+			return;
+		}
+
+		if (isMungpleCreated(currentGeoHash)) {
+			return;
+		}
+
+		markMungpleCreated(currentGeoHash);
+		MungpleEvent event = new MungpleEvent("mungple", currentGeoHash, MungpleEventType.MUNGPLE_CREATED,
+			LocalDateTime.now());
+		mungpleProducer.sendMungpleEvent(event);
+	}
+
 	private String getUserGeoHashKey(String userId) {
-		return "users:" + userId + ":geoHash";
+		return "users:" + userId + ":mungple:geohash";
 	}
 
 	private String getGeoHashKey(String geoHash) {
