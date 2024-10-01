@@ -25,6 +25,18 @@ public interface GeoUtils {
 		return new Point(nw.getLatitude(), nw.getLongitude());
 	}
 
+	static Point calculateNorthEastPoint(Point point, int sideLength) {
+		GlobalCoordinates ne = calculateOffset(new GlobalCoordinates(point.lat(), point.lon()), 45,
+			sideLength / Math.sqrt(2));
+		return new Point(ne.getLatitude(), ne.getLongitude());
+	}
+
+	static Point calculateSouthWestPoint(Point point, int sideLength) {
+		GlobalCoordinates sw = calculateOffset(new GlobalCoordinates(point.lat(), point.lon()), -135,
+			sideLength / Math.sqrt(2));
+		return new Point(sw.getLatitude(), sw.getLongitude());
+	}
+
 	static Point calculateGeohashCenterPoint(String geoHashString) {
 		var center = GeohashUtils.decode(geoHashString, SpatialContext.GEO);
 		return new Point(center.getLat(), center.getLon());
