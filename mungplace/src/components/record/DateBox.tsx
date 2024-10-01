@@ -33,10 +33,10 @@ const DateBox = ({
               {date}
             </DateText>
           </DateContainer>
-          {!hasAttendance && (
+          {hasAttendance && (
             <MaterialIcons
               name="check-circle"
-              size={14}
+              size={18}
               color={colors.ORANGE.BASE}
             />
           )}

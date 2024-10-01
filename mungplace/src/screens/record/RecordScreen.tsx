@@ -2,7 +2,6 @@ import React, {useCallback, useState} from 'react';
 import {useFocusEffect} from '@react-navigation/native';
 
 import styled from 'styled-components/native';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 import {colors} from '@/constants';
 import {getMonthYearDetails, getNewMonthYear} from '@/utils/date';
@@ -23,8 +22,8 @@ interface ExplorationInfo {
 
 // 월간 산책 정보 인터페이스
 interface MonthRecords {
-  year: number; // 연도
-  month: number; // 월
+  year: number;
+  month: number;
   totalExplorations: number; // 총 산책 횟수
   explorationInfos: ExplorationInfo[]; // ExplorationInfo 객체 배열
 }
@@ -32,7 +31,7 @@ interface MonthRecords {
 const currentMonthYear = getMonthYearDetails(new Date());
 
 const RecordScreen = () => {
-  const [selectedDate, setSelectedDate] = useState(0);
+  const [selectedDate, setSelectedDate] = useState<number | 0>(0);
   const [monthYear, setMonthYear] = useState(currentMonthYear);
   const [attendance, setAttendance] = useState<number[]>([]);
 
@@ -76,6 +75,7 @@ const RecordScreen = () => {
 
       moveToToday();
       getData();
+      console.log(attendance);
       return () => {};
     }, []),
   );
@@ -84,7 +84,7 @@ const RecordScreen = () => {
     <Container>
       <CustomHeader title="월간 산책" />
       <Calendar
-        attendance={[]}
+        attendance={attendance}
         monthYear={monthYear}
         selectedDate={selectedDate}
         moveToToday={moveToToday}
