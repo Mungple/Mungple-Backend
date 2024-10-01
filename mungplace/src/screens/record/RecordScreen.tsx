@@ -1,11 +1,11 @@
-import React, {useCallback, useState} from 'react';
-import {useFocusEffect} from '@react-navigation/native';
+import React, { useCallback, useState } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 
 import styled from 'styled-components/native';
 
-import {colors} from '@/constants';
-import {getMonthYearDetails, getNewMonthYear} from '@/utils/date';
-import {getMonthWalks, getDateWalks, getWalkDetail} from '@/api/walk';
+import { colors } from '@/constants';
+import { getMonthYearDetails, getNewMonthYear } from '@/utils/date';
+import { getMonthWalks, getDateWalks, getWalkDetail } from '@/api/walk';
 
 import CustomHeader from '@/components/common/CustomHeader';
 import Calendar from '@/components/record/Calendar';
@@ -56,14 +56,14 @@ const RecordScreen = () => {
   };
 
   const handleUpdateMonth = (increment: number) => {
-    setMonthYear(prev => getNewMonthYear(prev, increment));
+    setMonthYear((prev) => getNewMonthYear(prev, increment));
   };
 
   const processAttendance = (explorationInfos: ExplorationInfo[]) => {
     // endTime에서 날짜(day) 추출하고 중복 제거
     const days = [
       ...new Set(
-        explorationInfos.map(info => new Date(info.endTime).getDate()),
+        explorationInfos.map((info) => new Date(info.endTime).getDate()),
       ),
     ];
     setAttendance(days);

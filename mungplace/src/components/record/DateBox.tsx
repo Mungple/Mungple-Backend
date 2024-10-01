@@ -1,9 +1,9 @@
 import React from 'react';
-import {Dimensions, Pressable} from 'react-native';
+import { Dimensions, Pressable } from 'react-native';
 import styled from 'styled-components/native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
-import {colors} from '@/constants';
+import { colors } from '@/constants';
 
 interface DateBoxProps {
   date: number;
@@ -53,25 +53,25 @@ const DatePressable = styled(Pressable)<{
   border-radius: 8px;
   width: ${deviceWidth / 7}px;
   height: ${deviceWidth / 7 + 12}px;
-  border: ${({isSelected}) =>
+  border: ${({ isSelected }) =>
     isSelected ? `2px solid ${colors.ORANGE.BASE}` : 'none'};
 `;
 
-const DateContainer = styled.View<{isToday: boolean}>`
+const DateContainer = styled.View<{ isToday: boolean }>`
   margin-top: 6px;
   align-items: center;
   justify-content: center;
   width: 28px;
   height: 32px;
   border-radius: 8px;
-  background-color: ${({isToday}) =>
+  background-color: ${({ isToday }) =>
     isToday ? colors.ORANGE.BASE : 'transparent'};
 `;
 
-const DateText = styled.Text<{isToday: boolean; isSelected: boolean}>`
+const DateText = styled.Text<{ isToday: boolean; isSelected: boolean }>`
   font-size: 17px;
-  color: ${({isToday}) => (isToday ? colors.WHITE : colors.BLACK)};
-  font-weight: ${({isToday, isSelected}) =>
+  color: ${({ isToday }) => (isToday ? colors.WHITE : colors.BLACK)};
+  font-weight: ${({ isToday, isSelected }) =>
     isToday || isSelected ? 'bold' : 'normal'};
 `;
 
