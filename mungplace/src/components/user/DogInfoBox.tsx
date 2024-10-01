@@ -1,13 +1,15 @@
-import React from 'react';
-import styled from 'styled-components/native';
-import CustomCard from '../common/CustomCard';
-import {colors} from '@/constants';
-import {useUserStore} from '@/state/useUserStore';
-import {calculateAge} from '@/hooks/usePetAge';
+import React from 'react'
+import styled from 'styled-components/native'
+import CustomCard from '../common/CustomCard'
+import {colors} from '@/constants'
+import {useUserStore} from '@/state/useUserStore'
+import {calculateAge} from '@/hooks/usePetAge'
+import useGetPet from '@/hooks/queries/useGetPet'
 
 const DogInfoBox = () => {
-  const petData = useUserStore(state => state.petData);
-  const defaultPet = petData.find(pet => pet.isDefault === true);
+  const {userId} = useUserStore(state => state)
+  const {data} = useGetPet(userId)
+  const defaultPet = data?.find(pet => pet.isDefault === true)
   const age = defaultPet ? calculateAge(defaultPet.birth) : undefined
 
   return (
@@ -42,8 +44,8 @@ const DogInfoBox = () => {
         </Col>
       )}
     </Container>
-  );
-};
+  )
+}
 
 const Container = styled(CustomCard)`
   flex: 1;
@@ -52,31 +54,31 @@ const Container = styled(CustomCard)`
   flex-direction: row;
   align-items: center;
   background-color: ${colors.BEIGE.LIGHTER};
-`;
+`
 
 const Col = styled.View`
   flex: 1;
-`;
+`
 
 const Row = styled.View`
   flex-direction: row;
   justify-content: space-between;
   margin: 10px 0;
-`;
+`
 
 const Header = styled.Text`
   font-size: 20px;
   color: ${colors.BLACK};
-`;
+`
 
 const Title = styled.Text`
   font-size: 20px;
   color: ${colors.BLACK};
-`;
+`
 
 const Context = styled(Title)`
   font-weight: bold;
   text-align: right;
-`;
+`
 
-export default DogInfoBox;
+export default DogInfoBox

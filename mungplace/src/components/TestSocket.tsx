@@ -1,19 +1,11 @@
 import React from 'react'
 import {View, Text, Button} from 'react-native'
 import useWebSocket from '@/hooks/useWebsocket'
+import useWebSocketActions from '@/hooks/useWebsocketActions'
 
 const TestSocket = () => {
-  const {
-    explorations,
-    myBlueZone,
-    allBlueZone,
-    allRedZone,
-    mungZone,
-    sendLocation,
-    checkMyBlueZone,
-    checkAllUserZone,
-    checkMungPlace,
-  } = useWebSocket()
+  const {explorations, myBlueZone, allBlueZone, allRedZone, mungZone} = useWebSocket()
+  const {sendLocation, checkMyBlueZone, checkAllUserZone, checkMungPlace} = useWebSocketActions()
 
   return (
     <View>

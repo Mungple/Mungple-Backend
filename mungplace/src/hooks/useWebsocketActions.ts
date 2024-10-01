@@ -15,7 +15,7 @@ interface ToZone {
   }
 }
 
-const WebSocketActions = () => {
+const useWebSocketActions = () => {
   const {clientSocket} = useWebSocket()
 
   const sendLocation = useCallback(
@@ -83,4 +83,4 @@ const WebSocketActions = () => {
   }
 }
 
-export default WebSocketActions
+export default useWebSocketActions

@@ -1,6 +1,11 @@
 import type {UserProfile} from '@/types/domain'
 import {getEncryptStorage} from '@/utils'
 import axiosInstance from './axios'
+import {JwtPayload, jwtDecode} from 'jwt-decode'
+
+interface CustomJwtPayload extends JwtPayload {
+  userId: number
+}
 
 // 로그인 후 응답받는 토큰 데이터 타입
 type ResponseToken = {
@@ -17,10 +22,18 @@ type ResponseProfile = {
   imageName: string | null
 }
 
+// 소셜 로그인 함수
 const socialLogin = async (url: string): Promise<ResponseToken> => {
   const pathSegments = url.split('/')
   const accessToken = pathSegments[pathSegments.length - 1]
   return {accessToken}
+}
+
+// 유저 아이디 해석 함수
+const getUserId = async (token: string): Promise<number> => {
+  const decodedCode = jwtDecode<CustomJwtPayload>(token)
+  const userId = decodedCode.userId
+  return userId
 }
 
 // 프로필 정보 요청 함수
@@ -64,5 +77,5 @@ const logout = async () => {
   }
 }
 
-export {editProfile, getAccessToken, getProfile, logout, socialLogin}
+export {editProfile, getAccessToken, getProfile, logout, socialLogin, getUserId}
 export type {RequestProfile, ResponseProfile, ResponseToken}

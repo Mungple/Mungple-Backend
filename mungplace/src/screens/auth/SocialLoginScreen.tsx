@@ -1,47 +1,43 @@
-import React from 'react';
-import styled from 'styled-components/native';
-import {WebView, WebViewNavigation} from 'react-native-webview';
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
+import React from 'react'
+import styled from 'styled-components/native'
+import {WebView, WebViewNavigation} from 'react-native-webview'
+import {NativeStackScreenProps} from '@react-navigation/native-stack'
 
-import useAuth from '@/hooks/queries/useAuth';
-import {useAppStore} from '@/state/useAppStore';
-import {AuthStackParamList} from '@/navigations/stack/AuthStackNavigator';
+import useAuth from '@/hooks/queries/useAuth'
+import {useAppStore} from '@/state/useAppStore'
+import {AuthStackParamList} from '@/navigations/stack/AuthStackNavigator'
 
-type SocialLoginScreenProps = NativeStackScreenProps<AuthStackParamList, 'SocialLogin'>;
+type SocialLoginScreenProps = NativeStackScreenProps<AuthStackParamList, 'SocialLogin'>
 type CustomWebViewNavigation = Omit<WebViewNavigation, 'headers'>
 const domain = 'https://j11e106.p.ssafy.io'
 
 const SocialLoginScreen: React.FC<SocialLoginScreenProps> = ({route}) => {
-  const {provider} = route.params;
-  const {setLogin} = useAppStore();
-  const {loginMutation} = useAuth();
-  
+  const {provider} = route.params
+  const {loginMutation} = useAuth()
+  const {setLogin} = useAppStore.getState()
+
   const handleNavigationStateChange = (event: CustomWebViewNavigation) => {
-    const url = event.url;
-    
+    const url = event.url
+
     if (url.startsWith(`${domain}/api/auth/oauth-response`)) {
-        loginMutation.mutate(url)
-        setLogin(true)
+      loginMutation.mutate(url)
+      setLogin(true)
     }
   }
 
   return (
     <Container>
-      <WebViewContainer
+      <WebView
         style={{flex: 1}}
         source={{uri: `${domain}/api/users/login/${provider}`}}
         onNavigationStateChange={handleNavigationStateChange}
       />
     </Container>
-  );
-};
+  )
+}
 
 const Container = styled.SafeAreaView`
   flex: 1;
-  
-`;
+`
 
-const WebViewContainer = styled(WebView)`
-`;
-
-export default SocialLoginScreen;
+export default SocialLoginScreen

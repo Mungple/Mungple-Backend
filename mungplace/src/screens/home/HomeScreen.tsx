@@ -2,7 +2,6 @@ import React, {useEffect, useState} from 'react'
 import {useNavigation} from '@react-navigation/native'
 import {NativeStackNavigationProp} from '@react-navigation/native-stack'
 
-import {getPetProfiles} from '@/api'
 import {startWalk} from '@/api/walk'
 import * as HS from './HomeScreenStyle'
 import {mapNavigations} from '@/constants'
@@ -16,27 +15,17 @@ import CustomModal from '@/components/common/CustomModal'
 import CustomButton from '@/components/common/CustomButton'
 import CustomModalHeader from '@/components/common/CustomModalHeader'
 import {MapStackParamList} from '@/navigations/stack/MapStackNavigator'
+import useGetPet from '@/hooks/queries/useGetPet'
 
 const windowHeight = Dimensions.get('window').height
 
 const HomeScreen: React.FC = () => {
-  const userId = useUserStore(state => state.userId)
-  const setPetData = useUserStore(state => state.setPetData)
   const [modalVisible, setModalVisible] = useState(false)
   const {userLocation, isUserLocationError} = useUserLocation()
   const [selectedPets, setSelectedPets] = useState<number[]>([])
   const setWalkingStart = useAppStore(state => state.setWalkingStart)
   const setStartExplorate = useAppStore(state => state.setStartExplorate)
   const navigation = useNavigation<NativeStackNavigationProp<MapStackParamList>>()
-
-  const getPetProfile = async () => {
-    const data = await getPetProfiles(userId)
-    setPetData(data)
-  }
-
-  useEffect(() => {
-    getPetProfile()
-  })
 
   // 산책 시작 모달
   const handleModalVisivle = () => {
@@ -45,7 +34,9 @@ const HomeScreen: React.FC = () => {
 
   // 반려견 선택 로직
   const handlePetSelect = (dogId: number) => {
-    setSelectedPets(prev => (prev.includes(dogId) ? prev.filter(id => id !== dogId) : [...prev, dogId]))
+    setSelectedPets(prev =>
+      prev.includes(dogId) ? prev.filter(id => id !== dogId) : [...prev, dogId],
+    )
   }
 
   // 산책 시작 함수
@@ -56,13 +47,11 @@ const HomeScreen: React.FC = () => {
         lon: userLocation.longitude.toString(),
         dogIds: selectedPets,
       })
-      console.log(walkData)
 
       setModalVisible(false)
       setWalkingStart(true)
       setStartExplorate(await startWalk(walkData))
-      console.log('산책 시작')
-      console.log(useAppStore.getState().startExplorate)
+      console.log('산책 시작 >>>', useAppStore.getState().startExplorate)
       navigation.navigate(mapNavigations.WALKING)
     } else if (isUserLocationError) {
       Alert.alert('Error', '위치 권한을 허용해주세요')

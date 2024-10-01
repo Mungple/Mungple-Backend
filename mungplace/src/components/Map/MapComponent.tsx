@@ -24,7 +24,7 @@ interface MapComponentProps {
   userLocation: {latitude: number; longitude: number}
   path?: {latitude: number; longitude: number}[]
   bottomOffset?: number
-  markers: MarkerData[] // 마커 생성 용
+  markers?: MarkerData[] // 마커 생성 용
   isFormVisible: boolean
   onFormClose: () => void
 
@@ -196,7 +196,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
             ))}
 
         {/* Polyline */}
-        {path.length > 1 && visibleElements.convenienceInfo && (
+        {path.length > 1 && (
           <Polyline
             coordinates={path}
             strokeColor={colors.ORANGE.LIGHTER} // 필요에 따라 색상 변경
@@ -235,7 +235,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
               weight: cell.weight,
             }))}
             gradient={{
-              colors: ['red', 'darkred'], // 레드존 색상 설정
+              colors: ['red', 'darkred'],
               startPoints: [0.2, 1.0],
               colorMapSize: 256,
             }}

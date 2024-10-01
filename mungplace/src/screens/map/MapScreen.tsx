@@ -1,51 +1,33 @@
 // screens/MapScreen.tsx
-import React, {useState} from 'react';
-import {View, StyleSheet} from 'react-native';
-import MapComponent from '@/components/map/MapComponent';
-import useUserLocation from '@/hooks/useUserLocation';
+import React, {useState} from 'react'
+import styled from 'styled-components/native'
+
+import useUserLocation from '@/hooks/useUserLocation'
+import MapComponent from '@/components/map/MapComponent'
 
 const MapScreen = () => {
-  const {userLocation} = useUserLocation();
-  const [isFormVisible, setIsFormVisible] = useState(false);
+  const {userLocation} = useUserLocation()
+  const [isFormVisible, setIsFormVisible] = useState(false)
 
   const handleFormClose = () => {
-    setIsFormVisible(false);
-  };
-
-  const handleAddMarker = (markerData: string | number) => {
-    // Marker 추가 로직
-    console.log('Adding Marker:', markerData);
-    // addMarker(markerData); // 예시로 주석 처리, 실제로는 상태 관리 로직을 호출합니다.
-  };
+    setIsFormVisible(false)
+  }
 
   return (
-    <View style={styles.container}>
+    <Container>
       {userLocation && (
-        <>
-          <MapComponent
-            userLocation={userLocation}
-            isFormVisible={isFormVisible}
-            onFormClose={handleFormClose}
-            onAddMarker={handleAddMarker}
-          />
-        </>
+        <MapComponent
+          userLocation={userLocation}
+          isFormVisible={isFormVisible}
+          onFormClose={handleFormClose}
+        />
       )}
-    </View>
-  );
-};
+    </Container>
+  )
+}
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  buttonContainer: {
-    position: 'absolute',
-    bottom: 10,
-    left: 10,
-    right: 10,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-});
+const Container = styled.SafeAreaView`
+  flex: 1;
+`
 
-export default MapScreen;
+export default MapScreen
