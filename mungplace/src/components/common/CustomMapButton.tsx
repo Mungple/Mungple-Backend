@@ -6,6 +6,7 @@ import {colors} from '@/constants'
 
 interface CustomButtonProps extends PressableProps {
   iconName: string // 사용할 아이콘 이름
+  children?: React.ReactNode
   inValid?: boolean // 버튼이 유효하지 않을 때 비활성화 여부 (기본값: false)
   style?: StyleProp<ViewStyle> // 사용자 지정 스타일
   iconSize?: number // 아이콘 크기 설정
@@ -18,6 +19,7 @@ interface CustomButtonProps extends PressableProps {
 
 const CustomMapButton = ({
   iconName,
+  children,
   inValid = false,
   style = null,
   iconSize = 40,
@@ -48,6 +50,7 @@ const CustomMapButton = ({
       {...props}>
       <View style={styles.fixedSize}>
         <Icon name={iconName} size={iconSize} color={colors.BLACK} />
+        {children}
       </View>
     </Pressable>
   )

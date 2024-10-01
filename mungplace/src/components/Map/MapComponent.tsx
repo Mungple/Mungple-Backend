@@ -1,22 +1,24 @@
 import React, {useRef, useEffect, useState} from 'react'
 import {Animated, StyleSheet, Image} from 'react-native'
-import MapView, {Heatmap, Marker, Polyline, PROVIDER_GOOGLE} from 'react-native-maps'
-import ClusteredMapView from 'react-native-map-clustering' // 클러스터링 라이브러리
 import styled from 'styled-components/native'
-import {useMapStore, MarkerData} from '@/state/useMapStore' // zustand
+import {useFocusEffect, useNavigation} from '@react-navigation/native'
+import ClusteredMapView from 'react-native-map-clustering'
+import MapView, {Heatmap, Marker, Polyline, PROVIDER_GOOGLE} from 'react-native-maps'
+
+import {colors} from '@/constants' // 색깔
+import MapSettings from './MapSettings'
+import PolygonLayer from './PolygonLayer' // 멍플 지오해시
+import {mapNavigations} from '@/constants'
+import MarkerForm from '../marker/MarkerForm'
+import redMarker from '@/assets/redMarker.png' // 레드 마커
+import blueMarker from '@/assets/blueMarker.png' // 블루 마커
+import useWebSocket from '@/hooks/useWebsocket' // 웹소켓에서 블루, 레드 멍플 가져올거임
 import usePermission from '@/hooks/usePermission' // 퍼미션
 import useUserLocation from '@/hooks/useUserLocation' // 유저 위치
 import CustomMapButton from '../common/CustomMapButton' // 커스텀 버튼
 import CustomBottomSheet from '../common/CustomBottomSheet' // 커스텀 바텀 바
-import {colors} from '@/constants' // 색깔
-import blueMarker from '@/assets/blueMarker.png' // 블루 마커
-import redMarker from '@/assets/redMarker.png' // 레드 마커
-import PolygonLayer from './PolygonLayer' // 멍플 지오해시
-import MarkerForm from '../marker/MarkerForm'
-import {useNavigation} from '@react-navigation/native'
-import {mapNavigations} from '@/constants'
+import {useMapStore, MarkerData} from '@/state/useMapStore' // zustand
 import useMarkersWithinRadius from '@/hooks/useMarkersWithinRadius' // 주변 위치 조회 훅
-import useWebSocket from '@/hooks/useWebsocket' // 웹소켓에서 블루, 레드 멍플 가져올거임
 
 interface MapComponentProps {
   userLocation: {latitude: number; longitude: number}
@@ -86,7 +88,9 @@ const MapComponent: React.FC<MapComponentProps> = ({
   // 메뉴 햄버거 바 클릭 시 호출되는 함수
   const handlePressMenu = () => {
     setIsMenuVisible(prev => !prev)
-    const animationTargets = isMenuVisible ? {translateY: 0, opacity: 0} : {translateY: 80, opacity: 1}
+    const animationTargets = isMenuVisible
+      ? {translateY: 0, opacity: 0}
+      : {translateY: 80, opacity: 1}
 
     Animated.parallel([
       Animated.timing(translateY, {
@@ -109,6 +113,16 @@ const MapComponent: React.FC<MapComponentProps> = ({
   }
 
   usePermission('LOCATION')
+
+  // 화면을 떠날 때 WebSocket 연결 해제
+  useFocusEffect(
+    React.useCallback(() => {
+      console.log('MapComponent focused')
+      return () => {
+        console.log('MapComponent unfocused, WebSocket disconnected')
+      }
+    }, []),
+  )
 
   return (
     <Container>
@@ -139,7 +153,10 @@ const MapComponent: React.FC<MapComponentProps> = ({
                 longitude: marker.longitude,
               }}
               onPress={() => handleMarkerClick(marker.markerId)}>
-              <Image source={marker.type === 'BLUE' ? blueMarker : redMarker} style={styles.markerImage} />
+              <Image
+                source={marker.type === 'BLUE' ? blueMarker : redMarker}
+                style={styles.markerImage}
+              />
             </Marker>
           ))}
 
@@ -222,18 +239,27 @@ const MapComponent: React.FC<MapComponentProps> = ({
         />
         <ButtonWithTextContainer top={120} right={20}>
           <TextLabel>지도 설정</TextLabel>
-          <CustomMapButton onPress={handlePressSetting} iconName="settings-outline" inValid={isDisabled} />
+          <CustomMapButton
+            onPress={handlePressSetting}
+            iconName="settings-outline"
+            inValid={isDisabled}
+          />
         </ButtonWithTextContainer>
         <CustomBottomSheet
           modalVisible={isSettingModalVisible}
           setModalVisible={setIsSettingModalVisible}
           menuName="지도 설정"
           height={500}>
-          <CustomMapButton iconName="star" />
+          <MapSettings />
         </CustomBottomSheet>
       </Animated.View>
 
-      <CustomMapButton onPress={handlePressUserLocation} iconName="locate" bottom={20 + bottomOffset} left={20} />
+      <CustomMapButton
+        onPress={handlePressUserLocation}
+        iconName="locate"
+        bottom={20 + bottomOffset}
+        left={20}
+      />
       <CustomMapButton onPress={() => {}} iconName="reload" bottom={20 + bottomOffset} right={20} />
     </Container>
   )

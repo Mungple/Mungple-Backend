@@ -16,7 +16,10 @@ import CustomHeader from '@/components/common/CustomHeader'
 import CustomModalHeader from '@/components/common/CustomModalHeader'
 import {SettingStackParamList} from '@/navigations/stack/SettingStackNavigator'
 
-export type MyPageScreenProps = NativeStackScreenProps<SettingStackParamList, typeof settingNavigations.MY_PAGE>
+export type MyPageScreenProps = NativeStackScreenProps<
+  SettingStackParamList,
+  typeof settingNavigations.MY_PAGE
+>
 
 const windowHeight = Dimensions.get('window').height
 
@@ -32,7 +35,7 @@ const MyPageScreen: React.FC<MyPageScreenProps> = ({navigation}) => {
     if (data) {
       setUserData(data)
     }
-  }, [data, setUserData])
+  }, [data])
 
   const handleSettingPress = () => {
     navigation.navigate(settingNavigations.SETTING)
@@ -46,13 +49,20 @@ const MyPageScreen: React.FC<MyPageScreenProps> = ({navigation}) => {
     <Container>
       {/* 프로필 영역 */}
       <CustomHeader title="내 정보">
-        <IonIcons name={'settings-outline'} size={32} color={colors.BLACK} onPress={handleSettingPress} />
+        <IonIcons
+          name={'settings-outline'}
+          size={32}
+          color={colors.BLACK}
+          onPress={handleSettingPress}
+        />
       </CustomHeader>
 
       <ProfileCard>
         <Image
           source={
-            userData.imageName ? {uri: `http://j11e106.p.ssafy.io:9000/images/${userData.imageName}`} : DefaultImage
+            userData.imageName
+              ? {uri: `http://j11e106.p.ssafy.io:9000/images/${userData.imageName}`}
+              : DefaultImage
           }
         />
         <Context>
