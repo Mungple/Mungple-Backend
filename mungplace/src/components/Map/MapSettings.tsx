@@ -1,74 +1,96 @@
 import {colors} from '@/constants'
-import React from 'react'
-import {FlatList, TouchableOpacity} from 'react-native'
-import Icon from 'react-native-vector-icons/Ionicons' // 아이콘 라이브러리
+import React, {useState} from 'react'
 import styled from 'styled-components/native'
+import Icon from 'react-native-vector-icons/Ionicons'
+import {FlatList, TouchableOpacity} from 'react-native'
 
 interface ButtonItem {
   label: string
-  onPress: () => void
+  iconName: string
+  elementKey: keyof {
+    blueZone: boolean
+    redZone: boolean
+    mungZone: boolean
+    convenienceInfo: boolean
+    myBlueZone: boolean
+    redMarkers: boolean
+    constructionSites: boolean
+    blueMarkers: boolean
+  }
+}
+
+type VisibleElements = {
+  blueZone: boolean
+  redZone: boolean
+  mungZone: boolean
+  convenienceInfo: boolean
+  myBlueZone: boolean
+  redMarkers: boolean
+  constructionSites: boolean
+  blueMarkers: boolean
+}
+
+interface MapSettingProps {
+  visibleElements: VisibleElements
+  toggleElementVisibility: (element: keyof VisibleElements) => void
 }
 
 const buttonData: ButtonItem[] = [
   {
     label: '블루존',
-    onPress: () => {
-      console.log('블루존 버튼 클릭')
-    },
+    iconName: 'locate-outline',
+    elementKey: 'blueZone',
   },
   {
     label: '레드존',
-    onPress: () => {
-      console.log('레드존 버튼 클릭')
-    },
-  },
-  {
-    label: '멍플',
-    onPress: () => {
-      console.log('멍플 버튼 클릭')
-    },
-  },
-  {
-    label: '편의정보',
-    onPress: () => {
-      console.log('편의정보 버튼 클릭')
-    },
-  },
-  {
-    label: '내 블루존',
-    onPress: () => {
-      console.log('내 블루존 버튼 클릭')
-    },
-  },
-  {
-    label: '레드마커',
-    onPress: () => {
-      console.log('레드마커 버튼 클릭')
-    },
-  },
-  {
-    label: '공사장',
-    onPress: () => {
-      console.log('공사장 버튼 클릭')
-    },
+    iconName: 'locate-outline',
+    elementKey: 'redZone',
   },
   {
     label: '블루 마커',
-    onPress: () => {
-      console.log('블루 마커 버튼 클릭')
-    },
+    iconName: 'location-outline',
+    elementKey: 'blueMarkers',
+  },
+  {
+    label: '레드마커',
+    iconName: 'location-outline',
+    elementKey: 'redMarkers',
+  },
+  {
+    label: '멍플',
+    iconName: 'people-outline',
+    elementKey: 'mungZone',
+  },
+  {
+    label: '편의정보',
+    iconName: 'information-circle-outline',
+    elementKey: 'convenienceInfo',
+  },
+  {
+    label: '내 블루존',
+    iconName: 'home-outline',
+    elementKey: 'myBlueZone',
+  },
+  {
+    label: '공사장',
+    iconName: 'construct-outline',
+    elementKey: 'constructionSites',
   },
 ]
 
-const CustomBottomSheetContent: React.FC = () => {
-  const renderButtonItem = ({item}: {item: ButtonItem}) => (
-    <ButtonContainer>
-      <Button onPress={item.onPress}>
-        <Icon name="star-outline" size={24} color="white" />
-      </Button>
-      <ButtonLabel>{item.label}</ButtonLabel>
-    </ButtonContainer>
-  )
+const MapSettings: React.FC<MapSettingProps> = ({visibleElements, toggleElementVisibility}) => {
+  const renderButtonItem = ({item}: {item: ButtonItem}) => {
+    const isSelected = visibleElements[item.elementKey]
+
+    return (
+      <ButtonContainer>
+        <Button onPress={() => toggleElementVisibility(item.elementKey)} selected={isSelected}>
+          <Icon name={item.iconName} size={28} color={colors.WHITE} />
+        </Button>
+        <ButtonLabel>{item.label}</ButtonLabel>
+      </ButtonContainer>
+    )
+  }
 
   return (
     <List
@@ -76,6 +98,7 @@ const CustomBottomSheetContent: React.FC = () => {
       renderItem={renderButtonItem}
       keyExtractor={item => item.label}
       numColumns={2}
+      showsVerticalScrollIndicator={false}
       contentContainerStyle={{alignItems: 'center', paddingBottom: 40}}
     />
   )
@@ -85,7 +108,7 @@ const List = styled.FlatList`
   width: 100%;
 ` as unknown as typeof FlatList
 
-const Button = styled(TouchableOpacity)`
+const Button = styled(TouchableOpacity)<{selected: boolean}>`
   width: 70px;
   height: 70px;
   margin: 10px;
@@ -93,7 +116,7 @@ const Button = styled(TouchableOpacity)`
   border-radius: 35px;
   align-items: center;
   justify-content: center;
-  background-color: ${colors.GRAY_300};
+  background-color: ${({selected}) => (selected ? colors.ORANGE.BASE : colors.GRAY_300)};
 `
 
 const ButtonContainer = styled.View`
@@ -109,4 +132,4 @@ const ButtonLabel = styled.Text`
   color: black;
 `
 
-export default CustomBottomSheetContent
+export default MapSettings

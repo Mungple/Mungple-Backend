@@ -40,18 +40,38 @@ const MapComponent: React.FC<MapComponentProps> = ({
   // onAddMarker,
 }) => {
   useMarkersWithinRadius()
-  const {myBlueZone, allBlueZone, allRedZone, mungZone} = useWebSocket()
   const {addMarker} = useMapStore()
-  const nearbyMarkers = useMapStore(state => state.nearbyMarkers) // 상태에서 nearbyMarkers 가져오기
   const navigation = useNavigation()
   const mapRef = useRef<MapView | null>(null)
-  const [isMenuVisible, setIsMenuVisible] = useState(false)
-  const [formVisible, setFormVisible] = useState(false) // 마커폼 가시성 함수
-  const translateY = useRef(new Animated.Value(0)).current
-  const opacity = useRef(new Animated.Value(0)).current
-  const [isDisabled, setIsDisabled] = useState(true)
   const {isUserLocationError} = useUserLocation()
+  const [isDisabled, setIsDisabled] = useState(true)
+  const [formVisible, setFormVisible] = useState(false) // 마커폼 가시성 함수
+  const opacity = useRef(new Animated.Value(0)).current
+  const translateY = useRef(new Animated.Value(0)).current
+  const [isMenuVisible, setIsMenuVisible] = useState(false)
+  const nearbyMarkers = useMapStore(state => state.nearbyMarkers) // 상태에서 nearbyMarkers 가져오기
+  const {myBlueZone, allBlueZone, allRedZone, mungZone} = useWebSocket()
   const [isSettingModalVisible, setIsSettingModalVisible] = useState(false) // 환경 설정에 쓰는 모달 가시성
+
+  // 지도 요소 가시성 상태
+  const [visibleElements, setVisibleElements] = useState({
+    blueZone: true,
+    redZone: true,
+    mungZone: true,
+    convenienceInfo: true,
+    myBlueZone: true,
+    redMarkers: true,
+    constructionSites: true,
+    blueMarkers: true,
+  })
+
+  // 지도 요소 토글 함수
+  const toggleElementVisibility = (element: keyof typeof visibleElements) => {
+    setVisibleElements(prev => ({
+      ...prev,
+      [element]: !prev[element],
+    }))
+  }
 
   // Fetch zones data
   useEffect(() => {
@@ -143,34 +163,49 @@ const MapComponent: React.FC<MapComponentProps> = ({
         style={{flex: 1}}
         clusteringEnabled={true}
         clusterColor={colors.ORANGE.DARKER}>
-        {nearbyMarkers &&
-          nearbyMarkers.length > 0 &&
-          nearbyMarkers.map(marker => (
-            <Marker
-              key={marker.markerId}
-              coordinate={{
-                latitude: marker.latitude,
-                longitude: marker.longitude,
-              }}
-              onPress={() => handleMarkerClick(marker.markerId)}>
-              <Image
-                source={marker.type === 'BLUE' ? blueMarker : redMarker}
-                style={styles.markerImage}
-              />
-            </Marker>
-          ))}
+        {/* 블루 마커 */}
+        {visibleElements.blueMarkers &&
+          nearbyMarkers
+            .filter(marker => marker.type === 'BLUE')
+            .map(marker => (
+              <Marker
+                key={marker.markerId}
+                coordinate={{
+                  latitude: marker.latitude,
+                  longitude: marker.longitude,
+                }}
+                onPress={() => handleMarkerClick(marker.markerId)}>
+                <Image source={blueMarker} style={styles.markerImage} />
+              </Marker>
+            ))}
 
-        {/* path가 있을 때만 Polyline으로 표시 */}
-        {path.length > 1 && (
+        {/* 레드 마커 */}
+        {visibleElements.redMarkers &&
+          nearbyMarkers
+            .filter(marker => marker.type === 'RED')
+            .map(marker => (
+              <Marker
+                key={marker.markerId}
+                coordinate={{
+                  latitude: marker.latitude,
+                  longitude: marker.longitude,
+                }}
+                onPress={() => handleMarkerClick(marker.markerId)}>
+                <Image source={redMarker} style={styles.markerImage} />
+              </Marker>
+            ))}
+
+        {/* Polyline */}
+        {path.length > 1 && visibleElements.convenienceInfo && (
           <Polyline
             coordinates={path}
-            strokeColor={colors.ORANGE.LIGHTER} // Change color if needed
+            strokeColor={colors.ORANGE.LIGHTER} // 필요에 따라 색상 변경
             strokeWidth={5}
           />
         )}
 
         {/* 개인 블루존 히트맵 */}
-        {myBlueZone && myBlueZone.cells.length > 0 && (
+        {visibleElements.myBlueZone && myBlueZone && myBlueZone.cells.length > 0 && (
           <Heatmap
             points={myBlueZone.cells.map(cell => ({
               latitude: cell.point.latitude,
@@ -179,8 +214,9 @@ const MapComponent: React.FC<MapComponentProps> = ({
             }))}
           />
         )}
+
         {/* 전체 블루존 히트맵 */}
-        {allBlueZone && allBlueZone.cells.length > 0 && (
+        {visibleElements.blueZone && allBlueZone && allBlueZone.cells.length > 0 && (
           <Heatmap
             points={allBlueZone.cells.map(cell => ({
               latitude: cell.point.latitude,
@@ -191,7 +227,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
         )}
 
         {/* 전체 레드존 히트맵 */}
-        {allRedZone && allRedZone.cells.length > 0 && (
+        {visibleElements.redZone && allRedZone && allRedZone.cells.length > 0 && (
           <Heatmap
             points={allRedZone.cells.map(cell => ({
               latitude: cell.point.latitude,
@@ -205,6 +241,11 @@ const MapComponent: React.FC<MapComponentProps> = ({
             }}
           />
         )}
+
+        {/* 멍플 지오해시 */}
+        {/* {visibleElements.mungZone && mungZone && mungZone.length > 0 && (
+          <PolygonLayer zones={mungZone} />
+        )} */}
       </ClusteredMapView>
 
       {/* 커스텀 맵 버튼 */}
@@ -250,7 +291,10 @@ const MapComponent: React.FC<MapComponentProps> = ({
           setModalVisible={setIsSettingModalVisible}
           menuName="지도 설정"
           height={500}>
-          <MapSettings />
+          <MapSettings
+            visibleElements={visibleElements}
+            toggleElementVisibility={toggleElementVisibility}
+          />
         </CustomBottomSheet>
       </Animated.View>
 
