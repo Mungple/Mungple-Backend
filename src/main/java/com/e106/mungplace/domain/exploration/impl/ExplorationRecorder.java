@@ -9,6 +9,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -28,6 +29,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Component
 public class ExplorationRecorder {
+
+	@Value("${mungple.creation-threshold}")
+	private int MUNGPLE_THRESHOLD;
 
 	private final ExplorationRepository explorationRepository;
 	private final RedisTemplate<String, String> redisTemplate;
@@ -69,6 +73,10 @@ public class ExplorationRecorder {
 
 		redisTemplate.opsForSet().remove(getActiveUsersKey(), userId + ":" + explorationId);
 		redisTemplate.opsForValue().setIfPresent(getTotalDistanceKey(userId), "0", 1, TimeUnit.MILLISECONDS);
+
+		String[] userLatLon = redisTemplate.opsForValue().get(getPrePointKey(userId)).split(",");
+		decreaseGeoHashUserCount(Point.toMungpleGeoHash(userLatLon[0], userLatLon[1]));
+		
 		deleteAllValue(userId);
 	}
 
@@ -205,10 +213,36 @@ public class ExplorationRecorder {
 		return "users:" + userId + ":pre_point";
 	}
 
+	private String getUserMungpleKey(String userId) {
+		return "users:" + userId + ":mungple:geohash";
+	}
+
+	private String getGeoHashUserCountKey(String geoHash) {
+		return "geohash:" + geoHash;
+	}
+
+	private String getMungpleKey(String geoHash) {
+		return "mungple:" + geoHash;
+	}
+
+	private void decreaseGeoHashUserCount(String geoHash) {
+		if(redisTemplate.opsForValue().get(getGeoHashUserCountKey(geoHash)) == null) return;
+
+		Long decrement = redisTemplate.opsForValue().decrement(getGeoHashUserCountKey(geoHash), 1);
+
+		if(decrement < 1) {
+			redisTemplate.opsForValue().set(getGeoHashUserCountKey(geoHash), "none", 1, TimeUnit.MILLISECONDS);
+		}
+		else if(MUNGPLE_THRESHOLD - 1 == decrement) {
+			redisTemplate.delete(getMungpleKey(geoHash));
+		}
+	}
+
 	private void deleteAllValue(String userId) {
 		redisTemplate.delete(getUserKey(userId));
 		redisTemplate.delete(getConstantKey(userId));
 		redisTemplate.delete(getThreePointDistanceKey(userId));
 		redisTemplate.delete(getPrePointKey(userId));
+		redisTemplate.delete(getUserMungpleKey(userId));
 	}
 }
