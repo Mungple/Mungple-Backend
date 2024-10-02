@@ -9,7 +9,7 @@ import MarkerDetailScreen from '@/screens/map/MarkerDetailScreen'
 export type MapStackParamList = {
   [mapNavigations.HOME]: undefined
   [mapNavigations.WALKING]: undefined
-  [mapNavigations.MARKERDETAIL]: undefined
+  [mapNavigations.MARKERDETAIL]: {markerId: string}
 }
 
 const HomeStack = createNativeStackNavigator<MapStackParamList>()

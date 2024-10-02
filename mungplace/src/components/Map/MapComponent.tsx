@@ -1,24 +1,27 @@
-import React, {useRef, useEffect, useState} from 'react'
-import {Animated, StyleSheet, Image} from 'react-native'
-import styled from 'styled-components/native'
-import {useFocusEffect, useNavigation} from '@react-navigation/native'
-import ClusteredMapView from 'react-native-map-clustering'
-import MapView, {Heatmap, Marker, Polyline, PROVIDER_GOOGLE} from 'react-native-maps'
-
-import {colors} from '@/constants' // 색깔
-import MapSettings from './MapSettings'
-import PolygonLayer from './PolygonLayer' // 멍플 지오해시
-import {mapNavigations} from '@/constants'
-import MarkerForm from '../marker/MarkerForm'
-import redMarker from '@/assets/redMarker.png' // 레드 마커
+import React, {useRef, useEffect, useState} from 'react';
+import {Animated, StyleSheet, Image } from 'react-native';
+import ClusteredMapView from 'react-native-map-clustering' // 클러스터링 라이브러리
+import styled from 'styled-components/native';
+import { useMapStore, MarkerData, NearbyMarkerData } from '@/state/useMapStore'; // zustand
+import ClusterModal from '../marker/ClusterModal';
+import usePermission from '@/hooks/usePermission'; // 퍼미션
+import useUserLocation from '@/hooks/useUserLocation'; // 유저 위치
+import CustomMapButton from '../common/CustomMapButton'; // 커스텀 버튼
+import CustomBottomSheet from '../common/CustomBottomSheet'; // 커스텀 바텀 바
+import { colors } from '@/constants'; // 색깔
 import blueMarker from '@/assets/blueMarker.png' // 블루 마커
+import redMarker from '@/assets/redMarker.png' // 레드 마커
+import PolygonLayer from './PolygonLayer'; // 멍플 지오해시
+import MarkerForm from '../marker/MarkerForm';
+import { mapNavigations } from '@/constants';
+import useMarkersWithinRadius from '@/hooks/useMarkersWithinRadius'; // 주변 위치 조회 훅
 import useWebSocket from '@/hooks/useWebsocket' // 웹소켓에서 블루, 레드 멍플 가져올거임
-import usePermission from '@/hooks/usePermission' // 퍼미션
-import useUserLocation from '@/hooks/useUserLocation' // 유저 위치
-import CustomMapButton from '../common/CustomMapButton' // 커스텀 버튼
-import CustomBottomSheet from '../common/CustomBottomSheet' // 커스텀 바텀 바
-import {useMapStore, MarkerData} from '@/state/useMapStore' // zustand
-import useMarkersWithinRadius from '@/hooks/useMarkersWithinRadius' // 주변 위치 조회 훅
+import {useFocusEffect, useNavigation} from '@react-navigation/native'
+import MapView, {Heatmap, Marker, Polyline, PROVIDER_GOOGLE} from 'react-native-maps'
+import MapSettings from './MapSettings'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { MapStackParamList } from '@/navigations/stack/MapStackNavigator';
+
 
 interface MapComponentProps {
   userLocation: {latitude: number; longitude: number}
@@ -37,21 +40,45 @@ const MapComponent: React.FC<MapComponentProps> = ({
   bottomOffset = 0,
   path = [],
   onFormClose,
-  // onAddMarker,
 }) => {
   useMarkersWithinRadius()
   const {addMarker} = useMapStore()
-  const navigation = useNavigation()
-  const mapRef = useRef<MapView | null>(null)
-  const {isUserLocationError} = useUserLocation()
-  const [isDisabled, setIsDisabled] = useState(true)
-  const [formVisible, setFormVisible] = useState(false) // 마커폼 가시성 함수
-  const opacity = useRef(new Animated.Value(0)).current
-  const translateY = useRef(new Animated.Value(0)).current
-  const [isMenuVisible, setIsMenuVisible] = useState(false)
+  const mapRef = useRef<MapView | null>(null);
+  const [isClusterModalVisible, setClusterModalVisible] = useState(false);
+  const [selectedClusterMarkers, setSelectedClusterMarkers] = useState<NearbyMarkerData[]>([]);
+  const [isMenuVisible, setIsMenuVisible] = useState(false);
+  const [formVisible, setFormVisible] = useState(false); // 마커폼 가시성 함수
+  const translateY = useRef(new Animated.Value(0)).current;
+  const opacity = useRef(new Animated.Value(0)).current;
+  const [isDisabled, setIsDisabled] = useState(true);
+  const {isUserLocationError} = useUserLocation();
+  const [isSettingModalVisible, setIsSettingModalVisible] = useState(false) // 환경 설정에 쓰는 모달 가시성
+  const navigation = useNavigation<NativeStackNavigationProp<MapStackParamList>>()
+
+  // 존 체크 용임 지울거임 나중에
   const nearbyMarkers = useMapStore(state => state.nearbyMarkers) // 상태에서 nearbyMarkers 가져오기
   const {myBlueZone, allBlueZone, allRedZone, mungZone} = useWebSocket()
-  const [isSettingModalVisible, setIsSettingModalVisible] = useState(false) // 환경 설정에 쓰는 모달 가시성
+  const updatedMarkers = []
+  
+  if (nearbyMarkers && nearbyMarkers.markersGroupedByGeohash) {
+    // 모든 geohash에 대해 순회
+    Object.keys(nearbyMarkers.markersGroupedByGeohash).forEach((key) => {
+      const cluster = nearbyMarkers.markersGroupedByGeohash[key];
+      const { markers, geohashCenter } = cluster; // 클러스터에서 마커와 중심 좌표 추출
+  
+      // 각 클러스터의 마커에 대해 처리
+      markers.forEach((marker) => {
+        updatedMarkers.push({
+          markerId: marker.markerId,
+          userId: marker.userId,
+          createdAt: marker.createdAt,
+          type: marker.type,
+          lat: geohashCenter.lat, // 클러스터 중심의 위도
+          lon: geohashCenter.lon, // 클러스터 중심의 경도
+        });
+      });
+    });
+  }
 
   // 지도 요소 가시성 상태
   const [visibleElements, setVisibleElements] = useState({
@@ -100,9 +127,36 @@ const MapComponent: React.FC<MapComponentProps> = ({
 
   // 마커 클릭 시 호출되는 함수 (상세정보 호출)
   const handleMarkerClick = (markerId: string) => {
-    navigation.navigate(mapNavigations.MARKERDETAIL, {markerId})
-    console.log(`마커 클릭 : ${markerId}`)
+    // 데이터 구조에서 모든 클러스터를 순회
+    if (nearbyMarkers) {
+      Object.keys(nearbyMarkers.markersGroupedByGeohash).forEach(geohash => {
+      const cluster = nearbyMarkers.markersGroupedByGeohash[geohash];
+      
+      // 각 클러스터의 markers 배열을 순회
+      const marker = cluster.markers.find(m => m.markerId === markerId);
+      
+      // 해당 markerId가 있는 경우 상세 페이지로 이동
+      if (marker) {
+        navigation.navigate(mapNavigations.MARKERDETAIL, { markerId });
+        console.log(`마커 클릭 : ${markerId}`);
+        setClusterModalVisible(false);
+      }
+    });
   }
+  };
+  const handleClusterPress = (geohash: string) => {
+    const clusterData = nearbyMarkers?.markersGroupedByGeohash[geohash]
+    if (clusterData) {
+      setSelectedClusterMarkers(clusterData.markers); // 선택한 클러스터 데이터 설정
+      setClusterModalVisible(true); // 모달 열기
+    };
+  };
+  
+  // 클러스터 모달 닫기
+  // const handleCloseClusterModal = () => {
+  //   setIsClusterModalVisible(false)
+  //   setClusterMarkers([]) // 클러스터 리스트 모달을 닫으면 클러스터 마커 목록 초기화
+  // }
 
   // 메뉴 햄버거 바 클릭 시 호출되는 함수
   const handlePressMenu = () => {
@@ -161,40 +215,25 @@ const MapComponent: React.FC<MapComponentProps> = ({
         maxZoomLevel={20}
         style={{flex: 1}}
         clusteringEnabled={true}
-        clusterColor={colors.ORANGE.DARKER}>
-        {/* 블루 마커 */}
-        {visibleElements.blueMarkers &&
-          nearbyMarkers
-            .filter(marker => marker.type === 'BLUE')
-            .map(marker => (
-              <Marker
-                key={marker.markerId}
-                coordinate={{
-                  latitude: marker.latitude,
-                  longitude: marker.longitude,
-                }}
-                onPress={() => handleMarkerClick(marker.markerId)}>
-                <Image source={blueMarker} style={styles.markerImage} />
-              </Marker>
-            ))}
-
-        {/* 레드 마커 */}
-        {visibleElements.redMarkers &&
-          nearbyMarkers
-            .filter(marker => marker.type === 'RED')
-            .map(marker => (
-              <Marker
-                key={marker.markerId}
-                coordinate={{
-                  latitude: marker.latitude,
-                  longitude: marker.longitude,
-                }}
-                onPress={() => handleMarkerClick(marker.markerId)}>
-                <Image source={redMarker} style={styles.markerImage} />
-              </Marker>
-            ))}
-
-        {/* Polyline */}
+        clusterColor={colors.ORANGE.DARKER}
+        onClusterPress={(cluster) => handleClusterPress(cluster)}
+        >
+        {updatedMarkers.length > 0 && updatedMarkers.map((marker) => (
+          <Marker
+            key={marker.markerId} // 각 마커에 고유 키 할당
+            coordinate={{
+              latitude: marker.lat, // 마커의 위도
+              longitude: marker.lon, // 마커의 경도
+            }}
+            onPress={() => handleMarkerClick(marker.markerId)} // 마커 클릭 시 상세 페이지로 이동
+          >
+            <Image
+              source={marker.type === 'BLUE' ? blueMarker : redMarker} // 마커의 타입에 따라 이미지 결정
+              style={styles.markerImage}
+            />
+          </Marker>
+        ))}
+        {/* path가 있을 때만 Polyline으로 표시 */}
         {path.length > 1 && (
           <Polyline
             coordinates={path}
@@ -247,6 +286,13 @@ const MapComponent: React.FC<MapComponentProps> = ({
         )} */}
       </ClusteredMapView>
 
+      <ClusterModal
+        isVisible={isClusterModalVisible}
+        markers={selectedClusterMarkers}   
+        onClose={() => setClusterModalVisible(false)}
+        fetchMarkerDetails={handleMarkerClick} // 마커 상세 정보 가져오기 함수 전달
+      />
+      
       {/* 커스텀 맵 버튼 */}
       <CustomMapButton onPress={handlePressMenu} iconName="menu" top={20} right={20} />
 
