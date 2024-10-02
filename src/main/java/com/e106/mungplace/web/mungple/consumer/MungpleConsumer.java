@@ -25,7 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class MungpleConsumer {
 
-	private static final int MUNGPLE_THRESHOLD = 7;
+	private static final int MUNGPLE_THRESHOLD = 2;
 
 	private final RedisTemplate<String, String> redisTemplate;
 	public final String topic;
@@ -60,7 +60,7 @@ public class MungpleConsumer {
 		if (previousGeoHash == null) {
 			increaseGeoHashUserCount(currentGeoHash);
 			setMungplace(null, currentGeoHash);  // 처음에는 이전 위치가 없으므로 null 처리
-		} else {
+		} else if(previousGeoHash != null) {
 			if (!previousGeoHash.equals(currentGeoHash)) {
 				decreaseGeoHashUserCount(previousGeoHash);
 				increaseGeoHashUserCount(currentGeoHash);

@@ -32,9 +32,6 @@ public class MungpleService {
 
 		List<String> mungpleData = getNearbyMungplesSpiral(geohash, 4);
 
-		for (String data : mungpleData) {
-			System.out.println(data);
-		}
 		// WebSocket을 통해 사용자에게 Mungple 데이터 전송
 		messagingTemplate.convertAndSendToUser(userId.toString(), destination, mungpleData);
 	}
