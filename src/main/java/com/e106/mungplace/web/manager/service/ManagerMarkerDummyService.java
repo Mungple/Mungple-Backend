@@ -3,16 +3,17 @@ package com.e106.mungplace.web.manager.service;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.data.elasticsearch.core.geo.GeoPoint;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
-import com.e106.mungplace.common.image.ImageStore;
 import com.e106.mungplace.domain.image.entity.ImageInfo;
 import com.e106.mungplace.domain.image.repository.MarkerImageRepository;
 import com.e106.mungplace.domain.manager.impl.ManagerReader;
 import com.e106.mungplace.domain.marker.entity.Marker;
+import com.e106.mungplace.domain.marker.entity.MarkerPoint;
 import com.e106.mungplace.domain.marker.entity.MarkerType;
+import com.e106.mungplace.domain.marker.repository.MarkerPointRepository;
 import com.e106.mungplace.domain.marker.repository.MarkerRepository;
 import com.e106.mungplace.domain.user.entity.User;
 import com.e106.mungplace.web.manager.dto.ManagerMarkerDummyCreateRequest;
@@ -24,14 +25,28 @@ import lombok.RequiredArgsConstructor;
 public class ManagerMarkerDummyService {
 
 	private final MarkerImageRepository markerImageRepository;
+	private final MarkerPointRepository markerPointRepository;
 	private final MarkerRepository markerRepository;
 	private final ManagerReader managerReader;
 
 	@Transactional
 	public void createMarkerDummyProcess(ManagerMarkerDummyCreateRequest request) {
 		User manager = managerReader.findOrCreateManager(request.managerName());
+
 		Marker marker = request.toEntity(manager);
-		markerRepository.save(marker);
+		Marker savedMarker = markerRepository.save(marker);
+		GeoPoint geoPoint = new GeoPoint(savedMarker.getLat(), savedMarker.getLon());
+
+		MarkerPoint markerPoint = MarkerPoint.builder()
+			.markerId(savedMarker.getId())
+			.userId(savedMarker.getUser().getUserId())
+			.explorationId(savedMarker.getExploration() != null ? savedMarker.getExploration().getId() : null)
+			.point(geoPoint)
+			.createdAt(savedMarker.getCreatedDate())
+			.type(savedMarker.getType())
+			.build();
+
+		markerPointRepository.save(markerPoint);
 		saveMarkerImages(marker);
 	}
 
