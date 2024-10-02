@@ -14,6 +14,7 @@ import {queryKeys, storageKeys} from '@/constants'
 import type {ResponseError, UseMutationCustomOptions, UseQueryCustomOptions} from '@/types/common'
 import {removeHeader, setEncryptStorage, setHeader} from '@/utils'
 import { useUserStore } from '@/state/useUserStore'
+import { useAppStore } from '@/state/useAppStore'
 
 // 로그인 커스텀 훅
 function useLogin(mutationOptions?: UseMutationCustomOptions) {
@@ -21,9 +22,10 @@ function useLogin(mutationOptions?: UseMutationCustomOptions) {
     mutationFn: (loginUrl: string) => socialLogin(loginUrl),
     onSuccess: async accessToken => {
       const {setUserId} = useUserStore.getState()
+      const {setToken} = useAppStore.getState()
       setHeader('Authorization', `Bearer ${accessToken}`)
       setEncryptStorage(storageKeys.ACCESS_TOKEN, accessToken)
-
+      setToken(accessToken)
       const userId = await getUserId(accessToken)
       setUserId(Number(userId))
     },

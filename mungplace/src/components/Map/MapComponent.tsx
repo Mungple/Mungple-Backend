@@ -145,12 +145,17 @@ const MapComponent: React.FC<MapComponentProps> = ({
   }
   };
   const handleClusterPress = (geohash: string) => {
-    const clusterData = nearbyMarkers?.markersGroupedByGeohash[geohash]
+    console.log('클러스터 핸들러 호출됨', geohash);
+    const clusterData = nearbyMarkers?.markersGroupedByGeohash[geohash];
+    
     if (clusterData) {
-      setSelectedClusterMarkers(clusterData.markers); // 선택한 클러스터 데이터 설정
-      setClusterModalVisible(true); // 모달 열기
-    };
-  };
+        console.log('클러스터 데이터:', clusterData);
+        setSelectedClusterMarkers(clusterData.markers); // 선택한 클러스터 데이터 설정
+        setClusterModalVisible(true); // 모달 열기
+    } else {
+        console.log(`Cluster data not found for geohash: ${geohash}`);
+    }
+};
   
   // 클러스터 모달 닫기
   // const handleCloseClusterModal = () => {
@@ -216,7 +221,9 @@ const MapComponent: React.FC<MapComponentProps> = ({
         style={{flex: 1}}
         clusteringEnabled={true}
         clusterColor={colors.ORANGE.DARKER}
-        onClusterPress={(cluster) => handleClusterPress(cluster)}
+        onClusterPress={(cluster) =>{ 
+          console.log('Cluster Pressed:', cluster)
+          handleClusterPress(cluster.properties.cluster_id)}}
         >
         {updatedMarkers.length > 0 && updatedMarkers.map((marker) => (
           <Marker

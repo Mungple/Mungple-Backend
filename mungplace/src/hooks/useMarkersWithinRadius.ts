@@ -39,7 +39,7 @@ const useMarkersWithinRadius = () => {
         })
       })
 
-      console.log("클러스터 데이터 입니다", clusters)
+      // console.log("클러스터 데이터 입니다", clusters)
 
       // clusters 객체를 NearbyMarkersData 형태로 변환
         const updatedNearbyMarkersData: NearbyMarkersData = {
@@ -53,7 +53,7 @@ const useMarkersWithinRadius = () => {
           }, {} as { [key: string]: ClusterData })
         };
         
-        console.log("업데이트된 주변마커 설정", updatedNearbyMarkersData)
+        // console.log("업데이트된 주변마커 설정", updatedNearbyMarkersData)
       // 변환한 데이터 저장소에 세팅
       setNearbyMarkers(updatedNearbyMarkersData); // 주변 마커 설정
     } catch (error) {
