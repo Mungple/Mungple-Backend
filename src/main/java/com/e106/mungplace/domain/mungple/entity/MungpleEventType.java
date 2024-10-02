@@ -1,4 +1,4 @@
-package com.e106.mungplace.web.mungple;
+package com.e106.mungplace.domain.mungple.entity;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
