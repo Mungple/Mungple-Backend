@@ -10,6 +10,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.e106.mungplace.common.map.dto.Point;
 import com.e106.mungplace.domain.exploration.entity.Exploration;
 import com.e106.mungplace.domain.exploration.entity.ExplorationEvent;
 import com.e106.mungplace.domain.exploration.impl.ExplorationHelper;
@@ -53,6 +54,8 @@ public class ExplorationService {
 		explorationHelper.createDogsInExploration(request, exploration);
 		explorationRecorder.initRecord(exploration.getId().toString(), userId.toString(), request.lat(),
 			request.lon());
+
+		publishEvent(request, userId, exploration);
 
 		return ExplorationStartResponse.of(exploration);
 	}
@@ -118,6 +121,12 @@ public class ExplorationService {
 
 		ExplorationPayload payload = explorationHelper.createExplorationEventPayload(eventRequest);
 		ExplorationEvent event = ExplorationEvent.of(eventRequest, explorationId, payload);
+		producer.sendExplorationEvent(event);
+	}
+
+	private void publishEvent(ExplorationStartWithDogsRequest request, Long userId, Exploration exploration) {
+		ExplorationPayload payload = ExplorationPayload.of(Point.of(request.lat(), request.lon()), LocalDateTime.now());
+		ExplorationEvent event = ExplorationEvent.of(userId, exploration.getId(), payload);
 		producer.sendExplorationEvent(event);
 	}
 }

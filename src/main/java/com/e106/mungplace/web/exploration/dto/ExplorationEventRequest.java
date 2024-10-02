@@ -26,4 +26,13 @@ public class ExplorationEventRequest {
 
 	@NotNull
 	private LocalDateTime recordedAt;
+
+	public static ExplorationEventRequest of(Long userId, String lat, String lon) {
+		return ExplorationEventRequest.builder()
+			.userId(userId)
+			.lat(lat)
+			.lon(lon)
+			.recordedAt(LocalDateTime.now())
+			.build();
+	}
 }

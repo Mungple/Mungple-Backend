@@ -47,8 +47,7 @@
 
     async function loadCSVData() {
         try {
-            const response = await fetch('/api/manager/markers/csv');
-            console.log("response url" + response.url)
+            const response = await fetch('`${baseUrl}/../markers/csv');
             const data = await response.text();
             parseCSVData(data);
         } catch (error) {
@@ -59,8 +58,8 @@
     function parseCSVData(csvData) {
         const rows = csvData.split("\n").slice(1); // 헤더는 제외
         rows.forEach(row => {
-            const [uuid, title, content, markerType] = row.split(",");
-            markerData.push({uuid, title, content, markerType});
+            const [uuid, title, content, markerType] = row.split(",").map(col => col.trim());
+            markerData.push({ uuid, title, content, markerType });
         });
     }
 
@@ -137,10 +136,10 @@
     // 마커 추가 함수
     function addMarker(lat, lon, markerType) {
         const markerInfo = getRandomMarker(markerType);
-
         const marker = new google.maps.Marker({
             position: { lat: lat, lng: lon },
             map: map,
+            uuid: markerInfo.uuid,
             title: markerInfo.title,
             icon: markerType === "RED" ? "./images/red-marker.png" : "./images/blue-marker.png"
         });

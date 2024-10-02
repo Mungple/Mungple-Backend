@@ -7,6 +7,7 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.kafka.clients.admin.NewTopic;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.Acknowledgment;
@@ -25,7 +26,8 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class MungpleConsumer {
 
-	private static final int MUNGPLE_THRESHOLD = 2;
+	@Value("${mungple.creation-threshold}")
+	private int MUNGPLE_THRESHOLD;
 
 	private final RedisTemplate<String, String> redisTemplate;
 	public final String topic;

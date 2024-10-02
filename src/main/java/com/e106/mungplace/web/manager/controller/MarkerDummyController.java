@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.e106.mungplace.web.manager.dto.ManagerExplorePointCreateRequest;
 import com.e106.mungplace.web.manager.dto.ManagerMarkerDummyCreateRequest;
 import com.e106.mungplace.web.manager.service.ManagerMarkerDummyService;
 
@@ -41,8 +40,7 @@ public class MarkerDummyController {
 			Resource resource = resourceLoader.getResource("classpath:" + filename);
 
 			HttpHeaders headers = new HttpHeaders();
-			headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=markerData"
-				+ ".csv");
+			headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=markerData" + ".csv");
 
 			return ResponseEntity.ok()
 				.headers(headers)
