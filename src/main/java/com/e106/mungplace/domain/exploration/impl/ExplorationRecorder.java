@@ -125,7 +125,7 @@ public class ExplorationRecorder {
 		return String.valueOf(amountDistance);
 	}
 
-	@Scheduled(fixedRate = 60000)
+	@Scheduled(fixedRate = 3000)
 	public void validateActiveUsers() {
 		Set<String> connectedUserIds = sessionManager.getConnectedUserIds();
 		Set<String> activeUserInfos = redisTemplate.opsForSet().members(getActiveUsersKey());
