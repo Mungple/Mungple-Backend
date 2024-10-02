@@ -12,8 +12,8 @@ const ElapsedTime = () => {
         // 현재 시간을 시, 분, 초로 나눔
         const [hours, minutes, seconds] = prevTime.split(':').map(Number);
         const newSeconds = (seconds + 1) % 60;
-        const newMinutes = (minutes + Math.floor((seconds + 1) / 60)) % 60;
-        const newHours = hours + Math.floor((minutes + 1) / 60);
+        const newMinutes = (minutes + (seconds + 1 >= 60 ? 1 : 0)) % 60;
+        const newHours = hours + (minutes + 1 >= 60 && newSeconds === 0 ? 1 : 0);
 
         // 시, 분, 초를 다시 문자열로 조합하여 반환
         return `${String(newHours).padStart(2, '0')}:${String(
