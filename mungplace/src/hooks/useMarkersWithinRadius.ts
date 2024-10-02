@@ -1,11 +1,11 @@
 import axiosInstance from "@/api/axios";
 import React from "react";
 import { useFocusEffect } from "@react-navigation/native";
-import { useMapStore } from "@/state/useMapStore";
+import { useMapStore, NearbyMarkersData } from "@/state/useMapStore";
 import useUserLocation from "@/hooks/useUserLocation";
 
 const useMarkersWithinRadius = () => { 
-  const { setNearbyMarkers} = useMapStore((state) => ({
+  const { setNearbyMarkers } = useMapStore((state) => ({
     setNearbyMarkers: state.setNearbyMarkers,
   }));
 
@@ -24,28 +24,25 @@ const useMarkersWithinRadius = () => {
           markerType: 'ALL',
         },
       });
-      console.log("근처 마커 조회 응답:", response.data);
+      console.log("근처 마커 조회 응답:", response.data.markersGroupedByGeohash);
 
-      const nearbyMarkersFromServer = response.data.markersGroupedByGeohash;
-      const flattenedMarkers = [];
+      const nearbyMarkersFromServer: NearbyMarkersData = response.data.markersGroupedByGeohash
+      const clusters: NearbyMarkersData = { markersGroupedByGeohash: nearbyMarkersFromServer }
 
-      for (const geohash in nearbyMarkersFromServer) {
-        flattenedMarkers.push(...nearbyMarkersFromServer[geohash].markers);
-      }
-
-      setNearbyMarkers(flattenedMarkers);
+      setNearbyMarkers(clusters); // 주변 마커 설정
     } catch (error) {
       console.error("주변 마커 조회에 실패함", error.response ? error.response.data : error.message);
     }
   };
 
   useFocusEffect(
-   React.useCallback(() => {
-    if (userLocation) {
-      fetchNearbyMarkers() // 사용자의 위치가 있으면 마커 조회
-    }
-   }, [userLocation])
-  )
+    React.useCallback(() => {
+      if (userLocation) {
+        fetchNearbyMarkers(); // 사용자의 위치가 있으면 마커 조회
+      }
+    }, [userLocation])
+  );
+
   return null; // 상태 관리만 하니까 렌더링 필요 x
 };
 
