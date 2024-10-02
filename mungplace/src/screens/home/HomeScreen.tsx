@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react'
+import React, {useState} from 'react'
 import {useNavigation} from '@react-navigation/native'
 import {NativeStackNavigationProp} from '@react-navigation/native-stack'
 
@@ -8,14 +8,12 @@ import {mapNavigations} from '@/constants'
 import {Alert, Dimensions} from 'react-native'
 import PetList from '@/components/user/PetList'
 import {useAppStore} from '@/state/useAppStore'
-import {useUserStore} from '@/state/useUserStore'
-import DogInfoBox from '@/components/user/DogInfoBox'
+import PetInfoBox from '@/components/user/PetInfoBox'
 import useUserLocation from '@/hooks/useUserLocation'
 import CustomModal from '@/components/common/CustomModal'
 import CustomButton from '@/components/common/CustomButton'
 import CustomModalHeader from '@/components/common/CustomModalHeader'
 import {MapStackParamList} from '@/navigations/stack/MapStackNavigator'
-import useGetPet from '@/hooks/queries/useGetPet'
 
 const windowHeight = Dimensions.get('window').height
 
@@ -63,7 +61,7 @@ const HomeScreen: React.FC = () => {
   return (
     <HS.Container>
       <HS.ImageCard />
-      <DogInfoBox />
+      <PetInfoBox />
       <CustomButton label="산책 시작하기" onPress={handleModalVisivle} />
       {/* 산책 시작 확인 모달 */}
       <CustomModal

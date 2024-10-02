@@ -6,10 +6,10 @@ import {colors, numbers} from '@/constants';
 import styled from 'styled-components/native';
 
 interface YearSelectorProps {
-  isVisible: boolean;                   // 연도 선택기가 화면에 표시되는지 여부
-  currentyear: number;                  // 현재 선택된 연도
+  isVisible: boolean; // 연도 선택기가 화면에 표시되는지 여부
+  currentyear: number; // 현재 선택된 연도
   onChangeYear: (year: number) => void; // 연도 변경 시 호출되는 함수
-  hide: () => void;                     // 연도 선택기를 숨기는 함수
+  hide: () => void; // 연도 선택기를 숨기는 함수
 }
 
 function YearSelector({
@@ -95,7 +95,8 @@ const YearButton = styled.Pressable<{selected: boolean}>`
   border-radius: 5px;
   align-items: center;
   justify-content: center;
-  background-color: ${props => props.selected ? colors.ORANGE.BASE : 'transparent'};
+  background-color: ${props =>
+    props.selected ? colors.ORANGE.BASE : 'transparent'};
 `;
 
 const YearText = styled.Text<{selected: boolean}>`

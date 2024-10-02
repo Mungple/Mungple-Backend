@@ -25,10 +25,10 @@ const windowHeight = Dimensions.get('window').height
 
 const MyPageScreen: React.FC<MyPageScreenProps> = ({navigation}) => {
   const userId = useUserStore(state => state.userId)
-  const {useGetProfile} = useAuth()
   const userData = useUserStore(state => state.userData)
   const setUserData = useUserStore(state => state.setUserData)
   const [modalVisible, setModalVisible] = useState(false)
+  const {useGetProfile} = useAuth()
   const {data} = useGetProfile(userId)
 
   useEffect(() => {

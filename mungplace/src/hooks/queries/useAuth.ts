@@ -13,15 +13,19 @@ import queryClient from '@/api/queryClient'
 import {queryKeys, storageKeys} from '@/constants'
 import type {ResponseError, UseMutationCustomOptions, UseQueryCustomOptions} from '@/types/common'
 import {removeHeader, setEncryptStorage, setHeader} from '@/utils'
+import { useUserStore } from '@/state/useUserStore'
 
 // 로그인 커스텀 훅
 function useLogin(mutationOptions?: UseMutationCustomOptions) {
   return useMutation({
     mutationFn: (loginUrl: string) => socialLogin(loginUrl),
-    onSuccess: accessToken => {
+    onSuccess: async accessToken => {
+      const {setUserId} = useUserStore.getState()
       setHeader('Authorization', `Bearer ${accessToken}`)
       setEncryptStorage(storageKeys.ACCESS_TOKEN, accessToken)
-      useGetUserId(accessToken)
+
+      const userId = await getUserId(accessToken)
+      setUserId(Number(userId))
     },
     onSettled: () => {
       queryClient.refetchQueries({

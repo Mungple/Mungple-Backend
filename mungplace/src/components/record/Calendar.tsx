@@ -1,39 +1,48 @@
 import React from 'react';
-import styled from 'styled-components/native';
 import {FlatList, SafeAreaView} from 'react-native';
+
+import styled from 'styled-components/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
-import DateBox from './DateBox';
 import {colors} from '@/constants';
-import DayOfWeeks from './DayOfWeeks';
-import useModal from '@/hooks/useModal';
 import {MonthYear, isSameAsCurrentDate} from '@/utils/date';
-import YearSelector from './YearSelector';
+import DayOfWeeks from './DayOfWeeks';
 
-interface CalendarProps<T> {
+import useModal from '@/hooks/useModal';
+import DateBox from './DateBox';
+import YearSelector from './YearSelector';
+import MonthSelector from './MonthSelector';
+
+interface CalendarProps {
   monthYear: MonthYear;
   selectedDate: number;
-  attendance: Record<number, T[]>;
+  attendance: number[];
   moveToToday: () => void;
   onPressDate: (date: number) => void;
   onChangeMonth: (increment: number) => void;
 }
 
-function Calendar<T>({
+const Calendar = ({
   monthYear,
   attendance,
   selectedDate,
   moveToToday,
   onPressDate,
   onChangeMonth,
-}: CalendarProps<T>) {
+}: CalendarProps) => {
   const yearSelector = useModal();
+  const monthSelector = useModal();
   const {month, year, lastDate, firstDOW} = monthYear;
 
   const handleChangeYear = (selectYear: number) => {
     onChangeMonth((selectYear - year) * 12);
     yearSelector.hide();
+  };
+
+  const handleChangeMonth = (selectMonth: number) => {
+    onChangeMonth(selectMonth - month + 1);
+    monthSelector.hide();
   };
 
   return (
@@ -43,14 +52,20 @@ function Calendar<T>({
         <MonthButton onPress={() => onChangeMonth(-1)}>
           <Ionicons name="arrow-back" size={25} color={colors.BLACK} />
         </MonthButton>
-        <MonthYearContainer onPress={yearSelector.show}>
-          <TitleText>
-            {year}년 {month}월
-          </TitleText>
+        <MonthYearContainer>
+          <TitleText>{year}년</TitleText>
           <MaterialIcons
             name="keyboard-arrow-down"
             size={20}
             color={colors.GRAY_500}
+            onPress={yearSelector.show}
+          />
+          <TitleText>{month}월</TitleText>
+          <MaterialIcons
+            name="keyboard-arrow-down"
+            size={20}
+            color={colors.GRAY_500}
+            onPress={monthSelector.show}
           />
         </MonthYearContainer>
         <MonthButton onPress={() => onChangeMonth(1)}>
@@ -73,7 +88,7 @@ function Calendar<T>({
               date={item.date}
               onPressDate={onPressDate}
               selectedDate={selectedDate}
-              hasAttendance={Boolean(attendance[item.date])}
+              hasAttendance={Boolean(attendance.includes(item.date))}
               isToday={isSameAsCurrentDate(year, month, item.date)}
             />
           )}
@@ -89,9 +104,16 @@ function Calendar<T>({
         onChangeYear={handleChangeYear}
         hide={yearSelector.hide}
       />
+      {/* 월 선택 모달 */}
+      <MonthSelector
+        isVisible={monthSelector.isVisible}
+        currentmonth={month}
+        onChangeMonth={handleChangeMonth}
+        hide={monthSelector.hide}
+      />
     </SafeAreaView>
   );
-}
+};
 
 const HeaderContainer = styled.View`
   flex-direction: row;
