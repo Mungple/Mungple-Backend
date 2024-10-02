@@ -92,11 +92,22 @@ const MapComponent: React.FC<MapComponentProps> = ({
   };
 
   // 마커 클릭 시 호출되는 함수 (상세정보 호출)
-  const handleMarkerClick = (markerId : string ) => {
-    navigation.navigate(mapNavigations.MARKERDETAIL, { markerId })
-    console.log(`마커 클릭 : ${markerId}`)
-    setClusterModalVisible(false)
-  }
+  const handleMarkerClick = (markerId: string) => {
+    // 데이터 구조에서 모든 클러스터를 순회
+    Object.keys(nearbyMarkers.markersGroupedByGeohash).forEach(geohash => {
+      const cluster = nearbyMarkers.markersGroupedByGeohash[geohash];
+      
+      // 각 클러스터의 markers 배열을 순회
+      const marker = cluster.markers.find(m => m.markerId === markerId);
+      
+      // 해당 markerId가 있는 경우 상세 페이지로 이동
+      if (marker) {
+        navigation.navigate(mapNavigations.MARKERDETAIL, { markerId });
+        console.log(`마커 클릭 : ${markerId}`);
+        setClusterModalVisible(false);
+      }
+    });
+  };
   const handleClusterPress = (geohash: string) => {
     const clusterData = nearbyMarkers?.markersGroupedByGeohash[geohash]
     if (clusterData) {

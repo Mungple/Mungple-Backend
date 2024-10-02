@@ -46,12 +46,6 @@ export interface ClusterData {
   markers : NearbyMarkerData[]
 }
 
-// 지오해시 좌표
-export interface GeohashCenter {
-  lat : number
-  lon : number
-}
-
 // 주변 조회 전체를 받아오는 데이터
 export interface NearbyMarkersData {
   markersGroupedByGeohash: {

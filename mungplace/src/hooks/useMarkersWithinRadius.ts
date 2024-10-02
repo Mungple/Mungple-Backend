@@ -1,7 +1,7 @@
 import axiosInstance from "@/api/axios";
 import React from "react";
 import { useFocusEffect } from "@react-navigation/native";
-import { useMapStore, NearbyMarkersData } from "@/state/useMapStore";
+import { useMapStore, NearbyMarkersData, NearbyMarkerData, ClusterData } from "@/state/useMapStore";
 import useUserLocation from "@/hooks/useUserLocation";
 
 const useMarkersWithinRadius = () => { 
@@ -24,14 +24,40 @@ const useMarkersWithinRadius = () => {
           markerType: 'ALL',
         },
       });
-      console.log("근처 마커 조회 응답:", response.data.markersGroupedByGeohash);
 
       const nearbyMarkersFromServer: NearbyMarkersData = response.data.markersGroupedByGeohash
-      const clusters: NearbyMarkersData = { markersGroupedByGeohash: nearbyMarkersFromServer }
+      console.log("근처 마커 조회 응답:", nearbyMarkersFromServer);
+      const clusters: { [key : string] : NearbyMarkerData[] } = {} 
 
-      setNearbyMarkers(clusters); // 주변 마커 설정
+      Object.keys(nearbyMarkersFromServer).forEach(geohash => {
+        const clusterData = nearbyMarkersFromServer[geohash]
+        clusterData.markers.forEach(marker => {
+          if (!clusters[geohash]) {
+            clusters[geohash] = []
+          }
+          clusters[geohash].push(marker)
+        })
+      })
+
+      console.log("클러스터 데이터 입니다", clusters)
+
+      // clusters 객체를 NearbyMarkersData 형태로 변환
+        const updatedNearbyMarkersData: NearbyMarkersData = {
+          markersGroupedByGeohash: Object.keys(clusters).reduce((acc, geohash) => {
+            acc[geohash] = {
+              geohashCenter: nearbyMarkersFromServer[geohash].geohashCenter, // 기존의 geohashCenter 사용
+              count: clusters[geohash].length, // 마커의 개수를 count로 설정
+              markers: clusters[geohash], // 마커 배열 추가
+            };
+            return acc;
+          }, {} as { [key: string]: ClusterData })
+        };
+        
+        console.log("업데이트된 주변마커 설정", updatedNearbyMarkersData)
+      // 변환한 데이터 저장소에 세팅
+      setNearbyMarkers(updatedNearbyMarkersData); // 주변 마커 설정
     } catch (error) {
-      console.error("주변 마커 조회에 실패함", error.response ? error.response.data : error.message);
+      console.error("주변 마커 조회에 실패함", error);
     }
   };
 
