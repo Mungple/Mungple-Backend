@@ -25,4 +25,14 @@ public record ExplorationEvent(
 			.publishedAt(LocalDateTime.now())
 			.build();
 	}
+
+	public static ExplorationEvent of(Long userId, Long id, ExplorationPayload payload) {
+		return ExplorationEvent.builder()
+			.entityType("Exploration")
+			.userId(userId)
+			.explorationId(id)
+			.payload(payload)
+			.publishedAt(LocalDateTime.now())
+			.build();
+	}
 }

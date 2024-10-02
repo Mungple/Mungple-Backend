@@ -11,6 +11,10 @@ public record Point(
 	Double lon
 ) {
 
+	public static Point of(String lat, String lon) {
+		return new Point(Double.parseDouble(lat), Double.parseDouble(lon));
+	}
+
 	public static Point of(GeoPoint point) {
 		return new Point(point.getLat(), point.getLon());
 	}

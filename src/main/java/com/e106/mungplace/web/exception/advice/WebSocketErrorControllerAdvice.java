@@ -68,9 +68,11 @@ public class WebSocketErrorControllerAdvice {
 
 	private void postProcessIfFatalException(StompHeaderAccessor accessor) throws IOException {
 		String userId = accessor.getUser().getName();
-		String explorationId = accessor.getSessionAttributes().get("explorationId").toString();
+		if(accessor.getSessionAttributes().containsKey("explorationId")) {
+			String explorationId = accessor.getSessionAttributes().get("explorationId").toString();
+			explorationEndProcess(userId, explorationId);
+		}
 		sessionManager.closeSession(accessor.getSessionId());
-		explorationEndProcess(userId, explorationId);
 	}
 
 	private void explorationEndProcess(String userId, String explorationId) {
