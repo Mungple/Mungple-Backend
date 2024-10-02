@@ -14,23 +14,23 @@ import DateBox from './DateBox';
 import YearSelector from './YearSelector';
 import MonthSelector from './MonthSelector';
 
-interface CalendarProps<T> {
+interface CalendarProps {
   monthYear: MonthYear;
   selectedDate: number;
-  attendance: Record<number, T[]>;
+  attendance: number[];
   moveToToday: () => void;
   onPressDate: (date: number) => void;
   onChangeMonth: (increment: number) => void;
 }
 
-function Calendar<T>({
+const Calendar = ({
   monthYear,
   attendance,
   selectedDate,
   moveToToday,
   onPressDate,
   onChangeMonth,
-}: CalendarProps<T>) {
+}: CalendarProps) => {
   const yearSelector = useModal();
   const monthSelector = useModal();
   const {month, year, lastDate, firstDOW} = monthYear;
@@ -88,7 +88,7 @@ function Calendar<T>({
               date={item.date}
               onPressDate={onPressDate}
               selectedDate={selectedDate}
-              hasAttendance={Boolean(attendance[item.date])}
+              hasAttendance={Boolean(attendance.includes(item.date))}
               isToday={isSameAsCurrentDate(year, month, item.date)}
             />
           )}
@@ -113,7 +113,7 @@ function Calendar<T>({
       />
     </SafeAreaView>
   );
-}
+};
 
 const HeaderContainer = styled.View`
   flex-direction: row;

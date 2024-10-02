@@ -1,8 +1,8 @@
 import React, {useEffect, useState} from 'react';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {FlatList, StyleSheet} from 'react-native';
-import {colors} from '@/constants';
 import styled from 'styled-components/native';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import {colors} from '@/constants';
 
 interface MonthSelectorProps {
   isVisible: boolean;

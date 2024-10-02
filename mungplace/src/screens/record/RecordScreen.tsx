@@ -1,12 +1,11 @@
-import React, {useCallback, useState} from 'react';
-import {useFocusEffect} from '@react-navigation/native';
+import React, { useCallback, useState } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 
 import styled from 'styled-components/native';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
-import {colors} from '@/constants';
-import {getMonthYearDetails, getNewMonthYear} from '@/utils/date';
-import {getMonthWalks} from '@/api/walk';
+import { colors } from '@/constants';
+import { getMonthYearDetails, getNewMonthYear } from '@/utils/date';
+import { getMonthWalks, getDateWalks, getWalkDetail } from '@/api/walk';
 
 import CustomHeader from '@/components/common/CustomHeader';
 import Calendar from '@/components/record/Calendar';
@@ -23,8 +22,8 @@ interface ExplorationInfo {
 
 // 월간 산책 정보 인터페이스
 interface MonthRecords {
-  year: number; // 연도
-  month: number; // 월
+  year: number;
+  month: number;
   totalExplorations: number; // 총 산책 횟수
   explorationInfos: ExplorationInfo[]; // ExplorationInfo 객체 배열
 }
@@ -32,7 +31,7 @@ interface MonthRecords {
 const currentMonthYear = getMonthYearDetails(new Date());
 
 const RecordScreen = () => {
-  const [selectedDate, setSelectedDate] = useState(0);
+  const [selectedDate, setSelectedDate] = useState<number | 0>(0);
   const [monthYear, setMonthYear] = useState(currentMonthYear);
   const [attendance, setAttendance] = useState<number[]>([]);
 
@@ -41,19 +40,30 @@ const RecordScreen = () => {
     setMonthYear(getMonthYearDetails(new Date()));
   };
 
-  const handlePressDate = (date: number) => {
-    setSelectedDate(date);
+  const handlePressDate = async (date: number) => {
+    // 1자리 날짜를 2자리 형식으로 변환
+    const formattedDate = String(date).padStart(2, '0'); // 01, 02, ..., 10 등으로 변환
+    const dateString = `${monthYear.year}-${monthYear.month}-${formattedDate}`;
+
+    setSelectedDate(date); // 상태를 업데이트
+
+    try {
+      const data = await getDateWalks(dateString); // 비동기적으로 데이터 가져오기
+      console.log(data); // 데이터를 받아온 후 처리
+    } catch (error) {
+      console.error('일간 산책 기록 가져오기 실패:', error);
+    }
   };
 
   const handleUpdateMonth = (increment: number) => {
-    setMonthYear(prev => getNewMonthYear(prev, increment));
+    setMonthYear((prev) => getNewMonthYear(prev, increment));
   };
 
   const processAttendance = (explorationInfos: ExplorationInfo[]) => {
     // endTime에서 날짜(day) 추출하고 중복 제거
     const days = [
       ...new Set(
-        explorationInfos.map(info => new Date(info.endTime).getDate()),
+        explorationInfos.map((info) => new Date(info.endTime).getDate()),
       ),
     ];
     setAttendance(days);
@@ -76,6 +86,7 @@ const RecordScreen = () => {
 
       moveToToday();
       getData();
+      console.log(attendance);
       return () => {};
     }, []),
   );
@@ -84,7 +95,7 @@ const RecordScreen = () => {
     <Container>
       <CustomHeader title="월간 산책" />
       <Calendar
-        attendance={[]}
+        attendance={attendance}
         monthYear={monthYear}
         selectedDate={selectedDate}
         moveToToday={moveToToday}
