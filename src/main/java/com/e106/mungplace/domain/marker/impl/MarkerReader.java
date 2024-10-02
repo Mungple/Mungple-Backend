@@ -1,9 +1,13 @@
 package com.e106.mungplace.domain.marker.impl;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
 import com.e106.mungplace.domain.image.entity.ImageInfo;
@@ -41,4 +45,15 @@ public class MarkerReader {
 	public List<ImageInfo> findMarkerImage(UUID markerId) {
 		return markerImageRepository.findByMarkerId(markerId);
 	}
+
+	public List<Marker> findFirstMarkersByUserId(Long userId, Long size) {
+		Pageable pageable = PageRequest.of(0, size.intValue(), Sort.by("createdDate").descending());
+		return markerRepository.findFirstMarkersByUserId(userId, pageable);
+	}
+
+	public List<Marker> findMarkersByUserIdAndCursor(Long userId, Long size, LocalDateTime createdAt) {
+		Pageable pageable = PageRequest.of(0, size.intValue(), Sort.by("createdDate").descending());
+		return markerRepository.findMarkersByUserIdAndCursor(userId, createdAt, pageable);
+	}
+
 }

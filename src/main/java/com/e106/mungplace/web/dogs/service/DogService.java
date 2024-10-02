@@ -9,7 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.e106.mungplace.common.image.ImageRepository;
-import com.e106.mungplace.common.image.ImageStore;
+import com.e106.mungplace.common.image.ImageManager;
 import com.e106.mungplace.common.transaction.GlobalTransactional;
 import com.e106.mungplace.domain.dogs.entity.Dog;
 import com.e106.mungplace.domain.dogs.repository.DogRepository;
@@ -36,7 +36,7 @@ public class DogService {
 	private final DogRepository dogRepository;
 	private final DogExplorationRepository dogExplorationRepository;
 	private final ImageRepository imageRepository;
-	private final ImageStore imageStore;
+	private final ImageManager imageManager;
 	private final UserHelper userHelper;
 
 	@Transactional
@@ -120,7 +120,7 @@ public class DogService {
 		if (dog.getImageName() != null) {
 			imageRepository.deleteImageById(dog.getImageName());
 		}
-		String imageName = imageStore.saveImage(imageFile);
+		String imageName = imageManager.saveImage(imageFile);
 
 		dog.updateImageName(imageName);
 		return new ImageNameResponse(imageName);

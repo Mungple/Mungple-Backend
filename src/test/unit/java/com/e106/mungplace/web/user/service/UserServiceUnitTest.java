@@ -12,7 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.e106.mungplace.common.image.ImageRepository;
-import com.e106.mungplace.common.image.ImageStore;
+import com.e106.mungplace.common.image.ImageManager;
 import com.e106.mungplace.domain.user.entity.User;
 import com.e106.mungplace.domain.user.impl.UserHelper;
 import com.e106.mungplace.domain.user.repository.UserRepository;
@@ -35,7 +35,7 @@ class UserServiceUnitTest {
 	private UserHelper userHelper;
 
 	@Mock
-	private ImageStore imageStore;
+	private ImageManager imageManager;
 
 	@Mock
 	private ImageRepository imageRepository;
@@ -85,7 +85,7 @@ class UserServiceUnitTest {
 		// given
 		MultipartFile imageFile = mock(MultipartFile.class);
 		when(userHelper.getCurrentUser()).thenReturn(user);
-		when(imageStore.saveImage(imageFile)).thenReturn("newImage.jpg");
+		when(imageManager.saveImage(imageFile)).thenReturn("newImage.jpg");
 
 		// when
 		ImageNameResponse response = userService.updateUserImage(imageFile);
@@ -94,7 +94,7 @@ class UserServiceUnitTest {
 		assertNotNull(response);
 		assertEquals("newImage.jpg", response.image());
 		verify(imageRepository, times(1)).deleteImageById("oldImage.jpg");
-		verify(imageStore, times(1)).saveImage(imageFile);
+		verify(imageManager, times(1)).saveImage(imageFile);
 		verify(userHelper, times(1)).getCurrentUser();
 	}
 
@@ -105,7 +105,7 @@ class UserServiceUnitTest {
 		user.updateImageName(null); // No previous image
 		MultipartFile imageFile = mock(MultipartFile.class);
 		when(userHelper.getCurrentUser()).thenReturn(user);
-		when(imageStore.saveImage(imageFile)).thenReturn("newImage.jpg");
+		when(imageManager.saveImage(imageFile)).thenReturn("newImage.jpg");
 
 		// when
 		ImageNameResponse response = userService.updateUserImage(imageFile);
@@ -114,7 +114,7 @@ class UserServiceUnitTest {
 		assertNotNull(response);
 		assertEquals("newImage.jpg", response.image());
 		verify(imageRepository, times(0)).deleteImageById(anyString());
-		verify(imageStore, times(1)).saveImage(imageFile);
+		verify(imageManager, times(1)).saveImage(imageFile);
 		verify(userHelper, times(1)).getCurrentUser();
 	}
 }

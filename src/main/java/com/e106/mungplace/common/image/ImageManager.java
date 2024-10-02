@@ -12,7 +12,7 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Component
-public class ImageStore {
+public class ImageManager {
 
 	private final ImageRepository imageRepository;
 
@@ -32,5 +32,9 @@ public class ImageStore {
 
 	private boolean isValidImageExtension(String extension) {
 		return extension.equals("jpg") || extension.equals("jpeg") || extension.equals("png");
+	}
+
+	public void deleteImage(String storedFileName) {
+		imageRepository.deleteImageById(storedFileName);
 	}
 }
