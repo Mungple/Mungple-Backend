@@ -1,5 +1,5 @@
 // 빠른 오류 처리, 예측 가능한 네트워크 상태 처리, 서버 부하 감소를 위함
-import {QueryClient} from '@tanstack/react-query';
+import {QueryClient} from '@tanstack/react-query'
 
 // 모든 쿼리 관련 상태와 옵션 관리
 const queryClient = new QueryClient({
@@ -14,6 +14,6 @@ const queryClient = new QueryClient({
       retry: false,
     },
   },
-});
+})
 
-export default queryClient;
+export default queryClient

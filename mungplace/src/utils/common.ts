@@ -1,4 +1,4 @@
-import {ForwardedRef} from 'react';
+import {ForwardedRef} from 'react'
 
 // 여러 개의 ref를 병합하는 함수
 function mergeRefs<T>(...refs: ForwardedRef<T>[]) {
@@ -7,13 +7,13 @@ function mergeRefs<T>(...refs: ForwardedRef<T>[]) {
     refs.forEach(ref => {
       // ref가 함수인 경우, 노드를 인수로 전달하여 호출
       if (typeof ref === 'function') {
-        ref(node);
-      // ref가 객체인 경우, current 속성에 노드 할당
+        ref(node)
+        // ref가 객체인 경우, current 속성에 노드 할당
       } else if (ref) {
-        ref.current = node;
+        ref.current = node
       }
-    });
-  };
+    })
+  }
 }
 
-export {mergeRefs};
+export {mergeRefs}

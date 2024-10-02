@@ -8,40 +8,40 @@ const colors = {
   GRAY_500: '#424242',
   // System Blue
   BLUE: {
-    BASE: '#64B5F6',
     LIGHTER: '#90CAF9',
+    BASE: '#64B5F6',
     DARKER: '#2196F3',
   },
   // Creamy Beige
   BEIGE: {
-    BASE: '#F2E2C4',
     LIGHTER: '#F6EBD3',
+    BASE: '#F2E2C4',
     DARKER: '#E1D3B5',
   },
   // Warm Yellow
   YELLOW: {
-    BASE: '#F2AF5C',
     LIGHTER: '#F6BE83',
+    BASE: '#F2AF5C',
     DARKER: '#D7954D',
   },
   // Vibrant Orange
   ORANGE: {
-    BASE: '#F28749',
     LIGHTER: '#F6A072',
+    BASE: '#F28749',
     DARKER: '#D6753A',
   },
   // Pink Red
   RED: {
-    BASE: '#DB4455',
     LIGHTER: '#E8828D',
+    BASE: '#DB4455',
     DARKER: '#CD0C22',
   },
   // Rich Brown
   BROWN: {
-    BASE: '#8C4F2B',
     LIGHTER: '#A66843',
+    BASE: '#8C4F2B',
     DARKER: '#743E22',
   },
-};
+}
 
-export {colors};
+export {colors}

@@ -1,12 +1,12 @@
-import { colors } from '@/constants';
-import React from 'react';
-import { StatusBar } from 'react-native';
-import styled from 'styled-components/native';
+import {colors} from '@/constants'
+import React from 'react'
+import {StatusBar} from 'react-native'
+import styled from 'styled-components/native'
 
 type CustomHeaderProps = {
-  title: string;
-  children?: React.ReactNode;
-};
+  title: string
+  children?: React.ReactNode
+}
 
 const CustomHeader: React.FC<CustomHeaderProps> = ({title, children}) => {
   return (
@@ -17,10 +17,10 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({title, children}) => {
         {children}
       </Header>
     </>
-  );
-};
+  )
+}
 
-export default CustomHeader;
+export default CustomHeader
 
 const Header = styled.SafeAreaView`
   width: 100%;
@@ -29,10 +29,10 @@ const Header = styled.SafeAreaView`
   align-items: center;
   justify-content: space-between;
   background-color: ${colors.WHITE};
-`;
+`
 
 const HeaderTitle = styled.Text`
   font-size: 24px;
   font-weight: bold;
   color: ${colors.BLACK};
-`;
+`

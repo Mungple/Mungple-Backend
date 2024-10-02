@@ -9,6 +9,7 @@ import DefaultImage from '@/assets/profile-image.png';
 import {colors, settingNavigations} from '@/constants';
 import {SettingStackParamList} from '@/navigations/stack/SettingStackNavigator';
 import {NavigationProp} from '@react-navigation/native';
+import useGetPet from '@/hooks/queries/useGetPet';
 
 type PetListProps = {
   navigation?: NavigationProp<SettingStackParamList>;
@@ -21,7 +22,8 @@ const PetList: React.FC<PetListProps> = ({
   selectedPets = [],
   homeScreenPress,
 }) => {
-  const data = useUserStore(state => state.petData);
+  const userId = useUserStore(state => state.userId)
+  const {data} = useGetPet(userId)
 
   const renderItem = ({item}: {item: ResponsePetProfile}) => {
     const isSelected = selectedPets.includes(item.id);
