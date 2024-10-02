@@ -9,7 +9,6 @@ const MarkerDetailScreen: React.FC = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const { markerId } = route.params as { markerId: string }; // route.params에서 markerId를 가져옵니다.
-  
   const [markerDetails, setMarkerDetails] = useState<MarkerDetails | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -24,6 +23,7 @@ const MarkerDetailScreen: React.FC = () => {
   const fetchMarkerDetails = async (markerId: string) => {
     setLoading(true);
     setError(null);
+    console.log('마커 디테일 페이지 확인용',markerId)
     try {
       const response = await axiosInstance.get(`/markers/${markerId}`, {
         headers: {
@@ -38,6 +38,7 @@ const MarkerDetailScreen: React.FC = () => {
       setMarkerDetails({...response.data, images: imageWithUrl});
     } catch (err) {
       setError('마커 디테일을 가져오는 데 실패');
+      console.log(err)
     } finally {
       setLoading(false);
     }
