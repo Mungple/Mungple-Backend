@@ -1,77 +1,77 @@
-import {Alert, Dimensions} from 'react-native';
-import React, {useEffect, useState} from 'react';
-import Icon from 'react-native-vector-icons/Ionicons';
-import {useNavigation} from '@react-navigation/native';
-import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import {Alert, Dimensions} from 'react-native'
+import React, {useEffect, useState} from 'react'
+import Icon from 'react-native-vector-icons/Ionicons'
+import {useNavigation} from '@react-navigation/native'
+import {NativeStackNavigationProp} from '@react-navigation/native-stack'
 
-import * as WS from './WalkingScreenStyle';
-import {useAppStore} from '@/state/useAppStore';
-import {colors, mapNavigations} from '@/constants';
-import useUserLocation from '@/hooks/useUserLocation';
-import MapComponent from '@/components/map/MapComponent';
-import CustomModal from '@/components/common/CustomModal';
-import ElapsedTime from '@/components/walking/ElapsedTime';
-import CustomButton from '@/components/common/CustomButton';
-import {MapStackParamList} from '@/navigations/stack/MapStackNavigator';
-import { exitWalk } from '@/api/walk';
-import { useMapStore } from '@/state/useMapStore';
+import {exitWalk} from '@/api/walk'
+import * as WS from './WalkingScreenStyle'
+import {useAppStore} from '@/state/useAppStore'
+import {useMapStore} from '@/state/useMapStore'
+import {colors, mapNavigations} from '@/constants'
+import useUserLocation from '@/hooks/useUserLocation'
+import MapComponent from '@/components/map/MapComponent'
+import CustomModal from '@/components/common/CustomModal'
+import ElapsedTime from '@/components/walking/ElapsedTime'
+import CustomButton from '@/components/common/CustomButton'
+import {MapStackParamList} from '@/navigations/stack/MapStackNavigator'
 
-const bottomBlockHeight = (Dimensions.get('window').height * 1) / 5;
-const bottomBlockWidth = Dimensions.get('window').width - 40;
+const bottomBlockHeight = (Dimensions.get('window').height * 1) / 5
+const bottomBlockWidth = Dimensions.get('window').width - 40
 
 const WalkingScreen = () => {
-  const {userLocation} = useUserLocation();
-  const [distance, setDistance] = useState(0);
-  const [isFormVisible, setIsFormVisible] = useState(false);
-  const [modalVisible, setModalVisible] = useState(false);
-  const startExplorate = useAppStore(state => state.startExplorate);
-  const setWalkingStart = useAppStore(state => state.setWalkingStart);
-  const [path, setPath] = useState<{latitude: number; longitude: number}[]>([]);
+  const {userLocation} = useUserLocation()
+  const [distance, setDistance] = useState(0)
+  const [isFormVisible, setIsFormVisible] = useState(false)
+  const [modalVisible, setModalVisible] = useState(false)
+  const startExplorate = useAppStore(state => state.startExplorate)
+  const setWalkingStart = useAppStore(state => state.setWalkingStart)
+  const [path, setPath] = useState<{latitude: number; longitude: number}[]>([])
   const markers = useMapStore(state => state.markers)
 
-  const navigation = useNavigation<NativeStackNavigationProp<MapStackParamList>>();
+  const navigation = useNavigation<NativeStackNavigationProp<MapStackParamList>>()
 
   const handleWalkingEnd = () => {
-    setModalVisible(true);
-  };
+    setModalVisible(true)
+  }
 
   const handleFormClose = () => {
-    setIsFormVisible(false);
-  };
+    setIsFormVisible(false)
+  }
 
   const handleAddMarker = (markerData: unknown) => {
-    console.log('Adding Marker:', markerData);
-  };
+    console.log('Adding Marker:', markerData)
+  }
 
   const confirmEndWalking = () => {
     if (startExplorate) {
       console.log(startExplorate.explorationId)
       exitWalk(startExplorate.explorationId)
-      setWalkingStart(false);
-      setModalVisible(false);
+      setWalkingStart(false)
+      setModalVisible(false)
       console.log('산책 종료')
-      navigation.navigate(mapNavigations.HOME);
+      navigation.navigate(mapNavigations.HOME)
     } else {
       Alert.alert('Error', '산책 정보가 업데이트 불가합니다')
     }
-  };
+  }
 
   const cancelEndWalking = () => {
-    setModalVisible(false);
-  };
+    setModalVisible(false)
+  }
 
   // 5초마다 좌표를 수집하여 경로 업데이트
   useEffect(() => {
     const intervalId = setInterval(() => {
       if (userLocation) {
         // 새로운 좌표를 경로에 추가
-        setPath(prevPath => [...prevPath, userLocation]);
+        setPath(prevPath => [...prevPath, userLocation])
       }
-    }, 5000);
+    }, 5000)
 
     // 컴포넌트 언마운트 시 interval 정리
-    return () => clearInterval(intervalId);
-  }, [userLocation]);
+    return () => clearInterval(intervalId)
+  }, [userLocation])
 
   return (
     <WS.Container>
@@ -104,14 +104,8 @@ const WalkingScreen = () => {
           </WS.BottomCard>
 
           {/* 산책 종료 확인 모달 */}
-          <CustomModal
-            modalVisible={modalVisible}
-            setModalVisible={setModalVisible}>
-            <Icon
-              size={48}
-              name="alert-circle-outline"
-              color={colors.ORANGE.BASE}
-            />
+          <CustomModal modalVisible={modalVisible} setModalVisible={setModalVisible}>
+            <Icon size={48} name="alert-circle-outline" color={colors.ORANGE.BASE} />
             <WS.ModalTitle>산책을 종료하시겠습니까?</WS.ModalTitle>
             <WS.ButtonContainer>
               <WS.ConfirmButton label="확인" onPress={confirmEndWalking} />
@@ -121,7 +115,7 @@ const WalkingScreen = () => {
         </>
       )}
     </WS.Container>
-  );
-};
+  )
+}
 
-export default WalkingScreen;
+export default WalkingScreen

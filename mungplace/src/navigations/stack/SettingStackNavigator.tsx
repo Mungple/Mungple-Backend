@@ -1,22 +1,22 @@
-import React from 'react';
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import React from 'react'
+import {createNativeStackNavigator} from '@react-navigation/native-stack'
 
-import {ResponsePetProfile} from '@/types';
-import {settingNavigations} from '@/constants';
-import MyPageScreen from '@/screens/user/MyPageScreen';
-import SettingScreen from '@/screens/user/SettingScreen';
-import PetDetailScreen from '@/screens/user/PetDetailScreen';
-import EditProfileScreen from '@/screens/user/EditProfileScreen';
+import {ResponsePetProfile} from '@/types'
+import {settingNavigations} from '@/constants'
+import MyPageScreen from '@/screens/user/MyPageScreen'
+import SettingScreen from '@/screens/user/SettingScreen'
+import PetDetailScreen from '@/screens/user/PetDetailScreen'
+import EditProfileScreen from '@/screens/user/EditProfileScreen'
 
 export type SettingStackParamList = {
-  [settingNavigations.SETTING]: undefined;
-  [settingNavigations.MY_PAGE]: undefined;
-  [settingNavigations.PET_DETAIL]: {petData: ResponsePetProfile};
-  [settingNavigations.EDIT_PROFILE]: undefined;
-  [settingNavigations.DELETE_ACCOUNT]: undefined;
-};
+  [settingNavigations.SETTING]: undefined
+  [settingNavigations.MY_PAGE]: undefined
+  [settingNavigations.PET_DETAIL]: {petData: ResponsePetProfile}
+  [settingNavigations.EDIT_PROFILE]: undefined
+  [settingNavigations.DELETE_ACCOUNT]: undefined
+}
 
-const Stack = createNativeStackNavigator<SettingStackParamList>();
+const Stack = createNativeStackNavigator<SettingStackParamList>()
 
 function SettingStackNavigator() {
   return (
@@ -50,7 +50,7 @@ function SettingStackNavigator() {
         }}
       />
     </Stack.Navigator>
-  );
+  )
 }
 
-export default SettingStackNavigator;
+export default SettingStackNavigator

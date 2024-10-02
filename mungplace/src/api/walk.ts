@@ -12,13 +12,13 @@ const startWalk = async (JSON: string) => {
       headers: {
         'Content-Type': `application/json; charset=utf8`,
       },
-    });
-    return data;
+    })
+    return data
   } catch (error) {
     console.log('산책 시작 실패 :', error);
     throw error;
   }
-};
+}
 
 // 산책 종료 함수
 const exitWalk = async (explorationId: number) => {
@@ -27,13 +27,13 @@ const exitWalk = async (explorationId: number) => {
       headers: {
         'Content-Type': `application/json; charset=utf8`,
       },
-    });
-    return data;
+    })
+    return data
   } catch (error) {
     console.log('산책 종료 실패 :', error);
     throw error;
   }
-};
+}
 
 // 월간 산책 기록 목록 조회 함수
 const getMonthWalks = async (year: number, month: number) => {

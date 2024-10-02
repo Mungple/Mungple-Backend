@@ -1,22 +1,25 @@
-import React, { useState } from 'react';
-import styled from 'styled-components/native';
-import {Dimensions, TextInput, TouchableOpacity} from 'react-native';
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import { managerLogin } from '@/components/common/ManagerLogin';
-import {authNavigations} from '@/constants';
-import Logo from '@/assets/mungple_logo.png';
-import kakaoLogo from '@/assets/kakao_login_button.png';
-import naverLogo from '@/assets/naver_login_button.png';
-import googleLogo from '@/assets/google_login_button.png';
-import {AuthStackParamList} from '@/navigations/stack/AuthStackNavigator';
-import CustomButton from '@/components/common/CustomButton';
+import React, {useState} from 'react'
+import styled from 'styled-components/native'
+import {Dimensions, TextInput, TouchableOpacity} from 'react-native'
+import {NativeStackScreenProps} from '@react-navigation/native-stack'
+import {managerLogin} from '@/components/common/ManagerLogin'
+import {authNavigations} from '@/constants'
+import Logo from '@/assets/mungple_logo.png'
+import kakaoLogo from '@/assets/kakao_login_button.png'
+import naverLogo from '@/assets/naver_login_button.png'
+import googleLogo from '@/assets/google_login_button.png'
+import {AuthStackParamList} from '@/navigations/stack/AuthStackNavigator'
+import CustomButton from '@/components/common/CustomButton'
 
-type AuthHomeScreenProps = NativeStackScreenProps<AuthStackParamList, typeof authNavigations.AUTH_HOME>;
+type AuthHomeScreenProps = NativeStackScreenProps<
+  AuthStackParamList,
+  typeof authNavigations.AUTH_HOME
+>
 
 const width = Dimensions.get('screen').width
 
 const AuthHomeScreen: React.FC<AuthHomeScreenProps> = ({navigation}) => {
-  const [username, setUsername ] = useState('')
+  const [username, setUsername] = useState('')
 
   const handleLoginPress = () => {
     if (username.trim()) {
@@ -27,32 +30,31 @@ const AuthHomeScreen: React.FC<AuthHomeScreenProps> = ({navigation}) => {
   }
   return (
     <Container>
-      <LogoContainer >
+      <LogoContainer>
         <LogoImage source={Logo} />
-      </LogoContainer >
+      </LogoContainer>
 
       <ButtonsContainer>
-        <LoginButton onPress={() => navigation.navigate(authNavigations.SOCIAL_LOGIN, {provider:'kakao'})}>
+        <LoginButton
+          onPress={() => navigation.navigate(authNavigations.SOCIAL_LOGIN, {provider: 'kakao'})}>
           <ButtonImage source={kakaoLogo} />
         </LoginButton>
 
-        <LoginButton onPress={() => navigation.navigate(authNavigations.SOCIAL_LOGIN, {provider:'naver'})}>
+        <LoginButton
+          onPress={() => navigation.navigate(authNavigations.SOCIAL_LOGIN, {provider: 'naver'})}>
           <ButtonImage source={naverLogo} />
         </LoginButton>
 
-        <LoginButton onPress={() => navigation.navigate(authNavigations.SOCIAL_LOGIN, {provider:'google'})}>
+        <LoginButton
+          onPress={() => navigation.navigate(authNavigations.SOCIAL_LOGIN, {provider: 'google'})}>
           <ButtonImage source={googleLogo} />
         </LoginButton>
-        <TextInput
-          value={username}
-          onChangeText={setUsername}
-          placeholder='매니저 이름'
-        />
-        <CustomButton label='매니저 로그인' onPress={handleLoginPress} />
+        <TextInput value={username} onChangeText={setUsername} placeholder="매니저 이름" />
+        <CustomButton label="매니저 로그인" onPress={handleLoginPress} />
       </ButtonsContainer>
     </Container>
-  );
-};
+  )
+}
 
 const Container = styled.SafeAreaView`
   flex: 1.5;
@@ -65,15 +67,15 @@ const LogoContainer = styled.View`
   width: ${width * 0.6}px;
   height: ${width * 0.6}px;
   margin-bottom: 40px;
-`;
+`
 
 const LogoImage = styled.Image`
   width: 100%;
   height: 100%;
-  resizeMode: contain;
+  resizemode: contain;
 `
 
-const ButtonsContainer  = styled.View`
+const ButtonsContainer = styled.View`
   width: 100%;
   align-items: center;
 `
@@ -81,12 +83,12 @@ const ButtonsContainer  = styled.View`
 const LoginButton = styled(TouchableOpacity)`
   width: 100%;
   align-items: center;
-`;
+`
 
 const ButtonImage = styled.Image`
   width: ${width - 60}px;
   height: ${width * 0.18}px;
-  resizeMode: contain;
-`;
+  resizemode: contain;
+`
 
-export default AuthHomeScreen;
+export default AuthHomeScreen

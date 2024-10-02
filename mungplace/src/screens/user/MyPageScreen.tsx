@@ -1,50 +1,49 @@
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import React, { useEffect, useState } from 'react';
-import { Dimensions, Image as RNImage, Text } from 'react-native';
-import IonIcons from 'react-native-vector-icons/Ionicons';
-import styled from 'styled-components/native';
+import {NativeStackScreenProps} from '@react-navigation/native-stack'
+import React, {useEffect, useState} from 'react'
+import {Dimensions, Image as RNImage, Text} from 'react-native'
+import IonIcons from 'react-native-vector-icons/Ionicons'
+import styled from 'styled-components/native'
 
-import DefaultImage from '@/assets/profile-image.png';
-import CustomCard from '@/components/common/CustomCard';
-import CustomHeader from '@/components/common/CustomHeader';
-import CustomModal from '@/components/common/CustomModal';
-import CustomModalHeader from '@/components/common/CustomModalHeader';
-import PetForm from '@/components/user/PetForm';
-import PetList from '@/components/user/PetList';
-import { colors, settingNavigations } from '@/constants';
-import useAuth from '@/hooks/queries/useAuth';
-import { SettingStackParamList } from '@/navigations/stack/SettingStackNavigator';
-import { useUserStore } from '@/state/useUserStore';
+import useAuth from '@/hooks/queries/useAuth'
+import PetForm from '@/components/user/PetForm'
+import PetList from '@/components/user/PetList'
+import {useUserStore} from '@/state/useUserStore'
+import DefaultImage from '@/assets/profile-image.png'
+import {colors, settingNavigations} from '@/constants'
+import CustomCard from '@/components/common/CustomCard'
+import CustomModal from '@/components/common/CustomModal'
+import CustomHeader from '@/components/common/CustomHeader'
+import CustomModalHeader from '@/components/common/CustomModalHeader'
+import {SettingStackParamList} from '@/navigations/stack/SettingStackNavigator'
 
 export type MyPageScreenProps = NativeStackScreenProps<
   SettingStackParamList,
   typeof settingNavigations.MY_PAGE
->;
+>
 
-const windowHeight = Dimensions.get('window').height;
+const windowHeight = Dimensions.get('window').height
 
 const MyPageScreen: React.FC<MyPageScreenProps> = ({navigation}) => {
-  const userId = useUserStore(state => state.userId);
-  const {useGetProfile} = useAuth();
-  const userData = useUserStore(state => state.userData);
-  const setUserData = useUserStore(state => state.setUserData);
-  const [modalVisible, setModalVisible] = useState(false);
-  const {data} = useGetProfile(userId);
-  
+  const userId = useUserStore(state => state.userId)
+  const userData = useUserStore(state => state.userData)
+  const setUserData = useUserStore(state => state.setUserData)
+  const [modalVisible, setModalVisible] = useState(false)
+  const {useGetProfile} = useAuth()
+  const {data} = useGetProfile(userId)
+
   useEffect(() => {
     if (data) {
-      setUserData(data);
+      setUserData(data)
     }
-  }, [data, setUserData]);
+  }, [data])
 
   const handleSettingPress = () => {
-    navigation.navigate(settingNavigations.SETTING);
-  };
+    navigation.navigate(settingNavigations.SETTING)
+  }
 
   const handleAddPet = () => {
-    setModalVisible(prev => !prev);
-  };
-  
+    setModalVisible(prev => !prev)
+  }
 
   return (
     <Container>
@@ -60,9 +59,11 @@ const MyPageScreen: React.FC<MyPageScreenProps> = ({navigation}) => {
 
       <ProfileCard>
         <Image
-          source={userData.imageName
-            ? {uri: `http://j11e106.p.ssafy.io:9000/images/${userData.imageName}`}
-            : DefaultImage}
+          source={
+            userData.imageName
+              ? {uri: `http://j11e106.p.ssafy.io:9000/images/${userData.imageName}`}
+              : DefaultImage
+          }
         />
         <Context>
           <Title>{userData.nickname}</Title>
@@ -82,22 +83,19 @@ const MyPageScreen: React.FC<MyPageScreenProps> = ({navigation}) => {
         <PetList navigation={navigation} />
       </PetListBox>
 
-      <CustomModal
-        isWide={true}
-        modalVisible={modalVisible}
-        setModalVisible={setModalVisible}>
+      <CustomModal isWide={true} modalVisible={modalVisible} setModalVisible={setModalVisible}>
         <CustomModalHeader title="반려견 등록" closeButton={handleAddPet} />
         <PetForm setModalVisible={setModalVisible} />
       </CustomModal>
     </Container>
-  );
-};
+  )
+}
 
 const Container = styled.SafeAreaView`
   flex: 1;
   align-items: center;
   background-color: ${colors.WHITE};
-`;
+`
 
 const ProfileCard = styled(CustomCard)`
   width: 90%;
@@ -108,53 +106,53 @@ const ProfileCard = styled(CustomCard)`
   flex-direction: row;
   justify-content: space-around;
   border-color: ${colors.GRAY_200};
-`;
+`
 
 const Image = styled(RNImage)`
   width: 70px;
   height: 70px;
   border-radius: 35px;
-`;
+`
 
 const Context = styled.View`
   gap: 10px;
   flex-direction: column;
-`;
+`
 
 const Title = styled.Text`
   font-size: 18px;
   font-weight: bold;
   color: ${colors.BLACK};
-`;
+`
 
 const HeaderBox = styled.View`
   padding: 0 20px;
   align-items: center;
   flex-direction: row;
   justify-content: center;
-`;
+`
 
 const AddPetButton = styled.TouchableOpacity`
   padding: 10px 16px;
   border-radius: 8px;
   background-color: ${colors.ORANGE.BASE};
-`;
+`
 
 const AddPetText = styled.Text`
   font-weight: bold;
   color: ${colors.WHITE};
-`;
+`
 
 const MenuText = styled.Text`
   flex: 1;
   font-size: 18px;
   font-weight: bold;
   color: ${colors.BLACK};
-`;
+`
 
 const PetListBox = styled.View`
   width: 100%;
   height: ${windowHeight * 0.7}px;
-`;
+`
 
-export default MyPageScreen;
+export default MyPageScreen
