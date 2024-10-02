@@ -59,7 +59,7 @@ public class MungpleConsumer {
 
 		if (previousGeoHash == null) {
 			increaseGeoHashUserCount(currentGeoHash);
-			setMungplace(null, currentGeoHash);  // 처음에는 이전 위치가 없으므로 null 처리
+			setMungplace(null, currentGeoHash);
 		} else if(previousGeoHash != null) {
 			if (!previousGeoHash.equals(currentGeoHash)) {
 				decreaseGeoHashUserCount(previousGeoHash);
