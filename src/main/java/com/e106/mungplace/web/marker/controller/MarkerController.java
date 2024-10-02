@@ -5,12 +5,13 @@ import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.e106.mungplace.web.marker.dto.CreateMarkerResponse;
 import com.e106.mungplace.web.marker.dto.GeohashMarkerResponse;
 import com.e106.mungplace.web.marker.dto.MarkerInfoResponse;
+import com.e106.mungplace.web.marker.dto.MarkerResponse;
 import com.e106.mungplace.web.marker.dto.MarkerSearchRequest;
 import com.e106.mungplace.web.marker.service.MarkerService;
 
@@ -42,9 +44,16 @@ public class MarkerController {
 	}
 
 	@ResponseStatus(HttpStatus.ACCEPTED)
-	@PostMapping("/{markerId}")
+	@DeleteMapping("/{markerId}")
 	public void deleteMarker(@PathVariable("markerId") UUID markerId) {
 		markerService.deleteMarkerProcess(markerId);
+	}
+
+	@GetMapping("/users")
+	public ResponseEntity<List<MarkerResponse>> getUserMarkers(	@RequestParam Long size,
+		@RequestParam(required = false) UUID cursorId) {
+		List<MarkerResponse> markers = markerService.getUserMarkers(size, cursorId);
+		return ResponseEntity.ok(markers);
 	}
 
 	@GetMapping

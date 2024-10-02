@@ -26,6 +26,7 @@ import com.e106.mungplace.domain.marker.entity.PublishStatus;
 import com.e106.mungplace.domain.marker.impl.MarkerReader;
 import com.e106.mungplace.domain.marker.impl.MarkerSerializer;
 import com.e106.mungplace.domain.marker.impl.MarkerWriter;
+import com.e106.mungplace.domain.marker.repository.MarkerPointRepository;
 import com.e106.mungplace.domain.user.impl.UserHelper;
 import com.e106.mungplace.domain.util.GeoUtils;
 import com.e106.mungplace.web.exception.ApplicationException;
@@ -37,6 +38,7 @@ import com.e106.mungplace.web.marker.dto.MarkerCreateRequest;
 import com.e106.mungplace.web.marker.dto.MarkerInfoResponse;
 import com.e106.mungplace.web.marker.dto.MarkerPayload;
 import com.e106.mungplace.web.marker.dto.MarkerPointResponse;
+import com.e106.mungplace.web.marker.dto.MarkerResponse;
 import com.e106.mungplace.web.marker.dto.MarkerSearchRequest;
 import com.e106.mungplace.web.marker.dto.RequestMarkerType;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -64,6 +66,7 @@ public class MarkerService {
 	private final UserHelper userHelper;
 	private final MarkerSerializer markerSerializer;
 	private final ObjectMapper objectMapper;
+	private final MarkerPointRepository markerPointRepository;
 
 	@GlobalTransactional
 	@Transactional
@@ -140,14 +143,15 @@ public class MarkerService {
 			() -> new ApplicationException(ApplicationError.MARKER_NOT_FOUND));
 	}
 
-	@Transactional
+	@GlobalTransactional
 	public void deleteMarkerProcess(UUID markerId) {
 		Long userId = userHelper.getCurrentUserId();
 		Marker marker = getMarkerOrThrow(markerId);
 		validateIsUsersMarker(marker, userId);
 
-		// TODO: <홍성우> MinIO에서 마커 삭제하는 로직 구현
-		// TODO: <홍성우> Elasticsearch에서 마커 삭제하는 로직 구현
+		markerWriter.delete(marker);
+
+		markerPointRepository.deleteById(markerId);
 		markerWriter.delete(marker);
 	}
 
@@ -245,5 +249,20 @@ public class MarkerService {
 			.images(imageNames)
 			.createdAt(marker.getCreatedDate())
 			.build();
+	}
+
+	public List<MarkerResponse> getUserMarkers(Long size, UUID cursorId) {
+		Long userId = userHelper.getCurrentUserId();
+
+		List<Marker> markers = (cursorId == null) ?
+			markerReader.findFirstMarkersByUserId(userId, size) :
+			markerReader.find(cursorId)
+				.map(cursorMarker -> markerReader.findMarkersByUserIdAndCursor(userId, size,
+					cursorMarker.getCreatedDate()))
+				.orElseThrow(RuntimeException::new);
+
+		return markers.stream()
+			.map(MarkerResponse::of)
+			.collect(Collectors.toList());
 	}
 }
