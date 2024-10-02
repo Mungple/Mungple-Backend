@@ -1,4 +1,5 @@
 import React, { useCallback, useState } from 'react';
+import { View } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 
 import styled from 'styled-components/native';
@@ -10,6 +11,7 @@ import { getMonthWalks, getDateWalks, getWalkDetail } from '@/api/walk';
 import CustomHeader from '@/components/common/CustomHeader';
 import Calendar from '@/components/record/Calendar';
 import MonthStatistics from '@/components/record/MonthStatistics';
+import DayWalksList from '@/components/record/DayWalksList';
 
 // 산책 목록 인터페이스
 interface ExplorationInfo {
@@ -34,6 +36,11 @@ const RecordScreen = () => {
   const [selectedDate, setSelectedDate] = useState<number | 0>(0);
   const [monthYear, setMonthYear] = useState(currentMonthYear);
   const [attendance, setAttendance] = useState<number[]>([]);
+  const [dayWalksOpen, setDayWalksOpen] = useState(false);
+  // 일간 산책 모달 상태 변경 함수
+  const toggleDayWalks = () => {
+    setDayWalksOpen((prev) => !prev);
+  };
 
   const moveToToday = () => {
     setSelectedDate(new Date().getDate());
@@ -50,6 +57,7 @@ const RecordScreen = () => {
     try {
       const data = await getDateWalks(dateString); // 비동기적으로 데이터 가져오기
       console.log(data); // 데이터를 받아온 후 처리
+      toggleDayWalks(); // 일간 산책 모달 열기
     } catch (error) {
       console.error('일간 산책 기록 가져오기 실패:', error);
     }
@@ -61,11 +69,7 @@ const RecordScreen = () => {
 
   const processAttendance = (explorationInfos: ExplorationInfo[]) => {
     // endTime에서 날짜(day) 추출하고 중복 제거
-    const days = [
-      ...new Set(
-        explorationInfos.map((info) => new Date(info.endTime).getDate()),
-      ),
-    ];
+    const days = [...new Set(explorationInfos.map((info) => new Date(info.endTime).getDate()))];
     setAttendance(days);
   };
 
@@ -73,10 +77,7 @@ const RecordScreen = () => {
     useCallback(() => {
       const getData = async () => {
         try {
-          const response: MonthRecords = await getMonthWalks(
-            monthYear.year,
-            monthYear.month,
-          );
+          const response: MonthRecords = await getMonthWalks(monthYear.year, monthYear.month);
           processAttendance(response.explorationInfos);
           console.log(response);
         } catch (err) {
@@ -106,6 +107,7 @@ const RecordScreen = () => {
         <FooterText>월간 통계</FooterText>
       </Footer>
       <MonthStatistics year={monthYear.year} month={monthYear.month} />
+      <DayWalksList visible={dayWalksOpen} onRequestClose={toggleDayWalks} />
     </Container>
   );
 };
