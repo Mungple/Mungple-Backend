@@ -1,7 +1,7 @@
 import styled from 'styled-components/native';
-import {TouchableOpacity} from 'react-native';
+import { TouchableOpacity } from 'react-native';
 
-import {colors} from '@/constants';
+import { colors } from '@/constants';
 import CustomCard from '@/components/common/CustomCard';
 import CustomButton from '@/components/common/CustomButton';
 
@@ -43,13 +43,6 @@ const CloseButton = styled(TouchableOpacity)`
 
 const StartButton = styled(CustomButton)`
   margin: 20px;
-`
+`;
 
-export {
-  MenuText,
-  Container,
-  ImageCard,
-  StartButton,
-  CloseButton,
-  HeaderContainer,
-};
+export { MenuText, Container, ImageCard, StartButton, CloseButton, HeaderContainer };

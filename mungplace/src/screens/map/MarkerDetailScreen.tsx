@@ -4,6 +4,7 @@ import axiosInstance from '@/api/axios';
 import { MarkerDetails } from '../../state/useMapStore'; // MarkerDetails 타입을 useMapStore에서 가져옵니다.
 import { useAppStore } from '@/state/useAppStore';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import { getAccessToken } from '@/api';
 
 const MarkerDetailScreen: React.FC = () => {
   const navigation = useNavigation();
@@ -12,10 +13,11 @@ const MarkerDetailScreen: React.FC = () => {
   const [markerDetails, setMarkerDetails] = useState<MarkerDetails | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const accessToken = useAppStore((state) => state.token);
+  const accessToken = useAppStore(state => state.token)
 
   useEffect(() => {
     fetchMarkerDetails(markerId);
+    
   }, [markerId]);
 
   const BASE_IMAGE_URL = 'http://j11e106.p.ssafy.io:9000/images/'
@@ -23,7 +25,7 @@ const MarkerDetailScreen: React.FC = () => {
   const fetchMarkerDetails = async (markerId: string) => {
     setLoading(true);
     setError(null);
-    console.log('마커 디테일 페이지 확인용',markerId)
+    console.log('마커 디테일 페이지 확인용', accessToken)
     try {
       const response = await axiosInstance.get(`/markers/${markerId}`, {
         headers: {
