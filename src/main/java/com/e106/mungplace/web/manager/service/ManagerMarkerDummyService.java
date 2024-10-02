@@ -5,9 +5,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
-import com.e106.mungplace.common.image.ImageStore;
 import com.e106.mungplace.domain.image.entity.ImageInfo;
 import com.e106.mungplace.domain.image.repository.MarkerImageRepository;
 import com.e106.mungplace.domain.manager.impl.ManagerReader;

@@ -21,7 +21,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.elasticsearch.core.geo.GeoPoint;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.e106.mungplace.common.image.ImageStore;
+import com.e106.mungplace.common.image.ImageManager;
 import com.e106.mungplace.domain.exploration.entity.Exploration;
 import com.e106.mungplace.domain.exploration.impl.ExplorationReader;
 import com.e106.mungplace.domain.image.repository.MarkerImageRepository;
@@ -68,7 +68,7 @@ class MarkerServiceTest {
 	private MarkerService markerService;
 
 	@Mock
-	private ImageStore imageStore;
+	private ImageManager imageManager;
 
 	@Mock
 	private MarkerImageRepository markerImageRepository;
