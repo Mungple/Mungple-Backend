@@ -1,4 +1,4 @@
-import {useMutation, useQuery} from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query';
 
 import {
   RequestProfile,
@@ -8,36 +8,44 @@ import {
   getUserId,
   logout,
   socialLogin,
-} from '@/api/auth'
-import queryClient from '@/api/queryClient'
-import {queryKeys, storageKeys} from '@/constants'
-import type {ResponseError, UseMutationCustomOptions, UseQueryCustomOptions} from '@/types/common'
-import {removeHeader, setEncryptStorage, setHeader} from '@/utils'
-import { useUserStore } from '@/state/useUserStore'
+} from '@/api/auth';
+import queryClient from '@/api/queryClient';
+import { queryKeys, storageKeys } from '@/constants';
+import type {
+  ResponseError,
+  UseMutationCustomOptions,
+  UseQueryCustomOptions,
+} from '@/types/common';
+import { removeHeader, setEncryptStorage, setHeader } from '@/utils';
+import { useUserStore } from '@/state/useUserStore';
+import { useAppStore } from '@/state/useAppStore';
 
 // 로그인 커스텀 훅
 function useLogin(mutationOptions?: UseMutationCustomOptions) {
   return useMutation({
     mutationFn: (loginUrl: string) => socialLogin(loginUrl),
-    onSuccess: async accessToken => {
-      const {setUserId} = useUserStore.getState()
-      setHeader('Authorization', `Bearer ${accessToken}`)
-      setEncryptStorage(storageKeys.ACCESS_TOKEN, accessToken)
+    onSuccess: async (accessToken) => {
+      const { setUserId } = useUserStore.getState();
+      const { setToken } = useAppStore.getState();
 
-      const userId = await getUserId(accessToken)
-      setUserId(Number(userId))
+      setHeader('Authorization', `Bearer ${accessToken}`);
+      setEncryptStorage(storageKeys.ACCESS_TOKEN, accessToken);
+      setToken(accessToken);
+
+      const userId = await getUserId(accessToken);
+      setUserId(Number(userId));
     },
     onSettled: () => {
       queryClient.refetchQueries({
         queryKey: [queryKeys.AUTH, queryKeys.GET_ACCESS_TOKEN],
-      })
+      });
       queryClient.invalidateQueries({
         queryKey: [queryKeys.AUTH, queryKeys.GET_PROFILE],
-      })
+      });
     },
-    throwOnError: error => Number(error.response?.status) >= 500,
+    throwOnError: (error) => Number(error.response?.status) >= 500,
     ...mutationOptions,
-  })
+  });
 }
 
 // 유저 아이디 가져오기
@@ -48,7 +56,7 @@ function useGetUserId(token: string | null, queryOptions?: UseQueryCustomOptions
     enabled: Boolean(token),
     throwOnError: true,
     ...queryOptions,
-  })
+  });
 }
 
 // 프로필 정보 가져오기 훅
@@ -58,18 +66,18 @@ function useGetProfile(userId: number, queryOptions?: UseQueryCustomOptions<Resp
     queryKey: [queryKeys.AUTH, queryKeys.GET_PROFILE],
     enabled: Boolean(userId),
     ...queryOptions,
-  })
+  });
 }
 
 // 프로필 정보 변경 훅
 function useUpdateProfile(mutationOptions?: UseMutationCustomOptions) {
-  return useMutation<ResponseProfile, ResponseError, {userId: number; body: RequestProfile}>({
-    mutationFn: ({userId, body}) => editProfile(userId, body),
-    onSuccess: newProfile => {
-      queryClient.setQueryData([queryKeys.AUTH, queryKeys.GET_PROFILE], newProfile)
+  return useMutation<ResponseProfile, ResponseError, { userId: number; body: RequestProfile }>({
+    mutationFn: ({ userId, body }) => editProfile(userId, body),
+    onSuccess: (newProfile) => {
+      queryClient.setQueryData([queryKeys.AUTH, queryKeys.GET_PROFILE], newProfile);
     },
     ...mutationOptions,
-  })
+  });
 }
 
 // 로그아웃 커스텀 훅
@@ -77,19 +85,19 @@ function useLogout(mutationOptions?: UseMutationCustomOptions) {
   return useMutation({
     mutationFn: logout,
     onSuccess: () => {
-      removeHeader('Authorization')
+      removeHeader('Authorization');
     },
     onSettled: () => {
-      queryClient.invalidateQueries({queryKey: [queryKeys.AUTH]})
+      queryClient.invalidateQueries({ queryKey: [queryKeys.AUTH] });
     },
     ...mutationOptions,
-  })
+  });
 }
 
 function useAuth() {
-  const loginMutation = useLogin()
-  const logoutMutation = useLogout()
-  const profileMutation = useUpdateProfile()
+  const loginMutation = useLogin();
+  const logoutMutation = useLogout();
+  const profileMutation = useUpdateProfile();
 
   return {
     loginMutation,
@@ -97,7 +105,7 @@ function useAuth() {
     profileMutation,
     useGetProfile,
     useGetUserId,
-  }
+  };
 }
 
-export default useAuth
+export default useAuth;

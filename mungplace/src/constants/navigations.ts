@@ -16,7 +16,8 @@ const authNavigations = {
 const mapNavigations = {
   WALKING: 'Walking',
   HOME: 'MapHome',
-  MARKERDETAIL: 'MarkerDetail'
+  MARKERDETAIL: 'MarkerDetail',
+  MYMARKERLIST: 'MyMarkerList',
 } as const;
 
 const settingNavigations = {
