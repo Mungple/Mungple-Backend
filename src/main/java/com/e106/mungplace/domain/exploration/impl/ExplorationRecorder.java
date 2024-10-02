@@ -53,6 +53,7 @@ public class ExplorationRecorder {
 		redisTemplate.opsForValue().set(getPrePointKey(userId), lat + "," + lon);
 		redisTemplate.opsForList().rightPush(getThreePointDistanceKey(userId), "0");
 		redisTemplate.opsForSet().add(getActiveUsersKey(), userId + ":" + explorationId);
+
 	}
 
 	public void endRecord(String userId, String explorationId) {
