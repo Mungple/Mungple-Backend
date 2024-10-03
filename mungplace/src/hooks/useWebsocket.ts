@@ -125,6 +125,10 @@ const useWebSocket = (explorationId: number = -1) => {
       try {
         const parsedMessage = JSON.parse(message.body) as FromZone;
         setMyBlueZone(parsedMessage);
+<<<<<<< HEAD
+        console.log("하이요",parsedMessage)
+=======
+>>>>>>> ee4e8aaaae6673b963a56afae64fe1973b98b849
       } catch (e) {
         console.error('Error parsing bluezone message:', e);
       }

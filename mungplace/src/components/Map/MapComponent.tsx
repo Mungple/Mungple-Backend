@@ -31,8 +31,6 @@ interface MapComponentProps {
   isFormVisible: boolean;
   onFormClose: () => void;
 
-  // userMarkers : UserMarker[] // 유저 마커
-  // nearbyMarkers : UserMarker[] // 주변 마커 데이터
 }
 
 const MapComponent: React.FC<MapComponentProps> = ({
@@ -105,6 +103,8 @@ const MapComponent: React.FC<MapComponentProps> = ({
       [element]: !prev[element],
     }));
   };
+<<<<<<< HEAD
+=======
 
   // Fetch zones data
   useEffect(() => {
@@ -113,6 +113,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
     console.log('레드존:', allRedZone);
     console.log('멍플:', mungZone);
   }, [myBlueZone, allBlueZone, allRedZone, mungZone]);
+>>>>>>> ee4e8aaaae6673b963a56afae64fe1973b98b849
 
   // 유저의 위치를 호출하는 함수
   const handlePressUserLocation = () => {
@@ -302,9 +303,9 @@ const MapComponent: React.FC<MapComponentProps> = ({
         )}
 
         {/* 멍플 지오해시 */}
-        {/* {visibleElements.mungZone && mungZone && mungZone.length > 0 && (
+        {visibleElements.mungZone && mungZone && mungZone.length > 0 && (
           <PolygonLayer zones={mungZone} />
-        )} */}
+        )}
       </ClusteredMapView>
 
       <ClusterModal
