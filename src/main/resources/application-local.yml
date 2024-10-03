@@ -48,17 +48,5 @@ server:
   tomcat:
     max-http-form-post-size: 100MB
 
-logging:
-  level:
-    org.elasticsearch: TRACE
-    org.elasticsearch.client.RestClient: TRACE
-    org.springframework.data.elasticsearch.core: TRACE
-    org.springframework.security: DEBUG
-    org.springframework.web.socket: DEBUG
-    org.springframework.messaging: DEBUG
-    org.springframework.web.socket.handler: DEBUG
-    org.springframework.kafka: ERROR
-    org.apache.kafka: ERROR
-
 mungple:
-  creation-threshold : 3
+  creation-threshold: 3
