@@ -1,14 +1,14 @@
 import React from 'react';
-import {NavigatorScreenParams, RouteProp} from '@react-navigation/native';
-import {colors, mainNavigations} from '@/constants';
+import { NavigatorScreenParams, RouteProp } from '@react-navigation/native';
+import { colors, mainNavigations } from '@/constants';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 import MapScreen from '@/screens/map/MapScreen';
 import HomeScreen from '@/screens/home/HomeScreen';
-import RecordScreen from '@/screens/record/RecordScreen';
 import RankingScreen from '@/screens/ranking/RankingScreen';
-import SettingStackNavigator, {SettingStackParamList} from '../stack/SettingStackNavigator';
+import SettingStackNavigator, { SettingStackParamList } from '../stack/SettingStackNavigator';
+import RecordNavigator from '../stack/RecordNavigator';
 
 type MainTabParamList = {
   [mainNavigations.HOME]: undefined;
@@ -46,19 +46,13 @@ function TabBarIcons(route: RouteProp<MainTabParamList>, focused: boolean) {
     }
   }
 
-  return (
-    <Ionicons
-      name={iconName}
-      color={focused ? colors.ORANGE.BASE : colors.BLACK}
-      size={30}
-    />
-  );
+  return <Ionicons name={iconName} color={focused ? colors.ORANGE.BASE : colors.BLACK} size={30} />;
 }
 
 const MainTabNavigator = () => {
   return (
     <Tab.Navigator
-      screenOptions={({route}) => ({
+      screenOptions={({ route }) => ({
         tabBarActiveTintColor: `${colors.ORANGE.BASE}`,
         tabBarInactiveTintColor: `${colors.BLACK}`,
         headerStyle: {
@@ -75,32 +69,24 @@ const MainTabNavigator = () => {
           fontWeight: 'bold',
         },
         headerShown: false,
-        tabBarIcon: ({focused}) => TabBarIcons(route, focused),
+        tabBarIcon: ({ focused }) => TabBarIcons(route, focused),
       })}>
-      <Tab.Screen
-        name={mainNavigations.HOME}
-        component={HomeScreen}
-        options={{title: '홈'}}
-      />
-      <Tab.Screen
-        name={mainNavigations.MAP}
-        component={MapScreen}
-        options={{title: '지도'}}
-      />
+      <Tab.Screen name={mainNavigations.HOME} component={HomeScreen} options={{ title: '홈' }} />
+      <Tab.Screen name={mainNavigations.MAP} component={MapScreen} options={{ title: '지도' }} />
       <Tab.Screen
         name={mainNavigations.RECORD}
-        component={RecordScreen}
-        options={{title: '기록'}}
+        component={RecordNavigator}
+        options={{ title: '기록' }}
       />
       <Tab.Screen
         name={mainNavigations.RANKING}
         component={RankingScreen}
-        options={{title: '랭킹'}}
+        options={{ title: '랭킹' }}
       />
       <Tab.Screen
         name={mainNavigations.MYPAGE}
         component={SettingStackNavigator}
-        options={{title: '내정보'}}
+        options={{ title: '내정보' }}
       />
     </Tab.Navigator>
   );

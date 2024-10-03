@@ -11,7 +11,7 @@ interface UserState {
   setUserData: (value: UserProfile) => void;
 }
 
-export const useUserStore = create<UserState>(set => ({
+export const useUserStore = create<UserState>((set) => ({
   userId: 0,
   petData: [],
   userData: {
@@ -20,7 +20,7 @@ export const useUserStore = create<UserState>(set => ({
     imageName: null,
   },
 
-  setUserId: (value: number) => set({userId: value}),
-  setPetData: (value: ResponsePetProfile[]) => set({petData: value}),
-  setUserData: (value: UserProfile) => set({userData: value}),
+  setUserId: (value: number) => set({ userId: value }),
+  setPetData: (value: ResponsePetProfile[]) => set({ petData: value }),
+  setUserData: (value: UserProfile) => set({ userData: value }),
 }));

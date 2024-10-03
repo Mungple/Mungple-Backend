@@ -72,10 +72,8 @@ const Calendar = ({
           <Ionicons name="arrow-forward" size={25} color={colors.BLACK} />
         </MonthButton>
       </HeaderContainer>
-
       {/* 요일 부분 */}
       <DayOfWeeks />
-
       {/* 본문 부분 */}
       <BodyContainer>
         <FlatList
@@ -96,7 +94,6 @@ const Calendar = ({
           numColumns={7}
         />
       </BodyContainer>
-
       {/* 년도 선택 모달 */}
       <YearSelector
         isVisible={yearSelector.isVisible}
