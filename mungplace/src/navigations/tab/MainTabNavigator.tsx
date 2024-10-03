@@ -8,7 +8,7 @@ import MapScreen from '@/screens/map/MapScreen';
 import HomeScreen from '@/screens/home/HomeScreen';
 import RankingScreen from '@/screens/ranking/RankingScreen';
 import SettingStackNavigator, { SettingStackParamList } from '../stack/SettingStackNavigator';
-import RecordNavigator from '../stack/RecordNavigator';
+import RecordStackNavigator from '../stack/RecordStackNavigator';
 
 type MainTabParamList = {
   [mainNavigations.HOME]: undefined;
@@ -75,7 +75,7 @@ const MainTabNavigator = () => {
       <Tab.Screen name={mainNavigations.MAP} component={MapScreen} options={{ title: '지도' }} />
       <Tab.Screen
         name={mainNavigations.RECORD}
-        component={RecordNavigator}
+        component={RecordStackNavigator}
         options={{ title: '기록' }}
       />
       <Tab.Screen

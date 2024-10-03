@@ -1,10 +1,11 @@
-import React, {useState, useCallback} from 'react';
-import {Text, ActivityIndicator, ScrollView} from 'react-native';
-import {useFocusEffect} from '@react-navigation/native';
+import React, { useState, useCallback } from 'react';
+import { Text, ActivityIndicator, ScrollView } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 import styled from 'styled-components/native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import {DEVICE_WIDTH} from '@/constants/device';
-import {getStatistics} from '@/api/walk';
+import { colors } from '@/constants';
+import { DEVICE_WIDTH } from '@/constants/device';
+import { getStatistics } from '@/api/walk';
 
 interface Statistics {
   year: number;
@@ -27,10 +28,7 @@ interface StatCardProps {
 const ICON_SIZE = DEVICE_WIDTH * 0.1;
 const FONT_SIZE = DEVICE_WIDTH * 0.04;
 
-const MonthStatistics: React.FC<{year: number; month: number}> = ({
-  year,
-  month,
-}) => {
+const MonthStatistics: React.FC<{ year: number; month: number }> = ({ year, month }) => {
   const [statistics, setStatistics] = useState<Statistics | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -80,47 +78,42 @@ const MonthStatistics: React.FC<{year: number; month: number}> = ({
   return (
     <ScrollView>
       <Container>
+        <Footer>
+          <FooterText>월간 통계</FooterText>
+        </Footer>
+        <StatCard
+          icon="explore"
+          label="총 산책 횟수"
+          value={`${statistics?.totalExplorations} 회`}
+        />
         <StatCard
           icon="track-changes"
-          label="산책 거리"
+          label="총 산책 거리"
           value={`${statistics?.totalDistance} km`}
         />
-        <StatCard
-          icon="timer"
-          label="산책 시간"
-          value={`${statistics?.totalTime} 분`}
-        />
+        <StatCard icon="timer" label="총 산책 시간" value={`${statistics?.totalTime} 분`} />
         <StatCard
           icon="directions-walk"
-          label="?"
+          label="가장 많이 걸은 거리"
           value={`${statistics?.bestDistance} km`}
         />
         <StatCard
           icon="access-time"
-          label="?"
+          label="가장 오래 걸은 시간"
           value={`${statistics?.bestTime} `}
         />
-        <StatCard
-          icon="today"
-          label="?"
-          value={`${statistics?.bestTimeDay} 회`}
-        />
+        <StatCard icon="today" label="가장 오래 걸은 날" value={`${statistics?.bestTimeDay} 일`} />
         <StatCard
           icon="date-range"
-          label="?"
-          value={`${statistics?.bestDistanceDay} 회`}
-        />
-        <StatCard
-          icon="explore"
-          label="산책 횟수"
-          value={`${statistics?.totalExplorations} 회`}
+          label="가장 많이 걸은 날"
+          value={`${statistics?.bestDistanceDay} 일`}
         />
       </Container>
     </ScrollView>
   );
 };
 
-const StatCard: React.FC<StatCardProps> = ({icon, label, value}) => (
+const StatCard: React.FC<StatCardProps> = ({ icon, label, value }) => (
   <Card>
     <CardContent>
       <StatIcon>
@@ -174,6 +167,20 @@ const StatLabel = styled.Text`
 const StatValue = styled.Text`
   font-size: ${FONT_SIZE}px;
   font-weight: bold;
+`;
+
+const Footer = styled.View`
+  padding-left: 20px;
+  padding-top: 12px;
+  padding-bottom: 12px;
+  border-bottom-width: 1px;
+  border-bottom-color: ${colors.GRAY_100};
+`;
+
+const FooterText = styled.Text`
+  font-size: 18px;
+  font-weight: bold;
+  color: ${colors.BLACK};
 `;
 
 export default MonthStatistics;

@@ -9,8 +9,7 @@ import { getMonthWalks, getDayWalks } from '@/api/walk';
 
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
-import { RecordStackParamList } from '@/navigations/stack/RecordNavigator';
-import CustomHeader from '@/components/common/CustomHeader';
+import { RecordStackParamList } from '@/navigations/stack/RecordStackNavigator';
 import Calendar from '@/components/record/Calendar';
 import MonthStatistics from '@/components/record/MonthStatistics';
 
@@ -87,10 +86,6 @@ const RecordScreen: React.FC<RecordScreenProps> = ({ navigation }) => {
       console.error('일간 산책 목록 가져오기 실패:', error);
     }
   };
-  // 산책 선택 시 산책 상세 화면으로 이동하는 함수
-  // const handleSelectWalk = (walkId: number) => {
-  //   navigation.navigate('WalkDetail', { walkId });
-  // };
 
   const handleUpdateMonth = (increment: number) => {
     setMonthYear((prev) => getNewMonthYear(prev, increment));
@@ -117,7 +112,6 @@ const RecordScreen: React.FC<RecordScreenProps> = ({ navigation }) => {
 
   return (
     <Container>
-      <CustomHeader title="월간 산책" />
       <Calendar
         attendance={attendance}
         monthYear={monthYear}
@@ -126,9 +120,7 @@ const RecordScreen: React.FC<RecordScreenProps> = ({ navigation }) => {
         onPressDate={handlePressDate}
         onChangeMonth={handleUpdateMonth}
       />
-      <Footer>
-        <FooterText>월간 통계</FooterText>
-      </Footer>
+
       <MonthStatistics year={monthYear.year} month={monthYear.month} />
     </Container>
   );
@@ -137,20 +129,6 @@ const RecordScreen: React.FC<RecordScreenProps> = ({ navigation }) => {
 const Container = styled.SafeAreaView`
   flex: 1;
   background-color: ${colors.WHITE};
-`;
-
-const Footer = styled.View`
-  padding-left: 20px;
-  padding-top: 12px;
-  padding-bottom: 12px;
-  border-bottom-width: 1px;
-  border-bottom-color: ${colors.GRAY_100};
-`;
-
-const FooterText = styled.Text`
-  font-size: 18px;
-  font-weight: bold;
-  color: ${colors.BLACK};
 `;
 
 export default RecordScreen;

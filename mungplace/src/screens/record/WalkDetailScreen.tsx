@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, ActivityIndicator } from 'react-native';
+import { Text, ActivityIndicator } from 'react-native';
 import styled from 'styled-components/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { RecordStackParamList } from '@/navigations/stack/RecordNavigator';
+import { RecordStackParamList } from '@/navigations/stack/RecordStackNavigator';
 import { getWalkDetail } from '@/api/walk'; // API 호출 함수 가져오기
 
 type DayWalksDetailProps = NativeStackScreenProps<RecordStackParamList, 'WalkDetail'>;
@@ -42,10 +42,8 @@ const DayWalksDetail: React.FC<DayWalksDetailProps> = ({ route }) => {
 
   return (
     <Container>
-      <Title>산책 상세 정보</Title>
-      <DetailText>산책 ID: {walkDetail.explorationId}</DetailText>
       <DetailText>산책 거리: {walkDetail.distance} 미터</DetailText>
-      <DetailText>함께한 개 ID: {walkDetail.togetherDogIds.join(', ')}</DetailText>
+      {/* <DetailText>함께한 개 ID: {walkDetail.togetherDogIds.join(', ')}</DetailText> */}
       <DetailText>시작 시간: {walkDetail.startTime}</DetailText>
       <DetailText>종료 시간: {walkDetail.endTime}</DetailText>
     </Container>
@@ -60,12 +58,6 @@ const LoadingContainer = styled.View`
 
 const Container = styled.View`
   padding: 20px;
-`;
-
-const Title = styled.Text`
-  font-size: 24px;
-  font-weight: bold;
-  margin-bottom: 10px;
 `;
 
 const DetailText = styled.Text`

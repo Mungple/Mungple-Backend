@@ -22,10 +22,22 @@ const RecordStack = createNativeStackNavigator<RecordStackParamList>();
 
 const RecordNavigator = () => {
   return (
-    <RecordStack.Navigator screenOptions={{ headerShown: false }}>
-      <RecordStack.Screen name="Record" component={RecordScreen} />
-      <RecordStack.Screen name="WalkList" component={WalkListScreen} />
-      <RecordStack.Screen name="WalkDetail" component={WalkDetailScreen} />
+    <RecordStack.Navigator>
+      <RecordStack.Screen
+        name="Record"
+        component={RecordScreen}
+        options={{ headerTitle: '월간 산책' }}
+      />
+      <RecordStack.Screen
+        name="WalkList"
+        component={WalkListScreen}
+        options={{ headerTitle: '일간 산책' }}
+      />
+      <RecordStack.Screen
+        name="WalkDetail"
+        component={WalkDetailScreen}
+        options={{ headerTitle: '산책 정보' }}
+      />
     </RecordStack.Navigator>
   );
 };
