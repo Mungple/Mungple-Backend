@@ -103,17 +103,6 @@ const MapComponent: React.FC<MapComponentProps> = ({
       [element]: !prev[element],
     }));
   };
-<<<<<<< HEAD
-=======
-
-  // Fetch zones data
-  useEffect(() => {
-    console.log('나의 블루존:', myBlueZone);
-    console.log('블루존:', allBlueZone);
-    console.log('레드존:', allRedZone);
-    console.log('멍플:', mungZone);
-  }, [myBlueZone, allBlueZone, allRedZone, mungZone]);
->>>>>>> ee4e8aaaae6673b963a56afae64fe1973b98b849
 
   // 유저의 위치를 호출하는 함수
   const handlePressUserLocation = () => {
