@@ -9,6 +9,7 @@ import lombok.Builder;
 
 @Builder
 public record ExplorationResponse(
+	Long explorationId,
 	LocalDateTime startTime,
 	LocalDateTime endTime,
 	Long distance,
@@ -18,6 +19,7 @@ public record ExplorationResponse(
 ) {
 	public static ExplorationResponse of(Exploration exploration, List<Long> togetherDogIds) {
 		return ExplorationResponse.builder()
+			.explorationId(exploration.getId())
 			.startTime(exploration.getStartAt())
 			.endTime(exploration.getEndAt())
 			.distance(exploration.getDistance())
@@ -28,6 +30,7 @@ public record ExplorationResponse(
 	public static ExplorationResponse of(Exploration exploration, List<Long> togetherDogs,
 		List<ExplorationPoint> points) {
 		return ExplorationResponse.builder()
+			.explorationId(exploration.getId())
 			.startTime(exploration.getStartAt())
 			.endTime(exploration.getEndAt())
 			.distance(exploration.getDistance())
