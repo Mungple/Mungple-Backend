@@ -15,5 +15,5 @@ public @interface Loggable {
 
 	LogAction action();
 
-	String message();
+	String message() default "";
 }

@@ -16,6 +16,9 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.e106.mungplace.common.log.Loggable;
+import com.e106.mungplace.common.log.dto.LogAction;
+import com.e106.mungplace.common.log.dto.LogLevel;
 import com.e106.mungplace.web.dogs.dto.DogCreateRequest;
 import com.e106.mungplace.web.dogs.dto.DogResponse;
 import com.e106.mungplace.web.dogs.dto.DogUpdateRequest;
@@ -33,6 +36,7 @@ public class DogController {
 
 	private final DogService dogService;
 
+	@Loggable(level = LogLevel.TRACE, action = LogAction.CREATE)
 	@PostMapping("/dogs")
 	public ResponseEntity<DogResponse> findUserInfo(@RequestBody DogCreateRequest dogCreateRequest) {
 		return ResponseEntity.status(HttpStatus.CREATED).body(dogService.createDogProcess(dogCreateRequest));
