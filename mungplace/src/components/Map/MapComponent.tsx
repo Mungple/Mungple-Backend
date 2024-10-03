@@ -22,6 +22,7 @@ import CustomBottomSheet from '../common/CustomBottomSheet'; // 커스텀 바텀
 import useMarkersWithinRadius from '@/hooks/useMarkersWithinRadius'; // 주변 위치 조회 훅
 import { MapStackParamList } from '@/navigations/stack/MapStackNavigator';
 import { useMapStore, MarkerData, NearbyMarkerData } from '@/state/useMapStore';
+import MyBlueZoneHeatmap from '../map/CheckZone' // 블루, 레드존 렌더링 함수
 
 interface MapComponentProps {
   userLocation: { latitude: number; longitude: number };
@@ -53,7 +54,6 @@ const MapComponent: React.FC<MapComponentProps> = ({
   const [isSettingModalVisible, setIsSettingModalVisible] = useState(false); // 환경 설정에 쓰는 모달 가시성
   const navigation = useNavigation<NativeStackNavigationProp<MapStackParamList>>();
 
-  // 존 체크 용임 지울거임 나중에
   const nearbyMarkers = useMapStore((state) => state.nearbyMarkers); // 상태에서 nearbyMarkers 가져오기
   const { myBlueZone, allBlueZone, allRedZone, mungZone } = useWebSocket();
   const updatedMarkers: {
@@ -254,15 +254,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
         )}
 
         {/* 개인 블루존 히트맵 */}
-        {visibleElements.myBlueZone && myBlueZone && myBlueZone.cells.length > 0 && (
-          <Heatmap
-            points={myBlueZone.cells.map((cell) => ({
-              latitude: cell.point.latitude,
-              longitude: cell.point.longitude,
-              weight: cell.weight,
-            }))}
-          />
-        )}
+        <MyBlueZoneHeatmap />
 
         {/* 전체 블루존 히트맵 */}
         {visibleElements.blueZone && allBlueZone && allBlueZone.cells.length > 0 && (
@@ -291,10 +283,10 @@ const MapComponent: React.FC<MapComponentProps> = ({
           />
         )}
 
-        {/* 멍플 지오해시 */}
+        {/* 멍플 지오해시
         {visibleElements.mungZone && mungZone && mungZone.length > 0 && (
           <PolygonLayer zones={mungZone} />
-        )}
+        )} */}
       </ClusteredMapView>
 
       <ClusterModal

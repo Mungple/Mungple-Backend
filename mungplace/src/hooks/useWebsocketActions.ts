@@ -34,9 +34,11 @@ const useWebSocketActions = () => {
 
   const checkMyBlueZone = useCallback(
     (myBlueZone: ToZone) => {
+      // console.log("연결상태확인", clientSocket.connected)
+      // console.log("블루존 요청 전송:", myBlueZone);
       if (clientSocket?.connected) {
         clientSocket.publish({
-          destination: '/user/pub/users/bluezone',
+          destination: '/pub/users/bluezone',
           body: JSON.stringify(myBlueZone),
         })
       } else {
