@@ -4,7 +4,7 @@ import axiosInstance from '@/api/axios';
 import { MarkerDetails } from '../../state/useMapStore'; // MarkerDetails 타입을 useMapStore에서 가져옵니다.
 import { useAppStore } from '@/state/useAppStore';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { getAccessToken } from '@/api';
+import { useUserStore } from '@/state/useUserStore';
 
 const MarkerDetailScreen: React.FC = () => {
   const navigation = useNavigation();
@@ -14,6 +14,7 @@ const MarkerDetailScreen: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const accessToken = useAppStore(state => state.token)
+  const currentUserId = useUserStore(state => state.userId)
 
   useEffect(() => {
     fetchMarkerDetails(markerId);
@@ -25,7 +26,6 @@ const MarkerDetailScreen: React.FC = () => {
   const fetchMarkerDetails = async (markerId: string) => {
     setLoading(true);
     setError(null);
-    console.log('마커 디테일 페이지 확인용', accessToken)
     try {
       const response = await axiosInstance.get(`/markers/${markerId}`, {
         headers: {
@@ -43,6 +43,27 @@ const MarkerDetailScreen: React.FC = () => {
       console.log(err)
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    try {
+      const response = await axiosInstance.delete(`/markers/${markerId}`, {
+        headers: {
+          'Content-Type': 'application/json; charset=utf8',
+          'Authorization': `Bearer ${accessToken}`,
+        },
+      });
+      
+      if (response.status === 202) {
+        console.log('마커 삭제 성공');
+        setTimeout(() => {
+          navigation.goBack();
+        }, 100); // 100ms 후에 goBack 호출
+      }
+    } catch (err) {
+      console.log('마커 삭제 중 에러 발생:', err);
+      
     }
   };
 
@@ -77,6 +98,10 @@ const MarkerDetailScreen: React.FC = () => {
         </View>
       )}
       <Text style={styles.userId}>작성자: {markerDetails.userId}</Text>
+      {/* 현재 접속한 유저와 작성자가 동일할 때만 삭제 버튼 렌더링 */}
+      {currentUserId === markerDetails.userId && (
+        <Button title="삭제" onPress={handleDelete} />
+      )}
       <Button title="Back" onPress={() => navigation.goBack()} />
     </View>
   );

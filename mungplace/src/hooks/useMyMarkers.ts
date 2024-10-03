@@ -69,7 +69,7 @@ const useMyMarkers = () => {
     return Array.from(cellsMap.values()); // 맵을 배열로 변환
   };
 
-  return { markers, fetchMyMarkers, loading, myBlueZone };
+  return { markers, fetchMyMarkers, loading };
 };
 
 export default useMyMarkers;
