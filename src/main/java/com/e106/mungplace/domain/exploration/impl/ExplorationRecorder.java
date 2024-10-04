@@ -88,8 +88,9 @@ public class ExplorationRecorder {
 
 		validateUserIdWhenGeoHashIsDifference(userId, previousGeoHash, currentGeoHash);
 
-		String totalDistance = calculateDistance(userId, lat, lon);
+		String totalDistance = GeoUtils.secondDecimalFormat(calculateDistance(userId, lat, lon));
 		redisTemplate.opsForValue().set(getTotalDistanceKey(userId), totalDistance);
+		messagingTemplate.convertAndSendToUser(userId, "/sub/explorations/distance", totalDistance);
 	}
 
 	private boolean validateUserIdWhenGeoHashIsDifference(String userId, String userPreviousGeoHash,

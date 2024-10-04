@@ -80,7 +80,7 @@ class ExplorationRecorderUnitTest {
 		verify(valueOperations).set("users:1:geohash", generatedGeoHash, 60, TimeUnit.SECONDS);
 		verify(valueOperations).set("users:1:constant", generatedConstantGeoHash, 30, TimeUnit.MINUTES);
 		verify(valueOperations).set("users:1:total_distance", "0");
-		verify(valueOperations).set("users:1:prePoint", "35.166668,129.066666");
+		verify(valueOperations).set("users:1:pre_point", "35.166668,129.066666");
 		verify(listOperations).rightPush("users:1:point_distance", "0");
 		verify(setOperations).add("active_users", userId + ":" + explorationId);
 	}
@@ -95,7 +95,7 @@ class ExplorationRecorderUnitTest {
 		when(redisTemplate.opsForList()).thenReturn(listOperations);
 
 		when(valueOperations.get("users:1:geohash")).thenReturn(Point.toUserCurrentGeoHash("35.166668", "129.066666"));
-		when(valueOperations.get("users:1:prePoint")).thenReturn("35.166668,129.066666");
+		when(valueOperations.get("users:1:pre_point")).thenReturn("35.166668,129.066666");
 		when(valueOperations.get("users:1:total_distance")).thenReturn("0");
 
 		// when
@@ -108,7 +108,7 @@ class ExplorationRecorderUnitTest {
 			double distanceValue = Double.parseDouble(distance);
 			return Math.abs(distanceValue - 47.77623214831248) < 0.01; // 허용 오차 0.01
 		}));
-		verify(valueOperations).set("users:1:prePoint", "35.167000,129.067000");
+		verify(valueOperations).set("users:1:pre_point", "35.167000,129.067000");
 	}
 
 	@Test
@@ -121,7 +121,7 @@ class ExplorationRecorderUnitTest {
 		when(redisTemplate.opsForList()).thenReturn(listOperations);
 
 		when(valueOperations.get("users:1:geohash")).thenReturn(Point.toUserCurrentGeoHash("35.166668", "129.066666"));
-		when(valueOperations.get("users:1:prePoint")).thenReturn("35.166668,129.066666");
+		when(valueOperations.get("users:1:pre_point")).thenReturn("35.166668,129.066666");
 		when(valueOperations.get("users:1:total_distance")).thenReturn("0");
 		when(listOperations.range("users:1:point_distance", 0, -1)).thenReturn(List.of("50", "50"));
 
@@ -166,6 +166,7 @@ class ExplorationRecorderUnitTest {
 		Exploration exploration = mock(Exploration.class);
 		when(explorationRepository.findById(anyLong())).thenReturn(Optional.of(exploration));
 		when(valueOperations.get("users:1:total_distance")).thenReturn("100.5");
+		when(valueOperations.get("users:1:pre_point")).thenReturn("35.166668,129.066666");
 
 		// when
 		explorationRecorder.endRecord(userId, explorationId);
@@ -177,6 +178,6 @@ class ExplorationRecorderUnitTest {
 		verify(redisTemplate).delete("users:1:geohash");
 		verify(redisTemplate).delete("users:1:constant");
 		verify(redisTemplate).delete("users:1:point_distance");
-		verify(redisTemplate).delete("users:1:prePoint");
+		verify(redisTemplate).delete("users:1:pre_point");
 	}
 }

@@ -55,7 +55,7 @@ public class MarkerService {
 
 	private static final int MARKER_PRECISION = 9;
 	private static final int MAX_IMAGE_FILE_COUNT = 3;
-	private static final int MARKER_SEARCH_DAY_RANGE = 1;
+	private static final int MARKER_SEARCH_DAY_RANGE = 7;
 	private static final Double DEFAULT_MARKER_RADIUS = 500.0;
 	private static final String ENTITY_TYPE_MARKER = "Marker";
 	private static final String DATE_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
