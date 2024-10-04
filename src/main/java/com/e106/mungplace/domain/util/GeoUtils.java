@@ -1,5 +1,7 @@
 package com.e106.mungplace.domain.util;
 
+import java.text.DecimalFormat;
+
 import org.gavaghan.geodesy.Ellipsoid;
 import org.gavaghan.geodesy.GeodeticCalculator;
 import org.gavaghan.geodesy.GeodeticCurve;
@@ -52,6 +54,11 @@ public interface GeoUtils {
 		GeodeticCurve geoCurve = calculator.calculateGeodeticCurve(reference, start, end);
 
 		return geoCurve.getEllipsoidalDistance();
+	}
+
+	static String secondDecimalFormat(String value) {
+		DecimalFormat df = new DecimalFormat("#.##");
+		return df.format(Double.parseDouble(value));
 	}
 
 	private static GlobalCoordinates calculateOffset(GlobalCoordinates center, double bearing, double distanceMeters) {
