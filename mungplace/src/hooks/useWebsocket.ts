@@ -77,9 +77,12 @@ const useWebSocket = (explorationId: number = -1) => {
           debug: (str) => {
             console.log(str);
           },
-          reconnectDelay: 5000,
-          heartbeatIncoming: 4000,
-          heartbeatOutgoing: 4000,
+          appendMissingNULLonIncoming: true, // 서버로부터 받은 메시지에 NULL 문자가 없을 때 추가(RN Polyfill)
+          forceBinaryWSFrames: true, // WebSocket 프레임을 항상 바이너리로 설정(RN Polyfill)
+          reconnectDelay: 5000, // 재연결 시도 간격
+          heartbeatIncoming: 4000, // 서버로부터 메시지를 받는 주기
+          heartbeatOutgoing: 4000, // 서버로 메시지를 보내는 주기
+
           onConnect: () => {
             console.log('소켓 연결 성공');
             setClientSocket(socket);
@@ -159,7 +162,6 @@ const useWebSocket = (explorationId: number = -1) => {
   };
 
   return {
-    clientSocket,
     explorations,
     myBlueZone,
     allBlueZone,

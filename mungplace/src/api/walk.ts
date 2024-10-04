@@ -15,7 +15,7 @@ const startWalk = async (JSON: string) => {
     });
     return data;
   } catch (error) {
-    console.log('산책 시작 실패 :', error);
+    console.error('산책 시작 실패 :', error);
     throw error;
   }
 };
@@ -30,7 +30,7 @@ const exitWalk = async (explorationId: number) => {
     });
     return data;
   } catch (error) {
-    console.log('산책 종료 실패 :', error);
+    console.error('산책 종료 실패 :', error);
     throw error;
   }
 };

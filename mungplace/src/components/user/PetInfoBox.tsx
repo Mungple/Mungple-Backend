@@ -1,18 +1,16 @@
-import React from 'react'
-import styled from 'styled-components/native'
+import React from 'react';
+import styled from 'styled-components/native';
 
-import {colors} from '@/constants'
-import CustomCard from '../common/CustomCard'
-import {calculateAge} from '@/hooks/usePetAge'
-import useGetPet from '@/hooks/queries/useGetPet'
-import { useUserStore } from '@/state/useUserStore'
+import { colors } from '@/constants';
+import CustomCard from '../common/CustomCard';
+import { ResponsePetProfile } from '@/types';
 
-const PetInfoBox = () => {
-  const {userId} = useUserStore.getState()
-  const {data: petData} = useGetPet(userId)
-  const defaultPet = petData?.find(pet => pet.isDefault === true)
-  const age = defaultPet ? calculateAge(defaultPet.birth) : undefined
+type PetInfoBoxProps = {
+  defaultPet?: ResponsePetProfile;
+  age?: number;
+};
 
+const PetInfoBox = ({ defaultPet, age }: PetInfoBoxProps) => {
   return (
     <Container>
       {defaultPet ? (
@@ -45,8 +43,8 @@ const PetInfoBox = () => {
         </Col>
       )}
     </Container>
-  )
-}
+  );
+};
 
 const Container = styled(CustomCard)`
   flex: 1;
@@ -55,31 +53,31 @@ const Container = styled(CustomCard)`
   flex-direction: row;
   align-items: center;
   background-color: ${colors.BEIGE.LIGHTER};
-`
+`;
 
 const Col = styled.View`
   flex: 1;
-`
+`;
 
 const Row = styled.View`
   flex-direction: row;
   justify-content: space-between;
   margin: 10px 0;
-`
+`;
 
 const Header = styled.Text`
   font-size: 20px;
   color: ${colors.BLACK};
-`
+`;
 
 const Title = styled.Text`
   font-size: 20px;
   color: ${colors.BLACK};
-`
+`;
 
 const Context = styled(Title)`
   font-weight: bold;
   text-align: right;
-`
+`;
 
-export default PetInfoBox
+export default PetInfoBox;

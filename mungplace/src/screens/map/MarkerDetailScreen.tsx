@@ -4,19 +4,21 @@ import axiosInstance from '@/api/axios';
 import { MarkerDetails } from '../../state/useMapStore'; // MarkerDetails 타입을 useMapStore에서 가져옵니다.
 import { useAppStore } from '@/state/useAppStore';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import { useUserStore } from '@/state/useUserStore';
 
 const MarkerDetailScreen: React.FC = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const { markerId } = route.params as { markerId: string }; // route.params에서 markerId를 가져옵니다.
-  
   const [markerDetails, setMarkerDetails] = useState<MarkerDetails | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const accessToken = useAppStore((state) => state.token);
+  const accessToken = useAppStore(state => state.token)
+  const currentUserId = useUserStore(state => state.userId)
 
   useEffect(() => {
     fetchMarkerDetails(markerId);
+    
   }, [markerId]);
 
   const BASE_IMAGE_URL = 'http://j11e106.p.ssafy.io:9000/images/'
@@ -38,8 +40,30 @@ const MarkerDetailScreen: React.FC = () => {
       setMarkerDetails({...response.data, images: imageWithUrl});
     } catch (err) {
       setError('마커 디테일을 가져오는 데 실패');
+      console.log(err)
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    try {
+      const response = await axiosInstance.delete(`/markers/${markerId}`, {
+        headers: {
+          'Content-Type': 'application/json; charset=utf8',
+          'Authorization': `Bearer ${accessToken}`,
+        },
+      });
+      
+      if (response.status === 202) {
+        console.log('마커 삭제 성공');
+        setTimeout(() => {
+          navigation.goBack();
+        }, 100); // 100ms 후에 goBack 호출
+      }
+    } catch (err) {
+      console.log('마커 삭제 중 에러 발생:', err);
+      
     }
   };
 
@@ -74,6 +98,10 @@ const MarkerDetailScreen: React.FC = () => {
         </View>
       )}
       <Text style={styles.userId}>작성자: {markerDetails.userId}</Text>
+      {/* 현재 접속한 유저와 작성자가 동일할 때만 삭제 버튼 렌더링 */}
+      {currentUserId === markerDetails.userId && (
+        <Button title="삭제" onPress={handleDelete} />
+      )}
       <Button title="Back" onPress={() => navigation.goBack()} />
     </View>
   );

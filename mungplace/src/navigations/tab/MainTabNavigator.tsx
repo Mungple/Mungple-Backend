@@ -6,15 +6,14 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 import MapScreen from '@/screens/map/MapScreen';
 import HomeScreen from '@/screens/home/HomeScreen';
+import RecordScreen from '@/screens/record/RecordScreen';
 import RankingScreen from '@/screens/ranking/RankingScreen';
 import SettingStackNavigator, { SettingStackParamList } from '../stack/SettingStackNavigator';
-import RecordStackNavigator from '../stack/RecordStackNavigator';
 
 type MainTabParamList = {
   [mainNavigations.HOME]: undefined;
   [mainNavigations.MAP]: undefined;
   [mainNavigations.RECORD]: undefined;
-  [mainNavigations.RANKING]: undefined;
   [mainNavigations.MYPAGE]: NavigatorScreenParams<SettingStackParamList>;
 };
 
@@ -34,10 +33,6 @@ function TabBarIcons(route: RouteProp<MainTabParamList>, focused: boolean) {
     }
     case mainNavigations.RECORD: {
       iconName = focused ? 'document-text' : 'document-text-outline';
-      break;
-    }
-    case mainNavigations.RANKING: {
-      iconName = focused ? 'trophy' : 'trophy-outline';
       break;
     }
     case mainNavigations.MYPAGE: {
@@ -75,7 +70,7 @@ const MainTabNavigator = () => {
       <Tab.Screen name={mainNavigations.MAP} component={MapScreen} options={{ title: '지도' }} />
       <Tab.Screen
         name={mainNavigations.RECORD}
-        component={RecordStackNavigator}
+        component={RecordScreen}
         options={{ title: '기록' }}
       />
       <Tab.Screen
