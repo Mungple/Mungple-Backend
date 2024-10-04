@@ -69,7 +69,7 @@ const getStatistics = async (year: number, month: number) => {
 };
 
 // 일간 산책 기록 목록 조회 함수
-const getDateWalks = async (date: string) => {
+const getDayWalks = async (date: string) => {
   try {
     const { data } = await axiosInstance.get(`/explorations/days`, {
       params: {
@@ -94,4 +94,4 @@ const getWalkDetail = async (explorationId: number) => {
   }
 };
 
-export { startWalk, exitWalk, getMonthWalks, getDateWalks, getStatistics, getWalkDetail };
+export { startWalk, exitWalk, getMonthWalks, getDayWalks, getStatistics, getWalkDetail };
