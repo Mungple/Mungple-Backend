@@ -1,7 +1,7 @@
-import {Dimensions} from 'react-native';
+import { Dimensions } from 'react-native';
 import styled from 'styled-components/native';
 
-import {colors} from '@/constants';
+import { colors } from '@/constants';
 import CustomCard from '@/components/common/CustomCard';
 import CustomButton from '@/components/common/CustomButton';
 
@@ -35,12 +35,12 @@ const Container = styled.View`
   flex: 1;
 `;
 
-const BottomCard = styled(CustomCard)<{height: number; width: number}>`
+const BottomCard = styled(CustomCard)<{ height: number; width: number }>`
   position: absolute;
   bottom: 0;
-  height: ${({height}) => `${height}px`};
-  width: ${({width}) => `${width}px`};
-  margin-right: 20px;
+  height: ${({ height }) => `${height}px`};
+  width: ${({ width }) => `${width}px`};
+  margin: 20px;
   padding: 20px;
 `;
 

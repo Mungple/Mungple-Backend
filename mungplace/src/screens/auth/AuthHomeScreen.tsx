@@ -6,8 +6,6 @@ import { managerLogin } from '@/components/common/ManagerLogin';
 import { authNavigations } from '@/constants';
 import Logo from '@/assets/mungple_logo.png';
 import kakaoLogo from '@/assets/kakao_login_button.png';
-import naverLogo from '@/assets/naver_login_button.png';
-import googleLogo from '@/assets/google_login_button.png';
 import { AuthStackParamList } from '@/navigations/stack/AuthStackNavigator';
 import CustomButton from '@/components/common/CustomButton';
 
@@ -35,20 +33,10 @@ const AuthHomeScreen: React.FC<AuthHomeScreenProps> = ({ navigation }) => {
       </LogoContainer>
 
       <ButtonsContainer>
-        <LoginButton
-          onPress={() => navigation.navigate(authNavigations.SOCIAL_LOGIN, { provider: 'kakao' })}>
+        <LoginButton onPress={() => navigation.navigate(authNavigations.SOCIAL_LOGIN)}>
           <ButtonImage source={kakaoLogo} />
         </LoginButton>
 
-        <LoginButton
-          onPress={() => navigation.navigate(authNavigations.SOCIAL_LOGIN, { provider: 'naver' })}>
-          <ButtonImage source={naverLogo} />
-        </LoginButton>
-
-        <LoginButton
-          onPress={() => navigation.navigate(authNavigations.SOCIAL_LOGIN, { provider: 'google' })}>
-          <ButtonImage source={googleLogo} />
-        </LoginButton>
         <TextInput value={username} onChangeText={setUsername} placeholder="매니저 이름" />
         <CustomButton label="매니저 로그인" onPress={handleLoginPress} />
       </ButtonsContainer>
@@ -58,7 +46,7 @@ const AuthHomeScreen: React.FC<AuthHomeScreenProps> = ({ navigation }) => {
 
 const Container = styled.SafeAreaView`
   flex: 1.5;
-  margin: 20px;
+  padding: 20px;
   align-items: center;
   justify-content: center;
 `;

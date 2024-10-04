@@ -14,22 +14,24 @@ import MapComponent from '@/components/map/MapComponent';
 import CustomModal from '@/components/common/CustomModal';
 import ElapsedTime from '@/components/walking/ElapsedTime';
 import CustomButton from '@/components/common/CustomButton';
-import useWebSocketActions from '@/hooks/useWebsocketActions';
 import { MapStackParamList } from '@/navigations/stack/MapStackNavigator';
+import useWebSocketActions from '@/hooks/useWebsocketActions';
+import { LatLng } from 'react-native-maps';
 
 const bottomBlockHeight = (Dimensions.get('window').height * 1) / 5;
 const bottomBlockWidth = Dimensions.get('window').width - 40;
 
 const WalkingScreen = () => {
   const { userLocation } = useUserLocation();
-  const [distance, setDistance] = useState(0);
   const { sendLocation } = useWebSocketActions();
-  const [isFormVisible, setIsFormVisible] = useState(false);
+  const [distance, setDistance] = useState(0);
   const [modalVisible, setModalVisible] = useState(false);
+  const [isFormVisible, setIsFormVisible] = useState(false);
+  const markers = useMapStore((state) => state.markers);
   const startExplorate = useAppStore((state) => state.startExplorate);
   const setWalkingStart = useAppStore((state) => state.setWalkingStart);
   const [path, setPath] = useState<{ latitude: number; longitude: number }[]>([]);
-  const markers = useMapStore((state) => state.markers);
+  const [preLoc, setPreLoc] = useState<LatLng | null>(null);
 
   const navigation = useNavigation<NativeStackNavigationProp<MapStackParamList>>();
 
@@ -43,14 +45,12 @@ const WalkingScreen = () => {
 
   const confirmEndWalking = () => {
     if (startExplorate) {
-      console.log(startExplorate.explorationId);
       exitWalk(startExplorate.explorationId);
       setWalkingStart(false);
       setModalVisible(false);
-      console.log('산책 종료');
       navigation.navigate(mapNavigations.HOME);
     } else {
-      Alert.alert('Error', '산책 정보가 업데이트 불가합니다');
+      Alert.alert('Error', '산책 정보 업데이트가 불가능합니다');
     }
   };
 
@@ -60,29 +60,48 @@ const WalkingScreen = () => {
 
   // 5초마다 좌표를 수집하여 경로 업데이트
   useEffect(() => {
+    if (!userLocation) return;
+
     const intervalId = setInterval(() => {
-      if (userLocation) {
-        // 새로운 좌표를 경로에 추가
-        setPath((prevPath) => [...prevPath, userLocation]);
+      console.log(preLoc);
+      if (
+        Number(preLoc?.latitude) - userLocation.latitude > 0.000001 ||
+        Number(preLoc?.longitude) - userLocation.longitude > 0.000001
+      ) {
+        console.log(path);
+        setPath((prevPath) => [
+          ...prevPath,
+          { latitude: userLocation.latitude, longitude: userLocation.longitude },
+        ]);
       }
+      setPreLoc(userLocation);
     }, 5000);
 
-    // 컴포넌트 언마운트 시 interval 정리
-    return () => clearInterval(intervalId);
-  }, [userLocation]);
+    return () => {
+      clearInterval(intervalId);
+      console.log('clearInterval (userLocation)');
+    };
+  }, []);
 
   useEffect(() => {
-    const newDate = new Date().toISOString();
-    const nowDate = newDate.replace('T', ' ').substring(0, 19);
+    const intervalId = setInterval(() => {
+      // lat, lon, recordedAt 데이터 생성
+      const jsonData = {
+        lat: userLocation.latitude,
+        lon: userLocation.longitude,
+        recordedAt: new Date().toISOString().replace('T', ' ').substring(0, 19),
+      };
+      // 산책 ID와 위치 데이터를 서버에 전송
+      sendLocation(Number(startExplorate?.explorationId), jsonData);
+    }, 5000);
 
-    console.log(nowDate);
-    const jsonData = {
-      lat: userLocation.latitude,
-      lon: userLocation.longitude,
-      recordedAt: nowDate,
+    // 컴포넌트가 언마운트될 때 setInterval을 정리하여 메모리 누수 방지
+    return () => {
+      clearInterval(intervalId);
+      console.log('clearInterval (sendLocation)');
     };
-    sendLocation(Number(startExplorate?.explorationId), jsonData);
-  });
+    // 마운트 될때 useEffect 실행
+  }, []);
 
   return (
     <WS.Container>

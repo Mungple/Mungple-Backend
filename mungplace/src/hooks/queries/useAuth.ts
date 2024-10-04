@@ -1,24 +1,12 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 
-import {
-  RequestProfile,
-  ResponseProfile,
-  editProfile,
-  getProfile,
-  getUserId,
-  logout,
-  socialLogin,
-} from '@/api/auth';
 import queryClient from '@/api/queryClient';
-import { queryKeys, storageKeys } from '@/constants';
-import type {
-  ResponseError,
-  UseMutationCustomOptions,
-  UseQueryCustomOptions,
-} from '@/types/common';
-import { removeHeader, setEncryptStorage, setHeader } from '@/utils';
-import { useUserStore } from '@/state/useUserStore';
 import { useAppStore } from '@/state/useAppStore';
+import { useUserStore } from '@/state/useUserStore';
+import { queryKeys, storageKeys } from '@/constants';
+import { setEncryptStorage, setHeader } from '@/utils';
+import { ResponseProfile, getProfile, getUserId, socialLogin } from '@/api/auth';
+import type { UseMutationCustomOptions, UseQueryCustomOptions } from '@/types/common';
 
 // 로그인 커스텀 훅
 function useLogin(mutationOptions?: UseMutationCustomOptions) {
@@ -69,40 +57,11 @@ function useGetProfile(userId: number, queryOptions?: UseQueryCustomOptions<Resp
   });
 }
 
-// 프로필 정보 변경 훅
-function useUpdateProfile(mutationOptions?: UseMutationCustomOptions) {
-  return useMutation<ResponseProfile, ResponseError, { userId: number; body: RequestProfile }>({
-    mutationFn: ({ userId, body }) => editProfile(userId, body),
-    onSuccess: (newProfile) => {
-      queryClient.setQueryData([queryKeys.AUTH, queryKeys.GET_PROFILE], newProfile);
-    },
-    ...mutationOptions,
-  });
-}
-
-// 로그아웃 커스텀 훅
-function useLogout(mutationOptions?: UseMutationCustomOptions) {
-  return useMutation({
-    mutationFn: logout,
-    onSuccess: () => {
-      removeHeader('Authorization');
-    },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: [queryKeys.AUTH] });
-    },
-    ...mutationOptions,
-  });
-}
-
 function useAuth() {
   const loginMutation = useLogin();
-  const logoutMutation = useLogout();
-  const profileMutation = useUpdateProfile();
 
   return {
     loginMutation,
-    logoutMutation,
-    profileMutation,
     useGetProfile,
     useGetUserId,
   };

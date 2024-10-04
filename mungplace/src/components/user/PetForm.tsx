@@ -2,10 +2,10 @@ import React from 'react';
 import styled from 'styled-components/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
-import {colors} from '@/constants';
+import { colors } from '@/constants';
 import useForm from '@/hooks/useForm';
-import {Alert, Keyboard, KeyboardAvoidingView, Text} from 'react-native';
-import {createPetProfile, getPetProfiles} from '@/api';
+import { Alert, Keyboard, KeyboardAvoidingView, Text } from 'react-native';
+import { createPetProfile, getPetProfiles } from '@/api';
 import useModal from '@/hooks/useModal';
 import useImagePicker from '@/hooks/useImagePicker';
 import CustomButton from '@/components/common/CustomButton';
@@ -14,15 +14,18 @@ import EditProfileImageOption from '@/components/setting/EditProfileImageOption'
 import RadioButtonGroup from '../common/RadioButtonGroup';
 import { validateInputPet } from '@/utils';
 import { useUserStore } from '@/state/useUserStore';
+import useGetPet from '@/hooks/queries/useGetPet';
 
 type PetFormProps = {
   isEdit?: boolean;
-  setModalVisible: (visible: boolean) => void; 
-}
+  setModalVisible: (visible: boolean) => void;
+};
 
-const PetForm = ({setModalVisible, isEdit = false}: PetFormProps) => {
+const PetForm = ({ setModalVisible, isEdit = false }: PetFormProps) => {
   const imageOption = useModal();
-  const {userId, setPetData} = useUserStore.getState()
+  const { userId } = useUserStore.getState();
+  const { refetch } = useGetPet(userId);
+
   const inputUser = useForm({
     initialValue: {
       petName: '',
@@ -31,7 +34,7 @@ const PetForm = ({setModalVisible, isEdit = false}: PetFormProps) => {
       petBirth: '',
     },
     validate: validateInputPet,
-  })
+  });
 
   // 이미지 선택 기능을 위한 커스텀 훅
   const imagePicker = useImagePicker({
@@ -55,28 +58,30 @@ const PetForm = ({setModalVisible, isEdit = false}: PetFormProps) => {
         ...inputUser.values,
         petWeight: Number(inputUser.values.petWeight),
       });
-      createPetProfile(submitData);
-      setModalVisible(false)
-      setPetData(await getPetProfiles(userId))
-      Alert.alert('Complete', '반려견 등록이 완료되었습니다')
+      await createPetProfile(submitData);
+      await refetch();
+      setModalVisible(false);
+      Alert.alert('Complete', '반려견 등록이 완료되었습니다');
     } else {
-      Alert.alert('Error', '로그인 해주세요')
+      Alert.alert('Error', '로그인 해주세요');
     }
   };
 
   return (
     <Container>
-      <KeyboardAvoidingView
-        style={{flex: 1}} 
-        behavior='height'>
+      <KeyboardAvoidingView style={{ flex: 1 }} behavior="height">
         {/* 프로필 이미지 영역 */}
         <ProfileContainer>
           <ImageContainer onPress={handlePressImage}>
             {/* 이미지가 없을 때 기본 아이콘 표시 */}
-            {imagePicker.imageName === ''
-              ? <Ionicons name="camera-outline" size={40} color={colors.GRAY_400} />
-              : <MyImage source={{uri: `http://10.0.2.2:3030/${imagePicker.imageName}`}} resizeMode="cover" />
-            }
+            {imagePicker.imageName === '' ? (
+              <Ionicons name="camera-outline" size={40} color={colors.GRAY_400} />
+            ) : (
+              <MyImage
+                source={{ uri: `http://10.0.2.2:3030/${imagePicker.imageName}` }}
+                resizeMode="cover"
+              />
+            )}
           </ImageContainer>
         </ProfileContainer>
 
@@ -88,7 +93,7 @@ const PetForm = ({setModalVisible, isEdit = false}: PetFormProps) => {
             {...inputUser.getTextInputProps('petName')}
           />
           <CustomInputField
-            placeholder="생년월일"
+            placeholder="생년월일 (yyyy-mm-dd)"
             error={inputUser.errors.petBirth}
             touched={inputUser.touched.petBirth}
             {...inputUser.getTextInputProps('petBirth')}
@@ -97,16 +102,14 @@ const PetForm = ({setModalVisible, isEdit = false}: PetFormProps) => {
             placeholder="몸무게"
             error={inputUser.errors.petWeight}
             touched={inputUser.touched.petWeight}
-            inputMode='numeric'
+            inputMode="numeric"
             keyboardType="number-pad"
             {...inputUser.getTextInputProps('petWeight')}
           />
-          <RadioButtonGroup
-            selected={inputUser.values.petGender}
-            onSelected={handleRadioChange}>
+          <RadioButtonGroup selected={inputUser.values.petGender} onSelected={handleRadioChange}>
             {[
-              {label: '남아', key: 'MALE'},
-              {label: '여아', key: 'FEMALE'},
+              { label: '남아', key: 'MALE' },
+              { label: '여아', key: 'FEMALE' },
             ].map((radio) => (
               <RadioButtonGroup.RadioButtonItem key={radio.key} value={radio.key}>
                 <Text>{radio.label}</Text>
@@ -118,8 +121,8 @@ const PetForm = ({setModalVisible, isEdit = false}: PetFormProps) => {
 
         {/* 프로필 이미지 수정 모달 옵션 */}
         <EditProfileImageOption
-          isVisible={imageOption.isVisible}        // 모달이 보이는지 여부
-          hideOption={imageOption.hide}            // 모달 숨기기 함수
+          isVisible={imageOption.isVisible} // 모달이 보이는지 여부
+          hideOption={imageOption.hide} // 모달 숨기기 함수
           onChangeImage={imagePicker.handleChange} // 이미지 선택 후 동작 함수
         />
       </KeyboardAvoidingView>

@@ -2,7 +2,6 @@ const mainNavigations = {
   HOME: 'Home',
   MAP: 'Map',
   RECORD: 'Record',
-  RANKING: 'Ranking',
   MYPAGE: 'MyPage',
 } as const;
 
@@ -28,9 +27,4 @@ const settingNavigations = {
   DELETE_ACCOUNT: 'DeleteAccount',
 } as const;
 
-export {
-  mainNavigations,
-  authNavigations,
-  mapNavigations,
-  settingNavigations,
-};
+export { mainNavigations, authNavigations, mapNavigations, settingNavigations };
