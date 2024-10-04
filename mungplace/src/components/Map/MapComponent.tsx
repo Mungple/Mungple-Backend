@@ -12,6 +12,7 @@ import { mapNavigations } from '@/constants';
 import MarkerForm from '../marker/MarkerForm';
 import redMarker from '@/assets/redMarker.png'; // 레드 마커
 import blueMarker from '@/assets/blueMarker.png'; // 블루 마커
+import doghouse from '@/assets/doghouse.png'
 import usePermission from '@/hooks/usePermission'; // 퍼미션
 import useUserLocation from '@/hooks/useUserLocation'; // 유저 위치
 import CustomMapButton from '../common/CustomMapButton'; // 커스텀 버튼
@@ -22,6 +23,8 @@ import { useMapStore, MarkerData } from '@/state/useMapStore';
 import MyBlueZoneHeatmap from './MyBlueZoneHeatmap'; // 개인 블루존 렌더링
 import AllBlueZoneHeatmap from './AllBlueZoneHeatmap'; // 블루존 렌더링
 import AllRedZoneHeatmap from './AllRedZoneHeatmap'; // 레드존 렌더링
+import WithPetPlace from './WithPetPlace'; // 애견 동반 시설 조회
+
 
 interface MapComponentProps {
   userLocation: { latitude: number; longitude: number };
@@ -30,6 +33,12 @@ interface MapComponentProps {
   markers?: MarkerData[]; // 마커 생성 용
   isFormVisible: boolean;
   onFormClose: () => void;
+}
+
+interface PetFacility {
+  id: number;
+  latitude: number;
+  longitude: number;
 }
 
 const MapComponent: React.FC<MapComponentProps> = ({
@@ -49,7 +58,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
   const { isUserLocationError } = useUserLocation();
   const [isSettingModalVisible, setIsSettingModalVisible] = useState(false); // 환경 설정에 쓰는 모달 가시성
   const navigation = useNavigation<NativeStackNavigationProp<MapStackParamList>>();
-
+  const [petFacilities, setPetFacilities] = useState<PetFacility[]>([]); // 애견 동반 시설 상태
   const nearbyMarkers = useMapStore((state) => state.nearbyMarkers); // 상태에서 nearbyMarkers 가져오기
   const updatedMarkers: {
     markerId: string;
@@ -136,6 +145,11 @@ const MapComponent: React.FC<MapComponentProps> = ({
     }
   };
 
+  // 애견 동반 가능 시설 조회 함수
+  const handleFacilityMarkerPress = async (facilityId : number) => {
+    navigation.navigate(mapNavigations.FACILITYDETAIL, {facilityId})
+  }
+  // 내 마커 조회 함수
   const handleViewMyMarkers = () => {
     navigation.navigate('MyMarkerList');
   };
@@ -241,7 +255,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
         )}
 
         {/* 개인 블루존 히트맵 */}
-          <MyBlueZoneHeatmap />
+        <MyBlueZoneHeatmap />
 
         {/* 전체 블루존 히트맵 */}
         <AllBlueZoneHeatmap />
@@ -253,6 +267,22 @@ const MapComponent: React.FC<MapComponentProps> = ({
         {visibleElements.mungZone && mungZone && mungZone.length > 0 && (
           <PolygonLayer zones={mungZone} />
         )} */}
+
+        <WithPetPlace setPetFacilities={setPetFacilities} />
+
+        {/* 동반 시설 마커 렌더링 */}
+        {petFacilities.map((facility) => (
+          <Marker
+            key={facility.id} // 시설 ID가 유일한 키인지 확인
+            coordinate={{
+              latitude: facility.latitude,
+              longitude: facility.longitude,
+            }}
+            onPress={() => handleFacilityMarkerPress(facility.id)}
+          >
+            <Image source={doghouse} style={styles.markerImage} />
+          </Marker>
+        ))}
       </ClusteredMapView>
 
       {/* 커스텀 맵 버튼 */}

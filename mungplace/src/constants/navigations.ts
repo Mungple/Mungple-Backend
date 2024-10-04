@@ -17,6 +17,7 @@ const mapNavigations = {
   HOME: 'MapHome',
   MARKERDETAIL: 'MarkerDetail',
   MYMARKERLIST: 'MyMarkerList',
+  FACILITYDETAIL: 'FacilityDetail',
 } as const;
 
 const settingNavigations = {
