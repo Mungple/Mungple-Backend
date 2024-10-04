@@ -9,6 +9,13 @@ interface ToZone {
   };
 }
 
+interface MungZone {
+  point: {
+    lat: number
+    lon: number
+  }
+}
+
 interface ToLocation {
   lat: number;
   lon: number;
@@ -36,8 +43,6 @@ const useWebSocketActions = () => {
 
   const checkMyBlueZone = useCallback(
     (myBlueZone: ToZone) => {
-      // console.log("연결상태확인", clientSocket.connected)
-      // console.log("블루존 요청 전송:", myBlueZone);
       if (clientSocket?.connected) {
         clientSocket.publish({
           destination: '/pub/users/bluezone',
@@ -66,7 +71,7 @@ const useWebSocketActions = () => {
   );
 
   const checkMungPlace = useCallback(
-    (allUserZone: ToZone) => {
+    (allUserZone: MungZone) => {
       if (clientSocket?.connected) {
         clientSocket.publish({
           destination: '/user/pub/mungplace',

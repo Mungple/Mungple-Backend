@@ -4,24 +4,24 @@ import { Animated, StyleSheet, Image } from 'react-native';
 import ClusteredMapView from 'react-native-map-clustering';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import MapView, { Heatmap, Marker, Polyline, PROVIDER_GOOGLE } from 'react-native-maps';
+import MapView, { Marker, Polyline, PROVIDER_GOOGLE } from 'react-native-maps';
 
 import { colors } from '@/constants'; // 색깔
 import MapSettings from './MapSettings';
 import { mapNavigations } from '@/constants';
 import MarkerForm from '../marker/MarkerForm';
 import redMarker from '@/assets/redMarker.png'; // 레드 마커
-import useWebSocket from '@/hooks/useWebsocket'; // 웹소켓에서 블루, 레드 멍플 가져올거임
 import blueMarker from '@/assets/blueMarker.png'; // 블루 마커
-import ClusterModal from '../marker/ClusterModal';
 import usePermission from '@/hooks/usePermission'; // 퍼미션
 import useUserLocation from '@/hooks/useUserLocation'; // 유저 위치
 import CustomMapButton from '../common/CustomMapButton'; // 커스텀 버튼
 import CustomBottomSheet from '../common/CustomBottomSheet'; // 커스텀 바텀 바
 import useMarkersWithinRadius from '@/hooks/useMarkersWithinRadius'; // 주변 위치 조회 훅
 import { MapStackParamList } from '@/navigations/stack/MapStackNavigator';
-import { useMapStore, MarkerData, NearbyMarkerData } from '@/state/useMapStore';
-import MyBlueZoneHeatmap from '../map/CheckZone'; // 블루, 레드존 렌더링 함수
+import { useMapStore, MarkerData } from '@/state/useMapStore';
+import MyBlueZoneHeatmap from './MyBlueZoneHeatmap'; // 개인 블루존 렌더링
+import AllBlueZoneHeatmap from './AllBlueZoneHeatmap'; // 블루존 렌더링
+import AllRedZoneHeatmap from './AllRedZoneHeatmap'; // 레드존 렌더링
 
 interface MapComponentProps {
   userLocation: { latitude: number; longitude: number };
@@ -41,8 +41,6 @@ const MapComponent: React.FC<MapComponentProps> = ({
   useMarkersWithinRadius();
   const { addMarker } = useMapStore();
   const mapRef = useRef<MapView | null>(null);
-  const [isClusterModalVisible, setClusterModalVisible] = useState(false);
-  const [selectedClusterMarkers, setSelectedClusterMarkers] = useState<NearbyMarkerData[]>([]);
   const [isMenuVisible, setIsMenuVisible] = useState(false);
   const [formVisible, setFormVisible] = useState(false); // 마커폼 가시성 함수
   const translateY = useRef(new Animated.Value(0)).current;
@@ -53,7 +51,6 @@ const MapComponent: React.FC<MapComponentProps> = ({
   const navigation = useNavigation<NativeStackNavigationProp<MapStackParamList>>();
 
   const nearbyMarkers = useMapStore((state) => state.nearbyMarkers); // 상태에서 nearbyMarkers 가져오기
-  const { myBlueZone, allBlueZone, allRedZone, mungZone } = useWebSocket();
   const updatedMarkers: {
     markerId: string;
     userId: number;
@@ -134,16 +131,8 @@ const MapComponent: React.FC<MapComponentProps> = ({
         if (marker) {
           navigation.navigate(mapNavigations.MARKERDETAIL, { markerId });
           console.log(`마커 클릭 : ${markerId}`);
-          setClusterModalVisible(false);
         }
       });
-    }
-  };
-  const handleClusterPress = (geohash: string) => {
-    const clusterData = nearbyMarkers?.markersGroupedByGeohash[geohash];
-    if (clusterData) {
-      setSelectedClusterMarkers(clusterData.markers); // 선택한 클러스터 데이터 설정
-      setClusterModalVisible(true); // 모달 열기
     }
   };
 
@@ -209,7 +198,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
         style={{ flex: 1 }}
         clusteringEnabled={true}
         clusterColor={colors.ORANGE.DARKER}
-        onClusterPress={handleClusterPress}>
+        >
         {/* 블루 마커 */}
         {visibleElements.blueMarkers &&
           updatedMarkers
@@ -252,49 +241,19 @@ const MapComponent: React.FC<MapComponentProps> = ({
         )}
 
         {/* 개인 블루존 히트맵 */}
-        {visibleElements.myBlueZone && myBlueZone && myBlueZone.cells.length > 0 && (
           <MyBlueZoneHeatmap />
-        )}
 
         {/* 전체 블루존 히트맵 */}
-        {visibleElements.blueZone && allBlueZone && allBlueZone.cells.length > 0 && (
-          <Heatmap
-            points={allBlueZone.cells.map((cell) => ({
-              latitude: cell.point.latitude,
-              longitude: cell.point.longitude,
-              weight: cell.weight,
-            }))}
-          />
-        )}
+        <AllBlueZoneHeatmap />
 
         {/* 전체 레드존 히트맵 */}
-        {visibleElements.redZone && allRedZone && allRedZone.cells.length > 0 && (
-          <Heatmap
-            points={allRedZone.cells.map((cell) => ({
-              latitude: cell.point.latitude,
-              longitude: cell.point.longitude,
-              weight: cell.weight,
-            }))}
-            gradient={{
-              colors: ['red', 'darkred'],
-              startPoints: [0.2, 1.0],
-              colorMapSize: 256,
-            }}
-          />
-        )}
+        <AllRedZoneHeatmap />
 
         {/* 멍플 지오해시
         {visibleElements.mungZone && mungZone && mungZone.length > 0 && (
           <PolygonLayer zones={mungZone} />
         )} */}
       </ClusteredMapView>
-
-      <ClusterModal
-        isVisible={isClusterModalVisible}
-        markers={selectedClusterMarkers}
-        onClose={() => setClusterModalVisible(false)}
-        fetchMarkerDetails={handleMarkerClick} // 마커 상세 정보 가져오기 함수 전달
-      />
 
       {/* 커스텀 맵 버튼 */}
       <CustomMapButton onPress={handlePressMenu} iconName="menu" top={20} right={20} />
