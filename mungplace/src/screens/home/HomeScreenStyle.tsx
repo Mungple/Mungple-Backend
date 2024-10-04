@@ -1,5 +1,5 @@
 import styled from 'styled-components/native';
-import { TouchableOpacity } from 'react-native';
+import { ImageBackground, TouchableOpacity } from 'react-native';
 
 import { colors } from '@/constants';
 import CustomCard from '@/components/common/CustomCard';
@@ -14,6 +14,14 @@ const Container = styled.View`
 
 const ImageCard = styled(CustomCard)`
   flex: 2;
+  padding: 0;
+`;
+
+const Image = styled(ImageBackground)`
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 16px;
 `;
 
 // Modal 부분
@@ -45,4 +53,4 @@ const StartButton = styled(CustomButton)`
   margin: 20px;
 `;
 
-export { MenuText, Container, ImageCard, StartButton, CloseButton, HeaderContainer };
+export { MenuText, Container, Image, ImageCard, StartButton, CloseButton, HeaderContainer };

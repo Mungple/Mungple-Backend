@@ -1,6 +1,8 @@
-import { useState, useEffect, useRef } from 'react';
 import { Client } from '@stomp/stompjs';
-import axios from 'axios';
+import { useState, useEffect } from 'react';
+
+import { getAccessToken } from '@/api';
+import { useAppStore } from '@/state/useAppStore';
 
 interface Point {
   latitude: number;
@@ -25,92 +27,66 @@ interface ErrorMessage {
   message: string;
 }
 
+// WebSocket 서버 URI
 const WEBSOCKET_URI = 'wss://j11e106.p.ssafy.io/api/ws';
 
-// JWT 토큰을 캐싱할 변수
-let cachedToken: string | null = null;
-
-// JWT 토큰을 가져오는 함수
-const getJwtToken = async () => {
-  if (cachedToken) {
-    return cachedToken;
-  }
-  try {
-    const response = await axios.post(
-      `https://j11e106.p.ssafy.io/api/manager/login?username=manager`,
-    );
-    console.log('JWT Token을 가져오기 성공했습니다.');
-    cachedToken = response.data.accessToken;
-    return cachedToken;
-  } catch (error) {
-    console.error('JWT Token을 가져오는 데 실패했습니다.', error);
-    return null;
-  }
-};
-
 const useWebSocket = (explorationId: number = -1) => {
-  const [clientSocket, setClientSocket] = useState<Client | null>(null);
+  const { clientSocket, setClientSocket } = useAppStore();
   const [explorations, setExplorations] = useState<ErrorMessage | null>(null);
-  const [myBlueZone, setMyBlueZone] = useState<FromZone | null>(null);
   const [allBlueZone, setAllBlueZone] = useState<FromZone | null>(null);
   const [allRedZone, setAllRedZone] = useState<FromZone | null>(null);
+  const [myBlueZone, setMyBlueZone] = useState<FromZone | null>(null);
   const [mungZone, setMungZone] = useState<MungZone | null>(null);
-
-  // 토큰을 재사용하기 위해 ref 사용
-  const tokenRef = useRef<string | null>(null);
 
   // 소켓 연결 시도
   useEffect(() => {
     const connectWebSocket = async () => {
       try {
-        if (!tokenRef.current) {
-          tokenRef.current = await getJwtToken();
-        }
-        if (!tokenRef.current) {
-          console.error('토큰을 가져올 수 없어 소켓 연결을 시도할 수 없습니다.');
-          return;
-        }
+        const token = await getAccessToken();
 
         const socket = new Client({
-          webSocketFactory: () =>
-            new WebSocket(`${WEBSOCKET_URI}?Authorization=${tokenRef.current}`),
-          debug: (str) => {
-            console.log(str);
+          webSocketFactory: () => new WebSocket(`${WEBSOCKET_URI}?Authorization=${token}`),
+          beforeConnect: () => {
+            console.log('useWebSocket >>> 소켓 연결 시도 중');
           },
-          reconnectDelay: 5000,
-          heartbeatIncoming: 4000,
-          heartbeatOutgoing: 4000,
           appendMissingNULLonIncoming: true, // 서버로부터 받은 메시지에 NULL 문자가 없을 때 추가(RN Polyfill)
           forceBinaryWSFrames: true, // WebSocket 프레임을 항상 바이너리로 설정(RN Polyfill)
-          onConnect: () => {
-            console.log('소켓 연결 성공');
-            setClientSocket(socket);
+          reconnectDelay: 5000, // 재연결 시도 간격
+          heartbeatIncoming: 4000, // 서버로부터 메시지를 받는 주기
+          heartbeatOutgoing: 4000, // 서버로 메시지를 보내는 주기
 
-            // 메시지 구독
+          onConnect: () => {
+            setClientSocket(socket);
             subscribeToTopics(socket, explorationId);
+            console.log('useWebSocket >>> 소켓 연결 성공');
           },
           onStompError: (frame) => {
-            console.error('소켓 연결 에러 발생: ', frame.headers['message']);
+            console.error('useWebSocket >>> 소켓 연결 에러 발생:', frame.headers['message']);
           },
         });
 
         socket.activate();
-        return () => {
-          socket.deactivate();
-          setClientSocket(null);
-        };
       } catch (error) {
-        console.error('웹 소켓 에러 발생', error);
+        console.error('useWebSocket >>> 웹 소켓 에러 발생 :', error);
       }
     };
 
-    connectWebSocket();
-  }, [explorationId]);
+    if (!clientSocket) {
+      connectWebSocket();
+    }
+
+    return () => {
+      if (clientSocket) {
+        clientSocket.deactivate();
+        setClientSocket(null);
+      }
+    };
+  }, []);
 
   const subscribeToTopics = (socket: Client, explorationId: number) => {
     // 에러 메시지 수신
-    socket.subscribe('/user/sub/errors', (message) => {
-      console.error('Error message received:', message.body);
+    socket.subscribe('/user/sub/errors', () => {
+      console.error('useWebSocket >>> Error message received');
     });
 
     // 산책 기록 위치 수집
@@ -119,7 +95,7 @@ const useWebSocket = (explorationId: number = -1) => {
         const parsedMessage = JSON.parse(message.body) as ErrorMessage;
         setExplorations(parsedMessage);
       } catch (e) {
-        console.error('Error parsing exploration message:', e);
+        console.error('useWebSocket >>>', e);
       }
     });
     // 개인 블루존 조회
@@ -128,7 +104,7 @@ const useWebSocket = (explorationId: number = -1) => {
         const parsedMessage = JSON.parse(message.body) as FromZone;
         setMyBlueZone(parsedMessage);
       } catch (e) {
-        console.error('Error parsing bluezone message:', e);
+        console.error('useWebSocket >>>', e);
       }
     });
     // 전체 블루존 조회
@@ -137,7 +113,7 @@ const useWebSocket = (explorationId: number = -1) => {
         const parsedMessage = JSON.parse(message.body) as FromZone;
         setAllBlueZone(parsedMessage);
       } catch (e) {
-        console.error('Error parsing bluezone message:', e);
+        console.error('useWebSocket >>>', e);
       }
     });
     // 전체 레드존 조회
@@ -146,7 +122,7 @@ const useWebSocket = (explorationId: number = -1) => {
         const parsedMessage = JSON.parse(message.body) as FromZone;
         setAllRedZone(parsedMessage);
       } catch (e) {
-        console.error('Error parsing redzone message:', e);
+        console.error('useWebSocket >>>', e);
       }
     });
     // 멍플 조회
@@ -155,13 +131,12 @@ const useWebSocket = (explorationId: number = -1) => {
         const parsedMessage = JSON.parse(message.body) as MungZone;
         setMungZone(parsedMessage);
       } catch (e) {
-        console.error('Error parsing mungplace message:', e);
+        console.error('useWebSocket >>>', e);
       }
     });
   };
 
   return {
-    clientSocket,
     explorations,
     myBlueZone,
     allBlueZone,

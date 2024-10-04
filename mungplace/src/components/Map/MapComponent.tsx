@@ -1,5 +1,5 @@
 import styled from 'styled-components/native';
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { Animated, StyleSheet, Image } from 'react-native';
 import ClusteredMapView from 'react-native-map-clustering';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
@@ -22,7 +22,7 @@ import CustomBottomSheet from '../common/CustomBottomSheet'; // 커스텀 바텀
 import useMarkersWithinRadius from '@/hooks/useMarkersWithinRadius'; // 주변 위치 조회 훅
 import { MapStackParamList } from '@/navigations/stack/MapStackNavigator';
 import { useMapStore, MarkerData, NearbyMarkerData } from '@/state/useMapStore';
-import MyBlueZoneHeatmap from '../map/CheckZone' // 블루, 레드존 렌더링 함수
+import MyBlueZoneHeatmap from '../map/CheckZone'; // 블루, 레드존 렌더링 함수
 
 interface MapComponentProps {
   userLocation: { latitude: number; longitude: number };
@@ -31,7 +31,6 @@ interface MapComponentProps {
   markers?: MarkerData[]; // 마커 생성 용
   isFormVisible: boolean;
   onFormClose: () => void;
-
 }
 
 const MapComponent: React.FC<MapComponentProps> = ({
@@ -149,9 +148,9 @@ const MapComponent: React.FC<MapComponentProps> = ({
     }
   };
 
- const handleViewMyMarkers = () => {
-  navigation.navigate('MyMarkerList')
- }
+  const handleViewMyMarkers = () => {
+    navigation.navigate('MyMarkerList');
+  };
 
   // 메뉴 햄버거 바 클릭 시 호출되는 함수
   const handlePressMenu = () => {
@@ -185,9 +184,9 @@ const MapComponent: React.FC<MapComponentProps> = ({
   // 화면을 떠날 때 WebSocket 연결 해제
   useFocusEffect(
     React.useCallback(() => {
-      console.log('MapComponent focused');
+      console.log('MapComponent focused >>> WebSocket connected');
       return () => {
-        console.log('MapComponent unfocused, WebSocket disconnected');
+        console.log('MapComponent unfocused >>> WebSocket disconnected');
       };
     }, []),
   );
@@ -254,7 +253,9 @@ const MapComponent: React.FC<MapComponentProps> = ({
         )}
 
         {/* 개인 블루존 히트맵 */}
-        <MyBlueZoneHeatmap />
+        {visibleElements.myBlueZone && myBlueZone && myBlueZone.cells.length > 0 && (
+          <MyBlueZoneHeatmap />
+        )}
 
         {/* 전체 블루존 히트맵 */}
         {visibleElements.blueZone && allBlueZone && allBlueZone.cells.length > 0 && (
@@ -345,11 +346,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
         </CustomBottomSheet>
         <ButtonWithTextContainer top={200} right={20}>
           <TextLabel>내 마커 보기</TextLabel>
-          <CustomMapButton
-            onPress={handleViewMyMarkers}
-            iconName="location"
-            inValid={isDisabled}
-          />
+          <CustomMapButton onPress={handleViewMyMarkers} iconName="location" inValid={isDisabled} />
         </ButtonWithTextContainer>
       </Animated.View>
 

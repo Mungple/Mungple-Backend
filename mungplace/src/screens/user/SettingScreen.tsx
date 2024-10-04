@@ -2,7 +2,7 @@ import React from 'react';
 import { ScrollView } from 'react-native';
 import styled from 'styled-components/native';
 
-import useAuth from '@/hooks/queries/useAuth';
+import { removeHeader } from '@/utils';
 import { useAppStore } from '@/state/useAppStore';
 import { useNavigation } from '@react-navigation/native';
 import { colors, settingNavigations } from '@/constants';
@@ -11,7 +11,6 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { SettingStackParamList } from '@/navigations/stack/SettingStackNavigator';
 
 const SettingScreen = () => {
-  const { logoutMutation } = useAuth();
   const setLogin = useAppStore((state) => state.setLogin);
   const navigation = useNavigation<NativeStackNavigationProp<SettingStackParamList>>();
 
@@ -20,7 +19,7 @@ const SettingScreen = () => {
   };
 
   const handleLogoutPress = () => {
-    logoutMutation.mutate(null);
+    removeHeader('Authorization');
     setLogin(false);
   };
 

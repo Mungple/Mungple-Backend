@@ -14,13 +14,21 @@ import CustomModal from '@/components/common/CustomModal';
 import CustomButton from '@/components/common/CustomButton';
 import CustomModalHeader from '@/components/common/CustomModalHeader';
 import { MapStackParamList } from '@/navigations/stack/MapStackNavigator';
+import { useUserStore } from '@/state/useUserStore';
+import useGetPet from '@/hooks/queries/useGetPet';
+import { calculateAge } from '@/hooks/usePetAge';
+import dogMain from '@/assets/dog_main.png';
 
 const windowHeight = Dimensions.get('window').height;
 
 const HomeScreen: React.FC = () => {
+  const { userId } = useUserStore.getState();
+  const { data: petData } = useGetPet(userId);
   const [modalVisible, setModalVisible] = useState(false);
-  const { userLocation, isUserLocationError } = useUserLocation();
   const [selectedPets, setSelectedPets] = useState<number[]>([]);
+  const defaultPet = petData?.find((pet) => pet.isDefault === true);
+  const { userLocation, isUserLocationError } = useUserLocation();
+  const age = defaultPet ? calculateAge(defaultPet.birth) : undefined;
   const setWalkingStart = useAppStore((state) => state.setWalkingStart);
   const setStartExplorate = useAppStore((state) => state.setStartExplorate);
   const navigation = useNavigation<NativeStackNavigationProp<MapStackParamList>>();
@@ -49,7 +57,6 @@ const HomeScreen: React.FC = () => {
       setModalVisible(false);
       setWalkingStart(true);
       setStartExplorate(await startWalk(walkData));
-      console.log('산책 시작 >>>', useAppStore.getState().startExplorate);
       navigation.navigate(mapNavigations.WALKING);
     } else if (isUserLocationError) {
       Alert.alert('Error', '위치 권한을 허용해주세요');
@@ -60,8 +67,16 @@ const HomeScreen: React.FC = () => {
 
   return (
     <HS.Container>
-      <HS.ImageCard />
-      <PetInfoBox />
+      <HS.ImageCard>
+        <HS.Image
+          source={
+            // defaultPet && defaultPet.photo
+            //   ? `http://j11e106.p.ssafy.io:9000/images/${defaultPet.photo}`
+            //   : dogMain
+            dogMain
+          }></HS.Image>
+      </HS.ImageCard>
+      <PetInfoBox defaultPet={defaultPet} age={age} />
       <CustomButton label="산책 시작하기" onPress={handleModalVisivle} />
       {/* 산책 시작 확인 모달 */}
       <CustomModal

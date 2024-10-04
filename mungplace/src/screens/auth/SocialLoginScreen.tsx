@@ -11,8 +11,7 @@ type SocialLoginScreenProps = NativeStackScreenProps<AuthStackParamList, 'Social
 type CustomWebViewNavigation = Omit<WebViewNavigation, 'headers'>;
 const domain = 'https://j11e106.p.ssafy.io';
 
-const SocialLoginScreen: React.FC<SocialLoginScreenProps> = ({ route }) => {
-  const { provider } = route.params;
+const SocialLoginScreen: React.FC<SocialLoginScreenProps> = () => {
   const { loginMutation } = useAuth();
   const { setLogin } = useAppStore.getState();
 
@@ -29,7 +28,7 @@ const SocialLoginScreen: React.FC<SocialLoginScreenProps> = ({ route }) => {
     <Container>
       <WebView
         style={{ flex: 1 }}
-        source={{ uri: `${domain}/api/users/login/${provider}` }}
+        source={{ uri: `${domain}/api/users/login/kakao` }}
         onNavigationStateChange={handleNavigationStateChange}
       />
     </Container>
