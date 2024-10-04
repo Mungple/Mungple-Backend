@@ -22,6 +22,7 @@ import com.e106.mungplace.web.dogs.dto.DogUpdateRequest;
 import com.e106.mungplace.web.dogs.service.DogService;
 import com.e106.mungplace.web.user.dto.ImageNameResponse;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -34,7 +35,7 @@ public class DogController {
 	private final DogService dogService;
 
 	@PostMapping("/dogs")
-	public ResponseEntity<DogResponse> findUserInfo(@RequestBody DogCreateRequest dogCreateRequest) {
+	public ResponseEntity<DogResponse> findUserInfo(@Valid @RequestBody DogCreateRequest dogCreateRequest) {
 		return ResponseEntity.status(HttpStatus.CREATED).body(dogService.createDogProcess(dogCreateRequest));
 	}
 

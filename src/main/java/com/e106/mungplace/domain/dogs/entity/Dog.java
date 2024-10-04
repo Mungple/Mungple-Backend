@@ -1,7 +1,7 @@
 package com.e106.mungplace.domain.dogs.entity;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import com.e106.mungplace.common.audit.BaseTime;
@@ -42,7 +42,7 @@ public class Dog extends BaseTime {
 	private String dogName;
 
 	@Column(nullable = false)
-	private Date birth;
+	private LocalDate birth;
 
 	@Column(nullable = false, length = 20)
 	private Gender gender;
@@ -72,7 +72,7 @@ public class Dog extends BaseTime {
 		this.dogName = dogName;
 	}
 
-	public void updateBirth(Date birth) {
+	public void updateBirth(LocalDate birth) {
 		this.birth = birth;
 	}
 
