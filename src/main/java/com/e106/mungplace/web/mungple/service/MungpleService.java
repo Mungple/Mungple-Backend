@@ -10,6 +10,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import com.e106.mungplace.common.map.dto.Point;
+import com.e106.mungplace.domain.util.GeoUtils;
 import com.e106.mungplace.web.mungple.dto.MungpleRequest;
 
 import ch.hsr.geohash.GeoHash;
@@ -30,15 +31,15 @@ public class MungpleService {
 		Point point = mungpleRequest.point();
 		String geohash = Point.toMungpleGeoHash(point.lat().toString(), point.lon().toString());
 
-		List<String> mungpleData = getNearbyMungplesSpiral(geohash, 4);
+		List<Point> mungpleData = getNearbyMungplesSpiral(geohash, 4);
 
 		// WebSocket을 통해 사용자에게 Mungple 데이터 전송
 		messagingTemplate.convertAndSendToUser(userId.toString(), destination, mungpleData);
 	}
 
 	// 달팽이 모양으로 주변 GeoHash를 탐색
-	public List<String> getNearbyMungplesSpiral(String currentGeoHash, int numOfSteps) {
-		List<String> nearbyMungples = new ArrayList<>();
+	public List<Point> getNearbyMungplesSpiral(String currentGeoHash, int numOfSteps) {
+		List<Point> nearbyMungples = new ArrayList<>();
 		Set<String> visited = new HashSet<>();
 
 		// 중심 위치 추가
@@ -46,7 +47,8 @@ public class MungpleService {
 		visited.add(currentGeoHash);
 
 		if (isMungpleCreated(currentGeoHash)) {
-			nearbyMungples.add(currentGeoHash);
+			Point point = GeoUtils.calculateGeohashCenterPoint(currentGeoHash);
+			nearbyMungples.add(point);
 		}
 
 		GeoHash currentGeoHashPointer = centerGeoHash;
@@ -64,7 +66,8 @@ public class MungpleService {
 				// 방문 여부 및 Mungple 탐색 통합
 				if (visited.add(newGeoHashStr)) {
 					if (isMungpleCreated(newGeoHashStr)) {
-						nearbyMungples.add(newGeoHashStr);
+						Point point = GeoUtils.calculateGeohashCenterPoint(newGeoHashStr);
+						nearbyMungples.add(point);
 					}
 				}
 			}
@@ -83,7 +86,8 @@ public class MungpleService {
 
 			if (visited.add(newGeoHashStr)) {
 				if (isMungpleCreated(newGeoHashStr)) {
-					nearbyMungples.add(newGeoHashStr);
+					Point point = GeoUtils.calculateGeohashCenterPoint(newGeoHashStr);
+					nearbyMungples.add(point);
 				}
 			}
 		}
