@@ -1,12 +1,12 @@
 import React from 'react';
-import {FlatList, SafeAreaView} from 'react-native';
+import { FlatList, SafeAreaView } from 'react-native';
 
 import styled from 'styled-components/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
-import {colors} from '@/constants';
-import {MonthYear, isSameAsCurrentDate} from '@/utils/date';
+import { colors } from '@/constants';
+import { MonthYear, isSameAsCurrentDate } from '@/utils/date';
 import DayOfWeeks from './DayOfWeeks';
 
 import useModal from '@/hooks/useModal';
@@ -33,7 +33,7 @@ const Calendar = ({
 }: CalendarProps) => {
   const yearSelector = useModal();
   const monthSelector = useModal();
-  const {month, year, lastDate, firstDOW} = monthYear;
+  const { month, year, lastDate, firstDOW } = monthYear;
 
   const handleChangeYear = (selectYear: number) => {
     onChangeMonth((selectYear - year) * 12);
@@ -72,18 +72,16 @@ const Calendar = ({
           <Ionicons name="arrow-forward" size={25} color={colors.BLACK} />
         </MonthButton>
       </HeaderContainer>
-
       {/* 요일 부분 */}
       <DayOfWeeks />
-
       {/* 본문 부분 */}
       <BodyContainer>
         <FlatList
-          data={Array.from({length: lastDate + firstDOW}, (_, i) => ({
+          data={Array.from({ length: lastDate + firstDOW }, (_, i) => ({
             id: i,
             date: i - firstDOW + 1,
           }))}
-          renderItem={({item}) => (
+          renderItem={({ item }) => (
             <DateBox
               date={item.date}
               onPressDate={onPressDate}
@@ -92,11 +90,10 @@ const Calendar = ({
               isToday={isSameAsCurrentDate(year, month, item.date)}
             />
           )}
-          keyExtractor={item => String(item.id)}
+          keyExtractor={(item) => String(item.id)}
           numColumns={7}
         />
       </BodyContainer>
-
       {/* 년도 선택 모달 */}
       <YearSelector
         isVisible={yearSelector.isVisible}

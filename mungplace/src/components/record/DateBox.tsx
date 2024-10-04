@@ -15,17 +15,15 @@ interface DateBoxProps {
 
 const deviceWidth = Dimensions.get('window').width;
 
-const DateBox = ({
-  date,
-  isToday,
-  selectedDate,
-  hasAttendance,
-  onPressDate,
-}: DateBoxProps) => {
+const DateBox = ({ date, isToday, selectedDate, hasAttendance, onPressDate }: DateBoxProps) => {
+  const handlePress = () => {
+    if (hasAttendance) {
+      onPressDate(date);
+    }
+  };
+
   return (
-    <DatePressable
-      isSelected={selectedDate === date}
-      onPress={() => onPressDate(date)}>
+    <DatePressable isSelected={selectedDate === date} onPress={handlePress}>
       {date > 0 && (
         <>
           <DateContainer isToday={isToday}>
@@ -34,11 +32,7 @@ const DateBox = ({
             </DateText>
           </DateContainer>
           {hasAttendance && (
-            <MaterialIcons
-              name="check-circle"
-              size={18}
-              color={colors.ORANGE.BASE}
-            />
+            <MaterialIcons name="check-circle" size={18} color={colors.ORANGE.BASE} />
           )}
         </>
       )}
@@ -53,8 +47,7 @@ const DatePressable = styled(Pressable)<{
   border-radius: 8px;
   width: ${deviceWidth / 7}px;
   height: ${deviceWidth / 7 + 12}px;
-  border: ${({ isSelected }) =>
-    isSelected ? `2px solid ${colors.ORANGE.BASE}` : 'none'};
+  border: ${({ isSelected }) => (isSelected ? `2px solid ${colors.ORANGE.BASE}` : 'none')};
 `;
 
 const DateContainer = styled.View<{ isToday: boolean }>`
@@ -64,15 +57,13 @@ const DateContainer = styled.View<{ isToday: boolean }>`
   width: 28px;
   height: 32px;
   border-radius: 8px;
-  background-color: ${({ isToday }) =>
-    isToday ? colors.ORANGE.BASE : 'transparent'};
+  background-color: ${({ isToday }) => (isToday ? colors.ORANGE.BASE : 'transparent')};
 `;
 
 const DateText = styled.Text<{ isToday: boolean; isSelected: boolean }>`
   font-size: 17px;
   color: ${({ isToday }) => (isToday ? colors.WHITE : colors.BLACK)};
-  font-weight: ${({ isToday, isSelected }) =>
-    isToday || isSelected ? 'bold' : 'normal'};
+  font-weight: ${({ isToday, isSelected }) => (isToday || isSelected ? 'bold' : 'normal')};
 `;
 
 export default DateBox;

@@ -8,7 +8,6 @@ import MapView, { Heatmap, Marker, Polyline, PROVIDER_GOOGLE } from 'react-nativ
 
 import { colors } from '@/constants'; // 색깔
 import MapSettings from './MapSettings';
-import PolygonLayer from './PolygonLayer'; // 멍플 지오해시
 import { mapNavigations } from '@/constants';
 import MarkerForm from '../marker/MarkerForm';
 import redMarker from '@/assets/redMarker.png'; // 레드 마커
