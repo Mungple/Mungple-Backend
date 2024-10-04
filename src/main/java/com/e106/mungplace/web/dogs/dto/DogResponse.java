@@ -1,6 +1,6 @@
 package com.e106.mungplace.web.dogs.dto;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 import com.e106.mungplace.domain.dogs.entity.Dog;
 
@@ -20,7 +20,7 @@ public class DogResponse {
 	private String name;
 	private String gender;
 	private Integer weight;
-	private Date birth;
+	private LocalDate birth;
 	private String photo;
 
 	public static DogResponse of(Dog dog) {

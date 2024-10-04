@@ -2,8 +2,8 @@ package com.e106.mungplace.domain.dogexploration.repository;
 
 import static org.assertj.core.api.Assertions.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -89,7 +89,7 @@ public class DogExplorationRepositoryTest {
 		dog1 = Dog.builder()
 			.user(user)
 			.dogName("멍멍이1")
-			.birth(new Date())
+			.birth(LocalDate.now())
 			.gender(Gender.MALE)
 			.weight(30)
 			.isDefault(true)
@@ -97,7 +97,7 @@ public class DogExplorationRepositoryTest {
 		dog2 = Dog.builder()
 			.user(user)
 			.dogName("멍멍이2")
-			.birth(new Date())
+			.birth(LocalDate.now())
 			.gender(Gender.FEMALE)
 			.weight(25)
 			.isDefault(false)
