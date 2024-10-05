@@ -10,6 +10,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.NoTransactionException;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import com.e106.mungplace.common.log.dto.FormatLog;
@@ -49,8 +50,13 @@ public class ApplicationLogger {
 		String packageName = clazz.getPackageName();
 		String domain = extractDomain(packageName);
 		LogLayer layer = extractLayerType(packageName);
+		String transactionId;
 
-		String transactionId = Integer.toHexString(TransactionAspectSupport.currentTransactionStatus().hashCode());
+		try {
+			transactionId = Integer.toHexString(TransactionAspectSupport.currentTransactionStatus().hashCode());
+		} catch (NoTransactionException e) {
+			transactionId = "";
+		}
 
 		FormatLog applicationLog = new FormatLog(userId, transactionId, domain, layer, message);
 
