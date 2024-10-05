@@ -255,13 +255,13 @@ const MapComponent: React.FC<MapComponentProps> = ({
         )}
 
         {/* 개인 블루존 히트맵 */}
-        <MyBlueZoneHeatmap />
+        {visibleElements.myBlueZone && <MyBlueZoneHeatmap />}
 
         {/* 전체 블루존 히트맵 */}
-        <AllBlueZoneHeatmap />
+        {visibleElements.blueZone && <AllBlueZoneHeatmap />}
 
         {/* 전체 레드존 히트맵 */}
-        <AllRedZoneHeatmap />
+        {visibleElements.redZone && <AllRedZoneHeatmap />}
 
         {/* 멍플 지오해시
         {visibleElements.mungZone && mungZone && mungZone.length > 0 && (
