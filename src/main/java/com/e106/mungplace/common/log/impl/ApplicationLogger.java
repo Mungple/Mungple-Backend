@@ -1,6 +1,8 @@
 package com.e106.mungplace.common.log.impl;
 
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,8 +12,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
-import com.e106.mungplace.common.log.dto.ApplicationLog;
-import com.e106.mungplace.common.log.dto.LogAction;
+import com.e106.mungplace.common.log.dto.FormatLog;
+import com.e106.mungplace.common.log.dto.LogLayer;
 import com.e106.mungplace.common.log.dto.LogLevel;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -24,51 +26,33 @@ public class ApplicationLogger {
 
 	private final ObjectMapper objectMapper;
 
-	public void log(LogLevel level, LogAction action, Object payload, Class<?> clazz) {
-		String message;
+	public void log(LogLevel level, String payload, Class<?> clazz) {
+		logging(level, toFormatedMessage(payload, clazz), clazz);
+	}
+
+	public void log(LogLevel level, Object payload, Class<?> clazz) {
 		try {
-			message = objectMapper.writeValueAsString(payload);
+			String msg = objectMapper.writeValueAsString(payload);
+			logging(level, toFormatedMessage(msg, clazz), clazz);
 		} catch (JsonProcessingException e) {
-			message = payload.toString();
+			logging(level, toFormatedMessage(payload.toString(), clazz), clazz);
 		}
-		logging(level, toMessage(action, message, 0L), clazz);
 	}
 
-	public void log(LogLevel level, LogAction action, String message, Class<?> clazz) {
-		logging(level, toMessage(action, message, 0L), clazz);
-	}
-
-	public void log(LogLevel level, LogAction action, Exception exception, Class<?> clazz) {
-		logging(level, toMessage(action, exception.getMessage(), 0L), clazz);
-	}
-
-	public void log(LogLevel level, LogAction action, Object payload, Long elapseTime, Class<?> clazz) {
-		String message;
-		try {
-			message = objectMapper.writeValueAsString(payload);
-		} catch (JsonProcessingException e) {
-			message = payload.toString();
-		}
-		logging(level, toMessage(action, message, elapseTime), clazz);
-	}
-
-	public void log(LogLevel level, LogAction action, String message, Long elapseTime, Class<?> clazz) {
-		logging(level, toMessage(action, message, elapseTime), clazz);
-	}
-
-	public void log(LogLevel level, LogAction action, Exception exception, Long elapseTime, Class<?> clazz) {
-		logging(level, toMessage(action, exception.getMessage(), elapseTime), clazz);
-	}
-
-	private String toMessage(LogAction action, String message, Long elapseTime) {
-		String transactionId = Integer.toHexString(TransactionAspectSupport.currentTransactionStatus().hashCode());
+	private String toFormatedMessage(String message, Class<?> clazz) {
 		String userId = Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication())
 			.map(Authentication::getPrincipal)
 			.map(UserDetails.class::cast)
 			.map(UserDetails::getUsername)
 			.orElse(null);
 
-		ApplicationLog applicationLog = new ApplicationLog(userId, transactionId, action, message, elapseTime);
+		String packageName = clazz.getPackageName();
+		String domain = extractDomain(packageName);
+		LogLayer layer = extractLayerType(packageName);
+
+		String transactionId = Integer.toHexString(TransactionAspectSupport.currentTransactionStatus().hashCode());
+
+		FormatLog applicationLog = new FormatLog(userId, transactionId, domain, layer, message);
 
 		try {
 			return objectMapper.writeValueAsString(applicationLog);
@@ -87,5 +71,27 @@ public class ApplicationLogger {
 			case DEBUG -> logger.debug(message);
 			case TRACE -> logger.trace(message);
 		}
+	}
+
+	private static String extractDomain(String packageName) {
+		Pattern domainPattern = Pattern.compile("(?:domain|web)\\.([a-zA-Z]+)\\.");
+		Matcher matcher = domainPattern.matcher(packageName);
+
+		if (matcher.find()) {
+			return matcher.group(1);
+		}
+		return "unknown";
+	}
+
+	private static LogLayer extractLayerType(String packageName) {
+		if (packageName.contains(".controller")) {
+			return LogLayer.CONTROLLER;
+		} else if (packageName.contains(".service")) {
+			return LogLayer.SERVICE;
+		} else if (packageName.contains(".repository")) {
+			return LogLayer.REPOSITORY;
+		}
+
+		return LogLayer.UNKNOWN;
 	}
 }

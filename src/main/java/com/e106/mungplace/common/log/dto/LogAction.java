@@ -6,6 +6,8 @@ public enum LogAction {
 	CONSUME, PUBLISH, COMMIT, FAIL,
 	// socket
 	CONNECT, SUBSCRIBE, SEND, MESSAGE, DISCONNECT,
+	// controller
+	REQUEST, RESPONSE,
 	// crud
 	CREATE, SELECT, UPDATE, DELETE,
 }

@@ -6,14 +6,11 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import com.e106.mungplace.common.log.dto.LogAction;
-import com.e106.mungplace.common.log.dto.LogLevel;
 
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Loggable {
-	LogLevel level();
+public @interface MethodLoggable {
 
 	LogAction action();
-
-	String message();
+	String content() default "";
 }

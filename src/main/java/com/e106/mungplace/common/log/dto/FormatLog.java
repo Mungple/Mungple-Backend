@@ -1,10 +1,10 @@
 package com.e106.mungplace.common.log.dto;
 
-public record ApplicationLog(
+public record FormatLog(
 	String userId,
 	String transactionId,
-	LogAction action,
-	String message,
-	Long elapseTime
+	String domain,
+	LogLayer layer,
+	String payload
 ) {
 }
