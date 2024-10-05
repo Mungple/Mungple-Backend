@@ -31,11 +31,11 @@ public class MethodLogAspect {
 		String content = methodLoggable.content();
 
 		try {
-			logger.log(LogLevel.TRACE, new MethodCallLog(action, methodName, content), declaringType);
+			logger.log(LogLevel.TRACE, action, new MethodCallLog(methodName, content), declaringType);
 			result = joinPoint.proceed();
 		} finally {
 			long elapsedTime = System.currentTimeMillis() - startTime;
-			logger.log(LogLevel.TRACE, new MethodEndLog(action, methodName, content, elapsedTime),
+			logger.log(LogLevel.TRACE, action, new MethodEndLog(methodName, content, elapsedTime),
 				declaringType);
 		}
 		return result;

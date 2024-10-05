@@ -38,11 +38,11 @@ public class ControllerLogAspect {
 		String methodName = joinPoint.getSignature().getName();
 
 		try {
-			logger.log(LogLevel.TRACE, new MethodCallLog(LogAction.REQUEST, methodName, controllerLog), declaringType);
+			logger.log(LogLevel.TRACE, LogAction.REQUEST, new MethodCallLog(methodName, controllerLog), declaringType);
 			result = joinPoint.proceed();
 		} finally {
 			long elapsedTime = System.currentTimeMillis() - startTime;
-			logger.log(LogLevel.TRACE, new MethodEndLog(LogAction.RESPONSE, methodName, controllerLog, elapsedTime),
+			logger.log(LogLevel.TRACE, LogAction.RESPONSE, new MethodEndLog(methodName, controllerLog, elapsedTime),
 				declaringType);
 		}
 		return result;

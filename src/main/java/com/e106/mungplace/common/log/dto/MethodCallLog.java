@@ -4,7 +4,6 @@ import lombok.Builder;
 
 @Builder
 public record MethodCallLog(
-	LogAction action,
 	String methodName,
 	Object content
 ) {

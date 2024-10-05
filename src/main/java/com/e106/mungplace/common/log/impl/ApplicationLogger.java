@@ -14,6 +14,7 @@ import org.springframework.transaction.NoTransactionException;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import com.e106.mungplace.common.log.dto.FormatLog;
+import com.e106.mungplace.common.log.dto.LogAction;
 import com.e106.mungplace.common.log.dto.LogLayer;
 import com.e106.mungplace.common.log.dto.LogLevel;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -27,20 +28,20 @@ public class ApplicationLogger {
 
 	private final ObjectMapper objectMapper;
 
-	public void log(LogLevel level, String payload, Class<?> clazz) {
-		logging(level, toFormatedMessage(payload, clazz), clazz);
+	public void log(LogLevel level, LogAction action, String payload, Class<?> clazz) {
+		logging(level, toFormatedMessage(action, payload, clazz), clazz);
 	}
 
-	public void log(LogLevel level, Object payload, Class<?> clazz) {
+	public void log(LogLevel level, LogAction action, Object payload, Class<?> clazz) {
 		try {
 			String msg = objectMapper.writeValueAsString(payload);
-			logging(level, toFormatedMessage(msg, clazz), clazz);
+			logging(level, toFormatedMessage(action, msg, clazz), clazz);
 		} catch (JsonProcessingException e) {
-			logging(level, toFormatedMessage(payload.toString(), clazz), clazz);
+			logging(level, toFormatedMessage(action, payload.toString(), clazz), clazz);
 		}
 	}
 
-	private String toFormatedMessage(String message, Class<?> clazz) {
+	private String toFormatedMessage(LogAction action, String message, Class<?> clazz) {
 		String userId = Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication())
 			.map(Authentication::getPrincipal)
 			.map(UserDetails.class::cast)
@@ -58,7 +59,7 @@ public class ApplicationLogger {
 			transactionId = "";
 		}
 
-		FormatLog applicationLog = new FormatLog(userId, transactionId, domain, layer, message);
+		FormatLog applicationLog = new FormatLog(action, userId, transactionId, domain, layer, message);
 
 		try {
 			return objectMapper.writeValueAsString(applicationLog);
