@@ -1,12 +1,15 @@
 package com.e106.mungplace.common.image;
 
 import java.io.InputStream;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.e106.mungplace.common.transaction.RollbackableRepository;
+import com.e106.mungplace.domain.image.entity.ImageInfo;
+import com.e106.mungplace.domain.marker.entity.Marker;
 import com.e106.mungplace.web.exception.ApplicationException;
 import com.e106.mungplace.web.exception.dto.ApplicationError;
 

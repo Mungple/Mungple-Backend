@@ -1,10 +1,14 @@
 package com.e106.mungplace.common.image;
 
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.e106.mungplace.domain.image.entity.ImageInfo;
+import com.e106.mungplace.domain.marker.entity.Marker;
 import com.e106.mungplace.web.exception.ApplicationException;
 import com.e106.mungplace.web.exception.dto.ApplicationError;
 

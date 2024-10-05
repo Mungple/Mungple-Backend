@@ -11,7 +11,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
 import com.e106.mungplace.domain.image.entity.ImageInfo;
-import com.e106.mungplace.domain.image.repository.MarkerImageRepository;
+import com.e106.mungplace.domain.image.repository.MarkerImageInfoRepository;
 import com.e106.mungplace.domain.marker.entity.Marker;
 import com.e106.mungplace.domain.marker.entity.MarkerPoint;
 import com.e106.mungplace.domain.marker.repository.MarkerPointRepository;
@@ -25,7 +25,7 @@ public class MarkerReader {
 
 	private final MarkerRepository markerRepository;
 	private final MarkerPointRepository markerPointRepository;
-	private final MarkerImageRepository markerImageRepository;
+	private final MarkerImageInfoRepository markerImageInfoRepository;
 
 	public Optional<Marker> find(UUID markerId) {
 		return markerRepository.findById(markerId);
@@ -43,7 +43,7 @@ public class MarkerReader {
 	}
 
 	public List<ImageInfo> findMarkerImage(UUID markerId) {
-		return markerImageRepository.findByMarkerId(markerId);
+		return markerImageInfoRepository.findByMarkerId(markerId);
 	}
 
 	public List<Marker> findFirstMarkersByUserId(Long userId, Long size) {
