@@ -1,5 +1,6 @@
 package com.e106.mungplace.web.marker.controller;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.e106.mungplace.web.util.RequestDeduplicator;
 import com.e106.mungplace.web.marker.dto.CreateMarkerResponse;
 import com.e106.mungplace.web.marker.dto.GeohashMarkerResponse;
 import com.e106.mungplace.web.marker.dto.MarkerInfoResponse;
@@ -34,11 +36,14 @@ import lombok.extern.slf4j.Slf4j;
 public class MarkerController {
 
 	private final MarkerService markerService;
+	private final RequestDeduplicator requestDeduplicator;
 
 	@PostMapping(consumes = "multipart/form-data")
 	public ResponseEntity<CreateMarkerResponse> createMarker(
 		@RequestPart("MarkerCreateRequest") String markerInfoJson,
 		@RequestPart(name = "image", required = false) List<MultipartFile> imageFiles) throws Exception {
+
+		requestDeduplicator.isValidIdempotent(Arrays.asList("CREATE_MARKER", markerInfoJson));
 
 		return ResponseEntity.ok(markerService.createMarkerProcess(markerInfoJson, imageFiles));
 	}
