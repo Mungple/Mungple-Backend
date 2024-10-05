@@ -7,6 +7,9 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
+import com.e106.mungplace.common.log.dto.LogAction;
+import com.e106.mungplace.common.log.dto.LogLevel;
+import com.e106.mungplace.common.log.impl.ApplicationLogger;
 import com.e106.mungplace.domain.heatmap.dto.HeatmapChunk;
 import com.e106.mungplace.domain.heatmap.event.HeatmapQueryType;
 
@@ -14,12 +17,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @RequiredArgsConstructor
-@Slf4j
 @Component
 public class HeatmapChunkConsumer {
 
 	private static final int QUEUE_WAIT_TIME = 30;
 
+	private final ApplicationLogger logger;
 	private final RedisTemplate<String, HeatmapChunk> redisTemplate;
 	private final SimpMessagingTemplate messagingTemplate;
 
@@ -33,11 +36,11 @@ public class HeatmapChunkConsumer {
 		while (System.currentTimeMillis() < endTime) {
 			HeatmapChunk chunk = redisTemplate.opsForList().leftPop(key, 500, TimeUnit.MILLISECONDS);
 			if (chunk != null) {
-				log.info("key: {}, chunk: {}", key, chunk);
+				logger.log(LogLevel.DEBUG, LogAction.CONSUME, String.format("key: %s, chunk: %s", key, chunk), getClass());
 				messagingTemplate.convertAndSendToUser(userId.toString(), destination, chunk);
 			}
 		}
-		log.info("key: {} | 소켓 송신 종료", key);
+		logger.log(LogLevel.DEBUG, LogAction.CONSUME, String.format("key: %s | 소켓 송신 종료", key), getClass());
 	}
 
 	private String generateQueueKey(Long userId, HeatmapQueryType queryType) {

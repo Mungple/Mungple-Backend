@@ -20,7 +20,7 @@
         </encoder>
     </appender>
 
-    <root level="INFO" additivity="false">
+    <root level="WARN" additivity="false">
         <appender-ref ref="STDOUT"/>
         <appender-ref ref="ROLLING"/>
     </root>
