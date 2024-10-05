@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { Heatmap } from 'react-native-maps';
 import useUserLocation from '@/hooks/useUserLocation';
 import  useWebsocketActions  from '@/hooks/useWebsocketActions'
@@ -13,10 +13,9 @@ interface ToZone {
   };
 }
 
-const MyBlueZoneHeatmap = () => {
+const AllRedZoneHeatmap = () => {
   const { userLocation } = useUserLocation(); // 사용자 위치 가져오기
-  const { checkMyBlueZone } = useWebsocketActions()
-  const visibleElements = useState(true)
+  const { checkAllUserZone } = useWebsocketActions()
 
   // 사용자 위치 변경 시 블루존 요청
   useEffect(() => {
@@ -29,29 +28,34 @@ const MyBlueZoneHeatmap = () => {
         side: 1000,
         point: { lat: centerLat, lon: centerLon },
       };
-      checkMyBlueZone(zoneData);
+      checkAllUserZone(1, zoneData);
     }
-  }, [userLocation, checkMyBlueZone]);
+  }, [userLocation, checkAllUserZone]);
   
-  const { myBlueZone } = useWebSocket()
+  const { allRedZone } = useWebSocket()
   // console.log("visibleElements:", visibleElements);
   // console.log("myBlueZone:", myBlueZone);
   // console.log("Heatmap Point:", myBlueZone.cells)
   
   return (
     <>
-      {/* 개인 블루존 히트맵 렌더링 */}
-      {visibleElements && myBlueZone && myBlueZone.cells && myBlueZone.cells.length > 0 && (
+      {/* 레드존 히트맵 렌더링 */}
+      { allRedZone && allRedZone.cells && allRedZone.cells.length > 0 && (
         <Heatmap
-          points={myBlueZone.cells.map((cell) => ({
+          points={allRedZone.cells.map((cell) => ({
             latitude: cell.point.lat,
             longitude: cell.point.lon,
             weight: cell.weight,
           }))}
+          gradient={{
+            colors: ['red', 'darkred'],
+            startPoints: [0.2, 1.0],
+            colorMapSize: 256,
+          }}
         />
       )}
     </>
   );
 };
 
-export default MyBlueZoneHeatmap;
+export default AllRedZoneHeatmap;
