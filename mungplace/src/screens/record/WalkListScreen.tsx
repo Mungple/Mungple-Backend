@@ -1,32 +1,69 @@
 import React from 'react';
-import { View, Text, FlatList, TouchableOpacity } from 'react-native';
+import { FlatList, TouchableOpacity, Image } from 'react-native';
 import styled from 'styled-components/native';
 
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RecordStackParamList } from '@/navigations/stack/RecordStackNavigator';
+import { ResponsePetProfile } from '@/types';
+import { useUserStore } from '@/state/useUserStore';
+import { calculateDistance } from '@/utils/recordCalculator';
+import DefaultImage from '@/assets/profile-image.png';
+import { colors } from '@/constants';
 
 type WalkListScreenProps = NativeStackScreenProps<RecordStackParamList, 'WalkList'>;
 
 const WalkListScreen: React.FC<WalkListScreenProps> = ({ navigation, route }) => {
   const { dayListData } = route.params;
+  const petData = useUserStore((state) => state.petData);
+
+  const processPetPhoto = (petData: ResponsePetProfile[], dogId: number) => {
+    const pet = petData.find((pet) => pet.id === dogId);
+    return pet?.photo ? { uri: `http://j11e106.p.ssafy.io:9000/images/${pet.photo}` } : null;
+  };
 
   const renderDayWalks = ({
     item,
     index,
   }: {
     item: { distance: number; togetherDogIds: number[]; explorationId: number };
+    index: number;
   }) => {
+    const { distance, togetherDogIds, explorationId } = item;
+
     return (
       <TouchableOpacity
-        onPress={() => navigation.navigate('WalkDetail', { explorationId: item.explorationId })}>
+        onPress={() => navigation.navigate('WalkDetail', { explorationId: explorationId })}>
         <ListItem>
-          <NumberItem>{index}</NumberItem>
-          <Text>산책 거리: {item.distance} km</Text>
-          <FlatList
-            data={item.togetherDogIds}
-            renderItem={({ item }) => <Text>개 ID: {item}</Text>}
-            keyExtractor={(dogId) => dogId.toString()}
-          />
+          <NumContainer>
+            <TextItem>{index + 1}</TextItem>
+          </NumContainer>
+          <DogList>
+            {togetherDogIds.length > 0 ? (
+              <FlatList
+                data={togetherDogIds}
+                renderItem={({ item }) => {
+                  const imageSource = processPetPhoto(petData, item) || DefaultImage;
+                  return (
+                    <Image
+                      source={imageSource}
+                      style={{ width: 50, height: 50, borderRadius: 25, marginRight: 5 }}
+                    />
+                  );
+                }}
+                keyExtractor={(dogId) => dogId.toString()}
+                horizontal={true}
+                showsHorizontalScrollIndicator={false}
+              />
+            ) : (
+              <Image
+                source={DefaultImage}
+                style={{ width: 50, height: 50, borderRadius: 25, marginRight: 5 }}
+              />
+            )}
+          </DogList>
+          <DistaneContainer>
+            <TextItem>{calculateDistance(distance)}</TextItem>
+          </DistaneContainer>
         </ListItem>
       </TouchableOpacity>
     );
@@ -43,22 +80,41 @@ const WalkListScreen: React.FC<WalkListScreenProps> = ({ navigation, route }) =>
   );
 };
 
-const Container = styled.View`
+const Container = styled.SafeAreaView`
   flex: 1;
-  background-color: white;
+  background-color: ${colors.WHITE};
+  padding-vertical: 10px;
 `;
 
-const NumberItem = styled.Text`
-  flex: 1;
+const NumContainer = styled.Text`
+  flex: 2;
+  padding: 10px;
+`;
+
+const DistaneContainer = styled.View`
+  flex: 3;
+  font-weight: bold;
+  padding: 10px;
+`;
+
+const TextItem = styled.Text`
+  font-size: 24px;
   font-weight: bold;
 `;
 
 const ListItem = styled.View`
-  flexdirection: row;
+  flex-direction: row;
   margin-bottom: 10px;
   padding: 10px;
-  background-color: #f9f9f9;
-  border-radius: 5px;
+  align-items: center;
+  border-bottom-width: 1px;
+  border-bottom-color: ${colors.GRAY_100};
+`;
+
+const DogList = styled.View`
+  flex: 5;
+  flex-direction: row;
+  align-items: center;
 `;
 
 export default WalkListScreen;

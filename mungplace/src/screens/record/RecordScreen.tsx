@@ -1,10 +1,11 @@
 import React, { useCallback, useEffect, useState } from 'react';
+import { FlatList } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import styled from 'styled-components/native';
-import { colors } from '@/constants';
-import { getMonthYearDetails, getNewMonthYear } from '@/utils/date';
-import { getMonthWalks, getDayWalks } from '@/api/walk';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { colors } from '@/constants';
+import { getMonthWalks, getDayWalks } from '@/api/walk';
+import { getMonthYearDetails, getNewMonthYear } from '@/utils/date';
 import { RecordStackParamList } from '@/navigations/stack/RecordStackNavigator';
 import Calendar from '@/components/record/Calendar';
 import MonthStatistics from '@/components/record/MonthStatistics';
@@ -69,9 +70,8 @@ const RecordScreen: React.FC<RecordScreenProps> = ({ navigation }) => {
 
     try {
       const data = await getDayWalks(dateString); // 날짜에 맞는 산책 데이터 가져오기
-      console.log('일간 산책 목록:');
-      console.log(data);
-      processDayWalks(data.explorationInfos); // 가져온 데이터로 일간 산책 목록 처리
+      console.log('일간 산책 목록 가져오기 성공:', data);
+      processDayWalks(data.explorationInfos);
     } catch (error) {
       console.error('일간 산책 목록 가져오기 실패:', error);
     }
@@ -105,15 +105,30 @@ const RecordScreen: React.FC<RecordScreenProps> = ({ navigation }) => {
 
   return (
     <Container>
-      <Calendar
-        attendance={attendance}
-        monthYear={monthYear}
-        selectedDate={selectedDate}
-        moveToToday={moveToToday}
-        onPressDate={handlePressDate}
-        onChangeMonth={handleUpdateMonth}
+      <FlatList
+        data={[{ key: 'calendar' }, { key: 'statistics' }]}
+        renderItem={({ item }) => {
+          switch (item.key) {
+            case 'calendar':
+              return (
+                <Calendar
+                  attendance={attendance}
+                  monthYear={monthYear}
+                  selectedDate={selectedDate}
+                  moveToToday={moveToToday}
+                  onPressDate={handlePressDate}
+                  onChangeMonth={handleUpdateMonth}
+                />
+              );
+            case 'statistics':
+              return <MonthStatistics year={monthYear.year} month={monthYear.month} />;
+            default:
+              return null;
+          }
+        }}
+        keyExtractor={(item) => item.key}
+        contentContainerStyle={{ paddingBottom: 20 }}
       />
-      <MonthStatistics year={monthYear.year} month={monthYear.month} />
     </Container>
   );
 };
