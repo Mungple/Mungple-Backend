@@ -18,6 +18,7 @@ export const useUserStore = create<UserState>((set) => ({
     userId: 0,
     nickname: '',
     imageName: null,
+    createdAt: '',
   },
 
   setUserId: (value: number) => set({ userId: value }),

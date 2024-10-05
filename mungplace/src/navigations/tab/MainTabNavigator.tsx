@@ -6,7 +6,6 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 import MapScreen from '@/screens/map/MapScreen';
 import HomeScreen from '@/screens/home/HomeScreen';
-import RankingScreen from '@/screens/ranking/RankingScreen';
 import SettingStackNavigator, { SettingStackParamList } from '../stack/SettingStackNavigator';
 import RecordStackNavigator from '../stack/RecordStackNavigator';
 
