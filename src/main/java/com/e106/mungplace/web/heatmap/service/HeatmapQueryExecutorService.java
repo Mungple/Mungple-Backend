@@ -7,6 +7,8 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.stereotype.Component;
 
+import com.e106.mungplace.common.log.MethodLoggable;
+import com.e106.mungplace.common.log.dto.LogAction;
 import com.e106.mungplace.domain.heatmap.dto.HeatmapCell;
 import com.e106.mungplace.domain.heatmap.dto.HeatmapChunk;
 import com.e106.mungplace.domain.heatmap.dto.HeatmapSearchCondition;

@@ -6,6 +6,8 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.e106.mungplace.common.log.MethodLoggable;
+import com.e106.mungplace.common.log.dto.LogAction;
 import com.e106.mungplace.common.map.dto.Point;
 import com.e106.mungplace.domain.exploration.entity.Exploration;
 import com.e106.mungplace.domain.exploration.entity.ExplorePoint;
@@ -26,6 +28,7 @@ public class ManagerExplorePointService {
 	private final ManagerReader managerReader;
 	private final ExplorationRepository explorationRepository;
 
+	@MethodLoggable(action = LogAction.CREATE)
 	@Transactional
 	public Iterable<ExplorePoint> bulkInsertProcess(String managerName, List<Point> points) {
 		User manager = managerReader.findOrCreateManager(managerName);

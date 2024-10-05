@@ -10,6 +10,8 @@ import org.springframework.data.elasticsearch.core.SearchHit;
 import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.stereotype.Service;
 
+import com.e106.mungplace.common.log.MethodLoggable;
+import com.e106.mungplace.common.log.dto.LogAction;
 import com.e106.mungplace.common.map.dto.Point;
 import com.e106.mungplace.domain.facility.entity.PetFacilityPoint;
 import com.e106.mungplace.domain.facility.repository.PetFacilityRepository;
@@ -30,6 +32,7 @@ public class PetFacilityService {
 	private final ElasticsearchOperations elasticsearchOperations;
 	private final PetFacilityRepository petFacilityRepository;
 
+	@MethodLoggable(action = LogAction.SELECT)
 	public PetFacilitySearchResponse searchNearbyPetFacilityProcess(Point point, Integer radius) {
 		NativeQuery query = new NativeQueryBuilder()
 			.withFilter(QueryBuilders.geoDistance(builder ->
@@ -51,6 +54,7 @@ public class PetFacilityService {
 		return new PetFacilitySearchResponse(list);
 	}
 
+	@MethodLoggable(action = LogAction.SELECT)
 	public PetFacilityResponse getPetFacilityById(Long id) {
 		return petFacilityRepository.findById(id)
 			.map(PetFacilityResponse::of)

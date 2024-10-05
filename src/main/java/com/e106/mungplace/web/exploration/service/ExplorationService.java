@@ -10,6 +10,8 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.e106.mungplace.common.log.MethodLoggable;
+import com.e106.mungplace.common.log.dto.LogAction;
 import com.e106.mungplace.common.map.dto.Point;
 import com.e106.mungplace.domain.exploration.entity.Exploration;
 import com.e106.mungplace.domain.exploration.entity.ExplorationEvent;
@@ -44,6 +46,7 @@ public class ExplorationService {
 	private final ExplorationRecorder explorationRecorder;
 	private final ExplorationProducer producer;
 
+	@MethodLoggable(action = LogAction.CREATE)
 	@Transactional
 	public ExplorationStartResponse startExplorationProcess(ExplorationStartWithDogsRequest request) {
 		Long userId = userHelper.getCurrentUserId();
@@ -60,6 +63,7 @@ public class ExplorationService {
 		return ExplorationStartResponse.of(exploration);
 	}
 
+	@MethodLoggable(action = LogAction.UPDATE)
 	@Transactional
 	public void endExplorationProcess(Long explorationId) {
 		Long userId = userHelper.getCurrentUserId();
@@ -75,6 +79,7 @@ public class ExplorationService {
 		explorationRecorder.endRecord(userId.toString(), explorationId.toString());
 	}
 
+	@MethodLoggable(action = LogAction.SELECT)
 	@Transactional(readOnly = true)
 	public ExplorationsResponse findExplorationsOfMonthProcess(int year, int month) {
 		Long userId = userHelper.getCurrentUserId();
@@ -83,6 +88,7 @@ public class ExplorationService {
 		return ExplorationsResponse.of(year, month, explorationInfos);
 	}
 
+	@MethodLoggable(action = LogAction.SELECT)
 	@Transactional(readOnly = true)
 	public ExplorationsResponse findExplorationsOfDayProcess(LocalDate date) {
 		Long userId = userHelper.getCurrentUserId();
@@ -90,6 +96,7 @@ public class ExplorationService {
 		return ExplorationsResponse.of(date.getYear(), date.getMonthValue(), explorations);
 	}
 
+	@MethodLoggable(action = LogAction.SELECT)
 	@Transactional(readOnly = true)
 	public ExplorationResponse findExplorationProcess(Long explorationId) {
 		Long userId = userHelper.getCurrentUserId();
@@ -102,6 +109,7 @@ public class ExplorationService {
 		return ExplorationResponse.of(exploration, togetherDogIds, points);
 	}
 
+	@MethodLoggable(action = LogAction.SELECT)
 	@Transactional(readOnly = true)
 	public ExplorationStatisticResponse findExplorationStatisticsProcess(int year, int month) {
 		Long userId = userHelper.getCurrentUserId();
@@ -110,6 +118,7 @@ public class ExplorationService {
 		return StatisticUtils.createExplorationStatisticOfMonth(year, month, explorationInfos);
 	}
 
+	@MethodLoggable(action = LogAction.CREATE)
 	@Transactional
 	public void createExplorationEventProcess(ExplorationEventRequest eventRequest, Long explorationId,
 		Principal principal) {
