@@ -41,7 +41,6 @@ const getProfile = async (userId: number): Promise<ResponseProfile> => {
         'Content-Type': `application/json; charset=utf8`,
       },
     });
-    console.log(data);
     console.log('프로필 정보 요청 성공');
     return data;
   } catch (error) {
