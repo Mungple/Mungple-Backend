@@ -45,29 +45,35 @@ public class MarkerConsumer {
 
 	@KafkaListener(topics = "#{__listener.topic}", groupId = "#{__listener.topic}-create-group")
 	public void saveMarkerEventProcess(MarkerEvent event, Acknowledgment ack) {
+		try {
+			MarkerPayload markerPayload = markerSerializer.deserializeMarker(event.getPayload())
+				.orElseThrow(() -> new ApplicationException(ELASTIC_SEARCH_SAVE_ERROR));
 
-		String markerPayloadString = event.getPayload();
-		Optional<MarkerPayload> markerPayloadOptional = markerSerializer.deserializeMarker(markerPayloadString);
+			MarkerPoint markerPoint = buildMarkerPoint(event, markerPayload);
 
-		markerPayloadOptional.ifPresentOrElse(markerPayload -> {
-			GeoPoint geoPoint = new GeoPoint(markerPayload.getLat(), markerPayload.getLon());
+			saveMarkerPoint(markerPoint, event);
 
-			MarkerPoint markerPoint = MarkerPoint.builder()
-				.markerId(event.getEntityId())
-				.userId(markerPayload.getUserId())
-				.explorationId(markerPayload.getExplorationId() != null ? markerPayload.getExplorationId() : null)
-				.point(geoPoint)
-				.createdAt(event.getCreatedAt())
-				.type(markerPayload.getType())
-				.build();
-
-			markerPointRepository.save(markerPoint);
-			log.info("[{}] Consume Success - ID : {} ", topic.toUpperCase(), event.getUuid());
-		}, () -> {
+			ack.acknowledge();
+		} catch (Exception e) {
 			kafkaTemplate.send(KAFKA_TOPIC, KAFKA_TOPIC, event.getEntityId().toString());
-			throw new ApplicationException(ELASTIC_SEARCH_SAVE_ERROR);
-		});
+			throw new ApplicationException(ELASTIC_SEARCH_SAVE_ERROR); // 예외 재발생
+		}
+	}
 
-		ack.acknowledge();
+	private MarkerPoint buildMarkerPoint(MarkerEvent event, MarkerPayload markerPayload) {
+		GeoPoint geoPoint = new GeoPoint(markerPayload.getLat(), markerPayload.getLon());
+		return MarkerPoint.builder()
+			.markerId(event.getEntityId())
+			.userId(markerPayload.getUserId())
+			.explorationId(markerPayload.getExplorationId() != null ? markerPayload.getExplorationId() : null)
+			.point(geoPoint)
+			.createdAt(event.getCreatedAt())
+			.type(markerPayload.getType())
+			.build();
+	}
+
+	private void saveMarkerPoint(MarkerPoint markerPoint, MarkerEvent event) {
+		markerPointRepository.save(markerPoint);
+		log.info("[{}] Consume Success - ID : {}", topic.toUpperCase(), event.getUuid());
 	}
 }
