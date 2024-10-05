@@ -14,11 +14,12 @@ public class AsyncConfig {
 	@Bean(name = "taskExecutor")
 	public Executor taskExecutor() {
 		ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-		executor.setCorePoolSize(2);
-		executor.setMaxPoolSize(10);
-		executor.setQueueCapacity(500);
+		executor.setCorePoolSize(20);
+		executor.setMaxPoolSize(250);
+		executor.setQueueCapacity(1000);
 		executor.setThreadNamePrefix("RedisQueue-");
 		executor.initialize();
+		executor.setKeepAliveSeconds(60);
 		return executor;
 	}
 }

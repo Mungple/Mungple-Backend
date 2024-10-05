@@ -45,13 +45,14 @@ class HeatmapChunkConsumerIntgTest {
 	void When_QueueHasHeatmapChunk_Then_ConsumerSendToSocket() throws InterruptedException {
 		// given
 		Long userId = 999999999L;
+		String requestId = "skjdi21";
 		HeatmapQueryType queryType = HeatmapQueryType.USER_BLUEZONE;
 		String queueKey = String.format("users:%d:userbluezone", userId);
 		List<HeatmapCell> cells = Stream.generate(this::generateHeatmapCell).limit(2).toList();
 		redisTemplate.opsForList().rightPush(queueKey, new HeatmapChunk(cells));
 
 		// when
-		heatmapChunkConsumer.consume(userId, queryType);
+		heatmapChunkConsumer.consume(requestId, userId, queryType);
 		Thread.sleep(1000);
 
 		// then

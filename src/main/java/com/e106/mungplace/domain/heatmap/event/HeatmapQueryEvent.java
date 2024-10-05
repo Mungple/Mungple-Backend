@@ -8,6 +8,7 @@ import lombok.Builder;
 
 @Builder
 public record HeatmapQueryEvent(
+	String requestId,
 	Long userId,
 	Point leftTop,
 	Point rightBottom,

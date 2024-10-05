@@ -1,18 +1,34 @@
 import http from 'k6/http';
 import ws from 'k6/ws';
-import { check } from 'k6';
-import { Trend } from 'k6/metrics';
+import { check,  } from 'k6';
+import { Trend, Counter } from 'k6/metrics';
 
 // STOMP message response 시간을 측정하는 메트릭 (초 단위)
-let messageLatency = new Trend('message_latency', true);  // 'true'는 초 단위로 측정
+let messageLatency = new Trend('message_latency', true);
+let messageCounter = new Counter('message_counter');
+let receivedMessageCount = new Counter('received_message_count');
 
 const url = 'ws://host.docker.internal:8080/ws';
 const loginUrl = 'http://host.docker.internal:8080/manager/login';
 
+// 요청 ID에 대한 시작 시간을 저장하는 Map
+let requestTimestamps = new Map();
+
 export const options = {
     stages: [
-        { duration: '1s', target: 10 },  // 10명의 가상 사용자가 1초 동안 접속
-        { duration: '90s', target: 10 },  // 30초 동안 테스트 유지
+        { duration: '1s', target: 1 },
+
+        { duration: '20s', target: 100 },
+        { duration: '20s', target: 200 },
+        { duration: '20s', target: 300 },
+        { duration: '20s', target: 400 },
+        { duration: '20s', target: 500 },
+        { duration: '20s', target: 600 },
+        { duration: '20s', target: 700 },
+        { duration: '20s', target: 800 },
+        { duration: '20s', target: 900 },
+        { duration: '20s', target: 1000 },
+        { duration: '120s', target: 0 },
     ],
 };
 
@@ -39,15 +55,7 @@ export default function () {
         socket.on('open', function () {
             console.log(`User ${userId} connected to WebSocket server`);
 
-            const message = JSON.stringify({
-                side: 500,
-                point: {
-                    lat: 35.085639,  // 위도
-                    lon: 128.87754,  // 경도
-                },
-            });
-
-            // STOMP CONNECT 프레임 전송
+            // SUBSCRIBE 프레임을 통해 메시지 구독
             const connectFrame = 'CONNECT\naccept-version:1.1,1.0\nhost:localhost\n\n\0';
             socket.send(connectFrame);
 
@@ -55,23 +63,36 @@ export default function () {
             const subscribeFrame = `SUBSCRIBE\nid:sub-${userId}\ndestination:/user/sub/bluezone\n\n\0`;
             socket.send(subscribeFrame);
 
-            // STOMP SEND 프레임으로 heatmap 요청 전송
-            const sendFrame = `SEND\ndestination:/pub/bluezone\ncontent-type:application/json\n\n${message}\0`;
-            const startTime = new Date();  // 요청 전송 시작 시간
-            socket.send(sendFrame);
+            // 5초마다 STOMP SEND 프레임으로 heatmap 요청 전송
+            socket.setInterval(function () {
+                const requestId = Math.random().toString(36).substr(2, 9); // 고유한 요청 ID 생성
+                const startTime = new Date();  // 요청 전송 시작 시간
 
-            // 메시지 수신 시 응답 시간 측정
-            socket.on('message', function (msg) {
-                const endTime = new Date();
-                const latency = (endTime - startTime) / 1000;  // 응답 시간(초) 계산
-                console.log(`User ${userId} received heatmap: ${msg}`);
+                const message = JSON.stringify({
+                    requestId: requestId, // 고유한 ID 추가
+                    side: 500,
+                    point: {
+                        lat: 35.085639,  // 위도
+                        lon: 128.87754,  // 경도
+                    },
+                });
 
-                // 응답 시간을 측정하여 초 단위로 저장
-                messageLatency.add(latency);
-                check(msg, { 'heatmap received': (m) => m.indexOf('MESSAGE') !== -1 });
-            });
+                const sendFrame = `SEND\ndestination:/pub/bluezone\ncontent-type:application/json\n\n${message}\0`;
+                socket.send(sendFrame);
+                messageCounter.add(1);
 
-            // 소켓 연결을 끊지 않고 지속적으로 유지
+                socket.on('message', function (msg) {
+                    if(msg.indexOf(requestId) !== -1){
+                        const endTime = new Date();
+                        const latency = (endTime - startTime);  // 응답 시간(초) 계산
+
+                        receivedMessageCount.add(1);  // 1초를 넘기면 카운트 증가
+                        messageLatency.add(latency);
+                    }
+                });
+
+                console.log(`User ${userId} sent heatmap request at ${startTime} with requestId: ${requestId}`);
+            }, 15000);  // 5초마다 요청 전송
         });
 
         socket.on('close', function () {
