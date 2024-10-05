@@ -53,6 +53,7 @@ public class KafkaConfig {
 			new DefaultErrorHandler(new DeadLetterPublishingRecoverer(kafkaTemplate), generatedBackoff()));
 		factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL);
 
+
 		return factory;
 	}
 
@@ -142,6 +143,15 @@ public class KafkaConfig {
 	@Bean
 	public NewTopic accessLogTopic() {
 		return TopicBuilder.name("access-log")
+			.partitions(3)
+			.replicas(1)
+			.config(TopicConfig.RETENTION_MS_CONFIG, String.valueOf(7 * 24 * 60 * 60))
+			.build();
+	}
+
+	@Bean
+	public NewTopic markerRollbackTopic() {
+		return TopicBuilder.name("markerRollback")
 			.partitions(3)
 			.replicas(1)
 			.config(TopicConfig.RETENTION_MS_CONFIG, String.valueOf(7 * 24 * 60 * 60))
