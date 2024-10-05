@@ -1,9 +1,9 @@
 import React from 'react';
-import { Dimensions, Pressable } from 'react-native';
+import { Dimensions, Image, StyleSheet } from 'react-native';
 import styled from 'styled-components/native';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 import { colors } from '@/constants';
+import paw from '@/assets/paw.png';
 
 interface DateBoxProps {
   date: number;
@@ -31,18 +31,14 @@ const DateBox = ({ date, isToday, selectedDate, hasAttendance, onPressDate }: Da
               {date}
             </DateText>
           </DateContainer>
-          {hasAttendance && (
-            <MaterialIcons name="check-circle" size={18} color={colors.ORANGE.BASE} />
-          )}
+          {hasAttendance && <Image source={paw} style={styles.paw} />}
         </>
       )}
     </DatePressable>
   );
 };
 
-const DatePressable = styled(Pressable)<{
-  isSelected: boolean;
-}>`
+const DatePressable = styled.TouchableOpacity<{ isSelected: boolean }>`
   align-items: center;
   border-radius: 8px;
   width: ${deviceWidth / 7}px;
@@ -54,16 +50,25 @@ const DateContainer = styled.View<{ isToday: boolean }>`
   margin-top: 6px;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 32px;
-  border-radius: 8px;
+  width: 30px;
+  height: 34px;
+  border-radius: 10px;
   background-color: ${({ isToday }) => (isToday ? colors.ORANGE.BASE : 'transparent')};
 `;
 
 const DateText = styled.Text<{ isToday: boolean; isSelected: boolean }>`
-  font-size: 17px;
+  font-size: 16px;
   color: ${({ isToday }) => (isToday ? colors.WHITE : colors.BLACK)};
   font-weight: ${({ isToday, isSelected }) => (isToday || isSelected ? 'bold' : 'normal')};
+  padding: 4px;
 `;
+
+const styles = StyleSheet.create({
+  paw: {
+    width: 20,
+    height: 20,
+    marginTop: 4,
+  },
+});
 
 export default DateBox;

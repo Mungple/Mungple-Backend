@@ -9,22 +9,22 @@ import WalkDetailScreen from '@/screens/record/WalkDetailScreen';
 interface DayListData {
   explorationId: number; // 산책 ID
   distance: number; // 산책 거리 (예: 미터)
-  togertherDogIds: number[]; // 함께한 개의 ID 배열
+  togetherDogIds: number[]; // 함께한 개의 ID 배열
 }
 
 export type RecordStackParamList = {
-  Record: undefined;
-  WalkList: DayListData[];
+  RecordScreen: undefined;
+  WalkList: { dayListData: DayListData[] };
   WalkDetail: { explorationId: number };
 };
 
 const RecordStack = createNativeStackNavigator<RecordStackParamList>();
 
-const RecordNavigator = () => {
+const RecordStackNavigator = () => {
   return (
     <RecordStack.Navigator>
       <RecordStack.Screen
-        name="Record"
+        name="RecordScreen"
         component={RecordScreen}
         options={{ headerTitle: '월간 산책' }}
       />
@@ -42,4 +42,4 @@ const RecordNavigator = () => {
   );
 };
 
-export default RecordNavigator;
+export default RecordStackNavigator;
