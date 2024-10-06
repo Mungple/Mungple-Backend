@@ -33,7 +33,7 @@ const MungZoneHeatmap = () => {
   }, [userLocation, checkMungPlace]);
   
   const { mungZone } = useWebSocket()
-  console.log("멍존 입니다", mungZone)
+  // console.log("멍존 입니다", mungZone)
   return (
     <>
       {/* 멍존 렌더링 */}

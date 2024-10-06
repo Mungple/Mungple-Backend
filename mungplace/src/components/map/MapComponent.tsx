@@ -5,7 +5,7 @@ import ClusteredMapView from 'react-native-map-clustering';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import MapView, { Marker, Polyline, PROVIDER_GOOGLE } from 'react-native-maps';
-
+import useWebSocket from '@/hooks/useWebsocket';
 import { colors } from '@/constants'; // 색깔
 import MapSettings from './MapSettings';
 import { mapNavigations } from '@/constants';
@@ -24,8 +24,7 @@ import MyBlueZoneHeatmap from './MyBlueZoneHeatmap'; // 개인 블루존 렌더�
 import AllBlueZoneHeatmap from './AllBlueZoneHeatmap'; // 블루존 렌더링
 import AllRedZoneHeatmap from './AllRedZoneHeatmap'; // 레드존 렌더링
 import WithPetPlace from './WithPetPlace'; // 애견 동반 시설 조회
-import MungZoneHeatmap from './MungZoneHeatmap';
-
+import MungZoneHeatmap from './MungZoneHeatmap'; // 멍존 렌더링
 
 interface MapComponentProps {
   userLocation: { latitude: number; longitude: number };

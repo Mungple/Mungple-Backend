@@ -1,15 +1,16 @@
 import React, { useEffect } from 'react';
-import { View, Text, FlatList, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, ActivityIndicator, StyleSheet } from 'react-native';
 import useMyMarkers from '@/hooks/useMyMarkers';
 import { useNavigation } from '@react-navigation/native';
 import { MapStackParamList } from '@/navigations/stack/MapStackNavigator';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { mapNavigations } from '@/constants';
+import { useUserStore } from '@/state/useUserStore';
 
 const MyMar = () => {
   const { markers, fetchMyMarkers, loading } = useMyMarkers();
   const navigation = useNavigation<NativeStackNavigationProp<MapStackParamList>>()
-
+  const userNickname = useUserStore((state) => state.userData.nickname)
   useEffect(() => {
     fetchMyMarkers(); // 페이지 로딩 시 내 마커 데이터를 불러옴
   }, []);
@@ -24,21 +25,62 @@ const MyMar = () => {
   }
 
   return (
-    <View>
-      <Text>내 마커 리스트</Text>
+    <View style={styles.container}>
+      <Text style={styles.title}>내 마커 리스트</Text>
       <FlatList
         data={markers}
         keyExtractor={(item) => item.markerId}
         renderItem={({ item }) => (
-          <TouchableOpacity onPress={() => handleMarkerPress(item.markerId)}>
+          <TouchableOpacity onPress={() => handleMarkerPress(item.markerId)} style={styles.markerItem}>
             <View>
-              <Text>{item.title}</Text>
+              <Text style={styles.markerTitle}>{item.title}</Text>
+              <Text style={styles.markerTitle}>{userNickname}</Text>
             </View>
           </TouchableOpacity>
         )}
+        contentContainerStyle={styles.listContainer}
       />
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 16,
+    backgroundColor: '#f9f9f9',
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+  loaderContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f9f9f9',
+  },
+  listContainer: {
+    paddingBottom: 16,
+  },
+  markerItem: {
+    backgroundColor: '#fff',
+    padding: 16,
+    borderRadius: 8,
+    marginVertical: 8,
+    elevation: 1, // 안드로이드 그림자 효과
+    shadowColor: '#000', // iOS 그림자 효과
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 1.41,
+  },
+  markerTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#333',
+  },
+});
 
 export default MyMar;
