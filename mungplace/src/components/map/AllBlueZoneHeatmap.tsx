@@ -2,16 +2,8 @@ import React, { useEffect } from 'react';
 import { Heatmap } from 'react-native-maps';
 import useUserLocation from '@/hooks/useUserLocation';
 import useWebsocketActions from '@/hooks/useWebsocketActions';
-import { FromZone } from '@/hooks/useWebsocket';
 import { colors } from '@/constants';
-
-interface ToZone {
-  side: number;
-  point: {
-    lat: number;
-    lon: number;
-  };
-}
+import { FromZone, ToZone } from '@/types';
 
 type AllBlueZoneHeatmapProps = {
   allBlueZone: FromZone | null;

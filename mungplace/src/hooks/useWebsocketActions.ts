@@ -1,20 +1,6 @@
 import { useCallback } from 'react';
 import { useAppStore } from '@/state/useAppStore';
-
-interface ToZone {
-  side: number;
-  point: {
-    lat: number;
-    lon: number;
-  };
-}
-
-interface MungZone {
-  point: {
-    lat: number;
-    lon: number;
-  };
-}
+import { ToMungZone, ToZone } from '@/types';
 
 interface ToLocation {
   lat: number;
@@ -71,7 +57,7 @@ const useWebSocketActions = () => {
   );
 
   const checkMungPlace = useCallback(
-    (allUserZone: MungZone) => {
+    (allUserZone: ToMungZone) => {
       if (clientSocket?.connected) {
         clientSocket.publish({
           destination: '/user/pub/mungplace',

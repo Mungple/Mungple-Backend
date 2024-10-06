@@ -1,15 +1,14 @@
 // 1. 라이브러리 및 네이티브 기능
 import styled from 'styled-components/native';
-import React, { useEffect, useRef, useState } from 'react';
-import { Animated, StyleSheet, Image } from 'react-native';
 import ClusteredMapView from 'react-native-map-clustering';
+import { Animated, StyleSheet, Image } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import MapView, { Marker, Polyline, PROVIDER_GOOGLE } from 'react-native-maps';
 
 // 2. 커스텀 컴포넌트
 import MapSettings from './MapSettings';
-import WithPetPlace from './WithPetPlace';
 import MarkerForm from '../marker/MarkerForm';
 import CustomMapButton from '../common/CustomMapButton';
 import CustomBottomSheet from '../common/CustomBottomSheet';
@@ -32,13 +31,14 @@ import useUserLocation from '@/hooks/useUserLocation';
 import useMarkersWithinRadius from '@/hooks/useMarkersWithinRadius';
 
 // 6. 상태 관리 및 데이터
+import { fetchWithPetPlace } from '@/api/map';
 import { colors, mapNavigations } from '@/constants';
 import { useMapStore, MarkerData } from '@/state/useMapStore';
 
 // 7. 네비게이션 타입
 import { MapStackParamList } from '@/navigations/stack/MapStackNavigator';
-import { useAppStore } from '@/state/useAppStore';
 
+// 컴포넌트에 전달되는 props 정의
 interface MapComponentProps {
   userLocation: { latitude: number; longitude: number };
   path?: { latitude: number; longitude: number }[];
@@ -49,35 +49,44 @@ interface MapComponentProps {
   explorationId?: number;
 }
 
-interface PetFacility {
-  id: number;
-  latitude: number;
-  longitude: number;
-}
-
+// ========== Main Functional Component ==========
 const MapComponent: React.FC<MapComponentProps> = ({
   userLocation,
   bottomOffset = 0,
   path = [],
   explorationId = -1,
 }) => {
-  useMarkersWithinRadius();
-  const nearbyMarkers = useMapStore((state) => state.nearbyMarkers);
-
-  const { addMarker } = useMapStore();
-  const mapRef = useRef<MapView | null>(null);
-  const { isUserLocationError } = useUserLocation();
-  const [isDisabled, setIsDisabled] = useState(true);
+  // ========== Constants ==========
+  // 애니메이션 값 및 상태 관리
   const opacity = useRef(new Animated.Value(0)).current;
   const translateY = useRef(new Animated.Value(0)).current;
+
+  // 상태 관리 및 리액트 훅
+  const [isDisabled, setIsDisabled] = useState(true);
+  const [formVisible, setFormVisible] = useState(false);
   const [isMenuVisible, setIsMenuVisible] = useState(false);
-  const setDistance = useAppStore((state) => state.setDistance);
-  const { getDistance, myBlueZone, allBlueZone, allRedZone, mungZone } =
-    useWebSocket(explorationId);
-  const [formVisible, setFormVisible] = useState(false); // 마커폼 가시성 함수
-  const [petFacilities, setPetFacilities] = useState<PetFacility[]>([]); // 애견 동반 시설 상태
-  const [isSettingModalVisible, setIsSettingModalVisible] = useState(false); // 환경 설정에 쓰는 모달 가시성
+  const petFacilities = useMapStore((state) => state.petFacilities);
+  const [isSettingModalVisible, setIsSettingModalVisible] = useState(false);
+  const [visibleElements, setVisibleElements] = useState({
+    blueZone: true,
+    redZone: true,
+    mungZone: true,
+    convenienceInfo: true,
+    myBlueZone: true,
+    redMarkers: true,
+    blueMarkers: true,
+  });
+
+  // 지도 관련 레퍼런스 및 위치 상태
+  const mapRef = useRef<MapView | null>(null);
+  const { isUserLocationError } = useUserLocation();
+  const setPetFacilities = useMapStore((state) => state.setPetFacilities);
   const navigation = useNavigation<NativeStackNavigationProp<MapStackParamList>>();
+  const { myBlueZone, allBlueZone, allRedZone, mungZone } = useWebSocket(explorationId);
+
+  // 마커 처리 및 업데이트
+  const { addMarker } = useMapStore();
+  const nearbyMarkers = useMapStore((state) => state.nearbyMarkers);
   const updatedMarkers: {
     markerId: string;
     userId: number;
@@ -107,17 +116,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
     });
   }
 
-  // 지도 요소 가시성 상태
-  const [visibleElements, setVisibleElements] = useState({
-    blueZone: true,
-    redZone: true,
-    mungZone: true,
-    convenienceInfo: true,
-    myBlueZone: true,
-    redMarkers: true,
-    blueMarkers: true,
-  });
-
+  // ========== Methods ==========
   // 지도 요소 토글 함수
   const toggleElementVisibility = (element: keyof typeof visibleElements) => {
     setVisibleElements((prev) => ({
@@ -138,7 +137,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
     }
   };
 
-  // 마커 등록 하기 => 오류 발생 시 여기 타입 일 수 있음
+  // 마커 등록 하기
   const handleMarkerSubmit = (markerData: MarkerData) => {
     addMarker(markerData);
     setFormVisible(false);
@@ -199,6 +198,8 @@ const MapComponent: React.FC<MapComponentProps> = ({
     handlePressMenu();
   };
 
+  // ========== Side Effects ==========
+  useMarkersWithinRadius();
   usePermission('LOCATION');
 
   // 화면을 떠날 때 WebSocket 연결 해제
@@ -212,15 +213,18 @@ const MapComponent: React.FC<MapComponentProps> = ({
   );
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      console.log('distance', getDistance);
-      setDistance(Number(getDistance));
-    }, 5000);
+    const { latitude, longitude } = userLocation;
+    const getPetFacilities = async () => {
+      if (latitude && longitude) {
+        const petFacilities = await fetchWithPetPlace(latitude, longitude);
+        const facilityPoints = petFacilities.facilityPoints;
+        setPetFacilities(facilityPoints);
+      }
+    };
+    getPetFacilities();
+  }, [userLocation]);
 
-    // 컴포넌트가 언마운트될 때 인터벌 정리
-    return () => clearInterval(interval);
-  }, []);
-
+  // ========== UI Rendering ==========
   return (
     <Container>
       <ClusteredMapView
@@ -283,30 +287,25 @@ const MapComponent: React.FC<MapComponentProps> = ({
 
         {/* 개인 블루존 히트맵 */}
         {visibleElements.myBlueZone && <MyBlueZoneHeatmap myBlueZone={myBlueZone} />}
-
         {/* 전체 블루존 히트맵 */}
         {visibleElements.blueZone && <AllBlueZoneHeatmap allBlueZone={allBlueZone} />}
-
         {/* 전체 레드존 히트맵 */}
         {visibleElements.redZone && <AllRedZoneHeatmap allRedZone={allRedZone} />}
-
         {/* 멍존 히트맵 */}
         {visibleElements.mungZone && <MungZoneHeatmap mungZone={mungZone} />}
-
-        <WithPetPlace setPetFacilities={setPetFacilities} />
-
-        {/* 동반 시설 마커 렌더링 */}
-        {petFacilities.map((facility) => (
-          <Marker
-            key={facility.id} // 시설 ID가 유일한 키인지 확인
-            coordinate={{
-              latitude: facility.latitude,
-              longitude: facility.longitude,
-            }}
-            onPress={() => handleFacilityMarkerPress(facility.id)}>
-            <Image source={doghouse} style={styles.markerImage} />
-          </Marker>
-        ))}
+        {/* 동반 시설 마커 */}
+        {visibleElements.convenienceInfo &&
+          petFacilities.map((facility) => (
+            <Marker
+              key={facility.id}
+              coordinate={{
+                latitude: facility.point.lat,
+                longitude: facility.point.lon,
+              }}
+              onPress={() => handleFacilityMarkerPress(facility.id)}>
+              <Image source={doghouse} style={styles.markerImage} />
+            </Marker>
+          ))}
       </ClusteredMapView>
 
       {/* 커스텀 맵 버튼 */}
@@ -335,8 +334,8 @@ const MapComponent: React.FC<MapComponentProps> = ({
           isVisible={formVisible}
           onSubmit={handleMarkerSubmit}
           onClose={() => setFormVisible(false)}
-          latitude={userLocation.latitude} // 유저의 위도 값
-          longitude={userLocation.longitude} // 유저의 경도 값
+          latitude={userLocation.latitude}
+          longitude={userLocation.longitude}
         />
         <ButtonWithTextContainer top={120} right={20}>
           <TextLabel>지도 설정</TextLabel>
