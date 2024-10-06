@@ -1,50 +1,41 @@
 import React from 'react';
 import styled from 'styled-components/native';
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import { Alert, Keyboard, Text } from 'react-native';
 
-import { colors } from '@/constants';
 import useForm from '@/hooks/useForm';
-import { Alert, Keyboard, KeyboardAvoidingView, Text } from 'react-native';
-import { createPetProfile, getPetProfiles } from '@/api';
-import useModal from '@/hooks/useModal';
-import useImagePicker from '@/hooks/useImagePicker';
+import { validateInputPet } from '@/utils';
+import usePet from '@/hooks/queries/usePet';
+import { ResponsePetProfile } from '@/types';
+import ImagePicker from '../common/ImagePicker';
+import { useUserStore } from '@/state/useUserStore';
+import { useNavigation } from '@react-navigation/native';
+import RadioButtonGroup from '../common/RadioButtonGroup';
 import CustomButton from '@/components/common/CustomButton';
 import CustomInputField from '@/components/common/CustomInputField';
-import EditProfileImageOption from '@/components/setting/EditProfileImageOption';
-import RadioButtonGroup from '../common/RadioButtonGroup';
-import { validateInputPet } from '@/utils';
-import { useUserStore } from '@/state/useUserStore';
-import useGetPet from '@/hooks/queries/useGetPet';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
 type PetFormProps = {
-  isEdit?: boolean;
+  petData?: ResponsePetProfile;
   setModalVisible: (visible: boolean) => void;
 };
 
-const PetForm = ({ setModalVisible, isEdit = false }: PetFormProps) => {
-  const imageOption = useModal();
+const PetForm = ({ setModalVisible, petData }: PetFormProps) => {
   const { userId } = useUserStore.getState();
-  const { refetch } = useGetPet(userId);
+  const { postPetMutation, putPetMutation } = usePet();
+  const navigation = useNavigation();
 
   const inputUser = useForm({
     initialValue: {
-      petName: '',
-      petGender: 'MALE',
-      petWeight: 0,
-      petBirth: '',
+      petName: petData ? petData.name : '',
+      petGender: petData ? petData.gender : 'MALE',
+      petWeight: petData ? petData.weight : 0,
+      petBirth: petData ? petData.birth.slice(0, 10) : '',
     },
     validate: validateInputPet,
   });
 
-  // 이미지 선택 기능을 위한 커스텀 훅
-  const imagePicker = useImagePicker({
-    image: '',
-    onSettled: imageOption.hide,
-  });
-
   // 프로필 이미지 클릭 시 모달을 열고 키보드를 숨김
   const handlePressImage = () => {
-    imageOption.show();
     Keyboard.dismiss();
   };
 
@@ -52,16 +43,23 @@ const PetForm = ({ setModalVisible, isEdit = false }: PetFormProps) => {
     inputUser.handleChangeText('petGender', value);
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
     if (userId) {
       const submitData = JSON.stringify({
         ...inputUser.values,
         petWeight: Number(inputUser.values.petWeight),
       });
-      await createPetProfile(submitData);
-      await refetch();
-      setModalVisible(false);
-      Alert.alert('Complete', '반려견 등록이 완료되었습니다');
+
+      if (petData) {
+        putPetMutation.mutate([petData.id, submitData]);
+        setModalVisible(false);
+        navigation.goBack();
+        Alert.alert('Complete', `반려견 변경이 완료되었습니다`);
+      } else {
+        postPetMutation.mutate(submitData);
+        setModalVisible(false);
+        Alert.alert('Complete', `반려견 등록이 완료되었습니다`);
+      }
     } else {
       Alert.alert('Error', '로그인 해주세요');
     }
@@ -69,21 +67,8 @@ const PetForm = ({ setModalVisible, isEdit = false }: PetFormProps) => {
 
   return (
     <Container>
-      <KeyboardAvoidingView style={{ flex: 1 }} behavior="height">
-        {/* 프로필 이미지 영역 */}
-        <ProfileContainer>
-          <ImageContainer onPress={handlePressImage}>
-            {/* 이미지가 없을 때 기본 아이콘 표시 */}
-            {imagePicker.imageName === '' ? (
-              <Ionicons name="camera-outline" size={40} color={colors.GRAY_400} />
-            ) : (
-              <MyImage
-                source={{ uri: `http://10.0.2.2:3030/${imagePicker.imageName}` }}
-                resizeMode="cover"
-              />
-            )}
-          </ImageContainer>
-        </ProfileContainer>
+      <KeyboardAwareScrollView>
+        {petData && <ImagePicker petData={petData} onPress={handlePressImage} />}
 
         <InputContainer>
           <CustomInputField
@@ -116,16 +101,9 @@ const PetForm = ({ setModalVisible, isEdit = false }: PetFormProps) => {
               </RadioButtonGroup.RadioButtonItem>
             ))}
           </RadioButtonGroup>
-          <CustomButton label="등록 완료" onPress={handleSubmit} />
+          <CustomButton label={`${petData ? '변경' : '등록'} 완료`} onPress={handleSubmit} />
         </InputContainer>
-
-        {/* 프로필 이미지 수정 모달 옵션 */}
-        <EditProfileImageOption
-          isVisible={imageOption.isVisible} // 모달이 보이는지 여부
-          hideOption={imageOption.hide} // 모달 숨기기 함수
-          onChangeImage={imagePicker.handleChange} // 이미지 선택 후 동작 함수
-        />
-      </KeyboardAvoidingView>
+      </KeyboardAwareScrollView>
     </Container>
   );
 };
@@ -135,30 +113,8 @@ const Container = styled.View`
   padding: 20px;
 `;
 
-const ProfileContainer = styled.View`
-  align-items: center;
-  margin-top: 20px;
-  margin-bottom: 40px;
-`;
-
-const MyImage = styled.Image`
-  width: 100%;
-  height: 100%;
-  border-radius: 50px;
-`;
-
-const ImageContainer = styled.Pressable`
-  width: 150px;
-  height: 150px;
-  border-radius: 75px;
-  justify-content: center;
-  align-items: center;
-  border-color: ${colors.GRAY_300};
-  border-width: 1px;
-`;
-
 const InputContainer = styled.View`
-  gap: 20px;
+  gap: 30px;
 `;
 
 export default PetForm;

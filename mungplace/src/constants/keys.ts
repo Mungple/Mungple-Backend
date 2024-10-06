@@ -4,11 +4,11 @@ const queryKeys = {
   GET_PROFILE: 'getProfile',
   GET_USER_ID: 'getUserId',
   GET_PETS: 'getPets',
-} as const
+} as const;
 
 const storageKeys = {
   ACCESS_TOKEN: 'accesstoken',
   REFRESH_TOKEN: 'refreshtoken',
-} as const
+} as const;
 
-export {queryKeys, storageKeys}
+export { queryKeys, storageKeys };

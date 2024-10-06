@@ -1,8 +1,8 @@
-import React, {ReactNode} from 'react';
-import {TouchableOpacityProps} from 'react-native';
+import React, { ReactNode } from 'react';
+import { TouchableOpacityProps } from 'react-native';
 import styled from 'styled-components/native';
 
-import {colors} from '@/constants';
+import { colors } from '@/constants';
 
 interface SettingItemProps extends TouchableOpacityProps {
   title: string;
@@ -11,21 +11,12 @@ interface SettingItemProps extends TouchableOpacityProps {
   color?: string;
 }
 
-function SettingItem({
-  title,
-  subTitle,
-  icon = null,
-  color,
-  ...props
-}: SettingItemProps) {
-
+function SettingItem({ title, subTitle, icon = null, color, ...props }: SettingItemProps) {
   return (
     <Container {...props}>
       {icon}
       <TitleContainer>
-        <TitleText style={{color: color ?? colors.BLACK}}>
-          {title}
-        </TitleText>
+        <TitleText style={{ color: color ?? colors.BLACK }}>{title}</TitleText>
         {subTitle && <SubTitleText>{subTitle}</SubTitleText>}
       </TitleContainer>
     </Container>
@@ -41,10 +32,6 @@ const Container = styled.TouchableOpacity`
   border-color: ${colors.GRAY_200};
   border-bottom-width: 1px;
   border-top-width: 1px;
-
-  &:active {
-    background-color: ${colors.GRAY_200};
-  }
 `;
 
 const TitleContainer = styled.View`

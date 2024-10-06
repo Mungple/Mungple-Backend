@@ -1,32 +1,30 @@
-import React from 'react'
-import styled from 'styled-components/native'
-import Ionicons from 'react-native-vector-icons/Ionicons'
+import React from 'react';
+import { PressableProps } from 'react-native';
+import styled from 'styled-components/native';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
-import {colors} from '@/constants'
-import useModal from '@/hooks/useModal'
-import {useUserStore} from '@/state/useUserStore'
-import useImagePicker from '@/hooks/useImagePicker'
-import EditProfileImageOption from '@/components/setting/EditProfileImageOption'
+import { colors } from '@/constants';
+import useModal from '@/hooks/useModal';
+import { useUserStore } from '@/state/useUserStore';
+import useImagePicker from '@/hooks/useImagePicker';
+import EditProfileImageOption from '@/components/setting/EditProfileImageOption';
+import { ResponsePetProfile } from '@/types';
 
-type ImagePickerProps = {
-  petId?: number
-  uploadFunction: (formData: FormData, petId?: number) => Promise<string>
+interface ImagePickerProps extends PressableProps {
+  petData?: ResponsePetProfile;
 }
 
-const ImagePicker = ({petId, uploadFunction}: ImagePickerProps) => {
-  const imageOption = useModal()
-  const {imageName} = useUserStore(state => state.userData)
-  const petData = useUserStore(state => state.petData)
-  const petImage = petData.find(pet => pet.id === petId)?.photo
-  const image = petId ? petImage : imageName
+const ImagePicker = ({ petData }: ImagePickerProps) => {
+  const imageOption = useModal();
+  const { imageName } = useUserStore((state) => state.userData);
+  const image = petData ? petData.photo : imageName;
 
   // 이미지 선택 기능을 위한 커스텀 훅
   const imagePicker = useImagePicker({
-    petId: petId,
+    petId: petData && petData.id,
     image: image ? `http://j11e106.p.ssafy.io:9000/images/${image}` : '',
-    onSettled: () => imageOption.hide(),
-    uploadFunction: uploadFunction,
-  })
+    onSettled: imageOption.hide,
+  });
 
   return (
     <Container>
@@ -36,7 +34,7 @@ const ImagePicker = ({petId, uploadFunction}: ImagePickerProps) => {
           {imagePicker.imageName === '' ? (
             <Ionicons name="camera-outline" size={40} color={colors.GRAY_400} />
           ) : (
-            <MyImage source={{uri: imagePicker.imageName}} resizeMode="cover" />
+            <MyImage source={{ uri: imagePicker.imageName }} resizeMode="cover" />
           )}
         </ImageContainer>
       </ProfileContainer>
@@ -48,27 +46,26 @@ const ImagePicker = ({petId, uploadFunction}: ImagePickerProps) => {
         onChangeImage={imagePicker.handleChange} // 이미지 선택 후 동작 함수
       />
     </Container>
-  )
-}
+  );
+};
 
 const Container = styled.SafeAreaView`
-  flex: 1;
   padding: 20px;
   justify-content: center;
   background-color: ${colors.WHITE};
-`
+`;
 
 const ProfileContainer = styled.View`
   align-items: center;
   margin-top: 20px;
   margin-bottom: 40px;
-`
+`;
 
 const MyImage = styled.Image`
   width: 150px;
   height: 150px;
   border-radius: 75px;
-`
+`;
 
 const ImageContainer = styled.Pressable`
   width: 150px;
@@ -79,6 +76,6 @@ const ImageContainer = styled.Pressable`
   border-color: ${colors.GRAY_300};
   border-width: 1px;
   overflow: hidden;
-`
+`;
 
-export default ImagePicker
+export default ImagePicker;

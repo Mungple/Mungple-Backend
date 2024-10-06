@@ -67,7 +67,7 @@ const MyPageScreen: React.FC<MyPageScreenProps> = ({ navigation }) => {
         />
         <Context>
           <Title>{userData.nickname}</Title>
-          <Text>128 포인트</Text>
+          <Text>이번 주 산책 횟수 | {}</Text>
         </Context>
       </ProfileCard>
 

@@ -1,26 +1,21 @@
 // hooks/useImagePicker.ts
-import {useEffect, useState} from 'react';
-import {Alert} from 'react-native';
-import ImagePicker, {Image as PickerImage} from 'react-native-image-crop-picker';
+import { useEffect, useState } from 'react';
+import { Alert } from 'react-native';
+import ImagePicker, { Image as PickerImage } from 'react-native-image-crop-picker';
 
-import {getFormDataImage} from '@/utils';
+import { getFormDataImage } from '@/utils';
+import useImage from './queries/useImage';
 
 interface UseImagePickerProps {
   petId?: number;
   image?: string;
   onSettled?: () => void;
-  uploadFunction: (formData: FormData, petId?: number) => Promise<string>;
 }
 
 // 이미지 선택 및 업로드를 관리하는 커스텀 훅
-const useImagePicker = ({
-  petId,
-  image = '',
-  onSettled,
-  uploadFunction,
-}: UseImagePickerProps) => {
+const useImagePicker = ({ petId, image = '', onSettled }: UseImagePickerProps) => {
   const [imageName, setImageName] = useState<string>(image);
-  const [isUploading, setIsUploading] = useState<boolean>(false);
+  const { imageMutation, petImageMutation } = useImage();
 
   useEffect(() => {
     setImageName(image);
@@ -37,16 +32,13 @@ const useImagePicker = ({
 
     // 이미지 업로드
     const formData = getFormDataImage('image', selectedImage);
-    setIsUploading(true);
 
     const upload = () => {
-      if (petId) {
-        return uploadFunction(formData, petId);
-      } else {
-        return uploadFunction(formData);
-      }
-    }
-    const response = await upload()
+      return petId
+        ? petImageMutation.mutateAsync([formData, petId])
+        : imageMutation.mutateAsync(formData);
+    };
+    const response = await upload();
 
     if (response) {
       setImageName(`http://j11e106.p.ssafy.io:9000/images/${imageName}`);
@@ -59,7 +51,6 @@ const useImagePicker = ({
 
   return {
     imageName,
-    isUploading,
     handleChange,
   };
 };
