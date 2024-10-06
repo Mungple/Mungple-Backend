@@ -55,7 +55,17 @@ describe('HomeScreen', () => {
   const setupMocks = ({
     userLocation = { latitude: 37.7749, longitude: -122.4194 },
     isUserLocationError = false,
-    petData = [{ id: 1, isDefault: true, birth: '2020-01-01', photo: null }],
+    petData = [
+      {
+        birth: '2022-02-22',
+        gender: 'MALE',
+        id: 1,
+        isDefault: true,
+        name: '멍멍이',
+        photo: 'ea137b02-61c7-421a-a3c4-86f10c3a9cd2.jpg',
+        weight: 22,
+      },
+    ],
   } = {}) => {
     // 네비게이션 모킹 설정
     (useNavigation as jest.Mock).mockReturnValue(navigationMock);
@@ -87,13 +97,21 @@ describe('HomeScreen', () => {
     setupMocks();
   });
 
-  // 기본 펫 정보 및 이미지를 렌더링하는지 테스트
+  // 기본 반려견 정보 및 이미지를 렌더링하는지 테스트
   it('renders default pet info and image', () => {
-    const { getByText, getByTestId } = render(<HomeScreen />);
+    const { getByText } = render(<HomeScreen />);
 
-    // 펫의 나이와 이미지가 제대로 표시되는지 확인
-    expect(getByText('4살')).toBeTruthy();
-    expect(getByTestId('pet-image')).toBeTruthy();
+    // 반려견의 이름이 제대로 표시되는지 확인
+    expect(getByText('멍멍이')).toBeTruthy();
+
+    // 반려견의 성별이 제대로 표시되는지 확인
+    expect(getByText('남아')).toBeTruthy();
+
+    // 반려견의 나이가 제대로 표시되는지 확인
+    expect(getByText('32개월')).toBeTruthy();
+
+    // 반려견의 몸무게가 제대로 표시되는지 확인
+    expect(getByText('22kg')).toBeTruthy();
   });
 
   // "산책 시작하기" 버튼을 눌렀을 때 모달이 표시되는지 테스트
