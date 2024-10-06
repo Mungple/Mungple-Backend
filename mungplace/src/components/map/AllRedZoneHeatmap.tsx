@@ -2,15 +2,7 @@ import React, { useEffect } from 'react';
 import { Heatmap } from 'react-native-maps';
 import useUserLocation from '@/hooks/useUserLocation';
 import useWebsocketActions from '@/hooks/useWebsocketActions';
-import { FromZone } from '@/hooks/useWebsocket';
-
-interface ToZone {
-  side: number;
-  point: {
-    lat: number;
-    lon: number;
-  };
-}
+import { FromZone, ToZone } from '@/types';
 
 type AllRedZoneHeatmapProps = {
   allRedZone: FromZone | null;

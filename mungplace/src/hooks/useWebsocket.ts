@@ -3,28 +3,7 @@ import { useState, useEffect } from 'react';
 
 import { getAccessToken } from '@/api';
 import { useAppStore } from '@/state/useAppStore';
-
-export interface Point {
-  lat: number;
-  lon: number;
-}
-
-export interface Cell {
-  point: Point;
-  weight: number;
-}
-
-export interface FromZone {
-  cells: Cell[];
-}
-
-export interface MungZone {
-  points: Point[];
-}
-
-export interface Distance {
-  distance: number;
-}
+import { FromZone } from '@/types';
 
 export interface ErrorMessage {
   errorCode: string;
@@ -35,13 +14,14 @@ export interface ErrorMessage {
 const WEBSOCKET_URI = 'wss://j11e106.p.ssafy.io/api/ws';
 
 const useWebSocket = (explorationId: number = -1) => {
-  const { clientSocket, setClientSocket } = useAppStore();
+  const setDistance = useAppStore((state) => state.setDistance);
+  const clientSocket = useAppStore((state) => state.clientSocket);
+  const setClientSocket = useAppStore((state) => state.setClientSocket);
   const [explorations, setExplorations] = useState<ErrorMessage | null>(null);
   const [allBlueZone, setAllBlueZone] = useState<FromZone | null>(null);
   const [allRedZone, setAllRedZone] = useState<FromZone | null>(null);
   const [myBlueZone, setMyBlueZone] = useState<FromZone | null>(null);
-  const [mungZone, setMungZone] = useState<MungZone | null>(null);
-  const [getDistance, setDistance] = useState<Distance | null>(null);
+  const [mungZone, setMungZone] = useState<Array<{ geohash: string }> | null>(null);
 
   // 소켓 연결 시도
   useEffect(() => {
@@ -135,7 +115,7 @@ const useWebSocket = (explorationId: number = -1) => {
     socket.subscribe('/user/sub/mungplace', (message) => {
       try {
         console.log('mungplace', message.body);
-        const parsedMessage = JSON.parse(message.body) as MungZone;
+        const parsedMessage = JSON.parse(message.body) as Array<{ geohash: string }>;
         setMungZone(parsedMessage);
       } catch (e) {
         console.error('useWebSocket for mungplace >>>', e);
@@ -144,8 +124,9 @@ const useWebSocket = (explorationId: number = -1) => {
     // 산책 거리 조회
     socket.subscribe('/user/sub/explorations/distance', (message) => {
       try {
-        console.log('distance', message.body);
-        const parsedMessage = JSON.parse(message.body) as Distance;
+        console.log('useWebSocket >>> distance', message.body);
+        const parsedMessage = JSON.parse(message.body) as number;
+        console.log(parsedMessage);
         setDistance(parsedMessage);
       } catch (e) {
         console.error('useWebSocket for distance >>>', e);
@@ -159,7 +140,6 @@ const useWebSocket = (explorationId: number = -1) => {
     allBlueZone,
     allRedZone,
     mungZone,
-    getDistance,
   };
 };
 

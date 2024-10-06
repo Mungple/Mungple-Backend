@@ -17,15 +17,19 @@ import CustomButton from '@/components/common/CustomButton';
 import useWebSocketActions from '@/hooks/useWebsocketActions';
 import { MapStackParamList } from '@/navigations/stack/MapStackNavigator';
 
+// 화면 크기에 맞춰 하단 블록 크기 설정
 const bottomBlockHeight = (Dimensions.get('window').height * 1) / 5;
 const bottomBlockWidth = Dimensions.get('window').width - 40;
 
+// ========== Main Functional Component ==========
 const WalkingScreen = () => {
-  // 상태 관리
+  // ========== Constants ==========
+  // 상태 관리 (앱 스토어 및 맵 스토어에서 상태 추출)
   const markers = useMapStore((state) => state.markers);
   const startExplorate = useAppStore((state) => state.startExplorate);
   const setWalkingStart = useAppStore((state) => state.setWalkingStart);
 
+  // 사용자 위치 및 웹소켓 액션 추출
   const { userLocation } = useUserLocation();
   const { sendLocation } = useWebSocketActions();
   const distance = useAppStore((state) => state.distance);
@@ -33,16 +37,21 @@ const WalkingScreen = () => {
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [path, setPath] = useState<{ latitude: number; longitude: number }[]>([]);
 
+  // 네비게이션 훅
   const navigation = useNavigation<NativeStackNavigationProp<MapStackParamList>>();
 
+  // ========== Methods ==========
+  // 산책 종료 처리
   const handleWalkingEnd = () => {
     setModalVisible(true);
   };
 
+  // 폼 닫기 처리
   const handleFormClose = () => {
     setIsFormVisible(false);
   };
 
+  // 산책 종료 확인 후 처리
   const confirmEndWalking = () => {
     if (startExplorate) {
       exitWalk(startExplorate.explorationId);
@@ -54,10 +63,12 @@ const WalkingScreen = () => {
     }
   };
 
+  // 산책 종료 취소 처리
   const cancelEndWalking = () => {
     setModalVisible(false);
   };
 
+  // ========== Side Effects ==========
   // 5초마다 좌표를 수집하여 경로 업데이트
   useEffect(() => {
     // console.log(path);
@@ -68,12 +79,13 @@ const WalkingScreen = () => {
       ]);
     }, 5000);
 
+    // 언마운트 시 Interval 해제
     return () => {
       clearInterval(intervalId);
-      console.log('clearInterval (userLocation)');
     };
   }, [path]);
 
+  // 5초마다 웹소켓을 통해 위치 정보 전송
   useEffect(() => {
     const intervalId = setInterval(() => {
       // lat, lon, recordedAt 데이터 생성
@@ -89,11 +101,11 @@ const WalkingScreen = () => {
     // 컴포넌트가 언마운트될 때 setInterval을 정리하여 메모리 누수 방지
     return () => {
       clearInterval(intervalId);
-      console.log('clearInterval (sendLocation)');
     };
     // 마운트 될때 useEffect 실행
   }, []);
 
+  // ========== UI Rendering ==========
   return (
     <WS.Container>
       {userLocation && (

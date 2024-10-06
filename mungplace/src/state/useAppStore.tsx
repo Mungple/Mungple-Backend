@@ -29,7 +29,7 @@ export const useAppStore = create<AppState>((set) => ({
   setToken: (value: string) => set({ token: value }),
   setLogin: (value: boolean) => set({ isLogin: value }),
   setDistance: (value: number) => set({ distance: value }),
-  setClientSocket: (value: Client | null) => set({ clientSocket: value }),
   setWalkingStart: (value: boolean) => set({ walkingStart: value }),
+  setClientSocket: (value: Client | null) => set({ clientSocket: value }),
   setStartExplorate: (value: StartExplorate) => set({ startExplorate: value }),
 }));

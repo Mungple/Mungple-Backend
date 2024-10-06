@@ -18,7 +18,7 @@ interface ButtonItem {
   };
 }
 
-type VisibleElements = {
+interface VisibleElements {
   blueZone: boolean;
   redZone: boolean;
   mungZone: boolean;
@@ -26,7 +26,7 @@ type VisibleElements = {
   myBlueZone: boolean;
   redMarkers: boolean;
   blueMarkers: boolean;
-};
+}
 
 interface MapSettingProps {
   visibleElements: VisibleElements;
