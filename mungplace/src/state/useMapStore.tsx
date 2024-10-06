@@ -60,39 +60,31 @@ interface MapState {
   showUserMarkers: boolean;
   petFacilities: PetFacility[];
   nearbyMarkers: NearbyMarkersData | null;
-  addMarker: (marker: MarkerData) => void; // 마커 추가용 함수
-  setMarkers: (markers: MarkerData[]) => void;
-  setNearbyMarkers: (clusters: NearbyMarkersData) => void; // 주변 마커 설정 함수인데 수정필요할듯
-  getGeohashCenter: (hashKey: string) => { lat: number; lon: number } | null;
+
+  toggleUserMarkers: () => void;
+  addMarker: (value: MarkerData) => void;
+  setMarkers: (value: MarkerData[]) => void;
   setPetFacilities: (value: PetFacility[]) => void;
+  setNearbyMarkers: (value: NearbyMarkersData) => void;
+  getGeohashCenter: (value: string) => { lat: number; lon: number } | null;
 }
 
-export const useMapStore = create<MapState>((set) => ({
-  markers: [], // 내 마커
-  nearbyMarkers: null, // 주변 마커 (내 마커 + 다른 사용자 마커)
+export const useMapStore = create<MapState>((set, get) => ({
+  markers: [],
   petFacilities: [],
+  nearbyMarkers: null,
   showUserMarkers: true,
-  toggleUserMarkers: () => set((state) => ({ showUserMarkers: !state.showUserMarkers })),
 
-  getGeohashCenter: (hashKey) => {
-    const nearbyMarkers = get().nearbyMarkers; // get()을 통해 상태에 접근
-    if (!nearbyMarkers) return null; // nearbyMarkers가 null일 경우
-    const cluster = nearbyMarkers.markersGroupedByGeohash[hashKey];
-    return cluster ? cluster.geohashCenter : null;
-  },
-
-  addMarker: (marker) =>
-    set((state) => ({
-      markers: [...state.markers, marker],
-    })),
-
-  setNearbyMarkers: (clusters: NearbyMarkersData) =>
-    set(() => ({
-      nearbyMarkers: clusters,
-    })), // 주변 마커 설정
-  setMarkers: (markers: MarkerData[]) =>
-    set(() => ({
-      markers: markers,
-    })),
+  setMarkers: (value: MarkerData[]) => set(() => ({ markers: value })),
   setPetFacilities: (value: PetFacility[]) => set({ petFacilities: value }),
+  setNearbyMarkers: (value: NearbyMarkersData) => set({ nearbyMarkers: value }),
+  toggleUserMarkers: () => set((state) => ({ showUserMarkers: !state.showUserMarkers })),
+  addMarker: (value: MarkerData) => set((state) => ({ markers: [...state.markers, value] })),
+  getGeohashCenter: (hashKey) => {
+    const { nearbyMarkers } = get();
+    if (!nearbyMarkers || !nearbyMarkers.markersGroupedByGeohash[hashKey]) {
+      return null;
+    }
+    return nearbyMarkers.markersGroupedByGeohash[hashKey].geohashCenter || null;
+  },
 }));
