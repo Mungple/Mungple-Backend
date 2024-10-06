@@ -5,10 +5,6 @@ import { getAccessToken } from '@/api';
 import { useAppStore } from '@/state/useAppStore';
 import { FromZone } from '@/types';
 
-export interface Distance {
-  distance: number;
-}
-
 export interface ErrorMessage {
   errorCode: string;
   message: string;
@@ -18,13 +14,14 @@ export interface ErrorMessage {
 const WEBSOCKET_URI = 'wss://j11e106.p.ssafy.io/api/ws';
 
 const useWebSocket = (explorationId: number = -1) => {
-  const { clientSocket, setClientSocket } = useAppStore();
+  const setDistance = useAppStore((state) => state.setDistance);
+  const clientSocket = useAppStore((state) => state.clientSocket);
+  const setClientSocket = useAppStore((state) => state.setClientSocket);
   const [explorations, setExplorations] = useState<ErrorMessage | null>(null);
   const [allBlueZone, setAllBlueZone] = useState<FromZone | null>(null);
   const [allRedZone, setAllRedZone] = useState<FromZone | null>(null);
   const [myBlueZone, setMyBlueZone] = useState<FromZone | null>(null);
   const [mungZone, setMungZone] = useState<Array<{ geohash: string }> | null>(null);
-  const [getDistance, setDistance] = useState<Distance | null>(null);
 
   // 소켓 연결 시도
   useEffect(() => {
@@ -128,7 +125,8 @@ const useWebSocket = (explorationId: number = -1) => {
     socket.subscribe('/user/sub/explorations/distance', (message) => {
       try {
         console.log('useWebSocket >>> distance', message.body);
-        const parsedMessage = JSON.parse(message.body) as Distance;
+        const parsedMessage = JSON.parse(message.body) as number;
+        console.log(parsedMessage);
         setDistance(parsedMessage);
       } catch (e) {
         console.error('useWebSocket for distance >>>', e);
@@ -142,7 +140,6 @@ const useWebSocket = (explorationId: number = -1) => {
     allBlueZone,
     allRedZone,
     mungZone,
-    getDistance,
   };
 };
 

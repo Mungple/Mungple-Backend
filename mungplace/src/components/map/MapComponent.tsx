@@ -36,7 +36,6 @@ import { colors, mapNavigations } from '@/constants';
 import { useMapStore, MarkerData } from '@/state/useMapStore';
 
 // 7. 네비게이션 타입
-import { useAppStore } from '@/state/useAppStore';
 import { MapStackParamList } from '@/navigations/stack/MapStackNavigator';
 
 // 컴포넌트에 전달되는 props 정의
@@ -81,11 +80,9 @@ const MapComponent: React.FC<MapComponentProps> = ({
   // 지도 관련 레퍼런스 및 위치 상태
   const mapRef = useRef<MapView | null>(null);
   const { isUserLocationError } = useUserLocation();
-  const setDistance = useAppStore((state) => state.setDistance);
   const setPetFacilities = useMapStore((state) => state.setPetFacilities);
   const navigation = useNavigation<NativeStackNavigationProp<MapStackParamList>>();
-  const { getDistance, myBlueZone, allBlueZone, allRedZone, mungZone } =
-    useWebSocket(explorationId);
+  const { myBlueZone, allBlueZone, allRedZone, mungZone } = useWebSocket(explorationId);
 
   // 마커 처리 및 업데이트
   const { addMarker } = useMapStore();
@@ -225,9 +222,6 @@ const MapComponent: React.FC<MapComponentProps> = ({
       }
     };
     getPetFacilities();
-    if (explorationId !== -1) {
-      setDistance(Number(getDistance));
-    }
   }, [userLocation]);
 
   // ========== UI Rendering ==========

@@ -84,7 +84,6 @@ const WalkingScreen = () => {
     // 언마운트 시 Interval 해제
     return () => {
       clearInterval(intervalId);
-      console.log('clearInterval (userLocation)');
     };
   }, [path]);
 
@@ -104,7 +103,6 @@ const WalkingScreen = () => {
     // 컴포넌트가 언마운트될 때 setInterval을 정리하여 메모리 누수 방지
     return () => {
       clearInterval(intervalId);
-      console.log('clearInterval (sendLocation)');
     };
     // 마운트 될때 useEffect 실행
   }, []);
