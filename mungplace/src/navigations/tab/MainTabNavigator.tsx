@@ -62,7 +62,7 @@ const MainTabNavigator = () => {
         },
         tabBarLabelStyle: {
           fontSize: 12,
-          fontWeight: 'bold',
+          fontFamily: 'OTLaundryGothicB',
         },
         headerShown: false,
         tabBarIcon: ({ focused }) => TabBarIcons(route, focused),

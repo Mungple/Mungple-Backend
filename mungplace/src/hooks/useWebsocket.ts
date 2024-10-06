@@ -5,8 +5,8 @@ import { getAccessToken } from '@/api';
 import { useAppStore } from '@/state/useAppStore';
 
 export interface Point {
-  latitude: number;
-  longitude: number;
+  lat: number;
+  lon: number;
 }
 
 export interface Cell {

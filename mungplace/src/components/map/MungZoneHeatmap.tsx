@@ -33,7 +33,6 @@ const MungZoneHeatmap = ({ mungZone }: MungZoneHeatmapProps) => {
       checkMungPlace(zoneData);
     }
   }, [userLocation, checkMungPlace]);
-
   return (
     <>
       {/* 멍존 렌더링 */}
