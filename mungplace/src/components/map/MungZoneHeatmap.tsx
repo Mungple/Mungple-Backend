@@ -1,10 +1,9 @@
 import React, { useEffect } from 'react';
+import { useMapStore } from '@/state/useMapStore';
 import { Marker, Circle } from 'react-native-maps';
 import useUserLocation from '@/hooks/useUserLocation';
-import  useWebsocketActions  from '@/hooks/useWebsocketActions'
-import useWebSocket from '@/hooks/useWebsocket';
-import { useMapStore } from '@/state/useMapStore';
-
+import useWebsocketActions from '@/hooks/useWebsocketActions';
+import { MungZone as RQMungZone } from '@/hooks/useWebsocket';
 
 interface MungZone {
   point: {
@@ -13,11 +12,14 @@ interface MungZone {
   };
 }
 
-const MungZoneHeatmap = () => {
-  const { userLocation } = useUserLocation(); // 사용자 위치 가져오기
-  const getGeohashCenter = useMapStore(state => state.getGeohashCenter)
-  const { checkMungPlace } = useWebsocketActions()
+type MungZoneHeatmapProps = {
+  mungZone: RQMungZone | null;
+};
 
+const MungZoneHeatmap = ({ mungZone }: MungZoneHeatmapProps) => {
+  const getGeohashCenter = useMapStore((state) => state.getGeohashCenter);
+  const { checkMungPlace } = useWebsocketActions();
+  const { userLocation } = useUserLocation(); // 사용자 위치 가져오기
 
   // 사용자 위치 변경 시 블루존 요청
   useEffect(() => {
@@ -31,9 +33,6 @@ const MungZoneHeatmap = () => {
       checkMungPlace(zoneData);
     }
   }, [userLocation, checkMungPlace]);
-  
-  const { mungZone } = useWebSocket()
-  console.log("멍존 입니다", mungZone)
   return (
     <>
       {/* 멍존 렌더링 */}

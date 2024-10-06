@@ -14,8 +14,8 @@ import MapComponent from '@/components/map/MapComponent';
 import CustomModal from '@/components/common/CustomModal';
 import ElapsedTime from '@/components/walking/ElapsedTime';
 import CustomButton from '@/components/common/CustomButton';
-import { MapStackParamList } from '@/navigations/stack/MapStackNavigator';
 import useWebSocketActions from '@/hooks/useWebsocketActions';
+import { MapStackParamList } from '@/navigations/stack/MapStackNavigator';
 
 const bottomBlockHeight = (Dimensions.get('window').height * 1) / 5;
 const bottomBlockWidth = Dimensions.get('window').width - 40;
@@ -28,6 +28,7 @@ const WalkingScreen = () => {
 
   const { userLocation } = useUserLocation();
   const { sendLocation } = useWebSocketActions();
+  const distance = useAppStore((state) => state.distance);
   const [modalVisible, setModalVisible] = useState(false);
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [path, setPath] = useState<{ latitude: number; longitude: number }[]>([]);
@@ -59,7 +60,7 @@ const WalkingScreen = () => {
 
   // 5초마다 좌표를 수집하여 경로 업데이트
   useEffect(() => {
-    console.log(path);
+    // console.log(path);
     const intervalId = setInterval(() => {
       setPath((prevPath) => [
         ...prevPath,
@@ -117,7 +118,7 @@ const WalkingScreen = () => {
                 </WS.InfoBlock>
                 <WS.InfoBlock>
                   <WS.InfoLabel>이동 거리</WS.InfoLabel>
-                  <WS.InfoValue>{Number(null)} km</WS.InfoValue>
+                  <WS.InfoValue>{Number(distance)} km</WS.InfoValue>
                 </WS.InfoBlock>
               </WS.InfoRow>
             </WS.WalkingInfo>

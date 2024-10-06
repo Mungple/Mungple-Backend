@@ -5,8 +5,8 @@ import { getAccessToken } from '@/api';
 import { useAppStore } from '@/state/useAppStore';
 
 export interface Point {
-  latitude: number;
-  longitude: number;
+  lat: number;
+  lon: number;
 }
 
 export interface Cell {
@@ -41,7 +41,7 @@ const useWebSocket = (explorationId: number = -1) => {
   const [allRedZone, setAllRedZone] = useState<FromZone | null>(null);
   const [myBlueZone, setMyBlueZone] = useState<FromZone | null>(null);
   const [mungZone, setMungZone] = useState<MungZone | null>(null);
-  const [distance, setDistance] = useState<Distance | null>(null);
+  const [getDistance, setDistance] = useState<Distance | null>(null);
 
   // 소켓 연결 시도
   useEffect(() => {
@@ -159,7 +159,7 @@ const useWebSocket = (explorationId: number = -1) => {
     allBlueZone,
     allRedZone,
     mungZone,
-    distance,
+    getDistance,
   };
 };
 

@@ -31,9 +31,9 @@ const StyledText = styled(Text)<{
   font-family: ${({ fontWeight }) =>
     fontWeight === 'bold'
       ? 'OTLaundryGothicB'
-      : 'LaundryGothicOTF Regular'}; /* Bold 또는 Regular 폰트 설정 */
+      : 'OTLaundryGothicR'}; /* Bold 또는 Regular 폰트 설정 */
   font-size: ${({ fontSize }) =>
-    fontSize ? `${fontSize}px` : '16px'}; /* 폰트 사이즈 설정, 기본값은 14px */
+    fontSize ? `${fontSize}px` : '14px'}; /* 폰트 사이즈 설정, 기본값은 14px */
   color: ${({ color }) => (color ? color : colors.BLACK)}; /* 텍스트 색상 설정, 기본값은 BLACK */
 `;
 

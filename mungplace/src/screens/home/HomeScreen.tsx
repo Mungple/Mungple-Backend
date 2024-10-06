@@ -1,23 +1,35 @@
+// 1. 라이브러리 및 네이티브 기능
 import React, { useState } from 'react';
+import { Alert, Dimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
+// 2. API 호출
 import { startWalk } from '@/api/walk';
-import * as HS from './HomeScreenStyle';
-import { mapNavigations } from '@/constants';
-import { Alert, Dimensions } from 'react-native';
+
+// 3. 커스텀 컴포넌트
 import PetList from '@/components/user/PetList';
-import { useAppStore } from '@/state/useAppStore';
 import PetInfoBox from '@/components/user/PetInfoBox';
-import useUserLocation from '@/hooks/useUserLocation';
 import CustomModal from '@/components/common/CustomModal';
 import CustomButton from '@/components/common/CustomButton';
 import CustomModalHeader from '@/components/common/CustomModalHeader';
-import { MapStackParamList } from '@/navigations/stack/MapStackNavigator';
-import { useUserStore } from '@/state/useUserStore';
-import { calculateAge } from '@/hooks/usePetAge';
+
+// 4. 스타일 및 이미지
+import * as HS from './HomeScreenStyle';
 import dogMain from '@/assets/dog_main.png';
+
+// 5. 상수 및 네비게이션
+import { mapNavigations } from '@/constants';
+import { MapStackParamList } from '@/navigations/stack/MapStackNavigator';
+
+// 6. 상태 관리
+import { useAppStore } from '@/state/useAppStore';
+import { useUserStore } from '@/state/useUserStore';
+
+// 7. 훅(Hooks)
 import usePet from '@/hooks/queries/usePet';
+import { calculateAge } from '@/hooks/usePetAge';
+import useUserLocation from '@/hooks/useUserLocation';
 
 const windowHeight = Dimensions.get('window').height;
 
