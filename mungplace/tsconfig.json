@@ -3,6 +3,7 @@
   "compilerOptions": {
     "noImplicitAny": true,
     "baseUrl": ".",
+    "jsx": "react",
     "paths": {
       "@/*": ["src/*"],
       "test/*": ["test/*"],

@@ -59,6 +59,7 @@ interface MapState {
   markers: MarkerData[] // 이게 myMarkers랑 동일함, 즉 내 마커
   nearbyMarkers: NearbyMarkersData | null // 주변 마커, 마커랑 통합할 지 고민
   addMarker: (marker: MarkerData) => void; // 마커 추가용 함수
+  getGeohashCenter: (hashKey: string) => { lat: number; lon: number } | null;
   setNearbyMarkers: (clusters: NearbyMarkersData) => void // 주변 마커 설정 함수인데 수정필요할듯
   setMarkers: (markers: MarkerData[] ) => void
 }
@@ -71,7 +72,12 @@ export const useMapStore = create<MapState>((set) => ({
   nearbyMarkers: null, // 주변 마커 (내 마커 + 다른 사용자 마커)
   toggleUserMarkers: () => set((state) => ({ showUserMarkers: !state.showUserMarkers })),
 
-  
+  getGeohashCenter: (hashKey) => {
+    const nearbyMarkers = get().nearbyMarkers; // get()을 통해 상태에 접근
+    if (!nearbyMarkers) return null; // nearbyMarkers가 null일 경우
+    const cluster = nearbyMarkers.markersGroupedByGeohash[hashKey]; 
+    return cluster ? cluster.geohashCenter : null; 
+  },
 
   addMarker: (marker) => set((state) => ({
     markers: [...state.markers, marker],

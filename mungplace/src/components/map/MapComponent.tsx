@@ -24,7 +24,8 @@ import MyBlueZoneHeatmap from './MyBlueZoneHeatmap'; // 개인 블루존 렌더�
 import AllBlueZoneHeatmap from './AllBlueZoneHeatmap'; // 블루존 렌더링
 import AllRedZoneHeatmap from './AllRedZoneHeatmap'; // 레드존 렌더링
 import WithPetPlace from './WithPetPlace'; // 애견 동반 시설 조회
-import useWebSocket from '@/hooks/useWebsocket';
+import MungZoneHeatmap from './MungZoneHeatmap';
+
 
 interface MapComponentProps {
   userLocation: { latitude: number; longitude: number };
@@ -265,10 +266,8 @@ const MapComponent: React.FC<MapComponentProps> = ({
         {/* 전체 레드존 히트맵 */}
         {visibleElements.redZone && <AllRedZoneHeatmap allRedZone={allRedZone} />}
 
-        {/* 멍플 지오해시
-        {visibleElements.mungZone && mungZone && mungZone.length > 0 && (
-          <PolygonLayer zones={mungZone} />
-        )} */}
+        {/* 멍존 히트맵 */}
+        {visibleElements.mungZone && <MungZoneHeatmap />}
 
         <WithPetPlace setPetFacilities={setPetFacilities} />
 
