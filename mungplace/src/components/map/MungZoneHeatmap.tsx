@@ -1,6 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
+import { Marker, Circle } from 'react-native-maps';
 import useUserLocation from '@/hooks/useUserLocation';
-import useWebsocketActions from '@/hooks/useWebsocketActions';
+import  useWebsocketActions  from '@/hooks/useWebsocketActions'
+import useWebSocket from '@/hooks/useWebsocket';
+import { useMapStore } from '@/state/useMapStore';
+
 
 interface MungZone {
   point: {
@@ -9,14 +13,11 @@ interface MungZone {
   };
 }
 
-type AllBlueZoneHeatmapProps = {
-  mungZone: MungZone | null;
-};
-
-const AllBlueZoneHeatmap = ({ mungZone }: AllBlueZoneHeatmapProps) => {
+const MungZoneHeatmap = () => {
   const { userLocation } = useUserLocation(); // 사용자 위치 가져오기
-  const { checkMungPlace } = useWebsocketActions();
-  const visibleElements = useState(true);
+  const getGeohashCenter = useMapStore(state => state.getGeohashCenter)
+  const { checkMungPlace } = useWebsocketActions()
+
 
   // 사용자 위치 변경 시 블루존 요청
   useEffect(() => {
@@ -24,26 +25,52 @@ const AllBlueZoneHeatmap = ({ mungZone }: AllBlueZoneHeatmapProps) => {
       const centerLat = userLocation.latitude;
       const centerLon = userLocation.longitude;
 
-      // 반경 1000미터 내 블루존 요청
       const zoneData: MungZone = {
         point: { lat: centerLat, lon: centerLon },
       };
       checkMungPlace(zoneData);
     }
   }, [userLocation, checkMungPlace]);
-
-  // console.log("visibleElements:", visibleElements);
-  // console.log("myBlueZone:", myBlueZone);
-  // console.log("Heatmap Point:", myBlueZone.cells)
-
+  
+  const { mungZone } = useWebSocket()
+  console.log("멍존 입니다", mungZone)
   return (
     <>
-      {/* 멍존 렌더링
-      {visibleElements && mungZone && (
-        
-      )} */}
+      {/* 멍존 렌더링 */}
+      {mungZone && (
+        <>
+          {mungZone.map((zone: { geohash: string }) => {
+            // geohash를 통해 geohashCenter 얻기
+            const geohashCenter = getGeohashCenter(zone.geohash);
+            if (!geohashCenter) return null; // geohashCenter가 없으면 아무것도 렌더링하지 않음
+
+            return (
+              <React.Fragment key={zone.geohash}>
+                {/* 투명한 파란 원 렌더링 */}
+                <Circle
+                  center={{
+                    latitude: geohashCenter.lat,
+                    longitude: geohashCenter.lon,
+                  }}
+                  radius={75} // 반지름 75m
+                  fillColor="rgba(0, 0, 255, 0.5)" // 파란색 투명
+                  strokeColor="rgba(0, 0, 255, 1)" // 경계선 색상
+                />
+                {/* 중앙에 마커 추가 */}
+                <Marker
+                  coordinate={{
+                    latitude: geohashCenter.lat,
+                    longitude: geohashCenter.lon,
+                  }}
+                  pinColor="blue" // 마커 색상
+                />
+              </React.Fragment>
+            );
+          })}
+        </>
+      )}
     </>
   );
 };
 
-export default AllBlueZoneHeatmap;
+export default MungZoneHeatmap;
