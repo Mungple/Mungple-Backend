@@ -8,6 +8,7 @@ import DayOfWeeks from './DayOfWeeks';
 import DateBox from './DateBox';
 import YearSelector from './YearSelector';
 import MonthSelector from './MonthSelector';
+import CustomText from '../common/CustomText';
 
 interface CalendarProps {
   monthYear: MonthYear;
@@ -49,10 +50,14 @@ const Calendar = ({
         </MonthButton>
         <MonthYearContainer>
           <SelectBox onPress={() => setYearSelectorVisible(true)}>
-            <TitleText>{year}년</TitleText>
+            <CustomText fontWeight="bold" fontSize={20}>
+              {year}년
+            </CustomText>
           </SelectBox>
           <SelectBox onPress={() => setMonthSelectorVisible(true)}>
-            <TitleText>{month}월</TitleText>
+            <CustomText fontWeight="bold" fontSize={20}>
+              {month}월
+            </CustomText>
           </SelectBox>
         </MonthYearContainer>
         <MonthButton onPress={() => onChangeMonth(1)}>
@@ -60,7 +65,9 @@ const Calendar = ({
         </MonthButton>
       </HeaderContainer>
       <TodayButton onPress={moveToToday}>
-        <SubTitleText>Today</SubTitleText>
+        <CustomText fontWeight="bold" fontSize={16} color={colors.GRAY_500}>
+          Today
+        </CustomText>
       </TodayButton>
       {/* 요일 부분 */}
       <DayOfWeeks />
@@ -133,18 +140,6 @@ const TodayButton = styled.TouchableOpacity`
   align-items: center;
   margin-bottom: 10px;
   padding: 5px;
-`;
-
-const TitleText = styled.Text`
-  font-size: 20px;
-  font-weight: bold;
-  color: ${colors.BLACK};
-`;
-
-const SubTitleText = styled.Text`
-  font-size: 16px;
-  font-weight: bold;
-  color: ${colors.GRAY_500};
 `;
 
 const BodyContainer = styled.View`

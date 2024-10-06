@@ -9,6 +9,7 @@ import { useUserStore } from '@/state/useUserStore';
 import { calculateDistance } from '@/utils/recordCalculator';
 import DefaultImage from '@/assets/profile-image.png';
 import { colors } from '@/constants';
+import CustomText from '@/components/common/CustomText';
 
 type WalkListScreenProps = NativeStackScreenProps<RecordStackParamList, 'WalkList'>;
 
@@ -35,7 +36,9 @@ const WalkListScreen: React.FC<WalkListScreenProps> = ({ navigation, route }) =>
         onPress={() => navigation.navigate('WalkDetail', { explorationId: explorationId })}>
         <ListItem>
           <NumContainer>
-            <TextItem>{index + 1}</TextItem>
+            <CustomText fontWeight="bold" fontSize={24}>
+              {index + 1}
+            </CustomText>
           </NumContainer>
           <DogList>
             {togetherDogIds.length > 0 ? (
@@ -43,26 +46,20 @@ const WalkListScreen: React.FC<WalkListScreenProps> = ({ navigation, route }) =>
                 data={togetherDogIds}
                 renderItem={({ item }) => {
                   const imageSource = processPetPhoto(petData, item) || DefaultImage;
-                  return (
-                    <StyledImage
-                      source={imageSource}
-                      style={{ width: 50, height: 50, borderRadius: 25, marginRight: 5 }}
-                    />
-                  );
+                  return <StyledImage source={imageSource} />;
                 }}
                 keyExtractor={(dogId) => dogId.toString()}
                 horizontal={true}
                 showsHorizontalScrollIndicator={false}
               />
             ) : (
-              <StyledImage
-                source={DefaultImage}
-                style={{ width: 50, height: 50, borderRadius: 25, marginRight: 5 }}
-              />
+              <StyledImage source={DefaultImage} />
             )}
           </DogList>
           <DistaneContainer>
-            <TextItem>{calculateDistance(distance)}</TextItem>
+            <CustomText fontWeight="bold" fontSize={24}>
+              {calculateDistance(distance)}
+            </CustomText>
           </DistaneContainer>
         </ListItem>
       </TouchableOpacity>
@@ -96,11 +93,6 @@ const DistaneContainer = styled.View`
   font-weight: bold;
   padding: 10px;
   align-items: center;
-`;
-
-const TextItem = styled.Text`
-  font-size: 24px;
-  font-weight: bold;
 `;
 
 const ListItem = styled.View`
