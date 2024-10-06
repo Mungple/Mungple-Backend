@@ -4,25 +4,29 @@ import { useState, useEffect } from 'react';
 import { getAccessToken } from '@/api';
 import { useAppStore } from '@/state/useAppStore';
 
-interface Point {
-  lat: number;
-  lon: number;
+export interface Point {
+  latitude: number;
+  longitude: number;
 }
 
-interface Cell {
+export interface Cell {
   point: Point;
   weight: number;
 }
 
-interface FromZone {
+export interface FromZone {
   cells: Cell[];
 }
 
-interface MungZone {
+export interface MungZone {
   points: Point[];
 }
 
-interface ErrorMessage {
+export interface Distance {
+  distance: number;
+}
+
+export interface ErrorMessage {
   errorCode: string;
   message: string;
 }
@@ -37,6 +41,7 @@ const useWebSocket = (explorationId: number = -1) => {
   const [allRedZone, setAllRedZone] = useState<FromZone | null>(null);
   const [myBlueZone, setMyBlueZone] = useState<FromZone | null>(null);
   const [mungZone, setMungZone] = useState<MungZone | null>(null);
+  const [distance, setDistance] = useState<Distance | null>(null);
 
   // 소켓 연결 시도
   useEffect(() => {
@@ -58,6 +63,7 @@ const useWebSocket = (explorationId: number = -1) => {
           onConnect: () => {
             setClientSocket(socket);
             subscribeToTopics(socket, explorationId);
+            console.log(explorationId);
             console.log('useWebSocket >>> 소켓 연결 성공');
           },
           onStompError: (frame) => {
@@ -95,7 +101,7 @@ const useWebSocket = (explorationId: number = -1) => {
         const parsedMessage = JSON.parse(message.body) as ErrorMessage;
         setExplorations(parsedMessage);
       } catch (e) {
-        console.error('useWebSocket >>>', e);
+        console.error('useWebSocket for exploration >>>', e);
       }
     });
     // 개인 블루존 조회
@@ -104,7 +110,7 @@ const useWebSocket = (explorationId: number = -1) => {
         const parsedMessage = JSON.parse(message.body) as FromZone;
         setMyBlueZone(parsedMessage);
       } catch (e) {
-        console.error('useWebSocket >>>', e);
+        console.error('useWebSocket for myBluezone >>>', e);
       }
     });
     // 전체 블루존 조회
@@ -113,7 +119,7 @@ const useWebSocket = (explorationId: number = -1) => {
         const parsedMessage = JSON.parse(message.body) as FromZone;
         setAllBlueZone(parsedMessage);
       } catch (e) {
-        console.error('useWebSocket >>>', e);
+        console.error('useWebSocket for bluezone >>>', e);
       }
     });
     // 전체 레드존 조회
@@ -122,16 +128,27 @@ const useWebSocket = (explorationId: number = -1) => {
         const parsedMessage = JSON.parse(message.body) as FromZone;
         setAllRedZone(parsedMessage);
       } catch (e) {
-        console.error('useWebSocket >>>', e);
+        console.error('useWebSocket for redzone >>>', e);
       }
     });
     // 멍플 조회
     socket.subscribe('/user/sub/mungplace', (message) => {
       try {
+        console.log('mungplace', message.body);
         const parsedMessage = JSON.parse(message.body) as MungZone;
         setMungZone(parsedMessage);
       } catch (e) {
-        console.error('useWebSocket >>>', e);
+        console.error('useWebSocket for mungplace >>>', e);
+      }
+    });
+    // 산책 거리 조회
+    socket.subscribe('/user/sub/explorations/distance', (message) => {
+      try {
+        console.log('distance', message.body);
+        const parsedMessage = JSON.parse(message.body) as Distance;
+        setDistance(parsedMessage);
+      } catch (e) {
+        console.error('useWebSocket for distance >>>', e);
       }
     });
   };
@@ -142,6 +159,7 @@ const useWebSocket = (explorationId: number = -1) => {
     allBlueZone,
     allRedZone,
     mungZone,
+    distance,
   };
 };
 

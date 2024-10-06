@@ -16,22 +16,21 @@ import ElapsedTime from '@/components/walking/ElapsedTime';
 import CustomButton from '@/components/common/CustomButton';
 import { MapStackParamList } from '@/navigations/stack/MapStackNavigator';
 import useWebSocketActions from '@/hooks/useWebsocketActions';
-import { LatLng } from 'react-native-maps';
 
 const bottomBlockHeight = (Dimensions.get('window').height * 1) / 5;
 const bottomBlockWidth = Dimensions.get('window').width - 40;
 
 const WalkingScreen = () => {
-  const { userLocation } = useUserLocation();
-  const { sendLocation } = useWebSocketActions();
-  const [distance, setDistance] = useState(0);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [isFormVisible, setIsFormVisible] = useState(false);
+  // 상태 관리
   const markers = useMapStore((state) => state.markers);
   const startExplorate = useAppStore((state) => state.startExplorate);
   const setWalkingStart = useAppStore((state) => state.setWalkingStart);
+
+  const { userLocation } = useUserLocation();
+  const { sendLocation } = useWebSocketActions();
+  const [modalVisible, setModalVisible] = useState(false);
+  const [isFormVisible, setIsFormVisible] = useState(false);
   const [path, setPath] = useState<{ latitude: number; longitude: number }[]>([]);
-  const [preLoc, setPreLoc] = useState<LatLng | null>(null);
 
   const navigation = useNavigation<NativeStackNavigationProp<MapStackParamList>>();
 
@@ -60,28 +59,19 @@ const WalkingScreen = () => {
 
   // 5초마다 좌표를 수집하여 경로 업데이트
   useEffect(() => {
-    if (!userLocation) return;
-
+    console.log(path);
     const intervalId = setInterval(() => {
-      console.log(preLoc);
-      if (
-        Number(preLoc?.latitude) - userLocation.latitude > 0.000001 ||
-        Number(preLoc?.longitude) - userLocation.longitude > 0.000001
-      ) {
-        console.log(path);
-        setPath((prevPath) => [
-          ...prevPath,
-          { latitude: userLocation.latitude, longitude: userLocation.longitude },
-        ]);
-      }
-      setPreLoc(userLocation);
+      setPath((prevPath) => [
+        ...prevPath,
+        { latitude: userLocation.latitude, longitude: userLocation.longitude },
+      ]);
     }, 5000);
 
     return () => {
       clearInterval(intervalId);
       console.log('clearInterval (userLocation)');
     };
-  }, []);
+  }, [path]);
 
   useEffect(() => {
     const intervalId = setInterval(() => {
@@ -114,6 +104,7 @@ const WalkingScreen = () => {
             isFormVisible={isFormVisible}
             onFormClose={handleFormClose}
             bottomOffset={bottomBlockHeight + 20}
+            explorationId={startExplorate?.explorationId}
           />
 
           {/* 하단 상태 정보 */}
@@ -126,7 +117,7 @@ const WalkingScreen = () => {
                 </WS.InfoBlock>
                 <WS.InfoBlock>
                   <WS.InfoLabel>이동 거리</WS.InfoLabel>
-                  <WS.InfoValue>{distance.toFixed(1)} km</WS.InfoValue>
+                  <WS.InfoValue>{Number(null)} km</WS.InfoValue>
                 </WS.InfoBlock>
               </WS.InfoRow>
             </WS.WalkingInfo>

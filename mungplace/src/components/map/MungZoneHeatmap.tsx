@@ -1,9 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Heatmap } from 'react-native-maps';
 import useUserLocation from '@/hooks/useUserLocation';
-import  useWebsocketActions  from '@/hooks/useWebsocketActions'
-import useWebSocket from '@/hooks/useWebsocket';
-
+import useWebsocketActions from '@/hooks/useWebsocketActions';
 
 interface MungZone {
   point: {
@@ -12,10 +9,14 @@ interface MungZone {
   };
 }
 
-const AllBlueZoneHeatmap = () => {
+type AllBlueZoneHeatmapProps = {
+  mungZone: MungZone | null;
+};
+
+const AllBlueZoneHeatmap = ({ mungZone }: AllBlueZoneHeatmapProps) => {
   const { userLocation } = useUserLocation(); // 사용자 위치 가져오기
-  const { checkMungPlace } = useWebsocketActions()
-  const visibleElements = useState(true)
+  const { checkMungPlace } = useWebsocketActions();
+  const visibleElements = useState(true);
 
   // 사용자 위치 변경 시 블루존 요청
   useEffect(() => {
@@ -30,12 +31,11 @@ const AllBlueZoneHeatmap = () => {
       checkMungPlace(zoneData);
     }
   }, [userLocation, checkMungPlace]);
-  
-  const { mungZone } = useWebSocket()
+
   // console.log("visibleElements:", visibleElements);
   // console.log("myBlueZone:", myBlueZone);
   // console.log("Heatmap Point:", myBlueZone.cells)
-  
+
   return (
     <>
       {/* 멍존 렌더링

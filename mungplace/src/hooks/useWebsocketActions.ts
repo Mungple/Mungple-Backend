@@ -11,9 +11,9 @@ interface ToZone {
 
 interface MungZone {
   point: {
-    lat: number
-    lon: number
-  }
+    lat: number;
+    lon: number;
+  };
 }
 
 interface ToLocation {

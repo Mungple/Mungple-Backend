@@ -51,7 +51,7 @@ function useGetUserId(token: string | null, queryOptions?: UseQueryCustomOptions
 function useGetProfile(userId: number, queryOptions?: UseQueryCustomOptions<ResponseProfile>) {
   return useQuery({
     queryFn: () => getProfile(userId),
-    queryKey: [queryKeys.AUTH, queryKeys.GET_PROFILE],
+    queryKey: [queryKeys.AUTH, queryKeys.GET_PROFILE, userId],
     enabled: Boolean(userId),
     ...queryOptions,
   });

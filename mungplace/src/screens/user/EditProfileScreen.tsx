@@ -2,7 +2,6 @@ import React from 'react';
 import { Alert } from 'react-native';
 import styled from 'styled-components/native';
 
-import { addImage } from '@/api';
 import { colors } from '@/constants';
 import { useNavigation } from '@react-navigation/native';
 import ImagePicker from '@/components/common/ImagePicker';
@@ -13,12 +12,12 @@ const EditProfileScreen = () => {
 
   const handleSubmit = () => {
     navigation.goBack();
-    Alert.alert('제출', '프로필이 성공적으로 업데이트되었습니다.');
+    Alert.alert('완료', '프로필이 성공적으로 업데이트되었습니다.');
   };
 
   return (
     <Container>
-      <ImagePicker uploadFunction={addImage} />
+      <ImagePicker />
       <SubmitButton label="완료" onPress={handleSubmit} />
     </Container>
   );

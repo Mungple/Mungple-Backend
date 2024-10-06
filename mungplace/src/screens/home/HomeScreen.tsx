@@ -15,20 +15,24 @@ import CustomButton from '@/components/common/CustomButton';
 import CustomModalHeader from '@/components/common/CustomModalHeader';
 import { MapStackParamList } from '@/navigations/stack/MapStackNavigator';
 import { useUserStore } from '@/state/useUserStore';
-import useGetPet from '@/hooks/queries/useGetPet';
 import { calculateAge } from '@/hooks/usePetAge';
 import dogMain from '@/assets/dog_main.png';
+import usePet from '@/hooks/queries/usePet';
 
 const windowHeight = Dimensions.get('window').height;
 
 const HomeScreen: React.FC = () => {
+  // 펫 정보
   const { userId } = useUserStore.getState();
+  const { useGetPet } = usePet();
   const { data: petData } = useGetPet(userId);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [selectedPets, setSelectedPets] = useState<number[]>([]);
   const defaultPet = petData?.find((pet) => pet.isDefault === true);
   const { userLocation, isUserLocationError } = useUserLocation();
   const age = defaultPet ? calculateAge(defaultPet.birth) : undefined;
+
+  // 산책
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedPets, setSelectedPets] = useState<number[]>([]);
   const setWalkingStart = useAppStore((state) => state.setWalkingStart);
   const setStartExplorate = useAppStore((state) => state.setStartExplorate);
   const navigation = useNavigation<NativeStackNavigationProp<MapStackParamList>>();
@@ -70,10 +74,9 @@ const HomeScreen: React.FC = () => {
       <HS.ImageCard>
         <HS.Image
           source={
-            // defaultPet && defaultPet.photo
-            //   ? `http://j11e106.p.ssafy.io:9000/images/${defaultPet.photo}`
-            //   : dogMain
-            dogMain
+            defaultPet && defaultPet.photo
+              ? { uri: `http://j11e106.p.ssafy.io:9000/images/${defaultPet.photo}` }
+              : dogMain
           }></HS.Image>
       </HS.ImageCard>
       <PetInfoBox defaultPet={defaultPet} age={age} />
