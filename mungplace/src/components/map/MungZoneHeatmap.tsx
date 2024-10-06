@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react';
-import { useMapStore } from '@/state/useMapStore';
 import { Marker, Circle } from 'react-native-maps';
 
 import { ToMungZone } from '@/types';
