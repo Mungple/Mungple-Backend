@@ -32,8 +32,6 @@ const WalkingScreen = () => {
   // 사용자 위치 및 웹소켓 액션 추출
   const { userLocation } = useUserLocation();
   const { sendLocation } = useWebSocketActions();
-
-  // 상태값 (모달 및 경로, 폼 가시성)
   const distance = useAppStore((state) => state.distance);
   const [modalVisible, setModalVisible] = useState(false);
   const [isFormVisible, setIsFormVisible] = useState(false);

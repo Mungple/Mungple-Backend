@@ -3,6 +3,7 @@ import { FlatList, Modal, StyleSheet } from 'react-native';
 import styled from 'styled-components/native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { colors, numbers } from '@/constants';
+import CustomText from '@/components/common/CustomText';
 
 interface MonthSelectorProps {
   isVisible: boolean;
@@ -47,16 +48,22 @@ function MonthSelector({ isVisible, currentmonth, onChangeMonth, hide }: MonthSe
             renderItem={({ item }) => (
               <MonthButton
                 key={item.id}
-                onPress={() => onChangeMonth(item.id)} // 변경 없음
+                onPress={() => onChangeMonth(item.id)}
                 selected={currentmonth === item.id + 1}>
-                <MonthText selected={currentmonth === item.id + 1}>{item.month}</MonthText>
+                <CustomText
+                  fontWeight={currentmonth === item.id + 1 ? 'bold' : 'regular'}
+                  color={currentmonth === item.id + 1 ? colors.WHITE : colors.BLACK}>
+                  {item.month}
+                </CustomText>
               </MonthButton>
             )}
             keyExtractor={(item) => String(item.id)}
             numColumns={numbers.CALENDAR_SELECTOR_COLUMN}
           />
           <CloseButton onPress={hide}>
-            <CloseText>닫기</CloseText>
+            <CustomText fontWeight="bold" fontSize={16} style={{ marginRight: 10 }}>
+              닫기
+            </CustomText>
             <MaterialIcons name="keyboard-arrow-up" size={20} />
           </CloseButton>
         </MonthsContainer>
@@ -91,12 +98,6 @@ const MonthButton = styled.Pressable<{ selected: boolean }>`
   background-color: ${(props) => (props.selected ? colors.ORANGE.BASE : 'transparent')};
 `;
 
-const MonthText = styled.Text<{ selected: boolean }>`
-  font-size: 16px;
-  font-weight: ${(props) => (props.selected ? '600' : '500')};
-  color: ${(props) => (props.selected ? colors.WHITE : colors.GRAY_500)};
-`;
-
 const CloseButton = styled.Pressable`
   flex-direction: row;
   align-items: center;
@@ -108,13 +109,6 @@ const CloseButton = styled.Pressable`
   border-bottom-left-radius: 10px;
   border-bottom-right-radius: 10px;
   margin-top: 15px;
-`;
-
-const CloseText = styled.Text`
-  color: ${colors.BLACK};
-  font-size: 16px;
-  font-weight: 600;
-  margin-right: 10px;
 `;
 
 const styles = StyleSheet.create({
