@@ -1,0 +1,13 @@
+{
+  "migIndex": 1,
+  "data": [
+    {
+      "path": "src/assets/fonts/OTLaundryGothicB.otf",
+      "sha1": "39a08606f2222854411817ec9c2147b807610a33"
+    },
+    {
+      "path": "src/assets/fonts/OTLaundryGothicR.otf",
+      "sha1": "f03343ee0a43119736f37119d4a737f2a7484e38"
+    }
+  ]
+}

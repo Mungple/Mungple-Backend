@@ -40,7 +40,9 @@ function TabBarIcons(route: RouteProp<MainTabParamList>, focused: boolean) {
     }
   }
 
-  return <Ionicons name={iconName} color={focused ? colors.ORANGE.BASE : colors.BLACK} size={30} />;
+  return (
+    <Ionicons name={iconName} color={focused ? colors.ORANGE.BASE : colors.GRAY_300} size={30} />
+  );
 }
 
 const MainTabNavigator = () => {
@@ -48,7 +50,7 @@ const MainTabNavigator = () => {
     <Tab.Navigator
       screenOptions={({ route }) => ({
         tabBarActiveTintColor: `${colors.ORANGE.BASE}`,
-        tabBarInactiveTintColor: `${colors.BLACK}`,
+        tabBarInactiveTintColor: `${colors.GRAY_300}`,
         headerStyle: {
           backgroundColor: colors.WHITE,
           shadowColor: colors.GRAY_200,
@@ -75,7 +77,7 @@ const MainTabNavigator = () => {
       <Tab.Screen
         name={mainNavigations.MYPAGE}
         component={SettingStackNavigator}
-        options={{ title: '내정보' }}
+        options={{ title: '내 정보' }}
       />
     </Tab.Navigator>
   );
