@@ -14,6 +14,8 @@
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		7699B88040F8A987B510C191 /* libPods-mungplace-mungplaceTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 19F6CBCC0A4E27FBF8BF4A61 /* libPods-mungplace-mungplaceTests.a */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
+		B27A097C619F41B7BF7D7AAF /* OTLaundryGothicB.otf in Resources */ = {isa = PBXBuildFile; fileRef = 22C0FDDC154F45F8AA307210 /* OTLaundryGothicB.otf */; };
+		0BE3211E0D924F0C9137B84F /* OTLaundryGothicR.otf in Resources */ = {isa = PBXBuildFile; fileRef = AADC427195C04FEC869603B2 /* OTLaundryGothicR.otf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -45,6 +47,8 @@
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = mungplace/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		89C6BE57DB24E9ADA2F236DE /* Pods-mungplace-mungplaceTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-mungplace-mungplaceTests.release.xcconfig"; path = "Target Support Files/Pods-mungplace-mungplaceTests/Pods-mungplace-mungplaceTests.release.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
+		22C0FDDC154F45F8AA307210 /* OTLaundryGothicB.otf */ = {isa = PBXFileReference; name = "OTLaundryGothicB.otf"; path = "../src/assets/fonts/OTLaundryGothicB.otf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		AADC427195C04FEC869603B2 /* OTLaundryGothicR.otf */ = {isa = PBXFileReference; name = "OTLaundryGothicR.otf"; path = "../src/assets/fonts/OTLaundryGothicR.otf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -124,6 +128,7 @@
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
 				BBD78D7AC51CEA395F1C20DB /* Pods */,
+				593E21EE72D24E45B4EA1D53 /* Resources */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -149,6 +154,16 @@
 			);
 			path = Pods;
 			sourceTree = "<group>";
+		};
+		593E21EE72D24E45B4EA1D53 /* Resources */ = {
+			isa = "PBXGroup";
+			children = (
+				22C0FDDC154F45F8AA307210 /* OTLaundryGothicB.otf */,
+				AADC427195C04FEC869603B2 /* OTLaundryGothicR.otf */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+			path = "";
 		};
 /* End PBXGroup section */
 
@@ -245,6 +260,8 @@
 			files = (
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
+				B27A097C619F41B7BF7D7AAF /* OTLaundryGothicB.otf in Resources */,
+				0BE3211E0D924F0C9137B84F /* OTLaundryGothicR.otf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

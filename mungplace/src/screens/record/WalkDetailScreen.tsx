@@ -16,7 +16,7 @@ const DayWalksDetail: React.FC<DayWalksDetailProps> = ({ route }) => {
   useEffect(() => {
     const fetchWalkDetail = async () => {
       try {
-        const detail = await getWalkDetail(explorationId); // API 호출
+        const detail = await getWalkDetail(explorationId);
         setWalkDetail(detail); // 상태 업데이트
       } catch (error) {
         console.error('산책 상세 정보 가져오기 실패:', error);

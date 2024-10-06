@@ -1,11 +1,12 @@
 import React, { useState, useCallback } from 'react';
-import { Text, ActivityIndicator } from 'react-native';
+import { ActivityIndicator } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import styled from 'styled-components/native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { getStatistics } from '@/api/walk';
 import { colors } from '@/constants';
 import { calculateTime, calculateDistance } from '@/utils/recordCalculator';
+import CustomText from '../common/CustomText';
 
 interface Statistics {
   year: number;
@@ -74,7 +75,7 @@ const MonthStatistics: React.FC<{ year: number; month: number }> = ({ year, mont
   if (error) {
     return (
       <ErrorContainer>
-        <Text>{error}</Text>
+        <CustomText fontSize={16}>{error}</CustomText>
       </ErrorContainer>
     );
   }
@@ -82,7 +83,7 @@ const MonthStatistics: React.FC<{ year: number; month: number }> = ({ year, mont
   return (
     <Container>
       <StyledHeader>
-        <StyledHeaderText>월간 통계</StyledHeaderText>
+        <CustomText fontWeight="bold">월간 통계</CustomText>
       </StyledHeader>
       <StatCard icon="explore" label="총 산책 횟수" value={`${statistics?.totalExplorations} 회`} />
       <StatCard icon="timer" label="총 산책 시간" value={`${statistics?.totalTime}`} />
@@ -167,12 +168,6 @@ const StyledHeader = styled.View`
   padding-bottom: 12px;
   border-bottom-width: 1px;
   border-bottom-color: ${colors.GRAY_100};
-`;
-
-const StyledHeaderText = styled.Text`
-  font-size: 16px;
-  font-weight: bold;
-  color: ${colors.BLACK};
 `;
 
 export default MonthStatistics;
