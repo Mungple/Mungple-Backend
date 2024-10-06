@@ -102,6 +102,6 @@ public class WebSocketErrorControllerAdvice {
 
 	private void errorLogging(StompHeaderAccessor accessor, ApplicationSocketError error) {
 		StompErrorLog log = new StompErrorLog(accessor.getUser().getName(), error);
-		logger.log(LogLevel.ERROR, LogAction.SOCKET, log, getClass());
+		logger.log(LogLevel.ERROR, LogAction.FAIL, log, getClass());
 	}
 }

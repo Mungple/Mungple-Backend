@@ -2,8 +2,10 @@ package com.e106.mungplace.common.log.dto;
 
 public enum LogAction {
 
+	// common
+	FAIL,
 	// event
-	PUBLISH, CONSUME, ACK, COMMIT, FAIL,
+	PUBLISH, CONSUME, ACK, COMMIT,
 	// socket
 	SOCKET,
 	// controller
