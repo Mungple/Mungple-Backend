@@ -1,8 +1,8 @@
 // 1. 라이브러리 및 네이티브 기능
 import styled from 'styled-components/native';
-import React, { useEffect, useRef, useState } from 'react';
-import { Animated, StyleSheet, Image } from 'react-native';
 import ClusteredMapView from 'react-native-map-clustering';
+import { Animated, StyleSheet, Image } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import MapView, { Marker, Polyline, PROVIDER_GOOGLE } from 'react-native-maps';
@@ -32,14 +32,14 @@ import useUserLocation from '@/hooks/useUserLocation';
 import useMarkersWithinRadius from '@/hooks/useMarkersWithinRadius';
 
 // 6. 상태 관리 및 데이터
+import { PetFacility } from '@/types';
 import { colors, mapNavigations } from '@/constants';
 import { useMapStore, MarkerData } from '@/state/useMapStore';
 
 // 7. 네비게이션 타입
-import { MapStackParamList } from '@/navigations/stack/MapStackNavigator';
 import { useAppStore } from '@/state/useAppStore';
+import { MapStackParamList } from '@/navigations/stack/MapStackNavigator';
 
-// ========== 인터페이스 정의 ==========
 // 컴포넌트에 전달되는 props 정의
 interface MapComponentProps {
   userLocation: { latitude: number; longitude: number };
@@ -49,13 +49,6 @@ interface MapComponentProps {
   isFormVisible: boolean;
   onFormClose: () => void;
   explorationId?: number;
-}
-
-// 애견 동반 시설 타입 정의
-interface PetFacility {
-  id: number;
-  latitude: number;
-  longitude: number;
 }
 
 // ========== Main Functional Component ==========
