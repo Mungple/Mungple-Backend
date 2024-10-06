@@ -4,6 +4,7 @@ import styled from 'styled-components/native';
 
 import { colors } from '@/constants';
 import paw from '@/assets/paw.png';
+import CustomText from '../common/CustomText';
 
 interface DateBoxProps {
   date: number;
@@ -27,9 +28,12 @@ const DateBox = ({ date, isToday, selectedDate, hasAttendance, onPressDate }: Da
       {date > 0 && (
         <>
           <DateContainer isToday={isToday}>
-            <DateText isToday={isToday} isSelected={selectedDate === date}>
+            <CustomText
+              fontWeight={isToday || selectedDate === date ? 'bold' : 'regular'}
+              fontSize={16}
+              color={isToday ? colors.WHITE : colors.BLACK}>
               {date}
-            </DateText>
+            </CustomText>
           </DateContainer>
           {hasAttendance && <Image source={paw} style={styles.paw} />}
         </>
@@ -54,13 +58,6 @@ const DateContainer = styled.View<{ isToday: boolean }>`
   height: 34px;
   border-radius: 10px;
   background-color: ${({ isToday }) => (isToday ? colors.ORANGE.BASE : 'transparent')};
-`;
-
-const DateText = styled.Text<{ isToday: boolean; isSelected: boolean }>`
-  font-size: 16px;
-  color: ${({ isToday }) => (isToday ? colors.WHITE : colors.BLACK)};
-  font-weight: ${({ isToday, isSelected }) => (isToday || isSelected ? 'bold' : 'normal')};
-  padding: 4px;
 `;
 
 const styles = StyleSheet.create({
