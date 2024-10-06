@@ -4,7 +4,11 @@ import useUserLocation from '@/hooks/useUserLocation';
 import { useAppStore } from '@/state/useAppStore';
 import { PetFacility } from '@/types';
 
-const WithPetPlace = ({ setPetFacilities }) => {
+interface WithPetPlaceProps {
+  setPetFacilities: React.Dispatch<React.SetStateAction<PetFacility[]>>;
+}
+
+const WithPetPlace = ({ setPetFacilities }: WithPetPlaceProps) => {
   const { userLocation } = useUserLocation();
   const radius = 1000;
   const latitude = userLocation.latitude;
@@ -38,7 +42,7 @@ const WithPetPlace = ({ setPetFacilities }) => {
     }
   }, [latitude, longitude]);
 
-  return null; // 렌더링할 것이 없음
+  return null;
 };
 
 export default WithPetPlace;

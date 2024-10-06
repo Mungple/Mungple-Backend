@@ -306,8 +306,8 @@ const MapComponent: React.FC<MapComponentProps> = ({
           <Marker
             key={facility.id} // 시설 ID가 유일한 키인지 확인
             coordinate={{
-              latitude: facility.latitude,
-              longitude: facility.longitude,
+              latitude: facility.point.lat,
+              longitude: facility.point.lon,
             }}
             onPress={() => handleFacilityMarkerPress(facility.id)}>
             <Image source={doghouse} style={styles.markerImage} />

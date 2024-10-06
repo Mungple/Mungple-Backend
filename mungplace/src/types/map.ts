@@ -3,13 +3,13 @@ interface Point {
   lon: number;
 }
 
-interface FacilityPoints {
+interface PetFacility {
   id: number;
   point: Point;
 }
 
-interface PetFacility {
-  facilityPoints: FacilityPoints[];
+interface FacilityPoints {
+  facilityPoints: PetFacility[];
 }
 
 interface PetFacilityDetail {
@@ -23,4 +23,4 @@ interface PetFacilityDetail {
   description: string;
 }
 
-export type { PetFacility, PetFacilityDetail };
+export type { Point, FacilityPoints, PetFacility, PetFacilityDetail };

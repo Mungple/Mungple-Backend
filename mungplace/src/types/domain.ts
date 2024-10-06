@@ -43,12 +43,6 @@ interface Exploration {
   endAt: string;
 }
 
-interface PetFacility {
-  id: number;
-  latitude: number;
-  longitude: number;
-}
-
 export type {
   Exploration,
   ImageUri,
@@ -56,5 +50,4 @@ export type {
   ResponsePetProfile,
   StartExplorate,
   UserProfile,
-  PetFacility,
 };
