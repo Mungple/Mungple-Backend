@@ -304,7 +304,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
         {/* 동반 시설 마커 렌더링 */}
         {petFacilities.map((facility) => (
           <Marker
-            key={facility.id} // 시설 ID가 유일한 키인지 확인
+            key={facility.id}
             coordinate={{
               latitude: facility.point.lat,
               longitude: facility.point.lon,

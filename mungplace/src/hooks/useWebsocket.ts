@@ -3,24 +3,7 @@ import { useState, useEffect } from 'react';
 
 import { getAccessToken } from '@/api';
 import { useAppStore } from '@/state/useAppStore';
-
-export interface Point {
-  lat: number;
-  lon: number;
-}
-
-export interface Cell {
-  point: Point;
-  weight: number;
-}
-
-export interface FromZone {
-  cells: Cell[];
-}
-
-export interface MungZone {
-  points: Point[];
-}
+import { FromZone } from '@/types';
 
 export interface Distance {
   distance: number;
@@ -40,7 +23,7 @@ const useWebSocket = (explorationId: number = -1) => {
   const [allBlueZone, setAllBlueZone] = useState<FromZone | null>(null);
   const [allRedZone, setAllRedZone] = useState<FromZone | null>(null);
   const [myBlueZone, setMyBlueZone] = useState<FromZone | null>(null);
-  const [mungZone, setMungZone] = useState<MungZone | null>(null);
+  const [mungZone, setMungZone] = useState<Array<{ geohash: string }> | null>(null);
   const [getDistance, setDistance] = useState<Distance | null>(null);
 
   // 소켓 연결 시도
@@ -135,7 +118,7 @@ const useWebSocket = (explorationId: number = -1) => {
     socket.subscribe('/user/sub/mungplace', (message) => {
       try {
         console.log('mungplace', message.body);
-        const parsedMessage = JSON.parse(message.body) as MungZone;
+        const parsedMessage = JSON.parse(message.body) as Array<{ geohash: string }>;
         setMungZone(parsedMessage);
       } catch (e) {
         console.error('useWebSocket for mungplace >>>', e);
@@ -144,7 +127,7 @@ const useWebSocket = (explorationId: number = -1) => {
     // 산책 거리 조회
     socket.subscribe('/user/sub/explorations/distance', (message) => {
       try {
-        console.log('distance', message.body);
+        console.log('useWebSocket >>> distance', message.body);
         const parsedMessage = JSON.parse(message.body) as Distance;
         setDistance(parsedMessage);
       } catch (e) {

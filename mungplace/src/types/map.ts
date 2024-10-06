@@ -3,6 +3,24 @@ interface Point {
   lon: number;
 }
 
+interface ToZone {
+  side: number;
+  point: Point;
+}
+
+interface Cell {
+  point: Point;
+  weight: number;
+}
+
+interface FromZone {
+  cells: Cell[];
+}
+
+interface ToMungZone {
+  point: Point;
+}
+
 interface PetFacility {
   id: number;
   point: Point;
@@ -23,4 +41,13 @@ interface PetFacilityDetail {
   description: string;
 }
 
-export type { Point, FacilityPoints, PetFacility, PetFacilityDetail };
+export type {
+  Cell,
+  Point,
+  ToZone,
+  FromZone,
+  ToMungZone,
+  PetFacility,
+  FacilityPoints,
+  PetFacilityDetail,
+};

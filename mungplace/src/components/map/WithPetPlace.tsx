@@ -1,8 +1,9 @@
-import axiosInstance from '@/api/axios';
 import { useEffect } from 'react';
-import useUserLocation from '@/hooks/useUserLocation';
-import { useAppStore } from '@/state/useAppStore';
+
 import { PetFacility } from '@/types';
+import axiosInstance from '@/api/axios';
+import { useAppStore } from '@/state/useAppStore';
+import useUserLocation from '@/hooks/useUserLocation';
 
 interface WithPetPlaceProps {
   setPetFacilities: React.Dispatch<React.SetStateAction<PetFacility[]>>;
@@ -10,13 +11,10 @@ interface WithPetPlaceProps {
 
 const WithPetPlace = ({ setPetFacilities }: WithPetPlaceProps) => {
   const { userLocation } = useUserLocation();
-  const radius = 1000;
-  const latitude = userLocation.latitude;
-  const longitude = userLocation.longitude;
   const accessToken = useAppStore((state) => state.token);
 
-  const fetchWithPetPlace = async () => {
-    const url = `/pet-facilities?radius=${radius}&point.lat=${latitude}&point.lon=${longitude}`;
+  const fetchWithPetPlace = async (lat: number, lon: number) => {
+    const url = `/pet-facilities?radius=1000&point.lat=${lat}&point.lon=${lon}`;
     try {
       const response = await axiosInstance.get(url, {
         headers: {
@@ -25,22 +23,18 @@ const WithPetPlace = ({ setPetFacilities }: WithPetPlaceProps) => {
         },
       });
 
-      const facilities = response.data.facilityPoints.map((facility: PetFacility) => ({
-        id: facility.id,
-        latitude: facility.point.lat, // 응답 데이터에서 위도
-        longitude: facility.point.lon, // 응답 데이터에서 경도
-      }));
-      setPetFacilities(facilities);
+      setPetFacilities(response.data);
     } catch (error) {
       console.error('애견 동반 시설 조회 오류', error);
     }
   };
 
   useEffect(() => {
+    const { latitude, longitude } = userLocation;
     if (latitude && longitude) {
-      fetchWithPetPlace();
+      fetchWithPetPlace(latitude, longitude);
     }
-  }, [latitude, longitude]);
+  }, [userLocation]);
 
   return null;
 };
