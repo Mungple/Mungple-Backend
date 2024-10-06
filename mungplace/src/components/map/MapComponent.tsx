@@ -225,18 +225,10 @@ const MapComponent: React.FC<MapComponentProps> = ({
       }
     };
     getPetFacilities();
-  }, [userLocation]);
-
-  // 5초마다 거리 업데이트
-  useEffect(() => {
-    const interval = setInterval(() => {
-      console.log('distance', getDistance);
+    if (explorationId !== -1) {
       setDistance(Number(getDistance));
-    }, 5000);
-
-    // 컴포넌트가 언마운트될 때 인터벌 정리
-    return () => clearInterval(interval);
-  }, []);
+    }
+  }, [userLocation]);
 
   // ========== UI Rendering ==========
   return (
@@ -301,28 +293,25 @@ const MapComponent: React.FC<MapComponentProps> = ({
 
         {/* 개인 블루존 히트맵 */}
         {visibleElements.myBlueZone && <MyBlueZoneHeatmap myBlueZone={myBlueZone} />}
-
         {/* 전체 블루존 히트맵 */}
         {visibleElements.blueZone && <AllBlueZoneHeatmap allBlueZone={allBlueZone} />}
-
         {/* 전체 레드존 히트맵 */}
         {visibleElements.redZone && <AllRedZoneHeatmap allRedZone={allRedZone} />}
-
         {/* 멍존 히트맵 */}
         {visibleElements.mungZone && <MungZoneHeatmap mungZone={mungZone} />}
-
         {/* 동반 시설 마커 */}
-        {petFacilities.map((facility) => (
-          <Marker
-            key={facility.id}
-            coordinate={{
-              latitude: facility.point.lat,
-              longitude: facility.point.lon,
-            }}
-            onPress={() => handleFacilityMarkerPress(facility.id)}>
-            <Image source={doghouse} style={styles.markerImage} />
-          </Marker>
-        ))}
+        {visibleElements.convenienceInfo &&
+          petFacilities.map((facility) => (
+            <Marker
+              key={facility.id}
+              coordinate={{
+                latitude: facility.point.lat,
+                longitude: facility.point.lon,
+              }}
+              onPress={() => handleFacilityMarkerPress(facility.id)}>
+              <Image source={doghouse} style={styles.markerImage} />
+            </Marker>
+          ))}
       </ClusteredMapView>
 
       {/* 커스텀 맵 버튼 */}
@@ -351,8 +340,8 @@ const MapComponent: React.FC<MapComponentProps> = ({
           isVisible={formVisible}
           onSubmit={handleMarkerSubmit}
           onClose={() => setFormVisible(false)}
-          latitude={userLocation.latitude} // 유저의 위도 값
-          longitude={userLocation.longitude} // 유저의 경도 값
+          latitude={userLocation.latitude}
+          longitude={userLocation.longitude}
         />
         <ButtonWithTextContainer top={120} right={20}>
           <TextLabel>지도 설정</TextLabel>
