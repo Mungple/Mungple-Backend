@@ -37,6 +37,7 @@ import { useMapStore, MarkerData } from '@/state/useMapStore';
 
 // 7. 네비게이션 타입
 import { MapStackParamList } from '@/navigations/stack/MapStackNavigator';
+import { useAppStore } from '@/state/useAppStore';
 
 interface MapComponentProps {
   userLocation: { latitude: number; longitude: number };
@@ -46,7 +47,6 @@ interface MapComponentProps {
   isFormVisible: boolean;
   onFormClose: () => void;
   explorationId?: number;
-  setDistance: React.Dispatch<React.SetStateAction<number>>;
 }
 
 interface PetFacility {
@@ -60,7 +60,6 @@ const MapComponent: React.FC<MapComponentProps> = ({
   bottomOffset = 0,
   path = [],
   explorationId = -1,
-  setDistance,
 }) => {
   useMarkersWithinRadius();
   const nearbyMarkers = useMapStore((state) => state.nearbyMarkers);
@@ -72,7 +71,9 @@ const MapComponent: React.FC<MapComponentProps> = ({
   const opacity = useRef(new Animated.Value(0)).current;
   const translateY = useRef(new Animated.Value(0)).current;
   const [isMenuVisible, setIsMenuVisible] = useState(false);
-  const { distance, myBlueZone, allBlueZone, allRedZone, mungZone } = useWebSocket(explorationId);
+  const setDistance = useAppStore((state) => state.setDistance);
+  const { getDistance, myBlueZone, allBlueZone, allRedZone, mungZone } =
+    useWebSocket(explorationId);
   const [formVisible, setFormVisible] = useState(false); // 마커폼 가시성 함수
   const [petFacilities, setPetFacilities] = useState<PetFacility[]>([]); // 애견 동반 시설 상태
   const [isSettingModalVisible, setIsSettingModalVisible] = useState(false); // 환경 설정에 쓰는 모달 가시성
@@ -212,7 +213,8 @@ const MapComponent: React.FC<MapComponentProps> = ({
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setDistance(Number(distance));
+      console.log('distance', getDistance);
+      setDistance(Number(getDistance));
     }, 5000);
 
     // 컴포넌트가 언마운트될 때 인터벌 정리

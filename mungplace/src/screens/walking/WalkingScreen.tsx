@@ -28,7 +28,7 @@ const WalkingScreen = () => {
 
   const { userLocation } = useUserLocation();
   const { sendLocation } = useWebSocketActions();
-  const [distance, setDistance] = useState<number>(0);
+  const distance = useAppStore((state) => state.distance);
   const [modalVisible, setModalVisible] = useState(false);
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [path, setPath] = useState<{ latitude: number; longitude: number }[]>([]);
@@ -60,7 +60,7 @@ const WalkingScreen = () => {
 
   // 5초마다 좌표를 수집하여 경로 업데이트
   useEffect(() => {
-    console.log(path);
+    // console.log(path);
     const intervalId = setInterval(() => {
       setPath((prevPath) => [
         ...prevPath,
@@ -101,7 +101,6 @@ const WalkingScreen = () => {
           <MapComponent
             path={path}
             markers={markers}
-            setDistance={setDistance}
             userLocation={userLocation}
             isFormVisible={isFormVisible}
             onFormClose={handleFormClose}
