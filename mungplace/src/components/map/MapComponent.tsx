@@ -39,6 +39,8 @@ import { useMapStore, MarkerData } from '@/state/useMapStore';
 import { MapStackParamList } from '@/navigations/stack/MapStackNavigator';
 import { useAppStore } from '@/state/useAppStore';
 
+// ========== 인터페이스 정의 ==========
+// 컴포넌트에 전달되는 props 정의
 interface MapComponentProps {
   userLocation: { latitude: number; longitude: number };
   path?: { latitude: number; longitude: number }[];
@@ -49,35 +51,52 @@ interface MapComponentProps {
   explorationId?: number;
 }
 
+// 애견 동반 시설 타입 정의
 interface PetFacility {
   id: number;
   latitude: number;
   longitude: number;
 }
 
+// ========== Main Functional Component ==========
 const MapComponent: React.FC<MapComponentProps> = ({
   userLocation,
   bottomOffset = 0,
   path = [],
   explorationId = -1,
 }) => {
-  useMarkersWithinRadius();
-  const nearbyMarkers = useMapStore((state) => state.nearbyMarkers);
-
-  const { addMarker } = useMapStore();
-  const mapRef = useRef<MapView | null>(null);
-  const { isUserLocationError } = useUserLocation();
-  const [isDisabled, setIsDisabled] = useState(true);
+  // ========== Constants ==========
+  // 애니메이션 값 및 상태 관리
   const opacity = useRef(new Animated.Value(0)).current;
   const translateY = useRef(new Animated.Value(0)).current;
+
+  // 상태 관리 및 리액트 훅
+  const [isDisabled, setIsDisabled] = useState(true);
+  const [formVisible, setFormVisible] = useState(false);
   const [isMenuVisible, setIsMenuVisible] = useState(false);
+  const [petFacilities, setPetFacilities] = useState<PetFacility[]>([]);
+  const [isSettingModalVisible, setIsSettingModalVisible] = useState(false);
+  const [visibleElements, setVisibleElements] = useState({
+    blueZone: true,
+    redZone: true,
+    mungZone: true,
+    convenienceInfo: true,
+    myBlueZone: true,
+    redMarkers: true,
+    blueMarkers: true,
+  });
+
+  // 지도 관련 레퍼런스 및 위치 상태
+  const mapRef = useRef<MapView | null>(null);
+  const { isUserLocationError } = useUserLocation();
   const setDistance = useAppStore((state) => state.setDistance);
+  const navigation = useNavigation<NativeStackNavigationProp<MapStackParamList>>();
   const { getDistance, myBlueZone, allBlueZone, allRedZone, mungZone } =
     useWebSocket(explorationId);
-  const [formVisible, setFormVisible] = useState(false); // 마커폼 가시성 함수
-  const [petFacilities, setPetFacilities] = useState<PetFacility[]>([]); // 애견 동반 시설 상태
-  const [isSettingModalVisible, setIsSettingModalVisible] = useState(false); // 환경 설정에 쓰는 모달 가시성
-  const navigation = useNavigation<NativeStackNavigationProp<MapStackParamList>>();
+
+  // 마커 처리 및 업데이트
+  const { addMarker } = useMapStore();
+  const nearbyMarkers = useMapStore((state) => state.nearbyMarkers);
   const updatedMarkers: {
     markerId: string;
     userId: number;
@@ -107,17 +126,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
     });
   }
 
-  // 지도 요소 가시성 상태
-  const [visibleElements, setVisibleElements] = useState({
-    blueZone: true,
-    redZone: true,
-    mungZone: true,
-    convenienceInfo: true,
-    myBlueZone: true,
-    redMarkers: true,
-    blueMarkers: true,
-  });
-
+  // ========== Methods ==========
   // 지도 요소 토글 함수
   const toggleElementVisibility = (element: keyof typeof visibleElements) => {
     setVisibleElements((prev) => ({
@@ -138,7 +147,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
     }
   };
 
-  // 마커 등록 하기 => 오류 발생 시 여기 타입 일 수 있음
+  // 마커 등록 하기
   const handleMarkerSubmit = (markerData: MarkerData) => {
     addMarker(markerData);
     setFormVisible(false);
@@ -199,6 +208,8 @@ const MapComponent: React.FC<MapComponentProps> = ({
     handlePressMenu();
   };
 
+  // ========== Side Effects ==========
+  useMarkersWithinRadius();
   usePermission('LOCATION');
 
   // 화면을 떠날 때 WebSocket 연결 해제
@@ -211,6 +222,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
     }, []),
   );
 
+  // 5초마다 거리 업데이트
   useEffect(() => {
     const interval = setInterval(() => {
       console.log('distance', getDistance);
@@ -221,6 +233,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
     return () => clearInterval(interval);
   }, []);
 
+  // ========== UI Rendering ==========
   return (
     <Container>
       <ClusteredMapView
