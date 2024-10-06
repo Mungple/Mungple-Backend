@@ -9,7 +9,6 @@ import MapView, { Marker, Polyline, PROVIDER_GOOGLE } from 'react-native-maps';
 
 // 2. 커스텀 컴포넌트
 import MapSettings from './MapSettings';
-import WithPetPlace from './WithPetPlace';
 import MarkerForm from '../marker/MarkerForm';
 import CustomMapButton from '../common/CustomMapButton';
 import CustomBottomSheet from '../common/CustomBottomSheet';
@@ -32,7 +31,7 @@ import useUserLocation from '@/hooks/useUserLocation';
 import useMarkersWithinRadius from '@/hooks/useMarkersWithinRadius';
 
 // 6. 상태 관리 및 데이터
-import { PetFacility } from '@/types';
+import { fetchWithPetPlace } from '@/api/map';
 import { colors, mapNavigations } from '@/constants';
 import { useMapStore, MarkerData } from '@/state/useMapStore';
 
@@ -67,7 +66,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
   const [isDisabled, setIsDisabled] = useState(true);
   const [formVisible, setFormVisible] = useState(false);
   const [isMenuVisible, setIsMenuVisible] = useState(false);
-  const [petFacilities, setPetFacilities] = useState<PetFacility[]>([]);
+  const petFacilities = useMapStore((state) => state.petFacilities);
   const [isSettingModalVisible, setIsSettingModalVisible] = useState(false);
   const [visibleElements, setVisibleElements] = useState({
     blueZone: true,
@@ -83,6 +82,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
   const mapRef = useRef<MapView | null>(null);
   const { isUserLocationError } = useUserLocation();
   const setDistance = useAppStore((state) => state.setDistance);
+  const setPetFacilities = useMapStore((state) => state.setPetFacilities);
   const navigation = useNavigation<NativeStackNavigationProp<MapStackParamList>>();
   const { getDistance, myBlueZone, allBlueZone, allRedZone, mungZone } =
     useWebSocket(explorationId);
@@ -215,6 +215,18 @@ const MapComponent: React.FC<MapComponentProps> = ({
     }, []),
   );
 
+  useEffect(() => {
+    const { latitude, longitude } = userLocation;
+    const getPetFacilities = async () => {
+      if (latitude && longitude) {
+        const petFacilities = await fetchWithPetPlace(latitude, longitude);
+        const facilityPoints = petFacilities.facilityPoints;
+        setPetFacilities(facilityPoints);
+      }
+    };
+    getPetFacilities();
+  }, [userLocation]);
+
   // 5초마다 거리 업데이트
   useEffect(() => {
     const interval = setInterval(() => {
@@ -299,9 +311,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
         {/* 멍존 히트맵 */}
         {visibleElements.mungZone && <MungZoneHeatmap mungZone={mungZone} />}
 
-        <WithPetPlace setPetFacilities={setPetFacilities} />
-
-        {/* 동반 시설 마커 렌더링 */}
+        {/* 동반 시설 마커 */}
         {petFacilities.map((facility) => (
           <Marker
             key={facility.id}
