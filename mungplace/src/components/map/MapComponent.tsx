@@ -1,31 +1,43 @@
+// 1. 라이브러리 및 네이티브 기능
 import styled from 'styled-components/native';
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Animated, StyleSheet, Image } from 'react-native';
 import ClusteredMapView from 'react-native-map-clustering';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import MapView, { Marker, Polyline, PROVIDER_GOOGLE } from 'react-native-maps';
 
-import { colors } from '@/constants'; // 색깔
+// 2. 커스텀 컴포넌트
 import MapSettings from './MapSettings';
-import { mapNavigations } from '@/constants';
+import WithPetPlace from './WithPetPlace';
 import MarkerForm from '../marker/MarkerForm';
-import redMarker from '@/assets/redMarker.png'; // 레드 마커
-import blueMarker from '@/assets/blueMarker.png'; // 블루 마커
-import doghouse from '@/assets/doghouse.png';
-import usePermission from '@/hooks/usePermission'; // 퍼미션
-import useUserLocation from '@/hooks/useUserLocation'; // 유저 위치
-import CustomMapButton from '../common/CustomMapButton'; // 커스텀 버튼
-import CustomBottomSheet from '../common/CustomBottomSheet'; // 커스텀 바텀 바
-import useMarkersWithinRadius from '@/hooks/useMarkersWithinRadius'; // 주변 위치 조회 훅
-import { MapStackParamList } from '@/navigations/stack/MapStackNavigator';
-import { useMapStore, MarkerData } from '@/state/useMapStore';
-import MyBlueZoneHeatmap from './MyBlueZoneHeatmap'; // 개인 블루존 렌더링
-import AllBlueZoneHeatmap from './AllBlueZoneHeatmap'; // 블루존 렌더링
-import AllRedZoneHeatmap from './AllRedZoneHeatmap'; // 레드존 렌더링
-import WithPetPlace from './WithPetPlace'; // 애견 동반 시설 조회
-import MungZoneHeatmap from './MungZoneHeatmap';
+import CustomMapButton from '../common/CustomMapButton';
+import CustomBottomSheet from '../common/CustomBottomSheet';
 
+// 3. 지도 관련
+import MungZoneHeatmap from './MungZoneHeatmap';
+import MyBlueZoneHeatmap from './MyBlueZoneHeatmap';
+import AllRedZoneHeatmap from './AllRedZoneHeatmap';
+import AllBlueZoneHeatmap from './AllBlueZoneHeatmap';
+
+// 4. 리소스 및 이미지
+import doghouse from '@/assets/doghouse.png';
+import redMarker from '@/assets/redMarker.png';
+import blueMarker from '@/assets/blueMarker.png';
+
+// 5. 훅(Hooks)
+import useWebSocket from '@/hooks/useWebsocket';
+import usePermission from '@/hooks/usePermission';
+import useUserLocation from '@/hooks/useUserLocation';
+import useMarkersWithinRadius from '@/hooks/useMarkersWithinRadius';
+
+// 6. 상태 관리 및 데이터
+import { colors, mapNavigations } from '@/constants';
+import { useMapStore, MarkerData } from '@/state/useMapStore';
+
+// 7. 네비게이션 타입
+import { MapStackParamList } from '@/navigations/stack/MapStackNavigator';
+import { useAppStore } from '@/state/useAppStore';
 
 interface MapComponentProps {
   userLocation: { latitude: number; longitude: number };
@@ -59,7 +71,9 @@ const MapComponent: React.FC<MapComponentProps> = ({
   const opacity = useRef(new Animated.Value(0)).current;
   const translateY = useRef(new Animated.Value(0)).current;
   const [isMenuVisible, setIsMenuVisible] = useState(false);
-  const { distance, myBlueZone, allBlueZone, allRedZone } = useWebSocket(explorationId);
+  const setDistance = useAppStore((state) => state.setDistance);
+  const { getDistance, myBlueZone, allBlueZone, allRedZone, mungZone } =
+    useWebSocket(explorationId);
   const [formVisible, setFormVisible] = useState(false); // 마커폼 가시성 함수
   const [petFacilities, setPetFacilities] = useState<PetFacility[]>([]); // 애견 동반 시설 상태
   const [isSettingModalVisible, setIsSettingModalVisible] = useState(false); // 환경 설정에 쓰는 모달 가시성
@@ -197,6 +211,16 @@ const MapComponent: React.FC<MapComponentProps> = ({
     }, []),
   );
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      console.log('distance', getDistance);
+      setDistance(Number(getDistance));
+    }, 5000);
+
+    // 컴포넌트가 언마운트될 때 인터벌 정리
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <Container>
       <ClusteredMapView
@@ -267,7 +291,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
         {visibleElements.redZone && <AllRedZoneHeatmap allRedZone={allRedZone} />}
 
         {/* 멍존 히트맵 */}
-        {visibleElements.mungZone && <MungZoneHeatmap />}
+        {visibleElements.mungZone && <MungZoneHeatmap mungZone={mungZone} />}
 
         <WithPetPlace setPetFacilities={setPetFacilities} />
 

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Button, Image, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, Text, Button, Image, StyleSheet, ActivityIndicator, ScrollView } from 'react-native';
 import axiosInstance from '@/api/axios';
 import { MarkerDetails } from '../../state/useMapStore'; // MarkerDetails 타입을 useMapStore에서 가져옵니다.
 import { useAppStore } from '@/state/useAppStore';
@@ -86,10 +86,11 @@ const MarkerDetailScreen: React.FC = () => {
   }
 
   return (
-    <View style={styles.container}>
+    <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>{markerDetails.title}</Text>
       <Text style={styles.content}>{markerDetails.content}</Text>
       <Text style={styles.date}>{`${formatDate(markerDetails.createdAt)}에 생성됨`}</Text>
+      
       {markerDetails.images.length > 0 && (
         <View style={styles.imageContainer}>
           {markerDetails.images.map((imageUri, index) => (
@@ -97,57 +98,69 @@ const MarkerDetailScreen: React.FC = () => {
           ))}
         </View>
       )}
+      
       <Text style={styles.userId}>작성자: {markerDetails.userId}</Text>
+      
       {/* 현재 접속한 유저와 작성자가 동일할 때만 삭제 버튼 렌더링 */}
       {currentUserId === markerDetails.userId && (
-        <Button title="삭제" onPress={handleDelete} />
+        <Button title="삭제" onPress={handleDelete} color="#d9534f" />
       )}
-      <Button title="Back" onPress={() => navigation.goBack()} />
-    </View>
+      
+      <Button title="Back" onPress={() => navigation.goBack()} color="#5bc0de" />
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flexGrow: 1,
     padding: 20,
-    backgroundColor: 'white',
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 6,
+    elevation: 4,
+    margin: 10,
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 10,
+    color: '#2c3e50',
   },
   content: {
     fontSize: 16,
     marginBottom: 10,
+    color: '#34495e',
   },
   date: {
-    fontSize: 12,
-    color: '#888',
-    marginBottom: 10,
+    fontSize: 14,
+    marginBottom: 20,
+    color: '#95a5a6',
+    textAlign: 'right',
   },
   imageContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    marginBottom: 10,
+    justifyContent: 'space-between',
+    marginBottom: 20,
   },
   image: {
-    width: 100,
+    width: '48%',
     height: 100,
-    marginRight: 5,
-  },
-  type: {
-    fontSize: 14,
+    borderRadius: 8,
     marginBottom: 10,
+    borderWidth: 1,
+    borderColor: '#ecf0f1',
+    resizeMode: 'cover',
   },
   userId: {
     fontSize: 14,
-    color: '#666',
-  },
-  errorText: {
-    fontSize: 16,
-    color: 'red',
+    marginBottom: 20,
+    color: '#7f8c8d',
+    fontStyle: 'italic',
   },
 });
 

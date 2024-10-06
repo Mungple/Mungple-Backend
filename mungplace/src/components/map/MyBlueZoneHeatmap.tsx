@@ -3,6 +3,7 @@ import { Heatmap } from 'react-native-maps';
 import useUserLocation from '@/hooks/useUserLocation';
 import useWebsocketActions from '@/hooks/useWebsocketActions';
 import { FromZone } from '@/hooks/useWebsocket';
+import { colors } from '@/constants';
 
 interface ToZone {
   side: number;
@@ -49,6 +50,11 @@ const MyBlueZoneHeatmap = ({ myBlueZone }: MyBlueZoneHeatmapProps) => {
             longitude: cell.point.lon,
             weight: cell.weight,
           }))}
+          gradient={{
+            colors: [ colors.BEIGE.LIGHTER, colors.BLUE.BASE],
+            startPoints: [0.2, 1.0],
+            colorMapSize: 256,
+          }}
         />
       )}
     </>
