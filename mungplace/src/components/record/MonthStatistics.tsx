@@ -83,7 +83,9 @@ const MonthStatistics: React.FC<{ year: number; month: number }> = ({ year, mont
   return (
     <Container>
       <StyledHeader>
-        <CustomText fontWeight="bold">월간 통계</CustomText>
+        <CustomText fontWeight="bold" fontSize={16}>
+          월간 통계
+        </CustomText>
       </StyledHeader>
       <StatCard icon="explore" label="총 산책 횟수" value={`${statistics?.totalExplorations} 회`} />
       <StatCard icon="timer" label="총 산책 시간" value={`${statistics?.totalTime}`} />
@@ -108,10 +110,12 @@ const StatCard: React.FC<StatCardProps> = ({ icon, label, value }) => (
   <Card>
     <CardContent>
       <StatIcon>
-        <MaterialIcons name={icon} size={28} color={colors.ORANGE.BASE} />
+        <MaterialIcons name={icon} size={36} color={colors.ORANGE.BASE} />
       </StatIcon>
-      <StatLabel>{label}</StatLabel>
-      <StatValue>{value}</StatValue>
+      <CustomText fontWeight="bold" fontSize={18} style={{ flex: 1 }}>
+        {label}
+      </CustomText>
+      <CustomText fontSize={20}>{value}</CustomText>
     </CardContent>
   </Card>
 );
@@ -146,20 +150,7 @@ const CardContent = styled.View`
 `;
 
 const StatIcon = styled.View`
-  margin-right: 10px;
-`;
-
-const StatLabel = styled.Text`
-  font-weight: bold;
-  font-size: 16px;
-  color: ${colors.BLACK};
-  flex: 1;
-`;
-
-const StatValue = styled.Text`
-  font-size: 18px;
-  font-weight: 500;
-  color: ${colors.BLACK};
+  margin-right: 8px;
 `;
 
 const StyledHeader = styled.View`

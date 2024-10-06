@@ -1,5 +1,5 @@
 import React from 'react';
-import { FlatList, TouchableOpacity, Image } from 'react-native';
+import { FlatList, TouchableOpacity } from 'react-native';
 import styled from 'styled-components/native';
 
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -44,7 +44,7 @@ const WalkListScreen: React.FC<WalkListScreenProps> = ({ navigation, route }) =>
                 renderItem={({ item }) => {
                   const imageSource = processPetPhoto(petData, item) || DefaultImage;
                   return (
-                    <Image
+                    <StyledImage
                       source={imageSource}
                       style={{ width: 50, height: 50, borderRadius: 25, marginRight: 5 }}
                     />
@@ -55,7 +55,7 @@ const WalkListScreen: React.FC<WalkListScreenProps> = ({ navigation, route }) =>
                 showsHorizontalScrollIndicator={false}
               />
             ) : (
-              <Image
+              <StyledImage
                 source={DefaultImage}
                 style={{ width: 50, height: 50, borderRadius: 25, marginRight: 5 }}
               />
@@ -86,8 +86,8 @@ const Container = styled.SafeAreaView`
   padding-vertical: 10px;
 `;
 
-const NumContainer = styled.Text`
-  flex: 2;
+const NumContainer = styled.View`
+  flex: 1;
   padding: 10px;
 `;
 
@@ -95,6 +95,7 @@ const DistaneContainer = styled.View`
   flex: 3;
   font-weight: bold;
   padding: 10px;
+  align-items: center;
 `;
 
 const TextItem = styled.Text`
@@ -115,6 +116,13 @@ const DogList = styled.View`
   flex: 5;
   flex-direction: row;
   align-items: center;
+`;
+
+const StyledImage = styled.Image`
+  width: 50px;
+  height: 50px;
+  border-radius: 25px;
+  margin-right: 5px;
 `;
 
 export default WalkListScreen;

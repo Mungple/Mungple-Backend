@@ -9,6 +9,7 @@ import { getMonthYearDetails, getNewMonthYear } from '@/utils/date';
 import { RecordStackParamList } from '@/navigations/stack/RecordStackNavigator';
 import Calendar from '@/components/record/Calendar';
 import MonthStatistics from '@/components/record/MonthStatistics';
+import { Point } from '@/types/walkData';
 
 // 월간 산책 목록 인터페이스
 interface ExplorationInfo {
@@ -17,7 +18,7 @@ interface ExplorationInfo {
   explorationId: number; // 산책 ID
   distance: number; // 산책 거리 (예: 미터)
   togetherDogIds: number[]; // 함께한 개의 ID 배열
-  points: number[] | null; // 포인트 (null일 수 있음)
+  points: Point[] | null; // 포인트 (null일 수 있음)
 }
 
 // 월간 산책 정보 인터페이스
@@ -25,7 +26,7 @@ interface MonthRecords {
   year: number;
   month: number;
   totalExplorations: number; // 총 산책 횟수
-  explorationInfos: ExplorationInfo[]; // ExplorationInfo 객체 배열
+  explorationInfos: ExplorationInfo[];
 }
 
 // RecordScreen의 Props 타입 정의
