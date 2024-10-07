@@ -14,6 +14,7 @@ export interface ErrorMessage {
 const WEBSOCKET_URI = 'wss://j11e106.p.ssafy.io/api/ws';
 
 const useWebSocket = (explorationId: number = -1) => {
+  const setIsSocket = useAppStore((state) => state.setIsSocket);
   const setDistance = useAppStore((state) => state.setDistance);
   const clientSocket = useAppStore((state) => state.clientSocket);
   const setClientSocket = useAppStore((state) => state.setClientSocket);
@@ -43,6 +44,7 @@ const useWebSocket = (explorationId: number = -1) => {
           onConnect: () => {
             setClientSocket(socket);
             subscribeToTopics(socket, explorationId);
+            setIsSocket(true);
             console.log('useWebSocket >>> 소켓 연결 성공 | explorationId =', explorationId);
           },
           onStompError: (frame) => {
@@ -70,8 +72,8 @@ const useWebSocket = (explorationId: number = -1) => {
 
   const subscribeToTopics = (socket: Client, explorationId: number) => {
     // 에러 메시지 수신
-    socket.subscribe('/user/sub/errors', (message) => {
-      console.error('useWebSocket >>> Error message received', message);
+    socket.subscribe('/user/sub/errors', () => {
+      console.error('useWebSocket >>> Error message received');
     });
 
     // 산책 기록 위치 수집
@@ -115,6 +117,7 @@ const useWebSocket = (explorationId: number = -1) => {
       try {
         const parsedMessage = JSON.parse(message.body) as Array<{ geohash: string }>;
         setMungZone(parsedMessage);
+        console.log(parsedMessage);
       } catch (e) {
         console.error('useWebSocket for mungplace >>>', e);
       }
@@ -123,7 +126,7 @@ const useWebSocket = (explorationId: number = -1) => {
     socket.subscribe('/user/sub/explorations/distance', (message) => {
       try {
         const parsedMessage = JSON.parse(message.body) as Distance;
-        setDistance(parsedMessage.distance);
+        setDistance(Math.max(parsedMessage.distance ?? 0, 0));
       } catch (e) {
         console.error('useWebSocket for distance >>>', e);
       }

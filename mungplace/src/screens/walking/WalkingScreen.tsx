@@ -29,13 +29,12 @@ const WalkingScreen = () => {
   // ========== Constants ==========
   // 상태 관리 (앱 스토어 및 맵 스토어에서 상태 추출)
   const markers = useMapStore((state) => state.markers);
+  const distance = useAppStore((state) => state.distance);
+  const isSocket = useAppStore((state) => state.isSocket);
+  const setIsSocket = useAppStore((state) => state.setIsSocket);
+  const userLocation = useUserStore((state) => state.userLocation);
   const startExplorate = useAppStore((state) => state.startExplorate);
   const setWalkingStart = useAppStore((state) => state.setWalkingStart);
-
-  // 사용자 위치 및 웹소켓 액션 추출
-  const distance = useAppStore((state) => state.distance);
-  const clientSocket = useAppStore((state) => state.clientSocket);
-  const userLocation = useUserStore((state) => state.userLocation);
 
   const [modalVisible, setModalVisible] = useState(false);
   const [isFormVisible, setIsFormVisible] = useState(false);
@@ -44,6 +43,8 @@ const WalkingScreen = () => {
 
   // 네비게이션 훅
   const navigation = useNavigation<NativeStackNavigationProp<MapStackParamList>>();
+
+  const formatDistance = distance < 100 ? `${distance} m` : `${(distance / 1000).toFixed(2)} km`;
 
   // ========== Methods ==========
   // 산책 종료 처리
@@ -60,6 +61,7 @@ const WalkingScreen = () => {
   const confirmEndWalking = () => {
     if (startExplorate) {
       exitWalk(startExplorate.explorationId);
+      setIsSocket(false);
       setWalkingStart(false);
       setModalVisible(false);
       navigation.navigate(mapNavigations.HOME);
@@ -107,7 +109,7 @@ const WalkingScreen = () => {
     return () => {
       clearInterval(intervalId);
     };
-  }, []);
+  }, [isSocket]);
 
   // ========== UI Rendering ==========
   if (!startExplorate) {
@@ -138,7 +140,7 @@ const WalkingScreen = () => {
             </WS.InfoBlock>
             <WS.InfoBlock>
               <WS.InfoLabel>이동 거리</WS.InfoLabel>
-              <WS.InfoValue>{Number(distance)} km</WS.InfoValue>
+              <WS.InfoValue>{formatDistance}</WS.InfoValue>
             </WS.InfoBlock>
           </WS.InfoRow>
         </WS.WalkingInfo>
