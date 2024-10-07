@@ -122,10 +122,8 @@ const useWebSocket = (explorationId: number = -1) => {
     // 산책 거리 조회
     socket.subscribe('/user/sub/explorations/distance', (message) => {
       try {
-        console.log('useWebSocket >>> distance', message.body);
-        const parsedMessage = message.body;
-        console.log(parsedMessage);
-        setDistance(Number(parsedMessage));
+        const parsedMessage = JSON.parse(message.body) as Distance;
+        setDistance(parsedMessage.distance);
       } catch (e) {
         console.error('useWebSocket for distance >>>', e);
       }
