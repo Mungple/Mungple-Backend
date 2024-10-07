@@ -21,7 +21,7 @@ const WalkDetail: React.FC<WalkDetailProps> = ({ distance, endTime, startTime })
   return (
     <Container>
       <StyledHeader>
-        <CustomText fontWeight="bold" fontSize={16}>
+        <CustomText fontWeight="bold" fontSize={18}>
           상세 정보
         </CustomText>
       </StyledHeader>

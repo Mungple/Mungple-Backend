@@ -129,6 +129,7 @@ const RecordScreen: React.FC<RecordScreenProps> = ({ navigation }) => {
         }}
         keyExtractor={(item) => item.key}
         contentContainerStyle={{ paddingBottom: 20 }}
+        showsVerticalScrollIndicator={false}
       />
     </Container>
   );

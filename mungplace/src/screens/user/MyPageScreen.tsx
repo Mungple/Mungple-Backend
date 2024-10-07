@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { Dimensions, Image as RNImage, Text } from 'react-native';
+import { Image as RNImage } from 'react-native';
 import styled from 'styled-components/native';
 
 import useAuth from '@/hooks/queries/useAuth';
@@ -11,6 +11,7 @@ import DefaultImage from '@/assets/profile-image.png';
 import { colors, settingNavigations } from '@/constants';
 import CustomCard from '@/components/common/CustomCard';
 import CustomModal from '@/components/common/CustomModal';
+import CustomText from '@/components/common/CustomText';
 import CustomModalHeader from '@/components/common/CustomModalHeader';
 import { SettingStackParamList } from '@/navigations/stack/SettingStackNavigator';
 
@@ -19,11 +20,10 @@ export type MyPageScreenProps = NativeStackScreenProps<
   typeof settingNavigations.MY_PAGE
 >;
 
-const windowHeight = Dimensions.get('window').height;
-
 const MyPageScreen: React.FC<MyPageScreenProps> = ({ navigation }) => {
   const userId = useUserStore((state) => state.userId);
   const userData = useUserStore((state) => state.userData);
+  const defalutDogName = useUserStore((state) => state.petData[0].name);
   const setUserData = useUserStore((state) => state.setUserData);
   const [modalVisible, setModalVisible] = useState(false);
   const { useGetProfile } = useAuth();
@@ -50,23 +50,26 @@ const MyPageScreen: React.FC<MyPageScreenProps> = ({ navigation }) => {
           }
         />
         <Context>
-          <Title>{userData.nickname}</Title>
-          <Text>이번 주 산책 횟수 | {}</Text>
+          <CustomText fontWeight="bold" fontSize={18}>
+            {userData.nickname}
+          </CustomText>
+          <CustomText color={colors.GRAY_200}>대표 반려견 | {defalutDogName}</CustomText>
         </Context>
       </ProfileCard>
-
       {/* 반려견 목록 */}
       <HeaderBox>
-        <MenuText>나의 반려견</MenuText>
+        <MenuBox>
+          <CustomText fontWeight="bold" fontSize={18}>
+            나의 반려견
+          </CustomText>
+        </MenuBox>
         <AddPetButton onPress={handleAddPet}>
-          <AddPetText>등록</AddPetText>
+          <CustomText fontWeight="bold" fontSize={18} color={colors.WHITE}>
+            등록
+          </CustomText>
         </AddPetButton>
       </HeaderBox>
-
-      <PetListBox>
-        <PetList navigation={navigation} />
-      </PetListBox>
-
+      <PetList navigation={navigation} />
       <CustomModal isWide={true} modalVisible={modalVisible} setModalVisible={setModalVisible}>
         <CustomModalHeader title="반려견 등록" closeButton={handleAddPet} />
         <PetForm setModalVisible={setModalVisible} />
@@ -89,7 +92,7 @@ const ProfileCard = styled(CustomCard)`
   align-items: center;
   flex-direction: row;
   justify-content: space-around;
-  border-color: ${colors.GRAY_200};
+  border-color: ${colors.GRAY_100};
 `;
 
 const Image = styled(RNImage)`
@@ -101,12 +104,6 @@ const Image = styled(RNImage)`
 const Context = styled.View`
   gap: 10px;
   flex-direction: column;
-`;
-
-const Title = styled.Text`
-  font-size: 18px;
-  font-weight: bold;
-  color: ${colors.BLACK};
 `;
 
 const HeaderBox = styled.View`
@@ -122,21 +119,8 @@ const AddPetButton = styled.TouchableOpacity`
   background-color: ${colors.ORANGE.BASE};
 `;
 
-const AddPetText = styled.Text`
-  font-weight: bold;
-  color: ${colors.WHITE};
-`;
-
-const MenuText = styled.Text`
+const MenuBox = styled.View`
   flex: 1;
-  font-size: 18px;
-  font-weight: bold;
-  color: ${colors.BLACK};
-`;
-
-const PetListBox = styled.View`
-  width: 100%;
-  height: ${windowHeight * 0.7}px;
 `;
 
 export default MyPageScreen;

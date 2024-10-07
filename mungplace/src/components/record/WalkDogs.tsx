@@ -23,8 +23,8 @@ const WalkDogs: React.FC<WalkDogsProps> = ({ togetherDogIds }) => {
   return (
     <Container>
       <StyledHeader>
-        <CustomText fontWeight="bold" fontSize={16}>
-          함께 산책한 아이들
+        <CustomText fontWeight="bold" fontSize={18}>
+          함께 산책한 반려견
         </CustomText>
       </StyledHeader>
       <ListItem>
