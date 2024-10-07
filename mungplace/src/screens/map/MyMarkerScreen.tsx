@@ -72,7 +72,6 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginVertical: 8,
     elevation: 1, // 안드로이드 그림자 효과
-    shadowColor: '#000', // iOS 그림자 효과
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.2,
     shadowRadius: 1.41,
