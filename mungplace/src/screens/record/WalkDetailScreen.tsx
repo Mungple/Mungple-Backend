@@ -8,7 +8,7 @@ import { colors } from '@/constants';
 import WalkDetail from '@/components/record/WalkDetail';
 import CustomText from '@/components/common/CustomText';
 import WalkDogs from '@/components/record/WalkDogs';
-import { Point } from '@/types/walkData';
+import { Point } from '@/types';
 
 type DayWalksDetailProps = NativeStackScreenProps<RecordStackParamList, 'WalkDetail'>;
 

@@ -1,8 +1,8 @@
 // 1. 라이브러리 및 네이티브 기능
 import styled from 'styled-components/native';
 import ClusteredMapView from 'react-native-map-clustering';
-import { Animated, StyleSheet, Image } from 'react-native';
 import React, { useEffect, useRef, useState } from 'react';
+import { Animated, Image as RNImage, Text } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import MapView, { Marker, Polyline, PROVIDER_GOOGLE } from 'react-native-maps';
@@ -31,7 +31,9 @@ import useUserLocation from '@/hooks/useUserLocation';
 import useMarkersWithinRadius from '@/hooks/useMarkersWithinRadius';
 
 // 6. 상태 관리 및 데이터
+import { ToMungZone, ToZone } from '@/types';
 import { fetchWithPetPlace } from '@/api/map';
+import { useUserStore } from '@/state/useUserStore';
 import { colors, mapNavigations } from '@/constants';
 import { useMapStore, MarkerData } from '@/state/useMapStore';
 
@@ -40,21 +42,25 @@ import { MapStackParamList } from '@/navigations/stack/MapStackNavigator';
 
 // 컴포넌트에 전달되는 props 정의
 interface MapComponentProps {
-  userLocation: { latitude: number; longitude: number };
   path?: { latitude: number; longitude: number }[];
   bottomOffset?: number;
   markers?: MarkerData[]; // 마커 생성 용
   isFormVisible: boolean;
   onFormClose: () => void;
   explorationId?: number;
+  checkMyBlueZone: (myBlueZone: ToZone) => void;
+  checkAllUserZone: (zoneType: number, allUserZone: ToZone) => void;
+  checkMungPlace: (allUserZone: ToMungZone) => void;
 }
 
 // ========== Main Functional Component ==========
 const MapComponent: React.FC<MapComponentProps> = ({
-  userLocation,
   bottomOffset = 0,
   path = [],
   explorationId = -1,
+  checkMyBlueZone,
+  checkAllUserZone,
+  checkMungPlace,
 }) => {
   // ========== Constants ==========
   // 애니메이션 값 및 상태 관리
@@ -65,6 +71,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
   const [isDisabled, setIsDisabled] = useState(true);
   const [formVisible, setFormVisible] = useState(false);
   const [isMenuVisible, setIsMenuVisible] = useState(false);
+  const userLocation = useUserStore((state) => state.userLocation);
   const petFacilities = useMapStore((state) => state.petFacilities);
   const [isSettingModalVisible, setIsSettingModalVisible] = useState(false);
   const [visibleElements, setVisibleElements] = useState({
@@ -127,10 +134,10 @@ const MapComponent: React.FC<MapComponentProps> = ({
 
   // 유저의 위치를 호출하는 함수
   const handlePressUserLocation = () => {
-    if (!isUserLocationError) {
+    if (userLocation && !isUserLocationError) {
       mapRef.current?.animateToRegion({
-        latitude: userLocation.latitude || 35.096406,
-        longitude: userLocation.longitude || 128.853919,
+        latitude: userLocation.lat,
+        longitude: userLocation.lon,
         latitudeDelta: 0.0922,
         longitudeDelta: 0.0421,
       });
@@ -213,10 +220,9 @@ const MapComponent: React.FC<MapComponentProps> = ({
   );
 
   useEffect(() => {
-    const { latitude, longitude } = userLocation;
     const getPetFacilities = async () => {
-      if (latitude && longitude) {
-        const petFacilities = await fetchWithPetPlace(latitude, longitude);
+      if (userLocation) {
+        const petFacilities = await fetchWithPetPlace(userLocation.lat, userLocation.lon);
         const facilityPoints = petFacilities.facilityPoints;
         setPetFacilities(facilityPoints);
       }
@@ -225,6 +231,13 @@ const MapComponent: React.FC<MapComponentProps> = ({
   }, [userLocation]);
 
   // ========== UI Rendering ==========
+  if (!userLocation) {
+    return (
+      <Container>
+        <Text>위치 권한을 켜주세요</Text>
+      </Container>
+    );
+  }
   return (
     <Container>
       <ClusteredMapView
@@ -234,8 +247,8 @@ const MapComponent: React.FC<MapComponentProps> = ({
         followsUserLocation
         showsMyLocationButton={false}
         initialRegion={{
-          latitude: userLocation.latitude || 35.096406,
-          longitude: userLocation.longitude || 128.853919,
+          latitude: userLocation.lat,
+          longitude: userLocation.lon,
           latitudeDelta: 0.0922,
           longitudeDelta: 0.0421,
         }}
@@ -256,7 +269,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
                   longitude: marker.lon,
                 }}
                 onPress={() => handleMarkerClick(marker.markerId)}>
-                <Image source={blueMarker} style={styles.markerImage} />
+                <MarkerImage source={blueMarker} />
               </Marker>
             ))}
 
@@ -272,7 +285,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
                   longitude: marker.lon,
                 }}
                 onPress={() => handleMarkerClick(marker.markerId)}>
-                <Image source={redMarker} style={styles.markerImage} />
+                <MarkerImage source={redMarker} />
               </Marker>
             ))}
 
@@ -286,13 +299,21 @@ const MapComponent: React.FC<MapComponentProps> = ({
         )}
 
         {/* 개인 블루존 히트맵 */}
-        {visibleElements.myBlueZone && <MyBlueZoneHeatmap myBlueZone={myBlueZone} />}
+        {visibleElements.myBlueZone && (
+          <MyBlueZoneHeatmap myBlueZone={myBlueZone} checkMyBlueZone={checkMyBlueZone} />
+        )}
         {/* 전체 블루존 히트맵 */}
-        {visibleElements.blueZone && <AllBlueZoneHeatmap allBlueZone={allBlueZone} />}
+        {visibleElements.blueZone && (
+          <AllBlueZoneHeatmap allBlueZone={allBlueZone} checkAllUserZone={checkAllUserZone} />
+        )}
         {/* 전체 레드존 히트맵 */}
-        {visibleElements.redZone && <AllRedZoneHeatmap allRedZone={allRedZone} />}
+        {visibleElements.redZone && (
+          <AllRedZoneHeatmap allRedZone={allRedZone} checkAllUserZone={checkAllUserZone} />
+        )}
         {/* 멍존 히트맵 */}
-        {visibleElements.mungZone && <MungZoneHeatmap mungZone={mungZone} />}
+        {visibleElements.mungZone && (
+          <MungZoneHeatmap mungZone={mungZone} checkMungPlace={checkMungPlace} />
+        )}
         {/* 동반 시설 마커 */}
         {visibleElements.convenienceInfo &&
           petFacilities.map((facility) => (
@@ -303,7 +324,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
                 longitude: facility.point.lon,
               }}
               onPress={() => handleFacilityMarkerPress(facility.id)}>
-              <Image source={doghouse} style={styles.markerImage} />
+              <MarkerImage source={doghouse} />
             </Marker>
           ))}
       </ClusteredMapView>
@@ -334,8 +355,8 @@ const MapComponent: React.FC<MapComponentProps> = ({
           isVisible={formVisible}
           onSubmit={handleMarkerSubmit}
           onClose={() => setFormVisible(false)}
-          latitude={userLocation.latitude}
-          longitude={userLocation.longitude}
+          latitude={userLocation.lat}
+          longitude={userLocation.lon}
         />
         <ButtonWithTextContainer top={120} right={20}>
           <TextLabel>지도 설정</TextLabel>
@@ -372,36 +393,13 @@ const MapComponent: React.FC<MapComponentProps> = ({
   );
 };
 
-const styles = StyleSheet.create({
-  markerImage: {
-    width: 30,
-    height: 30,
-  },
-  markerImageLarge: {
-    width: 100,
-    height: 100,
-    resizeMode: 'contain',
-  },
-  modalContainer: {
-    flex: 1,
-    padding: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0,5)',
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  listItem: {
-    padding: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
-  },
-});
-
 const Container = styled.View`
   flex: 1;
+`;
+
+const MarkerImage = styled(RNImage)`
+  width: 30px;
+  height: 30px;
 `;
 
 const ButtonWithTextContainer = styled.View<{ top?: number; right?: number }>`
