@@ -107,9 +107,13 @@ const WalkingScreen = () => {
     return () => {
       clearInterval(intervalId);
     };
-  }, [clientSocket]);
+  }, []);
 
   // ========== UI Rendering ==========
+  if (!startExplorate) {
+    return navigation.goBack();
+  }
+
   return (
     <WS.Container>
       <MapComponent
@@ -118,7 +122,7 @@ const WalkingScreen = () => {
         isFormVisible={isFormVisible}
         onFormClose={handleFormClose}
         bottomOffset={bottomBlockHeight + 20}
-        explorationId={startExplorate?.explorationId}
+        explorationId={startExplorate.explorationId}
         checkMyBlueZone={checkMyBlueZone}
         checkAllUserZone={checkAllUserZone}
         checkMungPlace={checkMungPlace}
