@@ -82,7 +82,7 @@ const PetForm = ({ setModalVisible, petData }: PetFormProps) => {
           {...inputUser.getTextInputProps('petBirth')}
         />
         <CustomInputField
-          placeholder="몸무게"
+          placeholder="몸무게 (g)"
           error={inputUser.errors.petWeight}
           touched={inputUser.touched.petWeight}
           inputMode="numeric"
