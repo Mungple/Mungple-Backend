@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.e106.mungplace.domain.image.entity.ImageInfo;
-import com.e106.mungplace.domain.image.repository.MarkerImageRepository;
+import com.e106.mungplace.domain.image.repository.MarkerImageInfoRepository;
 import com.e106.mungplace.domain.manager.impl.ManagerReader;
 import com.e106.mungplace.domain.marker.entity.Marker;
 import com.e106.mungplace.domain.marker.entity.MarkerPoint;
@@ -24,7 +24,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 public class ManagerMarkerDummyService {
 
-	private final MarkerImageRepository markerImageRepository;
+	private final MarkerImageInfoRepository markerImageInfoRepository;
 	private final MarkerPointRepository markerPointRepository;
 	private final MarkerRepository markerRepository;
 	private final ManagerReader managerReader;
@@ -67,7 +67,7 @@ public class ManagerMarkerDummyService {
 
 		randomImages.stream()
 			.map(imageName -> new ImageInfo(imageName, marker))
-			.forEach(markerImageRepository::save);
+			.forEach(markerImageInfoRepository::save);
 	}
 
 	private List<String> getRandomImages(String[] imageNames, int count) {

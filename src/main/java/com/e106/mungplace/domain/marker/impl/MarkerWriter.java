@@ -7,7 +7,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.e106.mungplace.common.image.ImageManager;
 import com.e106.mungplace.domain.image.entity.ImageInfo;
-import com.e106.mungplace.domain.image.repository.MarkerImageRepository;
+import com.e106.mungplace.domain.image.repository.MarkerImageInfoRepository;
 import com.e106.mungplace.domain.marker.entity.Marker;
 import com.e106.mungplace.domain.marker.entity.MarkerEvent;
 import com.e106.mungplace.domain.marker.repository.MarkerOutboxRepository;
@@ -21,7 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class MarkerWriter {
 
-	private final MarkerImageRepository markerImageRepository;
+	private final MarkerImageInfoRepository markerImageInfoRepository;
 	private final MarkerOutboxRepository markerOutboxRepository;
 	private final MarkerRepository markerRepository;
 	private final ImageManager imageManager;
@@ -37,7 +37,7 @@ public class MarkerWriter {
 					String imageName = imageManager.saveImage(file);
 					return new ImageInfo(imageName, marker);
 				})
-				.forEach(markerImageRepository::save);
+				.forEach(markerImageInfoRepository::save);
 		}
 	}
 
@@ -46,12 +46,12 @@ public class MarkerWriter {
 	}
 
 	public void delete(Marker marker) {
-		List<ImageInfo> imageInfos = markerImageRepository.findByMarkerId(marker.getId());
+		List<ImageInfo> imageInfos = markerImageInfoRepository.findByMarkerId(marker.getId());
 		for (ImageInfo imageInfo : imageInfos) {
 			imageManager.deleteImage(imageInfo.getImageName());
 		}
 
-		markerImageRepository.deleteAll(imageInfos);
+		markerImageInfoRepository.deleteAll(imageInfos);
 
 		markerRepository.delete(marker);
 	}

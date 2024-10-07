@@ -24,7 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.e106.mungplace.common.image.ImageManager;
 import com.e106.mungplace.domain.exploration.entity.Exploration;
 import com.e106.mungplace.domain.exploration.impl.ExplorationReader;
-import com.e106.mungplace.domain.image.repository.MarkerImageRepository;
+import com.e106.mungplace.domain.image.repository.MarkerImageInfoRepository;
 import com.e106.mungplace.domain.marker.entity.Marker;
 import com.e106.mungplace.domain.marker.entity.MarkerEvent;
 import com.e106.mungplace.domain.marker.entity.MarkerPoint;
@@ -75,7 +75,7 @@ class MarkerServiceTest {
 	private ImageManager imageManager;
 
 	@Mock
-	private MarkerImageRepository markerImageRepository;
+	private MarkerImageInfoRepository markerImageInfoRepository;
 
 	@DisplayName("이미지가 4개 이상이면 에러")
 	@Test
