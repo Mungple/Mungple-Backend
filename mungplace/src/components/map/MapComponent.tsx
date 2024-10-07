@@ -31,6 +31,7 @@ import useUserLocation from '@/hooks/useUserLocation';
 import useMarkersWithinRadius from '@/hooks/useMarkersWithinRadius';
 
 // 6. 상태 관리 및 데이터
+import { ToMungZone, ToZone } from '@/types';
 import { fetchWithPetPlace } from '@/api/map';
 import { colors, mapNavigations } from '@/constants';
 import { useMapStore, MarkerData } from '@/state/useMapStore';
@@ -47,6 +48,9 @@ interface MapComponentProps {
   isFormVisible: boolean;
   onFormClose: () => void;
   explorationId?: number;
+  checkMyBlueZone: (myBlueZone: ToZone) => void;
+  checkAllUserZone: (zoneType: number, allUserZone: ToZone) => void;
+  checkMungPlace: (allUserZone: ToMungZone) => void;
 }
 
 // ========== Main Functional Component ==========
@@ -55,6 +59,9 @@ const MapComponent: React.FC<MapComponentProps> = ({
   bottomOffset = 0,
   path = [],
   explorationId = -1,
+  checkMyBlueZone,
+  checkAllUserZone,
+  checkMungPlace,
 }) => {
   // ========== Constants ==========
   // 애니메이션 값 및 상태 관리
@@ -286,13 +293,21 @@ const MapComponent: React.FC<MapComponentProps> = ({
         )}
 
         {/* 개인 블루존 히트맵 */}
-        {visibleElements.myBlueZone && <MyBlueZoneHeatmap myBlueZone={myBlueZone} />}
+        {visibleElements.myBlueZone && (
+          <MyBlueZoneHeatmap myBlueZone={myBlueZone} checkMyBlueZone={checkMyBlueZone} />
+        )}
         {/* 전체 블루존 히트맵 */}
-        {visibleElements.blueZone && <AllBlueZoneHeatmap allBlueZone={allBlueZone} />}
+        {visibleElements.blueZone && (
+          <AllBlueZoneHeatmap allBlueZone={allBlueZone} checkAllUserZone={checkAllUserZone} />
+        )}
         {/* 전체 레드존 히트맵 */}
-        {visibleElements.redZone && <AllRedZoneHeatmap allRedZone={allRedZone} />}
+        {visibleElements.redZone && (
+          <AllRedZoneHeatmap allRedZone={allRedZone} checkAllUserZone={checkAllUserZone} />
+        )}
         {/* 멍존 히트맵 */}
-        {visibleElements.mungZone && <MungZoneHeatmap mungZone={mungZone} />}
+        {visibleElements.mungZone && (
+          <MungZoneHeatmap mungZone={mungZone} checkMungPlace={checkMungPlace} />
+        )}
         {/* 동반 시설 마커 */}
         {visibleElements.convenienceInfo &&
           petFacilities.map((facility) => (

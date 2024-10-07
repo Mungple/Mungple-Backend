@@ -1,12 +1,6 @@
 import { useCallback } from 'react';
 import { useAppStore } from '@/state/useAppStore';
-import { ToMungZone, ToZone } from '@/types';
-
-interface ToLocation {
-  lat: number;
-  lon: number;
-  recordedAt: string;
-}
+import { ToLocation, ToMungZone, ToZone } from '@/types';
 
 const useWebSocketActions = () => {
   const { clientSocket } = useAppStore((state) => state);

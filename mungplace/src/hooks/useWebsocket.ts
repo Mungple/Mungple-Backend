@@ -43,8 +43,7 @@ const useWebSocket = (explorationId: number = -1) => {
           onConnect: () => {
             setClientSocket(socket);
             subscribeToTopics(socket, explorationId);
-            console.log(explorationId);
-            console.log('useWebSocket >>> 소켓 연결 성공');
+            console.log('useWebSocket >>> 소켓 연결 성공', explorationId);
           },
           onStompError: (frame) => {
             console.error('useWebSocket >>> 소켓 연결 에러 발생:', frame.headers['message']);
@@ -114,7 +113,6 @@ const useWebSocket = (explorationId: number = -1) => {
     // 멍플 조회
     socket.subscribe('/user/sub/mungplace', (message) => {
       try {
-        console.log('mungplace', message.body);
         const parsedMessage = JSON.parse(message.body) as Array<{ geohash: string }>;
         setMungZone(parsedMessage);
       } catch (e) {
@@ -125,9 +123,9 @@ const useWebSocket = (explorationId: number = -1) => {
     socket.subscribe('/user/sub/explorations/distance', (message) => {
       try {
         console.log('useWebSocket >>> distance', message.body);
-        const parsedMessage = JSON.parse(message.body) as number;
+        const parsedMessage = message.body;
         console.log(parsedMessage);
-        setDistance(parsedMessage);
+        setDistance(Number(parsedMessage));
       } catch (e) {
         console.error('useWebSocket for distance >>>', e);
       }

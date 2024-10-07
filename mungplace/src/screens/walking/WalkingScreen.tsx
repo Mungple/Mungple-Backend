@@ -31,11 +31,11 @@ const WalkingScreen = () => {
 
   // 사용자 위치 및 웹소켓 액션 추출
   const { userLocation } = useUserLocation();
-  const { sendLocation } = useWebSocketActions();
   const distance = useAppStore((state) => state.distance);
   const [modalVisible, setModalVisible] = useState(false);
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [path, setPath] = useState<{ latitude: number; longitude: number }[]>([]);
+  const { sendLocation, checkAllUserZone, checkMyBlueZone, checkMungPlace } = useWebSocketActions();
 
   // 네비게이션 훅
   const navigation = useNavigation<NativeStackNavigationProp<MapStackParamList>>();
@@ -71,7 +71,6 @@ const WalkingScreen = () => {
   // ========== Side Effects ==========
   // 5초마다 좌표를 수집하여 경로 업데이트
   useEffect(() => {
-    // console.log(path);
     const intervalId = setInterval(() => {
       setPath((prevPath) => [
         ...prevPath,
@@ -96,7 +95,7 @@ const WalkingScreen = () => {
       };
       // 산책 ID와 위치 데이터를 서버에 전송
       sendLocation(Number(startExplorate?.explorationId), jsonData);
-    }, 5000);
+    }, 3000);
 
     // 컴포넌트가 언마운트될 때 setInterval을 정리하여 메모리 누수 방지
     return () => {
@@ -118,6 +117,9 @@ const WalkingScreen = () => {
             onFormClose={handleFormClose}
             bottomOffset={bottomBlockHeight + 20}
             explorationId={startExplorate?.explorationId}
+            checkMyBlueZone={checkMyBlueZone}
+            checkAllUserZone={checkAllUserZone}
+            checkMungPlace={checkMungPlace}
           />
 
           {/* 하단 상태 정보 */}

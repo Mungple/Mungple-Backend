@@ -1,16 +1,15 @@
 import React, { useEffect } from 'react';
 import { Heatmap } from 'react-native-maps';
 import useUserLocation from '@/hooks/useUserLocation';
-import useWebsocketActions from '@/hooks/useWebsocketActions';
 import { FromZone, ToZone } from '@/types';
 
 type AllRedZoneHeatmapProps = {
   allRedZone: FromZone | null;
+  checkAllUserZone: (zoneType: number, allUserZone: ToZone) => void;
 };
 
-const AllRedZoneHeatmap = ({ allRedZone }: AllRedZoneHeatmapProps) => {
+const AllRedZoneHeatmap = ({ allRedZone, checkAllUserZone }: AllRedZoneHeatmapProps) => {
   const { userLocation } = useUserLocation(); // 사용자 위치 가져오기
-  const { checkAllUserZone } = useWebsocketActions();
 
   // 사용자 위치 변경 시 블루존 요청
   useEffect(() => {
