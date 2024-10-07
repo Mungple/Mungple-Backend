@@ -35,7 +35,7 @@ const WalkingScreen = () => {
   // 사용자 위치 및 웹소켓 액션 추출
   const distance = useAppStore((state) => state.distance);
   const clientSocket = useAppStore((state) => state.clientSocket);
-  const { lat, lon } = useUserStore((state) => state.userLocation);
+  const userLocation = useUserStore((state) => state.userLocation);
 
   const [modalVisible, setModalVisible] = useState(false);
   const [isFormVisible, setIsFormVisible] = useState(false);
@@ -76,8 +76,13 @@ const WalkingScreen = () => {
   // ========== Side Effects ==========
   // 5초마다 좌표를 수집하여 경로 업데이트
   useEffect(() => {
+    if (!userLocation) return;
+
     const intervalId = setInterval(() => {
-      setPath((prevPath) => [...prevPath, { latitude: lat, longitude: lon }]);
+      setPath((prevPath) => [
+        ...prevPath,
+        { latitude: userLocation.lat, longitude: userLocation.lon },
+      ]);
     }, 5000);
 
     // 언마운트 시 Interval 해제
@@ -86,12 +91,14 @@ const WalkingScreen = () => {
     };
   }, [path]);
 
-  // 5초마다 웹소켓을 통해 위치 정보 전송
+  // 3초마다 웹소켓을 통해 위치 정보 전송
   useEffect(() => {
+    if (!userLocation) return;
+
     const intervalId = setInterval(() => {
       const location = {
-        lat,
-        lon,
+        lat: userLocation.lat,
+        lon: userLocation.lon,
         recordedAt: new Date().toISOString(),
       };
       sendLocation(Number(startExplorate?.explorationId), location);

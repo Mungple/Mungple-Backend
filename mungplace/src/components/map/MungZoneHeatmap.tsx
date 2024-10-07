@@ -29,14 +29,16 @@ const GeoZoneMarker = ({ lat, lon, geohash }: GeoZoneMarkerProps) => (
 );
 
 const MungZoneHeatmap = ({ mungZone, checkMungPlace }: MungZoneHeatmapProps) => {
-  const { lat, lon } = useUserStore((state) => state.userLocation);
+  const userLocation = useUserStore((state) => state.userLocation);
   const getGeohashCenter = useMapStore((state) => state.getGeohashCenter);
 
   // 사용자 위치 변경 시 블루존 요청
   useEffect(() => {
-    const zoneData: ToMungZone = { point: { lat, lon } };
+    if (!userLocation) return;
+
+    const zoneData: ToMungZone = { point: { lat: userLocation.lat, lon: userLocation.lon } };
     checkMungPlace(zoneData);
-  }, [lat, lon, checkMungPlace]);
+  }, [userLocation, checkMungPlace]);
 
   if (!mungZone) return null;
 

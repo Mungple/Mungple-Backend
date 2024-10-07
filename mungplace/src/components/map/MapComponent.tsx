@@ -1,8 +1,8 @@
 // 1. 라이브러리 및 네이티브 기능
 import styled from 'styled-components/native';
-import { Animated, Image as RNImage } from 'react-native';
 import ClusteredMapView from 'react-native-map-clustering';
 import React, { useEffect, useRef, useState } from 'react';
+import { Animated, Image as RNImage, Text } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import MapView, { Marker, Polyline, PROVIDER_GOOGLE } from 'react-native-maps';
@@ -71,7 +71,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
   const [isDisabled, setIsDisabled] = useState(true);
   const [formVisible, setFormVisible] = useState(false);
   const [isMenuVisible, setIsMenuVisible] = useState(false);
-  const { lat, lon } = useUserStore((state) => state.userLocation);
+  const userLocation = useUserStore((state) => state.userLocation);
   const petFacilities = useMapStore((state) => state.petFacilities);
   const [isSettingModalVisible, setIsSettingModalVisible] = useState(false);
   const [visibleElements, setVisibleElements] = useState({
@@ -134,10 +134,10 @@ const MapComponent: React.FC<MapComponentProps> = ({
 
   // 유저의 위치를 호출하는 함수
   const handlePressUserLocation = () => {
-    if (!isUserLocationError) {
+    if (userLocation && !isUserLocationError) {
       mapRef.current?.animateToRegion({
-        latitude: lat,
-        longitude: lon,
+        latitude: userLocation.lat,
+        longitude: userLocation.lon,
         latitudeDelta: 0.0922,
         longitudeDelta: 0.0421,
       });
@@ -221,16 +221,23 @@ const MapComponent: React.FC<MapComponentProps> = ({
 
   useEffect(() => {
     const getPetFacilities = async () => {
-      if (lat && lon) {
-        const petFacilities = await fetchWithPetPlace(lat, lon);
+      if (userLocation) {
+        const petFacilities = await fetchWithPetPlace(userLocation.lat, userLocation.lon);
         const facilityPoints = petFacilities.facilityPoints;
         setPetFacilities(facilityPoints);
       }
     };
     getPetFacilities();
-  }, [lat, lon]);
+  }, [userLocation]);
 
   // ========== UI Rendering ==========
+  if (!userLocation) {
+    return (
+      <Container>
+        <Text>위치 권한을 켜주세요</Text>
+      </Container>
+    );
+  }
   return (
     <Container>
       <ClusteredMapView
@@ -240,8 +247,8 @@ const MapComponent: React.FC<MapComponentProps> = ({
         followsUserLocation
         showsMyLocationButton={false}
         initialRegion={{
-          latitude: lat,
-          longitude: lon,
+          latitude: userLocation.lat,
+          longitude: userLocation.lon,
           latitudeDelta: 0.0922,
           longitudeDelta: 0.0421,
         }}
@@ -348,8 +355,8 @@ const MapComponent: React.FC<MapComponentProps> = ({
           isVisible={formVisible}
           onSubmit={handleMarkerSubmit}
           onClose={() => setFormVisible(false)}
-          latitude={lat}
-          longitude={lon}
+          latitude={userLocation.lat}
+          longitude={userLocation.lon}
         />
         <ButtonWithTextContainer top={120} right={20}>
           <TextLabel>지도 설정</TextLabel>

@@ -64,7 +64,7 @@ const HomeScreen: React.FC = () => {
 
   // 산책 시작 함수
   const handleWalkingStart = async () => {
-    if (!isUserLocationError && selectedPets.length > 0) {
+    if (userLocation && !isUserLocationError && selectedPets.length > 0) {
       const walkData = JSON.stringify({
         lat: userLocation.lat.toString(),
         lon: userLocation.lon.toString(),
@@ -75,7 +75,7 @@ const HomeScreen: React.FC = () => {
       setWalkingStart(true);
       setStartExplorate(await startWalk(walkData));
       navigation.navigate(mapNavigations.WALKING);
-    } else if (isUserLocationError) {
+    } else if (!userLocation && isUserLocationError) {
       Alert.alert('Error', '위치 권한을 허용해주세요');
     } else {
       Alert.alert('Error', '반려견을 선택해주세요');

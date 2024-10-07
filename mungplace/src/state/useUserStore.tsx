@@ -5,7 +5,7 @@ interface UserState {
   userId: number;
   petData: ResponsePetProfile[];
   userData: UserProfile;
-  userLocation: Location;
+  userLocation: Location | null;
 
   setUserId: (value: number) => void;
   setPetData: (value: ResponsePetProfile[]) => void;
@@ -22,10 +22,7 @@ export const useUserStore = create<UserState>((set) => ({
     imageName: null,
     createdAt: '',
   },
-  userLocation: {
-    lat: 35.096406,
-    lon: 128.853919,
-  },
+  userLocation: null,
 
   setUserId: (value: number) => set({ userId: value }),
   setPetData: (value: ResponsePetProfile[]) => set({ petData: value }),

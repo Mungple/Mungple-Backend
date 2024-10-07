@@ -43,7 +43,7 @@ const useWebSocket = (explorationId: number = -1) => {
           onConnect: () => {
             setClientSocket(socket);
             subscribeToTopics(socket, explorationId);
-            console.log('useWebSocket >>> 소켓 연결 성공', explorationId);
+            console.log('useWebSocket >>> 소켓 연결 성공 | explorationId =', explorationId);
           },
           onStompError: (frame) => {
             console.error('useWebSocket >>> 소켓 연결 에러 발생:', frame.headers['message']);
