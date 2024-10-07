@@ -5,6 +5,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.e106.mungplace.common.image.ImageRepository;
 import com.e106.mungplace.common.image.ImageManager;
+import com.e106.mungplace.common.log.MethodLoggable;
+import com.e106.mungplace.common.log.dto.LogAction;
 import com.e106.mungplace.common.transaction.GlobalTransactional;
 import com.e106.mungplace.domain.user.entity.User;
 import com.e106.mungplace.domain.user.impl.UserHelper;
@@ -27,12 +29,14 @@ public class UserService {
 	private final ImageManager imageManager;
 	private final ImageRepository imageRepository;
 
+	@MethodLoggable(action = LogAction.SELECT)
 	public UserInfoResponse readUserInfo(Long userId) {
 		return userRepository.findById(userId)
 			.map(UserInfoResponse::of)
 			.orElseThrow(() -> new ApplicationException(ApplicationError.USER_NOT_FOUND));
 	}
 
+	@MethodLoggable(action = LogAction.UPDATE)
 	@GlobalTransactional
 	public ImageNameResponse updateUserImage(MultipartFile imageFile) {
 		User user = userHelper.getCurrentUser();

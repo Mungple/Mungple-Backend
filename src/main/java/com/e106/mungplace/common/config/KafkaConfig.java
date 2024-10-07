@@ -29,6 +29,7 @@ import org.springframework.kafka.support.serializer.JsonSerializer;
 import org.springframework.util.backoff.BackOff;
 import org.springframework.util.backoff.ExponentialBackOff;
 
+import com.e106.mungplace.web.handler.interceptor.KafkaConsumerInterceptor;
 import com.e106.mungplace.web.handler.interceptor.KafkaProducerInterceptor;
 
 @Configuration
@@ -68,6 +69,7 @@ public class KafkaConfig {
 		props.put(JsonDeserializer.USE_TYPE_INFO_HEADERS, true);
 		props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
 		props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "false");
+		props.put(ConsumerConfig.INTERCEPTOR_CLASSES_CONFIG, KafkaConsumerInterceptor.class.getName());
 		return new DefaultKafkaConsumerFactory<>(props);
 	}
 

@@ -9,6 +9,8 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.e106.mungplace.common.log.MethodLoggable;
+import com.e106.mungplace.common.log.dto.LogAction;
 import com.e106.mungplace.domain.user.entity.User;
 import com.e106.mungplace.domain.user.repository.UserRepository;
 import com.e106.mungplace.web.handler.filter.CustomOAuth2User;
@@ -27,6 +29,7 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
 
 	private final UserRepository userRepository;
 
+	@MethodLoggable(action = LogAction.SELECT)
 	@Override
 	@Transactional
 	public OAuth2User loadUser(OAuth2UserRequest oAuth2UserRequest) throws OAuth2AuthenticationException {
@@ -39,6 +42,7 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
 		return new CustomOAuth2User(user);
 	}
 
+	@MethodLoggable(action = LogAction.SELECT)
 	public User findOrSaveUser(OAuth2UserInfo userInfo) {
 		return userRepository.findUserByProviderId(userInfo.getProviderId())
 			.orElseGet(() -> saveUser(userInfo));

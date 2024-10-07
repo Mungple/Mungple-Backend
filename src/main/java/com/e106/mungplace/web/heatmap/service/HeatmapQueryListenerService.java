@@ -6,6 +6,8 @@ import org.apache.kafka.clients.admin.NewTopic;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
+import com.e106.mungplace.common.log.MethodLoggable;
+import com.e106.mungplace.common.log.dto.LogAction;
 import com.e106.mungplace.domain.heatmap.event.HeatmapQueryEvent;
 import com.e106.mungplace.domain.heatmap.event.HeatmapQueryType;
 import com.e106.mungplace.domain.heatmap.impl.HeatmapChunkConsumer;
@@ -25,6 +27,7 @@ public class HeatmapQueryListenerService {
 	private final HeatmapChunkConsumer heatmapChunkConsumer;
 	private final NewTopic heatMapTopic;
 
+	@MethodLoggable(action = LogAction.SELECT)
 	public void userBluezoneQueryProcess(Long userId, HeatmapRequest request) {
 		LocalDateTime to = LocalDateTime.now();
 		LocalDateTime from = to.minusMonths(1);
@@ -32,6 +35,7 @@ public class HeatmapQueryListenerService {
 		heatmapChunkConsumer.consume(userId, HeatmapQueryType.USER_BLUEZONE);
 	}
 
+	@MethodLoggable(action = LogAction.SELECT)
 	public void bluezoneQueryProcess(Long userId, HeatmapRequest request) {
 		LocalDateTime to = LocalDateTime.now();
 		LocalDateTime from = to.minusMonths(6);
@@ -39,6 +43,7 @@ public class HeatmapQueryListenerService {
 		heatmapChunkConsumer.consume(userId, HeatmapQueryType.BLUEZONE);
 	}
 
+	@MethodLoggable(action = LogAction.SELECT)
 	public void redzoneQueryProcess(Long userId, HeatmapRequest request) {
 		LocalDateTime to = LocalDateTime.now();
 		LocalDateTime from = to.minusMonths(6);
