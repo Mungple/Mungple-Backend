@@ -83,7 +83,7 @@ const MonthStatistics: React.FC<{ year: number; month: number }> = ({ year, mont
   return (
     <Container>
       <StyledHeader>
-        <CustomText fontWeight="bold" fontSize={16}>
+        <CustomText fontWeight="bold" fontSize={18}>
           월간 통계
         </CustomText>
       </StyledHeader>

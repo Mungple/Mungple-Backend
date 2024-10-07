@@ -5,7 +5,7 @@ import { colors } from '@/constants';
 import CustomCard from '@/components/common/CustomCard';
 import CustomButton from '@/components/common/CustomButton';
 
-const Container = styled.View`
+const Container = styled.SafeAreaView`
   flex: 1;
   justify-content: center;
   align-items: center;

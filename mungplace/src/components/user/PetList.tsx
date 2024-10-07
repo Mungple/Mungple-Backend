@@ -1,14 +1,16 @@
 import React from 'react';
 import styled from 'styled-components/native';
-import { FlatList, Text, Image as RNImage } from 'react-native';
+import { View, FlatList, Image as RNImage } from 'react-native';
+import { NavigationProp } from '@react-navigation/native';
+import { SettingStackParamList } from '@/navigations/stack/SettingStackNavigator';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import { ResponsePetProfile } from '@/types';
 import CustomCard from '../common/CustomCard';
+import CustomText from '../common/CustomText';
 import { useUserStore } from '@/state/useUserStore';
 import DefaultImage from '@/assets/profile-image.png';
 import { colors, settingNavigations } from '@/constants';
-import { SettingStackParamList } from '@/navigations/stack/SettingStackNavigator';
-import { NavigationProp } from '@react-navigation/native';
 import usePet from '@/hooks/queries/usePet';
 
 type PetListProps = {
@@ -22,9 +24,9 @@ const PetList: React.FC<PetListProps> = ({ navigation, selectedPets = [], homeSc
   const { useGetPet } = usePet();
   const { data } = useGetPet(userId);
 
-  const renderItem = ({ item }: { item: ResponsePetProfile }) => {
+  const renderItem = ({ item, index }: { item: ResponsePetProfile; index: number }) => {
     const isSelected = selectedPets.includes(item.id);
-    const lastWalkDate = item.birth.slice(0, 10);
+    const birthDate = item.birth.slice(0, 10);
     const onPress = () => {
       if (homeScreenPress) {
         homeScreenPress(item.id);
@@ -36,19 +38,35 @@ const PetList: React.FC<PetListProps> = ({ navigation, selectedPets = [], homeSc
     };
 
     return (
-      <DogCard isSelected={isSelected} onPress={onPress}>
-        <Image
-          source={
-            item.photo
-              ? { uri: `http://j11e106.p.ssafy.io:9000/images/${item.photo}` }
-              : DefaultImage
-          }
-        />
-        <Context>
-          <Title>{item.name}</Title>
-          <Text>마지막 산책일 | {lastWalkDate}</Text>
-        </Context>
-      </DogCard>
+      <View>
+        {index === 0 && (
+          <HighlightContainer>
+            <Ionicons name="trophy" size={24} color={colors.YELLOW.LIGHTER} />
+            <CustomText
+              fontSize={16}
+              fontWeight="bold"
+              color={colors.ORANGE.LIGHTER}
+              style={{ marginLeft: 4, marginBottom: 4 }}>
+              대표 반려견
+            </CustomText>
+          </HighlightContainer>
+        )}
+        <DogCard isSelected={isSelected} onPress={onPress} isDefalut={index === 0}>
+          <Image
+            source={
+              item.photo
+                ? { uri: `http://j11e106.p.ssafy.io:9000/images/${item.photo}` }
+                : DefaultImage
+            }
+          />
+          <Context>
+            <CustomText fontWeight="bold" fontSize={18}>
+              {item.name}
+            </CustomText>
+            <CustomText color={colors.GRAY_200}>생일 | {birthDate}</CustomText>
+          </Context>
+        </DogCard>
+      </View>
     );
   };
 
@@ -69,14 +87,15 @@ const List = styled.FlatList`
   padding: 20px;
 ` as unknown as typeof FlatList;
 
-const DogCard = styled(CustomCard)<{ isSelected: boolean }>`
+const DogCard = styled(CustomCard)<{ isSelected: boolean; isDefalut: boolean }>`
   padding: 13px 20px;
   align-items: center;
   margin-bottom: 10px;
   flex-direction: row;
   justify-content: space-around;
-  border-width: ${({ isSelected }) => (isSelected ? 3 : 1)}px;
-  border-color: ${({ isSelected }) => (isSelected ? colors.ORANGE.BASE : colors.GRAY_200)};
+  border-width: ${({ isSelected, isDefalut }) => (isSelected ? 3 : isDefalut ? 2 : 1)}px;
+  border-color: ${({ isSelected, isDefalut }) =>
+    isSelected ? colors.ORANGE.BASE : isDefalut ? colors.YELLOW.LIGHTER : colors.GRAY_100};
 `;
 
 const Image = styled(RNImage)`
@@ -90,10 +109,9 @@ const Context = styled.View`
   flex-direction: column;
 `;
 
-const Title = styled.Text`
-  font-size: 18px;
-  font-weight: bold;
-  color: ${colors.BLACK};
+const HighlightContainer = styled.View`
+  flex-direction: row;
+  padding: 6px;
 `;
 
 export default React.memo(PetList);
