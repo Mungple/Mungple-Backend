@@ -6,14 +6,14 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import com.e106.mungplace.web.exception.ApplicationException;
 
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-@Service
+@Component
 public class RequestDeduplicator {
 
 	private final String VALUE = "IDEMPOTENT";
