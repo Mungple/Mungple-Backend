@@ -15,7 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.e106.mungplace.common.image.ImageManager;
 import com.e106.mungplace.domain.image.entity.ImageInfo;
-import com.e106.mungplace.domain.image.repository.MarkerImageRepository;
+import com.e106.mungplace.domain.image.repository.MarkerImageInfoRepository;
 import com.e106.mungplace.domain.marker.entity.Marker;
 import com.e106.mungplace.domain.marker.entity.MarkerEvent;
 import com.e106.mungplace.domain.marker.entity.MarkerType;
@@ -26,7 +26,7 @@ import com.e106.mungplace.domain.marker.repository.MarkerRepository;
 class MarkerWriterTest {
 
 	@Mock
-	private MarkerImageRepository markerImageRepository;
+	private MarkerImageInfoRepository markerImageInfoRepository;
 
 	@Mock
 	private MarkerOutboxRepository markerOutboxRepository;
@@ -76,7 +76,7 @@ class MarkerWriterTest {
 		markerWriter.saveMarkerImages(List.of(file1, file2), marker);
 
 		// then
-		verify(markerImageRepository, times(2)).save(any(ImageInfo.class));
+		verify(markerImageInfoRepository, times(2)).save(any(ImageInfo.class));
 		verify(imageManager, times(1)).saveImage(file1);
 		verify(imageManager, times(1)).saveImage(file2);
 	}
@@ -101,7 +101,7 @@ class MarkerWriterTest {
 		ImageInfo imageInfo2 = new ImageInfo("image2.jpg", marker);
 		List<ImageInfo> imageInfos = List.of(imageInfo1, imageInfo2);
 
-		when(markerImageRepository.findByMarkerId(marker.getId())).thenReturn(imageInfos);
+		when(markerImageInfoRepository.findByMarkerId(marker.getId())).thenReturn(imageInfos);
 
 		// when
 		markerWriter.delete(marker);
@@ -110,7 +110,7 @@ class MarkerWriterTest {
 		verify(imageManager, times(1)).deleteImage("image1.jpg");
 		verify(imageManager, times(1)).deleteImage("image2.jpg");
 
-		verify(markerImageRepository, times(1)).deleteAll(imageInfos);
+		verify(markerImageInfoRepository, times(1)).deleteAll(imageInfos);
 
 		verify(markerRepository, times(1)).delete(marker);
 	}

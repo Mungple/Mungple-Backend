@@ -148,6 +148,15 @@ public class KafkaConfig {
 			.build();
 	}
 
+	@Bean
+	public NewTopic markerSaveFailureTopic() {
+		return TopicBuilder.name("markerSaveFailure")
+			.partitions(3)
+			.replicas(1)
+			.config(TopicConfig.RETENTION_MS_CONFIG, String.valueOf(7 * 24 * 60 * 60))
+			.build();
+	}
+
 	private BackOff generatedBackoff() {
 		ExponentialBackOff backOff = new ExponentialBackOff(1000L, 2L);
 		backOff.setMaxElapsedTime(10000L);
