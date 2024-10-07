@@ -1,16 +1,14 @@
-import { Location, ResponsePetProfile, UserProfile } from '@/types';
+import { ResponsePetProfile, UserProfile } from '@/types';
 import { create } from 'zustand';
 
 interface UserState {
   userId: number;
   petData: ResponsePetProfile[];
   userData: UserProfile;
-  userLocation: Location | null;
 
   setUserId: (value: number) => void;
   setPetData: (value: ResponsePetProfile[]) => void;
   setUserData: (value: UserProfile) => void;
-  setUserLocation: (value: Location) => void;
 }
 
 export const useUserStore = create<UserState>((set) => ({
@@ -22,10 +20,8 @@ export const useUserStore = create<UserState>((set) => ({
     imageName: null,
     createdAt: '',
   },
-  userLocation: null,
 
   setUserId: (value: number) => set({ userId: value }),
   setPetData: (value: ResponsePetProfile[]) => set({ petData: value }),
   setUserData: (value: UserProfile) => set({ userData: value }),
-  setUserLocation: (value: Location) => set({ userLocation: value }),
 }));

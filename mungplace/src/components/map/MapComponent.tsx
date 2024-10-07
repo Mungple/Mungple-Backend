@@ -1,8 +1,8 @@
 // 1. 라이브러리 및 네이티브 기능
 import styled from 'styled-components/native';
+import { Animated, Image as RNImage } from 'react-native';
 import ClusteredMapView from 'react-native-map-clustering';
 import React, { useEffect, useRef, useState } from 'react';
-import { Animated, Image as RNImage, Text } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import MapView, { Marker, Polyline, PROVIDER_GOOGLE } from 'react-native-maps';
@@ -33,7 +33,6 @@ import useMarkersWithinRadius from '@/hooks/useMarkersWithinRadius';
 // 6. 상태 관리 및 데이터
 import { ToMungZone, ToZone } from '@/types';
 import { fetchWithPetPlace } from '@/api/map';
-import { useUserStore } from '@/state/useUserStore';
 import { colors, mapNavigations } from '@/constants';
 import { useMapStore, MarkerData } from '@/state/useMapStore';
 
@@ -42,6 +41,7 @@ import { MapStackParamList } from '@/navigations/stack/MapStackNavigator';
 
 // 컴포넌트에 전달되는 props 정의
 interface MapComponentProps {
+  userLocation: { latitude: number; longitude: number };
   path?: { latitude: number; longitude: number }[];
   bottomOffset?: number;
   markers?: MarkerData[]; // 마커 생성 용
@@ -55,6 +55,7 @@ interface MapComponentProps {
 
 // ========== Main Functional Component ==========
 const MapComponent: React.FC<MapComponentProps> = ({
+  userLocation,
   bottomOffset = 0,
   path = [],
   explorationId = -1,
@@ -62,6 +63,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
   checkAllUserZone,
   checkMungPlace,
 }) => {
+  useMarkersWithinRadius();
   // ========== Constants ==========
   // 애니메이션 값 및 상태 관리
   const opacity = useRef(new Animated.Value(0)).current;
@@ -71,7 +73,6 @@ const MapComponent: React.FC<MapComponentProps> = ({
   const [isDisabled, setIsDisabled] = useState(true);
   const [formVisible, setFormVisible] = useState(false);
   const [isMenuVisible, setIsMenuVisible] = useState(false);
-  const userLocation = useUserStore((state) => state.userLocation);
   const petFacilities = useMapStore((state) => state.petFacilities);
   const [isSettingModalVisible, setIsSettingModalVisible] = useState(false);
   const [visibleElements, setVisibleElements] = useState({
@@ -123,6 +124,8 @@ const MapComponent: React.FC<MapComponentProps> = ({
     });
   }
 
+  usePermission('LOCATION');
+
   // ========== Methods ==========
   // 지도 요소 토글 함수
   const toggleElementVisibility = (element: keyof typeof visibleElements) => {
@@ -136,8 +139,8 @@ const MapComponent: React.FC<MapComponentProps> = ({
   const handlePressUserLocation = () => {
     if (userLocation && !isUserLocationError) {
       mapRef.current?.animateToRegion({
-        latitude: userLocation.lat,
-        longitude: userLocation.lon,
+        latitude: userLocation.latitude,
+        longitude: userLocation.longitude,
         latitudeDelta: 0.0922,
         longitudeDelta: 0.0421,
       });
@@ -206,9 +209,6 @@ const MapComponent: React.FC<MapComponentProps> = ({
   };
 
   // ========== Side Effects ==========
-  useMarkersWithinRadius();
-  usePermission('LOCATION');
-
   // 화면을 떠날 때 WebSocket 연결 해제
   useFocusEffect(
     React.useCallback(() => {
@@ -222,7 +222,10 @@ const MapComponent: React.FC<MapComponentProps> = ({
   useEffect(() => {
     const getPetFacilities = async () => {
       if (userLocation) {
-        const petFacilities = await fetchWithPetPlace(userLocation.lat, userLocation.lon);
+        const petFacilities = await fetchWithPetPlace(
+          userLocation.latitude,
+          userLocation.longitude,
+        );
         const facilityPoints = petFacilities.facilityPoints;
         setPetFacilities(facilityPoints);
       }
@@ -231,13 +234,6 @@ const MapComponent: React.FC<MapComponentProps> = ({
   }, [userLocation]);
 
   // ========== UI Rendering ==========
-  if (!userLocation) {
-    return (
-      <Container>
-        <Text>위치 권한을 켜주세요</Text>
-      </Container>
-    );
-  }
   return (
     <Container>
       <ClusteredMapView
@@ -247,8 +243,8 @@ const MapComponent: React.FC<MapComponentProps> = ({
         followsUserLocation
         showsMyLocationButton={false}
         initialRegion={{
-          latitude: userLocation.lat,
-          longitude: userLocation.lon,
+          latitude: userLocation.latitude,
+          longitude: userLocation.longitude,
           latitudeDelta: 0.0922,
           longitudeDelta: 0.0421,
         }}
@@ -355,8 +351,8 @@ const MapComponent: React.FC<MapComponentProps> = ({
           isVisible={formVisible}
           onSubmit={handleMarkerSubmit}
           onClose={() => setFormVisible(false)}
-          latitude={userLocation.lat}
-          longitude={userLocation.lon}
+          latitude={userLocation.latitude || 35.096406}
+          longitude={userLocation.longitude || 128.853919}
         />
         <ButtonWithTextContainer top={120} right={20}>
           <TextLabel>지도 설정</TextLabel>
