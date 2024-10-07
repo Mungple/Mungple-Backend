@@ -13,17 +13,18 @@ const startTestTime = new Date();
 const url = 'ws://host.docker.internal:8080/ws';
 const loginUrl = 'http://host.docker.internal:8080/manager/login';
 
+// export const options = {
+//     stages: [
+//         { duration: '0s', target: 100 },  // 100명으로 증가
+//         { duration: '60s', target: 100 },  // 60초 동안 500명 유지
+//         { duration: '60s', target: 100 },  // send 종료, 응답을 받는 시간
+//         { duration: '60s', target: 0 },  // 60초 동안 500명 유지
+//     ],
+// };
+
 export const options = {
-    stages: [
-        { duration: '20s', target: 100 },  // 100명으로 증가
-        { duration: '20s', target: 200 },  // 200명으로 증가
-        { duration: '20s', target: 300 },  // 300명으로 증가
-        { duration: '20s', target: 400 },  // 400명으로 증가
-        { duration: '20s', target: 500 },  // 500명으로 증가
-        { duration: '60s', target: 500 },  // 60초 동안 500명 유지
-        { duration: '60s', target: 500 },  // send 종료, 응답을 받는 시간
-        { duration: '60s', target: 0 },  // 60초 동안 500명 유지
-    ],
+    vus: 100,
+    duration: '90s',
 };
 
 function getJwtToken(userId) {
@@ -40,7 +41,7 @@ function sendMessage(socket, userId) {
     const currentTime = new Date();
     const elapsedTime = (currentTime - startTestTime) / 1000;
 
-    if (elapsedTime > 160) return;
+    if (elapsedTime > 30) return;
 
     const requestId = Math.random().toString(36).substr(2, 9);
     const startTime = new Date();
@@ -98,7 +99,7 @@ export default function () {
 
             socket.setInterval(function () {
                 sendMessage(socket, userId);
-            }, 15000);
+            }, 10000);
 
             socket.on('message', function (msg) {
                 handleMessage(msg);

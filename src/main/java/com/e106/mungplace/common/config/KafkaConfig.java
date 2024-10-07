@@ -53,7 +53,7 @@ public class KafkaConfig {
 		factory.setCommonErrorHandler(
 			new DefaultErrorHandler(new DeadLetterPublishingRecoverer(kafkaTemplate), generatedBackoff()));
 		factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL);
-
+		factory.setConcurrency(3);
 		return factory;
 	}
 
@@ -100,7 +100,7 @@ public class KafkaConfig {
 	public NewTopic tempTopic() {
 		return TopicBuilder.name("temp")
 			.partitions(3)
-			.replicas(1)
+			.replicas(2)
 			.config(TopicConfig.RETENTION_MS_CONFIG, String.valueOf(7 * 24 * 60 * 60))
 			.build();
 	}
@@ -109,7 +109,7 @@ public class KafkaConfig {
 	public NewTopic markerTopic() {
 		return TopicBuilder.name("marker")
 			.partitions(3)
-			.replicas(1)
+			.replicas(2)
 			.config(TopicConfig.RETENTION_MS_CONFIG, String.valueOf(7 * 24 * 60 * 60))
 			.build();
 	}
@@ -118,7 +118,7 @@ public class KafkaConfig {
 	public NewTopic explorationTopic() {
 		return TopicBuilder.name("exploration")
 			.partitions(3)
-			.replicas(1)
+			.replicas(2)
 			.config(TopicConfig.RETENTION_MS_CONFIG, String.valueOf(7 * 24 * 60 * 60))
 			.build();
 	}
@@ -126,8 +126,8 @@ public class KafkaConfig {
 	@Bean
 	public NewTopic heatMapTopic() {
 		return TopicBuilder.name("heatmap")
-			.partitions(3)
-			.replicas(1)
+			.partitions(6)
+			.replicas(2)
 			.config(TopicConfig.RETENTION_MS_CONFIG, String.valueOf(7 * 24 * 60 * 60))
 			.build();
 	}
@@ -136,7 +136,7 @@ public class KafkaConfig {
 	public NewTopic mungpleTopic() {
 		return TopicBuilder.name("mungple")
 			.partitions(3)
-			.replicas(1)
+			.replicas(2)
 			.config(TopicConfig.RETENTION_MS_CONFIG, String.valueOf(7 * 24 * 60 * 60))
 			.build();
 	}
@@ -145,7 +145,7 @@ public class KafkaConfig {
 	public NewTopic accessLogTopic() {
 		return TopicBuilder.name("access-log")
 			.partitions(3)
-			.replicas(1)
+			.replicas(2)
 			.config(TopicConfig.RETENTION_MS_CONFIG, String.valueOf(7 * 24 * 60 * 60))
 			.build();
 	}

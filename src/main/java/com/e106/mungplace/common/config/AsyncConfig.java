@@ -15,8 +15,8 @@ public class AsyncConfig {
 	public Executor taskExecutor() {
 		ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
 		executor.setCorePoolSize(2);
-		executor.setMaxPoolSize(20);
-		executor.setQueueCapacity(100);
+		executor.setMaxPoolSize(500);
+		executor.setQueueCapacity(1000);
 		executor.setThreadNamePrefix("RedisQueue-");
 		executor.initialize();
 		return executor;

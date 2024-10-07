@@ -39,6 +39,7 @@ public class HeatmapChunkConsumer {
 				logger.log(LogLevel.DEBUG, LogAction.CONSUME, String.format("key: %s, chunk: %s", key, chunk), getClass());
 				messagingTemplate.convertAndSendToUser(userId.toString(), destination, chunk);
 				messagingTemplate.convertAndSendToUser(userId.toString(), destination, requestId);
+				break;
 			}
 		}
 		logger.log(LogLevel.DEBUG, LogAction.CONSUME, String.format("key: %s | 소켓 송신 종료", key), getClass());

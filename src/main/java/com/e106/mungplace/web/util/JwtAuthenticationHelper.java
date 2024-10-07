@@ -31,11 +31,13 @@ public class JwtAuthenticationHelper {
 	@Value("${jwt.access-token-expire-time}")
 	private Long accessTokenExpireTime;
 
+	private final Long TOKEN_EXPIRATION_TIME = accessTokenExpireTime * 1000;
+
 	public String createAccessToken(Long userId) {
 		Date now = new Date();
 		return JWT.create()
 			.withIssuer(ISSUER)
-			.withExpiresAt(new Date(now.getTime() + accessTokenExpireTime))
+			.withExpiresAt(new Date(now.getTime() + TOKEN_EXPIRATION_TIME))
 			.withClaim("userId", userId)
 			.sign(Algorithm.HMAC512(secretKey));
 	}
