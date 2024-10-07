@@ -1,5 +1,6 @@
 package com.e106.mungplace.common.log.impl;
 
+import java.security.Principal;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -42,10 +43,8 @@ public class ApplicationLogger {
 	}
 
 	private String toFormattedMessage(LogAction action, String message, Class<?> clazz) {
-		String userId = Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication())
+		Object userId = Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication())
 			.map(Authentication::getPrincipal)
-			.map(UserDetails.class::cast)
-			.map(UserDetails::getUsername)
 			.orElse(null);
 
 		String packageName = clazz.getPackageName();
