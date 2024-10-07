@@ -82,7 +82,7 @@ const PetForm = ({ setModalVisible, petData }: PetFormProps) => {
           {...inputUser.getTextInputProps('petBirth')}
         />
         <CustomInputField
-          placeholder="몸무게"
+          placeholder="몸무게 (g)"
           error={inputUser.errors.petWeight}
           touched={inputUser.touched.petWeight}
           inputMode="numeric"
@@ -99,7 +99,11 @@ const PetForm = ({ setModalVisible, petData }: PetFormProps) => {
             </RadioButtonGroup.RadioButtonItem>
           ))}
         </RadioButtonGroup>
-        <CustomButton label={`${petData ? '변경' : '등록'} 완료`} onPress={handleSubmit} />
+        <CustomButton
+          label={`${petData ? '변경' : '등록'} 완료`}
+          onPress={handleSubmit}
+          inValid={!inputUser.isValid}
+        />
       </InputContainer>
     </Container>
   );

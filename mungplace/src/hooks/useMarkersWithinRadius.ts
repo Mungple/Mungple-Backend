@@ -1,15 +1,15 @@
 import axiosInstance from '@/api/axios';
 import React from 'react';
+import useUserLocation from './useUserLocation';
 import { useFocusEffect } from '@react-navigation/native';
 import { useMapStore, NearbyMarkersData, NearbyMarkerData, ClusterData } from '@/state/useMapStore';
-import { useUserStore } from '@/state/useUserStore';
 
 const useMarkersWithinRadius = () => {
   const { setNearbyMarkers } = useMapStore((state) => ({
     setNearbyMarkers: state.setNearbyMarkers,
   }));
 
-  const userLocation = useUserStore((state) => state.userLocation);
+  const { userLocation } = useUserLocation();
 
   const fetchNearbyMarkers = async () => {
     try {
@@ -19,8 +19,8 @@ const useMarkersWithinRadius = () => {
         },
         params: {
           radius: 500,
-          latitude: userLocation.lat,
-          longitude: userLocation.lon,
+          latitude: userLocation.latitude,
+          longitude: userLocation.longitude,
           markerType: 'ALL',
         },
       });

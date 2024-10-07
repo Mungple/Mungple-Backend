@@ -2,10 +2,12 @@
 import React, { useState } from 'react';
 import styled from 'styled-components/native';
 
+import useUserLocation from '@/hooks/useUserLocation';
 import MapComponent from '@/components/map/MapComponent';
 import useWebSocketActions from '@/hooks/useWebsocketActions';
 
 const MapScreen = () => {
+  const { userLocation } = useUserLocation();
   const [isFormVisible, setIsFormVisible] = useState(false);
   const { checkAllUserZone, checkMyBlueZone, checkMungPlace } = useWebSocketActions();
 
@@ -16,6 +18,7 @@ const MapScreen = () => {
   return (
     <Container>
       <MapComponent
+        userLocation={userLocation}
         isFormVisible={isFormVisible}
         onFormClose={handleFormClose}
         checkMyBlueZone={checkMyBlueZone}

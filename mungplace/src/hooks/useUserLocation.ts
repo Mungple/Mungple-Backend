@@ -1,12 +1,17 @@
 import { useEffect, useState } from 'react';
+import { LatLng } from 'react-native-maps';
 import GeoLocation from '@react-native-community/geolocation';
 import useAppState from './useAppState';
-import { useUserStore } from '@/state/useUserStore';
 // import {useMapStore} from '@/state/useMapStore';
 
 // 사용자 위치를 추적하고 관련 작업을 수행
-const useUserLocation = (): { isUserLocationError: boolean } => {
-  const setUserLocation = useUserStore((state) => state.setUserLocation);
+const useUserLocation = (): { userLocation: LatLng; isUserLocationError: boolean } => {
+  // const {fetchPersonalBlueZone, fetchGlobalBlueZone} = useMapStore();
+
+  const [userLocation, setUserLocation] = useState<LatLng>({
+    latitude: 35.096406,
+    longitude: 128.853919,
+  });
   const [isUserLocationError, setIsUserLocationError] = useState(false);
   const { isComeback } = useAppState();
 
@@ -14,8 +19,8 @@ const useUserLocation = (): { isUserLocationError: boolean } => {
     const getLocation = () => {
       GeoLocation.getCurrentPosition(
         (info) => {
-          const { latitude: lat, longitude: lon } = info.coords;
-          setUserLocation({ lat, lon });
+          const { latitude, longitude } = info.coords;
+          setUserLocation({ latitude, longitude });
           setIsUserLocationError(false);
         },
         () => {
@@ -41,7 +46,7 @@ const useUserLocation = (): { isUserLocationError: boolean } => {
     };
   }, [isComeback]);
 
-  return { isUserLocationError };
+  return { userLocation, isUserLocationError };
 };
 
 export default useUserLocation;

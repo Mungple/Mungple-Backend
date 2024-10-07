@@ -14,6 +14,7 @@ export interface ErrorMessage {
 const WEBSOCKET_URI = 'wss://j11e106.p.ssafy.io/api/ws';
 
 const useWebSocket = (explorationId: number = -1) => {
+  const setIsSocket = useAppStore((state) => state.setIsSocket);
   const setDistance = useAppStore((state) => state.setDistance);
   const clientSocket = useAppStore((state) => state.clientSocket);
   const setClientSocket = useAppStore((state) => state.setClientSocket);
@@ -21,7 +22,7 @@ const useWebSocket = (explorationId: number = -1) => {
   const [allBlueZone, setAllBlueZone] = useState<FromZone | null>(null);
   const [allRedZone, setAllRedZone] = useState<FromZone | null>(null);
   const [myBlueZone, setMyBlueZone] = useState<FromZone | null>(null);
-  const [mungZone, setMungZone] = useState<Array<{ geohash: string }> | null>(null);
+  const [mungZone, setMungZone] = useState<Array<string> | null>(null);
 
   // 소켓 연결 시도
   useEffect(() => {
@@ -43,6 +44,7 @@ const useWebSocket = (explorationId: number = -1) => {
           onConnect: () => {
             setClientSocket(socket);
             subscribeToTopics(socket, explorationId);
+            setIsSocket(true);
             console.log('useWebSocket >>> 소켓 연결 성공 | explorationId =', explorationId);
           },
           onStompError: (frame) => {
@@ -113,7 +115,7 @@ const useWebSocket = (explorationId: number = -1) => {
     // 멍플 조회
     socket.subscribe('/user/sub/mungplace', (message) => {
       try {
-        const parsedMessage = JSON.parse(message.body) as Array<{ geohash: string }>;
+        const parsedMessage = JSON.parse(message.body) as Array<string>;
         setMungZone(parsedMessage);
       } catch (e) {
         console.error('useWebSocket for mungplace >>>', e);
@@ -123,7 +125,7 @@ const useWebSocket = (explorationId: number = -1) => {
     socket.subscribe('/user/sub/explorations/distance', (message) => {
       try {
         const parsedMessage = JSON.parse(message.body) as Distance;
-        setDistance(parsedMessage.distance);
+        setDistance(Math.max(parsedMessage.distance ?? 0, 0));
       } catch (e) {
         console.error('useWebSocket for distance >>>', e);
       }

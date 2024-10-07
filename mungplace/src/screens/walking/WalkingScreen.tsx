@@ -10,13 +10,13 @@ import { colors, mapNavigations } from '@/constants';
 
 import { useAppStore } from '@/state/useAppStore';
 import { useMapStore } from '@/state/useMapStore';
-import { useUserStore } from '@/state/useUserStore';
 
 import MapComponent from '@/components/map/MapComponent';
 import CustomModal from '@/components/common/CustomModal';
 import ElapsedTime from '@/components/walking/ElapsedTime';
 import CustomButton from '@/components/common/CustomButton';
 
+import useUserLocation from '@/hooks/useUserLocation';
 import useWebSocketActions from '@/hooks/useWebsocketActions';
 import { MapStackParamList } from '@/navigations/stack/MapStackNavigator';
 
@@ -29,14 +29,13 @@ const WalkingScreen = () => {
   // ========== Constants ==========
   // 상태 관리 (앱 스토어 및 맵 스토어에서 상태 추출)
   const markers = useMapStore((state) => state.markers);
+  const distance = useAppStore((state) => state.distance);
+  const isSocket = useAppStore((state) => state.isSocket);
+  const setIsSocket = useAppStore((state) => state.setIsSocket);
   const startExplorate = useAppStore((state) => state.startExplorate);
   const setWalkingStart = useAppStore((state) => state.setWalkingStart);
 
-  // 사용자 위치 및 웹소켓 액션 추출
-  const distance = useAppStore((state) => state.distance);
-  const clientSocket = useAppStore((state) => state.clientSocket);
-  const userLocation = useUserStore((state) => state.userLocation);
-
+  const { userLocation } = useUserLocation();
   const [modalVisible, setModalVisible] = useState(false);
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [path, setPath] = useState<{ latitude: number; longitude: number }[]>([]);
@@ -44,6 +43,8 @@ const WalkingScreen = () => {
 
   // 네비게이션 훅
   const navigation = useNavigation<NativeStackNavigationProp<MapStackParamList>>();
+
+  const formatDistance = distance < 100 ? `${distance} m` : `${(distance / 1000).toFixed(2)} km`;
 
   // ========== Methods ==========
   // 산책 종료 처리
@@ -60,6 +61,7 @@ const WalkingScreen = () => {
   const confirmEndWalking = () => {
     if (startExplorate) {
       exitWalk(startExplorate.explorationId);
+      setIsSocket(false);
       setWalkingStart(false);
       setModalVisible(false);
       navigation.navigate(mapNavigations.HOME);
@@ -78,18 +80,11 @@ const WalkingScreen = () => {
   useEffect(() => {
     if (!userLocation) return;
 
-    const intervalId = setInterval(() => {
-      setPath((prevPath) => [
-        ...prevPath,
-        { latitude: userLocation.lat, longitude: userLocation.lon },
-      ]);
-    }, 5000);
-
-    // 언마운트 시 Interval 해제
-    return () => {
-      clearInterval(intervalId);
-    };
-  }, [path]);
+    setPath((prevPath) => [
+      ...prevPath,
+      { latitude: userLocation.latitude, longitude: userLocation.longitude },
+    ]);
+  }, [userLocation]);
 
   // 3초마다 웹소켓을 통해 위치 정보 전송
   useEffect(() => {
@@ -97,8 +92,8 @@ const WalkingScreen = () => {
 
     const intervalId = setInterval(() => {
       const location = {
-        lat: userLocation.lat,
-        lon: userLocation.lon,
+        lat: userLocation.latitude,
+        lon: userLocation.longitude,
         recordedAt: new Date().toISOString(),
       };
       sendLocation(Number(startExplorate?.explorationId), location);
@@ -107,7 +102,7 @@ const WalkingScreen = () => {
     return () => {
       clearInterval(intervalId);
     };
-  }, []);
+  }, [isSocket]);
 
   // ========== UI Rendering ==========
   if (!startExplorate) {
@@ -119,6 +114,7 @@ const WalkingScreen = () => {
       <MapComponent
         path={path}
         markers={markers}
+        userLocation={userLocation}
         isFormVisible={isFormVisible}
         onFormClose={handleFormClose}
         bottomOffset={bottomBlockHeight + 20}
@@ -138,7 +134,7 @@ const WalkingScreen = () => {
             </WS.InfoBlock>
             <WS.InfoBlock>
               <WS.InfoLabel>이동 거리</WS.InfoLabel>
-              <WS.InfoValue>{Number(distance)} km</WS.InfoValue>
+              <WS.InfoValue>{formatDistance}</WS.InfoValue>
             </WS.InfoBlock>
           </WS.InfoRow>
         </WS.WalkingInfo>

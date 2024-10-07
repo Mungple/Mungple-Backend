@@ -1,5 +1,12 @@
 import React, { useEffect } from 'react';
-import { View, Text, FlatList, TouchableOpacity, ActivityIndicator, StyleSheet } from 'react-native';
+import {
+  View,
+  Text,
+  FlatList,
+  TouchableOpacity,
+  ActivityIndicator,
+  StyleSheet,
+} from 'react-native';
 import useMyMarkers from '@/hooks/useMyMarkers';
 import { useNavigation } from '@react-navigation/native';
 import { MapStackParamList } from '@/navigations/stack/MapStackNavigator';
@@ -8,7 +15,8 @@ import { mapNavigations } from '@/constants';
 
 const MyMar = () => {
   const { myMarkers, fetchMyMarkers, loading } = useMyMarkers();
-  const navigation = useNavigation<NativeStackNavigationProp<MapStackParamList>>()
+  const navigation = useNavigation<NativeStackNavigationProp<MapStackParamList>>();
+
   useEffect(() => {
     fetchMyMarkers(); // 페이지 로딩 시 내 마커 데이터를 불러옴
   }, []);
@@ -29,7 +37,9 @@ const MyMar = () => {
         data={myMarkers}
         keyExtractor={(item) => item.markerId}
         renderItem={({ item }) => (
-          <TouchableOpacity onPress={() => handleMarkerPress(item.markerId)} style={styles.markerItem}>
+          <TouchableOpacity
+            onPress={() => handleMarkerPress(item.markerId)}
+            style={styles.markerItem}>
             <View>
               <Text style={styles.markerTitle}>{item.title}</Text>
             </View>
@@ -61,7 +71,6 @@ const styles = StyleSheet.create({
   },
   listContainer: {
     paddingBottom: 16,
-
   },
   markerItem: {
     backgroundColor: '#eaeaea',
