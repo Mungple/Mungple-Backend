@@ -1,12 +1,8 @@
 package com.e106.mungplace.common.log;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -59,37 +55,12 @@ public class ControllerLogAspect {
 		String uri = request.getRequestURI();
 		String params = request.getQueryString() != null ? request.getQueryString() : "";
 
-		String body = "";
-		String contentType = request.getContentType();
-		if (contentType != null) {
-			MediaType mediaType = MediaType.parseMediaType(contentType);
-			if (MediaType.MULTIPART_FORM_DATA.includes(mediaType)) {
-				body = "multipart/form-data";
-			} else {
-				try {
-					body = getBody(request);
-				} catch (IOException e) {
-					body = "";
-				}
-			}
-		}
-		return new ControllerLog(remoteAddr, method, uri, params, body);
+		return new ControllerLog(remoteAddr, method, uri, params);
 	}
 
 	private HttpServletRequest getCurrentHttpRequest() {
 		ServletRequestAttributes attributes =
 			(ServletRequestAttributes)RequestContextHolder.getRequestAttributes();
 		return attributes != null ? attributes.getRequest() : null;
-	}
-
-	// HttpServletRequest의 body를 읽어오는 헬퍼 메서드
-	private String getBody(HttpServletRequest request) throws IOException {
-		StringBuilder stringBuilder = new StringBuilder();
-		BufferedReader reader = request.getReader();
-		String line;
-		while ((line = reader.readLine()) != null) {
-			stringBuilder.append(line);
-		}
-		return stringBuilder.toString();
 	}
 }

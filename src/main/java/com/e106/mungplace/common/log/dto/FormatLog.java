@@ -6,6 +6,6 @@ public record FormatLog(
 	String transactionId,
 	String domain,
 	LogLayer layer,
-	String payload
+	Object payload
 ) {
 }
