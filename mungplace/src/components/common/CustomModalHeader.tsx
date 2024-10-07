@@ -1,26 +1,29 @@
-import React from 'react'
-import styled from 'styled-components/native'
-import IonIcons from 'react-native-vector-icons/Ionicons'
+import React from 'react';
+import styled from 'styled-components/native';
+import IonIcons from 'react-native-vector-icons/Ionicons';
 
-import {colors} from '@/constants'
+import { colors } from '@/constants';
+import CustomText from './CustomText';
 
 type CustomModalHeaderProps = {
-  title: string
-  closeButton: () => void
-}
+  title: string;
+  closeButton: () => void;
+};
 
-const CustomModalHeader: React.FC<CustomModalHeaderProps> = ({title, closeButton}) => {
+const CustomModalHeader: React.FC<CustomModalHeaderProps> = ({ title, closeButton }) => {
   return (
     <Container>
-      <Title>{title}</Title>
+      <CustomText fontWeight="bold" fontSize={24}>
+        {title}
+      </CustomText>
       <CloseButton onPress={closeButton}>
         <IonIcons name={'close'} size={32} color={colors.BLACK} />
       </CloseButton>
     </Container>
-  )
-}
+  );
+};
 
-export default CustomModalHeader
+export default CustomModalHeader;
 
 const Container = styled.View`
   width: 100%;
@@ -30,17 +33,10 @@ const Container = styled.View`
   flex-direction: row;
   justify-content: center;
   border-bottom-width: 1px;
-  border-bottom-color: ${colors.GRAY_300};
-`
-
-const Title = styled.Text`
-  font-size: 24px;
-  font-weight: bold;
-  text-align: center;
-  color: ${colors.BLACK};
-`
+  border-bottom-color: ${colors.GRAY_100};
+`;
 
 const CloseButton = styled.TouchableOpacity`
   position: absolute;
   right: 20px;
-`
+`;
