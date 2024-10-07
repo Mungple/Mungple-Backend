@@ -21,6 +21,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
+import com.e106.mungplace.common.log.impl.ApplicationLogger;
 import com.e106.mungplace.domain.exploration.entity.Exploration;
 import com.e106.mungplace.domain.exploration.impl.ExplorationRecorder;
 import com.e106.mungplace.domain.user.entity.User;
@@ -56,6 +57,9 @@ class ExplorationControllerUnitTest {
 
 	@MockBean
 	private WebSocketSessionManager sessionManager;
+
+	@MockBean
+	private ApplicationLogger applicationLogger;
 
 	@Autowired
 	private ObjectMapper objectMapper;

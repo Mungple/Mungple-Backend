@@ -5,6 +5,7 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.stereotype.Component;
 
+import com.e106.mungplace.common.log.MethodLoggable;
 import com.e106.mungplace.domain.exploration.entity.ExplorationEvent;
 import com.e106.mungplace.domain.exploration.entity.ExplorePoint;
 import com.e106.mungplace.domain.exploration.repository.ExplorePointRepository;

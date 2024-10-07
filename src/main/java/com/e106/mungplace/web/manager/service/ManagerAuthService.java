@@ -3,6 +3,8 @@ package com.e106.mungplace.web.manager.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.e106.mungplace.common.log.MethodLoggable;
+import com.e106.mungplace.common.log.dto.LogAction;
 import com.e106.mungplace.domain.manager.impl.ManagerReader;
 import com.e106.mungplace.domain.user.entity.User;
 import com.e106.mungplace.web.user.dto.LoginResponse;
@@ -17,6 +19,7 @@ public class ManagerAuthService {
 	private final ManagerReader managerReader;
 	private final JwtAuthenticationHelper jwtAuthenticationHelper;
 
+	@MethodLoggable(action = LogAction.SELECT)
 	@Transactional
 	public LoginResponse managerLoginProcess(String providerId) {
 		User manager = managerReader.findOrCreateManager(providerId);

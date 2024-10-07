@@ -18,6 +18,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
+import com.e106.mungplace.common.log.impl.ApplicationLogger;
 import com.e106.mungplace.common.map.dto.Point;
 import com.e106.mungplace.domain.exploration.impl.ExplorationRecorder;
 import com.e106.mungplace.domain.user.repository.UserRepository;
@@ -51,6 +52,9 @@ class ExplorePointBulkControllerUnitTest {
 
 	@MockBean
 	private ManagerExplorePointService explorePointService;
+
+	@MockBean
+	private ApplicationLogger applicationLogger;
 
 	@DisplayName("Point 목록을 전달하면 산책 위치 데이터를 삽입한다.")
 	@Test

@@ -7,6 +7,8 @@ import org.springframework.data.elasticsearch.core.geo.GeoPoint;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.e106.mungplace.common.log.MethodLoggable;
+import com.e106.mungplace.common.log.dto.LogAction;
 import com.e106.mungplace.domain.image.entity.ImageInfo;
 import com.e106.mungplace.domain.image.repository.MarkerImageInfoRepository;
 import com.e106.mungplace.domain.manager.impl.ManagerReader;
@@ -29,6 +31,7 @@ public class ManagerMarkerDummyService {
 	private final MarkerRepository markerRepository;
 	private final ManagerReader managerReader;
 
+	@MethodLoggable(action = LogAction.CREATE)
 	@Transactional
 	public void createMarkerDummyProcess(ManagerMarkerDummyCreateRequest request) {
 		User manager = managerReader.findOrCreateManager(request.managerName());
@@ -50,6 +53,7 @@ public class ManagerMarkerDummyService {
 		saveMarkerImages(marker);
 	}
 
+	@MethodLoggable(action = LogAction.CREATE)
 	public void saveMarkerImages(Marker marker) {
 		String[] redImages = {"red-1", "red-2", "red-3"};
 		String[] blueImages = {"blue-1", "blue-2", "blue-3"};

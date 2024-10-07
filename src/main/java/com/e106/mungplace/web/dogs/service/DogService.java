@@ -10,6 +10,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.e106.mungplace.common.image.ImageRepository;
 import com.e106.mungplace.common.image.ImageManager;
+import com.e106.mungplace.common.log.MethodLoggable;
+import com.e106.mungplace.common.log.dto.LogAction;
 import com.e106.mungplace.common.transaction.GlobalTransactional;
 import com.e106.mungplace.domain.dogs.entity.Dog;
 import com.e106.mungplace.domain.dogs.repository.DogRepository;
@@ -39,6 +41,7 @@ public class DogService {
 	private final ImageManager imageManager;
 	private final UserHelper userHelper;
 
+	@MethodLoggable(action = LogAction.CREATE)
 	@Transactional
 	public DogResponse createDogProcess(DogCreateRequest dogCreateRequest) {
 		User user = userHelper.getCurrentUser();
@@ -51,6 +54,7 @@ public class DogService {
 		return DogResponse.of(saveDog);
 	}
 
+	@MethodLoggable(action = LogAction.SELECT)
 	@Transactional(readOnly = true)
 	public List<DogResponse> findDogsProcess(Long userId) {
 		List<Dog> dogs = dogRepository.findByUserUserId(userId);
@@ -59,6 +63,7 @@ public class DogService {
 			.toList();
 	}
 
+	@MethodLoggable(action = LogAction.UPDATE)
 	@Transactional
 	public DogResponse updateDogProcess(Long dogId, DogUpdateRequest dogUpdateRequest) {
 		Long userId = userHelper.getCurrentUserId();
@@ -70,6 +75,7 @@ public class DogService {
 		return DogResponse.of(dog);
 	}
 
+	@MethodLoggable(action = LogAction.DELETE)
 	@Transactional
 	public void removeDogProcess(Long dogId) {
 		Long userId = userHelper.getCurrentUserId();

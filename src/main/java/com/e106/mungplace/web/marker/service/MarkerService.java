@@ -14,6 +14,8 @@ import org.springframework.data.elasticsearch.core.geo.GeoPoint;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.e106.mungplace.common.log.MethodLoggable;
+import com.e106.mungplace.common.log.dto.LogAction;
 import com.e106.mungplace.common.map.dto.Point;
 import com.e106.mungplace.common.transaction.GlobalTransactional;
 import com.e106.mungplace.domain.exploration.entity.Exploration;
@@ -71,8 +73,8 @@ public class MarkerService {
 	private final MarkerPointRepository markerPointRepository;
 	private final RequestDeduplicator requestDeduplicator;
 
+	@MethodLoggable(action = LogAction.CREATE)
 	@GlobalTransactional
-	@Transactional
 	public CreateMarkerResponse createMarkerProcess(String markerInfoJson, List<MultipartFile> imageFiles) {
 		requestDeduplicator.isValidIdempotent(Arrays.asList("CREATE_MARKER", markerInfoJson));
 
@@ -115,6 +117,7 @@ public class MarkerService {
 	}
 
 
+	@MethodLoggable(action = LogAction.DELETE)
 	@GlobalTransactional
 	public void deleteMarkerProcess(UUID markerId) {
 		Long userId = userHelper.getCurrentUserId();
@@ -127,6 +130,7 @@ public class MarkerService {
 		markerWriter.delete(marker);
 	}
 
+	@MethodLoggable(action = LogAction.SELECT)
 	public GeohashMarkerResponse getMarkersGroupedByGeohash(MarkerSearchRequest markerSearchRequest) {
 		List<MarkerPoint> markerPoints = findMarkersWithinRadius(markerSearchRequest);
 
@@ -138,6 +142,7 @@ public class MarkerService {
 			.build();
 	}
 
+	@MethodLoggable(action = LogAction.SELECT)
 	public MarkerInfoResponse getMarkerInfo(UUID markerId) {
 		Marker marker = getMarkerOrThrow(markerId);
 		List<ImageInfo> imageInfos = markerReader.findMarkerImage(markerId);
@@ -158,6 +163,7 @@ public class MarkerService {
 			.build();
 	}
 
+	@MethodLoggable(action = LogAction.SELECT)
 	public List<MarkerResponse> getUserMarkers(Long size, UUID cursorId) {
 		Long userId = userHelper.getCurrentUserId();
 

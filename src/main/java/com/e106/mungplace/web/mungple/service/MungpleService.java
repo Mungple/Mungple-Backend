@@ -9,6 +9,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
+import com.e106.mungplace.common.log.MethodLoggable;
+import com.e106.mungplace.common.log.dto.LogAction;
 import com.e106.mungplace.common.map.dto.Point;
 import com.e106.mungplace.domain.util.GeoUtils;
 import com.e106.mungplace.web.mungple.dto.MungpleRequest;
@@ -24,7 +26,7 @@ public class MungpleService {
 
 	private final SimpMessagingTemplate messagingTemplate;
 
-	// 특정 사용자에게 Mungple 데이터를 전송
+	@MethodLoggable(action = LogAction.SELECT)
 	public void sendMungpleToUser(MungpleRequest mungpleRequest, Long userId) {
 
 		String destination = "/sub/mungple";
@@ -37,7 +39,7 @@ public class MungpleService {
 		messagingTemplate.convertAndSendToUser(userId.toString(), destination, mungpleData);
 	}
 
-	// 달팽이 모양으로 주변 GeoHash를 탐색
+	@MethodLoggable(action = LogAction.SELECT)
 	public List<Point> getNearbyMungplesSpiral(String currentGeoHash, int numOfSteps) {
 		List<Point> nearbyMungples = new ArrayList<>();
 		Set<String> visited = new HashSet<>();
