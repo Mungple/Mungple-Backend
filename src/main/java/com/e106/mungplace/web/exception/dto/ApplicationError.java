@@ -16,6 +16,7 @@ public enum ApplicationError {
 	JSON_PROCESS_FAILED("E001", BAD_REQUEST, "JSON 변환 과정 중 문제가 생겼습니다. 요청 데이터를 확인해주세요."),
 	EVENT_PRODUCE_FAILED("E002", INTERNAL_SERVER_ERROR, "일시적인 오류가 발생했습니다. 다시 시도해주세요."),
 	RECORD_IS_TOO_LARGE("E003", BAD_REQUEST, "처리할 수 없는 크기의 데이터입니다."),
+	DUPLICATE_REQUEST("E004", BAD_REQUEST, "중복된 요청입니다."),
 
 	// auth
 	AUTHENTICATION_ERROR("E101", UNAUTHORIZED, "권한이 없습니다."),

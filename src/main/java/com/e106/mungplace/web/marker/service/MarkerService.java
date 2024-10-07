@@ -2,6 +2,7 @@ package com.e106.mungplace.web.marker.service;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -41,6 +42,7 @@ import com.e106.mungplace.web.marker.dto.MarkerPointResponse;
 import com.e106.mungplace.web.marker.dto.MarkerResponse;
 import com.e106.mungplace.web.marker.dto.MarkerSearchRequest;
 import com.e106.mungplace.web.marker.dto.RequestMarkerType;
+import com.e106.mungplace.web.util.RequestDeduplicator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -67,11 +69,13 @@ public class MarkerService {
 	private final MarkerSerializer markerSerializer;
 	private final ObjectMapper objectMapper;
 	private final MarkerPointRepository markerPointRepository;
+	private final RequestDeduplicator requestDeduplicator;
 
 	@GlobalTransactional
 	@Transactional
 	public CreateMarkerResponse createMarkerProcess(String markerInfoJson, List<MultipartFile> imageFiles) {
-		// 이미지 파일 개수 검증
+		requestDeduplicator.isValidIdempotent(Arrays.asList("CREATE_MARKER", markerInfoJson));
+
 		validateImageFileCount(imageFiles);
 
 		MarkerCreateRequest markerInfo = parseMarkerInfo(markerInfoJson);
