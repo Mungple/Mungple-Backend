@@ -1,13 +1,20 @@
 import React from 'react';
 import styled from 'styled-components/native';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 import { colors } from '@/constants';
-import CustomCard from '../common/CustomCard';
 import { ResponsePetProfile } from '@/types';
+import CustomCard from '../common/CustomCard';
+import CustomText from '../common/CustomText';
 
 type PetInfoBoxProps = {
   defaultPet?: ResponsePetProfile;
   age?: number;
+};
+
+const makeGtoKg = (g: number) => {
+  const kg = g / 1000;
+  return kg.toFixed(2);
 };
 
 const PetInfoBox = ({ defaultPet, age }: PetInfoBoxProps) => {
@@ -15,69 +22,99 @@ const PetInfoBox = ({ defaultPet, age }: PetInfoBoxProps) => {
     <Container>
       {defaultPet ? (
         <>
+          <Header>
+            <CustomText fontSize={22} fontWeight="bold">
+              대표 반려견
+            </CustomText>
+          </Header>
           <Col>
-            <Header>반려견 정보</Header>
-          </Col>
-          <Col>
             <Row>
-              <Title>이름</Title>
-              <Context>{defaultPet.name}</Context>
+              <TextIconWrapper>
+                <CustomText fontSize={18} style={{ marginRight: 10 }}>
+                  이름
+                </CustomText>
+                <MaterialIcons name="pets" size={20} color={colors.ORANGE.BASE} />
+              </TextIconWrapper>
+              <CustomText fontWeight="bold" fontSize={20}>
+                {defaultPet.name}
+              </CustomText>
             </Row>
             <Row>
-              <Title>성별</Title>
-              <Context>{defaultPet.gender === 'MALE' ? '남아' : '여아'}</Context>
+              <TextIconWrapper>
+                <CustomText fontSize={18} style={{ marginRight: 10 }}>
+                  성별
+                </CustomText>
+                {defaultPet.gender === 'MALE' ? (
+                  <MaterialIcons name="male" size={24} color={colors.BLUE.DARKER} />
+                ) : (
+                  <MaterialIcons name="female" size={24} color={colors.RED.LIGHTER} />
+                )}
+              </TextIconWrapper>
+              <CustomText fontWeight="bold" fontSize={20}>
+                {defaultPet.gender === 'MALE' ? '남아' : '여아'}
+              </CustomText>
             </Row>
             <Row>
-              <Title>나이</Title>
-              <Context>{age}개월</Context>
+              <TextIconWrapper>
+                <CustomText fontSize={18} style={{ marginRight: 10 }}>
+                  나이
+                </CustomText>
+                <MaterialIcons name="cake" size={20} color={colors.ORANGE.BASE} />
+              </TextIconWrapper>
+              <CustomText fontWeight="bold" fontSize={20}>
+                {age}개월
+              </CustomText>
             </Row>
             <Row>
-              <Title>몸무게</Title>
-              <Context>{defaultPet.weight}kg</Context>
+              <TextIconWrapper>
+                <CustomText fontSize={18} style={{ marginRight: 10 }}>
+                  몸무게
+                </CustomText>
+                <MaterialIcons name="fitness-center" size={20} color={colors.BLACK} />
+              </TextIconWrapper>
+              <CustomText fontWeight="bold" fontSize={20}>
+                {makeGtoKg(defaultPet.weight)}kg
+              </CustomText>
             </Row>
           </Col>
         </>
       ) : (
         <Col>
-          <Title>반려견을 등록해주세요</Title>
+          <CustomText fontWeight="bold">반려견을 등록해주세요</CustomText>
         </Col>
       )}
     </Container>
   );
 };
 
+const Header = styled.View`
+  flex-direction: row;
+  justify-content: space-between;
+  margin-bottom: 20px;
+`;
+
 const Container = styled(CustomCard)`
   flex: 1;
   margin: 20px;
   padding: 30px;
-  flex-direction: row;
-  align-items: center;
+  flex-direction: column;
   background-color: ${colors.BEIGE.LIGHTER};
+  overflow: hidden;
 `;
 
 const Col = styled.View`
-  flex: 1;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 18px;
 `;
 
 const Row = styled.View`
   flex-direction: row;
   justify-content: space-between;
-  margin: 10px 0;
 `;
 
-const Header = styled.Text`
-  font-size: 20px;
-  color: ${colors.BLACK};
-`;
-
-const Title = styled.Text`
-  font-size: 20px;
-  color: ${colors.BLACK};
-`;
-
-const Context = styled(Title)`
-  font-weight: bold;
-  text-align: right;
+const TextIconWrapper = styled.View`
+  flex-direction: row;
 `;
 
 export default PetInfoBox;

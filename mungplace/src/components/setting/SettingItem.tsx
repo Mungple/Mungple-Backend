@@ -3,6 +3,7 @@ import { TouchableOpacityProps } from 'react-native';
 import styled from 'styled-components/native';
 
 import { colors } from '@/constants';
+import CustomText from '../common/CustomText';
 
 interface SettingItemProps extends TouchableOpacityProps {
   title: string;
@@ -11,13 +12,15 @@ interface SettingItemProps extends TouchableOpacityProps {
   color?: string;
 }
 
-function SettingItem({ title, subTitle, icon = null, color, ...props }: SettingItemProps) {
+function SettingItem({ title, subTitle, icon = null, ...props }: SettingItemProps) {
   return (
     <Container {...props}>
       {icon}
       <TitleContainer>
-        <TitleText style={{ color: color ?? colors.BLACK }}>{title}</TitleText>
-        {subTitle && <SubTitleText>{subTitle}</SubTitleText>}
+        <CustomText fontSize={16} color={title === '로그아웃' ? colors.RED.DARKER : colors.BLACK}>
+          {title}
+        </CustomText>
+        {subTitle && <CustomText color={colors.GRAY_300}>{subTitle}</CustomText>}
       </TitleContainer>
     </Container>
   );
@@ -29,25 +32,14 @@ const Container = styled.TouchableOpacity`
   gap: 10px;
   padding: 15px;
   background-color: ${colors.WHITE};
-  border-color: ${colors.GRAY_200};
+  border-color: ${colors.GRAY_100};
   border-bottom-width: 1px;
-  border-top-width: 1px;
 `;
 
 const TitleContainer = styled.View`
   flex: 1;
   flex-direction: row;
   justify-content: space-between;
-`;
-
-const TitleText = styled.Text`
-  font-size: 16px;
-  font-weight: 500;
-  color: ${colors.BLACK};
-`;
-
-const SubTitleText = styled.Text`
-  color: ${colors.GRAY_300};
 `;
 
 export default SettingItem;

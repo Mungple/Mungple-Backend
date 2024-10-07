@@ -1,14 +1,13 @@
 import React from 'react';
 import { ScrollView } from 'react-native';
 import styled from 'styled-components/native';
-
-import { removeHeader } from '@/utils';
-import { useAppStore } from '@/state/useAppStore';
 import { useNavigation } from '@react-navigation/native';
-import { colors, settingNavigations } from '@/constants';
-import SettingItem from '@/components/setting/SettingItem';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { SettingStackParamList } from '@/navigations/stack/SettingStackNavigator';
+import { removeHeader } from '@/utils';
+import { useAppStore } from '@/state/useAppStore';
+import { settingNavigations } from '@/constants';
+import SettingItem from '@/components/setting/SettingItem';
 
 const SettingScreen = () => {
   const setLogin = useAppStore((state) => state.setLogin);
@@ -26,9 +25,8 @@ const SettingScreen = () => {
   return (
     <Container>
       <ScrollView>
-        <Space />
         <SettingItem title="프로필 사진 변경" onPress={handleProfilePress} />
-        <SettingItem title="로그아웃" onPress={handleLogoutPress} color={colors.RED.DARKER} />
+        <SettingItem title="로그아웃" onPress={handleLogoutPress} />
       </ScrollView>
     </Container>
   );
@@ -36,10 +34,6 @@ const SettingScreen = () => {
 
 const Container = styled.SafeAreaView`
   flex: 1;
-`;
-
-const Space = styled.View`
-  height: 30px;
 `;
 
 export default SettingScreen;
