@@ -21,6 +21,12 @@ interface ToMungZone {
   point: Point;
 }
 
+interface ToLocation {
+  lat: number;
+  lon: number;
+  recordedAt: string;
+}
+
 interface PetFacility {
   id: number;
   point: Point;
@@ -46,6 +52,7 @@ export type {
   Point,
   ToZone,
   FromZone,
+  ToLocation,
   ToMungZone,
   PetFacility,
   FacilityPoints,

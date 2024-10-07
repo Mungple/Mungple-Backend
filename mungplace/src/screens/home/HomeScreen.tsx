@@ -39,12 +39,13 @@ const HomeScreen: React.FC = () => {
   const { useGetPet } = usePet();
   const { data: petData } = useGetPet(userId);
   const defaultPet = petData?.find((pet) => pet.isDefault === true);
-  const { userLocation, isUserLocationError } = useUserLocation();
   const age = defaultPet ? calculateAge(defaultPet.birth) : undefined;
 
   // 산책
+  const { isUserLocationError } = useUserLocation();
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedPets, setSelectedPets] = useState<number[]>([]);
+  const userLocation = useUserStore((state) => state.userLocation);
   const setWalkingStart = useAppStore((state) => state.setWalkingStart);
   const setStartExplorate = useAppStore((state) => state.setStartExplorate);
   const navigation = useNavigation<NativeStackNavigationProp<MapStackParamList>>();
@@ -63,10 +64,10 @@ const HomeScreen: React.FC = () => {
 
   // 산책 시작 함수
   const handleWalkingStart = async () => {
-    if (!isUserLocationError && selectedPets.length > 0) {
+    if (userLocation && !isUserLocationError && selectedPets.length > 0) {
       const walkData = JSON.stringify({
-        lat: userLocation.latitude.toString(),
-        lon: userLocation.longitude.toString(),
+        lat: userLocation.lat.toString(),
+        lon: userLocation.lon.toString(),
         dogIds: selectedPets,
       });
 
@@ -74,7 +75,7 @@ const HomeScreen: React.FC = () => {
       setWalkingStart(true);
       setStartExplorate(await startWalk(walkData));
       navigation.navigate(mapNavigations.WALKING);
-    } else if (isUserLocationError) {
+    } else if (!userLocation && isUserLocationError) {
       Alert.alert('Error', '위치 권한을 허용해주세요');
     } else {
       Alert.alert('Error', '반려견을 선택해주세요');

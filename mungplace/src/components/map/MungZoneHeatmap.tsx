@@ -3,11 +3,11 @@ import { Marker, Circle } from 'react-native-maps';
 
 import { ToMungZone } from '@/types';
 import { useMapStore } from '@/state/useMapStore';
-import useUserLocation from '@/hooks/useUserLocation';
-import useWebsocketActions from '@/hooks/useWebsocketActions';
+import { useUserStore } from '@/state/useUserStore';
 
 type MungZoneHeatmapProps = {
   mungZone: Array<{ geohash: string }> | null;
+  checkMungPlace: (allUserZone: ToMungZone) => void;
 };
 
 type GeoZoneMarkerProps = {
@@ -28,17 +28,15 @@ const GeoZoneMarker = ({ lat, lon, geohash }: GeoZoneMarkerProps) => (
   </React.Fragment>
 );
 
-const MungZoneHeatmap = ({ mungZone }: MungZoneHeatmapProps) => {
-  const { userLocation } = useUserLocation();
-  const { checkMungPlace } = useWebsocketActions();
+const MungZoneHeatmap = ({ mungZone, checkMungPlace }: MungZoneHeatmapProps) => {
+  const userLocation = useUserStore((state) => state.userLocation);
   const getGeohashCenter = useMapStore((state) => state.getGeohashCenter);
 
   // 사용자 위치 변경 시 블루존 요청
   useEffect(() => {
     if (!userLocation) return;
 
-    const { latitude: lat, longitude: lon } = userLocation;
-    const zoneData: ToMungZone = { point: { lat, lon } };
+    const zoneData: ToMungZone = { point: { lat: userLocation.lat, lon: userLocation.lon } };
     checkMungPlace(zoneData);
   }, [userLocation, checkMungPlace]);
 

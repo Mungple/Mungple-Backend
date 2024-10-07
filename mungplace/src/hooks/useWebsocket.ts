@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 
 import { getAccessToken } from '@/api';
 import { useAppStore } from '@/state/useAppStore';
-import { FromZone } from '@/types';
+import { Distance, FromZone } from '@/types';
 
 export interface ErrorMessage {
   errorCode: string;
@@ -43,8 +43,7 @@ const useWebSocket = (explorationId: number = -1) => {
           onConnect: () => {
             setClientSocket(socket);
             subscribeToTopics(socket, explorationId);
-            console.log(explorationId);
-            console.log('useWebSocket >>> 소켓 연결 성공');
+            console.log('useWebSocket >>> 소켓 연결 성공 | explorationId =', explorationId);
           },
           onStompError: (frame) => {
             console.error('useWebSocket >>> 소켓 연결 에러 발생:', frame.headers['message']);
@@ -71,8 +70,8 @@ const useWebSocket = (explorationId: number = -1) => {
 
   const subscribeToTopics = (socket: Client, explorationId: number) => {
     // 에러 메시지 수신
-    socket.subscribe('/user/sub/errors', () => {
-      console.error('useWebSocket >>> Error message received');
+    socket.subscribe('/user/sub/errors', (message) => {
+      console.error('useWebSocket >>> Error message received', message);
     });
 
     // 산책 기록 위치 수집
@@ -114,7 +113,6 @@ const useWebSocket = (explorationId: number = -1) => {
     // 멍플 조회
     socket.subscribe('/user/sub/mungplace', (message) => {
       try {
-        console.log('mungplace', message.body);
         const parsedMessage = JSON.parse(message.body) as Array<{ geohash: string }>;
         setMungZone(parsedMessage);
       } catch (e) {
@@ -124,10 +122,8 @@ const useWebSocket = (explorationId: number = -1) => {
     // 산책 거리 조회
     socket.subscribe('/user/sub/explorations/distance', (message) => {
       try {
-        console.log('useWebSocket >>> distance', message.body);
-        const parsedMessage = JSON.parse(message.body) as number;
-        console.log(parsedMessage);
-        setDistance(parsedMessage);
+        const parsedMessage = JSON.parse(message.body) as Distance;
+        setDistance(parsedMessage.distance);
       } catch (e) {
         console.error('useWebSocket for distance >>>', e);
       }

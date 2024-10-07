@@ -9,7 +9,7 @@ import { getMonthYearDetails, getNewMonthYear } from '@/utils/date';
 import { RecordStackParamList } from '@/navigations/stack/RecordStackNavigator';
 import Calendar from '@/components/record/Calendar';
 import MonthStatistics from '@/components/record/MonthStatistics';
-import { Point } from '@/types/walkData';
+import { Point } from '@/types';
 
 // 월간 산책 목록 인터페이스
 interface ExplorationInfo {
