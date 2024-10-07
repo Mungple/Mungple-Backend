@@ -41,11 +41,17 @@ interface Distance {
   distance: number;
 }
 
+interface Location {
+  lat: number;
+  lon: number;
+}
+
 export type {
+  Location,
+  Distance,
+  UserProfile,
   Exploration,
+  StartExplorate,
   RequestPetProfile,
   ResponsePetProfile,
-  StartExplorate,
-  UserProfile,
-  Distance,
 };

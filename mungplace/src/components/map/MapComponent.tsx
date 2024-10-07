@@ -1,7 +1,7 @@
 // 1. 라이브러리 및 네이티브 기능
 import styled from 'styled-components/native';
+import { Animated, Image as RNImage } from 'react-native';
 import ClusteredMapView from 'react-native-map-clustering';
-import { Animated, StyleSheet, Image } from 'react-native';
 import React, { useEffect, useRef, useState } from 'react';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -33,6 +33,7 @@ import useMarkersWithinRadius from '@/hooks/useMarkersWithinRadius';
 // 6. 상태 관리 및 데이터
 import { ToMungZone, ToZone } from '@/types';
 import { fetchWithPetPlace } from '@/api/map';
+import { useUserStore } from '@/state/useUserStore';
 import { colors, mapNavigations } from '@/constants';
 import { useMapStore, MarkerData } from '@/state/useMapStore';
 
@@ -41,7 +42,6 @@ import { MapStackParamList } from '@/navigations/stack/MapStackNavigator';
 
 // 컴포넌트에 전달되는 props 정의
 interface MapComponentProps {
-  userLocation: { latitude: number; longitude: number };
   path?: { latitude: number; longitude: number }[];
   bottomOffset?: number;
   markers?: MarkerData[]; // 마커 생성 용
@@ -55,7 +55,6 @@ interface MapComponentProps {
 
 // ========== Main Functional Component ==========
 const MapComponent: React.FC<MapComponentProps> = ({
-  userLocation,
   bottomOffset = 0,
   path = [],
   explorationId = -1,
@@ -72,6 +71,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
   const [isDisabled, setIsDisabled] = useState(true);
   const [formVisible, setFormVisible] = useState(false);
   const [isMenuVisible, setIsMenuVisible] = useState(false);
+  const { lat, lon } = useUserStore((state) => state.userLocation);
   const petFacilities = useMapStore((state) => state.petFacilities);
   const [isSettingModalVisible, setIsSettingModalVisible] = useState(false);
   const [visibleElements, setVisibleElements] = useState({
@@ -136,8 +136,8 @@ const MapComponent: React.FC<MapComponentProps> = ({
   const handlePressUserLocation = () => {
     if (!isUserLocationError) {
       mapRef.current?.animateToRegion({
-        latitude: userLocation.latitude,
-        longitude: userLocation.longitude,
+        latitude: lat,
+        longitude: lon,
         latitudeDelta: 0.0922,
         longitudeDelta: 0.0421,
       });
@@ -220,16 +220,15 @@ const MapComponent: React.FC<MapComponentProps> = ({
   );
 
   useEffect(() => {
-    const { latitude, longitude } = userLocation;
     const getPetFacilities = async () => {
-      if (latitude && longitude) {
-        const petFacilities = await fetchWithPetPlace(latitude, longitude);
+      if (lat && lon) {
+        const petFacilities = await fetchWithPetPlace(lat, lon);
         const facilityPoints = petFacilities.facilityPoints;
         setPetFacilities(facilityPoints);
       }
     };
     getPetFacilities();
-  }, [userLocation]);
+  }, [lat, lon]);
 
   // ========== UI Rendering ==========
   return (
@@ -241,8 +240,8 @@ const MapComponent: React.FC<MapComponentProps> = ({
         followsUserLocation
         showsMyLocationButton={false}
         initialRegion={{
-          latitude: userLocation.latitude,
-          longitude: userLocation.longitude,
+          latitude: lat,
+          longitude: lon,
           latitudeDelta: 0.0922,
           longitudeDelta: 0.0421,
         }}
@@ -263,7 +262,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
                   longitude: marker.lon,
                 }}
                 onPress={() => handleMarkerClick(marker.markerId)}>
-                <Image source={blueMarker} style={styles.markerImage} />
+                <MarkerImage source={blueMarker} />
               </Marker>
             ))}
 
@@ -279,7 +278,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
                   longitude: marker.lon,
                 }}
                 onPress={() => handleMarkerClick(marker.markerId)}>
-                <Image source={redMarker} style={styles.markerImage} />
+                <MarkerImage source={redMarker} />
               </Marker>
             ))}
 
@@ -318,7 +317,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
                 longitude: facility.point.lon,
               }}
               onPress={() => handleFacilityMarkerPress(facility.id)}>
-              <Image source={doghouse} style={styles.markerImage} />
+              <MarkerImage source={doghouse} />
             </Marker>
           ))}
       </ClusteredMapView>
@@ -349,8 +348,8 @@ const MapComponent: React.FC<MapComponentProps> = ({
           isVisible={formVisible}
           onSubmit={handleMarkerSubmit}
           onClose={() => setFormVisible(false)}
-          latitude={userLocation.latitude}
-          longitude={userLocation.longitude}
+          latitude={lat}
+          longitude={lon}
         />
         <ButtonWithTextContainer top={120} right={20}>
           <TextLabel>지도 설정</TextLabel>
@@ -387,36 +386,13 @@ const MapComponent: React.FC<MapComponentProps> = ({
   );
 };
 
-const styles = StyleSheet.create({
-  markerImage: {
-    width: 30,
-    height: 30,
-  },
-  markerImageLarge: {
-    width: 100,
-    height: 100,
-    resizeMode: 'contain',
-  },
-  modalContainer: {
-    flex: 1,
-    padding: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0,5)',
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  listItem: {
-    padding: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
-  },
-});
-
 const Container = styled.View`
   flex: 1;
+`;
+
+const MarkerImage = styled(RNImage)`
+  width: 30px;
+  height: 30px;
 `;
 
 const ButtonWithTextContainer = styled.View<{ top?: number; right?: number }>`

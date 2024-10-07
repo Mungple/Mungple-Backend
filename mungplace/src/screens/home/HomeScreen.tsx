@@ -39,12 +39,13 @@ const HomeScreen: React.FC = () => {
   const { useGetPet } = usePet();
   const { data: petData } = useGetPet(userId);
   const defaultPet = petData?.find((pet) => pet.isDefault === true);
-  const { userLocation, isUserLocationError } = useUserLocation();
   const age = defaultPet ? calculateAge(defaultPet.birth) : undefined;
 
   // 산책
+  const { isUserLocationError } = useUserLocation();
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedPets, setSelectedPets] = useState<number[]>([]);
+  const userLocation = useUserStore((state) => state.userLocation);
   const setWalkingStart = useAppStore((state) => state.setWalkingStart);
   const setStartExplorate = useAppStore((state) => state.setStartExplorate);
   const navigation = useNavigation<NativeStackNavigationProp<MapStackParamList>>();
@@ -65,8 +66,8 @@ const HomeScreen: React.FC = () => {
   const handleWalkingStart = async () => {
     if (!isUserLocationError && selectedPets.length > 0) {
       const walkData = JSON.stringify({
-        lat: userLocation.latitude.toString(),
-        lon: userLocation.longitude.toString(),
+        lat: userLocation.lat.toString(),
+        lon: userLocation.lon.toString(),
         dogIds: selectedPets,
       });
 
