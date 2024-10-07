@@ -116,12 +116,19 @@ public class ExplorationService {
 		String userId = principal.getName();
 		eventRequest.setUserId(Long.parseLong(userId));
 
+		log.info("산책 검증 시작");
 		explorationReader.isValidExploration(explorationId);
-		explorationRecorder.recordExploration(userId, eventRequest.getLat(), eventRequest.getLon());
+		log.info("산책 검증 완료");
 
+		log.info("산책 기록 시작");
+		explorationRecorder.recordExploration(userId, eventRequest.getLat(), eventRequest.getLon());
+		log.info("산책 기록 종료");
+
+		log.info("산책 이벤트 발행");
 		ExplorationPayload payload = explorationHelper.createExplorationEventPayload(eventRequest);
 		ExplorationEvent event = ExplorationEvent.of(eventRequest, explorationId, payload);
 		producer.sendExplorationEvent(event);
+		log.info("산책 이벤트 발행 성공");
 	}
 
 	private void publishEvent(ExplorationStartWithDogsRequest request, Long userId, Exploration exploration) {

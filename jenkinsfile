@@ -14,7 +14,7 @@ pipeline {
     stages {
         stage('Clone') {
             steps {
-                git branch: 'backend', credentialsId: 'mungplace', url: 'https://lab.ssafy.com/s11-bigdata-dist-sub1/S11P21E106'
+                git branch: 'BE-refactor#100', credentialsId: 'mungplace', url: 'https://lab.ssafy.com/s11-bigdata-dist-sub1/S11P21E106'
             }
         }
 
