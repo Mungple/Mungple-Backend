@@ -76,7 +76,7 @@ public class ExplorationRecorder {
 		redisTemplate.opsForValue().setIfPresent(getTotalDistanceKey(userId), "0", 1, TimeUnit.MILLISECONDS);
 
 		String[] userLatLon = redisTemplate.opsForValue().get(getPrePointKey(userId)).split(",");
-		decreaseGeoHashUserCount(Point.toMungpleGeoHash(userLatLon[0], userLatLon[1]));
+		decreaseGeoHashUserCount(Point.toMungpleGeoHash(userLatLon[0], userLatLon[1]), userId);
 		
 		deleteAllValue(userId);
 	}
@@ -227,15 +227,11 @@ public class ExplorationRecorder {
 		return "mungple:" + geoHash;
 	}
 
-	private void decreaseGeoHashUserCount(String geoHash) {
-		if(redisTemplate.opsForValue().get(getGeoHashUserCountKey(geoHash)) == null) return;
+	private void decreaseGeoHashUserCount(String geoHash, String userId) {
+		redisTemplate.opsForSet().remove(getGeoHashUserCountKey(geoHash), userId);
 
-		Long decrement = redisTemplate.opsForValue().decrement(getGeoHashUserCountKey(geoHash), 1);
-
-		if(decrement < 1) {
-			redisTemplate.opsForValue().set(getGeoHashUserCountKey(geoHash), "none", 1, TimeUnit.MILLISECONDS);
-		}
-		else if(MUNGPLE_THRESHOLD - 1 == decrement) {
+		Long userCount = redisTemplate.opsForSet().size(getGeoHashUserCountKey(geoHash));
+		if (userCount == null || userCount < MUNGPLE_THRESHOLD) {
 			redisTemplate.delete(getMungpleKey(geoHash));
 		}
 	}

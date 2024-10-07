@@ -60,19 +60,18 @@ public class MungpleConsumer {
 		String previousGeoHash = redisTemplate.opsForValue().get(getUserGeoHashKey(userId));
 
 		if (previousGeoHash == null) {
-			increaseGeoHashUserCount(currentGeoHash);
+			addUserToGeoHashSet(currentGeoHash, userId);
 			setMungplace(null, currentGeoHash);  // 처음에는 이전 위치가 없으므로 null 처리
-		} else if(previousGeoHash != null) {
+		} else if (previousGeoHash != null) {
 			if (!previousGeoHash.equals(currentGeoHash)) {
-				decreaseGeoHashUserCount(previousGeoHash);
-				increaseGeoHashUserCount(currentGeoHash);
+				removeUserFromGeoHashSet(previousGeoHash, userId);
+				addUserToGeoHashSet(currentGeoHash, userId);
 				setMungplace(previousGeoHash, currentGeoHash);
 			}
 		}
 
 		redisTemplate.opsForValue().set(getUserGeoHashKey(userId), currentGeoHash, 10, TimeUnit.MINUTES);
 
-		printAllGeoHashUserCounts();
 		ack.acknowledge();
 	}
 
@@ -86,19 +85,12 @@ public class MungpleConsumer {
 			return;
 		}
 
-		String previousUserCountStr = redisTemplate.opsForValue().get(getGeoHashKey(previousGeoHash));
+		Set<String> previousGeoHashUsers = redisTemplate.opsForSet().members(getGeoHashKey(previousGeoHash));
 
-		if (previousUserCountStr == null) {
+		if (previousGeoHashUsers == null || previousGeoHashUsers.size() >= MUNGPLE_THRESHOLD) {
 			return;
 		}
 
-		int previousUserCount = Integer.parseInt(previousUserCountStr);
-
-		if (previousUserCount >= MUNGPLE_THRESHOLD) {
-			return;
-		}
-
-		// 멍플이 생성된 상태라면 제거
 		if (isMungpleCreated(previousGeoHash)) {
 			removeMungple(previousGeoHash);
 			log.info("Mungple removed for GeoHash: {}", previousGeoHash);
@@ -106,16 +98,9 @@ public class MungpleConsumer {
 	}
 
 	private void createMungpleIfNeeded(String currentGeoHash) {
-		// 유저수 가지고 오기
-		String currentUserCountStr = redisTemplate.opsForValue().get(getGeoHashKey(currentGeoHash));
+		Set<String> currentGeoHashUsers = redisTemplate.opsForSet().members(getGeoHashKey(currentGeoHash));
 
-		if (currentUserCountStr == null) {
-			return;
-		}
-
-		int currentUserCount = Integer.parseInt(currentUserCountStr);
-
-		if (currentUserCount < MUNGPLE_THRESHOLD) {
+		if (currentGeoHashUsers == null || currentGeoHashUsers.size() < MUNGPLE_THRESHOLD) {
 			return;
 		}
 
@@ -137,12 +122,12 @@ public class MungpleConsumer {
 		return "geohash:" + geoHash;
 	}
 
-	private void increaseGeoHashUserCount(String geoHash) {
-		redisTemplate.opsForValue().increment(getGeoHashKey(geoHash), 1);
+	private void addUserToGeoHashSet(String geoHash, String userId) {
+		redisTemplate.opsForSet().add(getGeoHashKey(geoHash), userId);
 	}
 
-	private void decreaseGeoHashUserCount(String geoHash) {
-		redisTemplate.opsForValue().decrement(getGeoHashKey(geoHash), 1);
+	private void removeUserFromGeoHashSet(String geoHash, String userId) {
+		redisTemplate.opsForSet().remove(getGeoHashKey(geoHash), userId);
 	}
 
 	private boolean isMungpleCreated(String geoHash) {
@@ -162,7 +147,7 @@ public class MungpleConsumer {
 		Set<String> geoHashKeys = redisTemplate.keys("geohash:*");
 		if (geoHashKeys != null && !geoHashKeys.isEmpty()) {
 			for (String geoHashKey : geoHashKeys) {
-				String userCount = redisTemplate.opsForValue().get(geoHashKey);
+				Long userCount = redisTemplate.opsForSet().size(geoHashKey);
 				log.info("GeoHash: {}, User Count: {}", geoHashKey, userCount);
 			}
 		} else {
