@@ -21,7 +21,7 @@ const MyBlueZoneHeatmap = ({ myBlueZone, checkMyBlueZone }: MyBlueZoneHeatmapPro
 
       // 반경 1000미터 내 블루존 요청
       const zoneData: ToZone = {
-        side: 1000,
+        side: 500,
         point: { lat: centerLat, lon: centerLon },
       };
       checkMyBlueZone(zoneData);
