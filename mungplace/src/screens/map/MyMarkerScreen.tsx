@@ -8,12 +8,13 @@ import { mapNavigations } from '@/constants';
 import { useUserStore } from '@/state/useUserStore';
 
 const MyMar = () => {
-  const { markers, fetchMyMarkers, loading } = useMyMarkers();
+  const { myMarkers, fetchMyMarkers, loading } = useMyMarkers();
   const navigation = useNavigation<NativeStackNavigationProp<MapStackParamList>>()
-  const userNickname = useUserStore((state) => state.userData.nickname)
+  const userLocation = useUserStore((state) => state.userLocation);
+
   useEffect(() => {
     fetchMyMarkers(); // 페이지 로딩 시 내 마커 데이터를 불러옴
-  }, []);
+  }, [userLocation]);
 
   // 각 마커를 클릭했을 때 상세 페이지로 이동하는 핸들러
   const handleMarkerPress = (markerId: string) => {
@@ -28,13 +29,12 @@ const MyMar = () => {
     <View style={styles.container}>
       <Text style={styles.title}>내 마커 리스트</Text>
       <FlatList
-        data={markers}
+        data={myMarkers}
         keyExtractor={(item) => item.markerId}
         renderItem={({ item }) => (
           <TouchableOpacity onPress={() => handleMarkerPress(item.markerId)} style={styles.markerItem}>
             <View>
               <Text style={styles.markerTitle}>{item.title}</Text>
-              <Text style={styles.markerTitle}>{userNickname}</Text>
             </View>
           </TouchableOpacity>
         )}
@@ -64,9 +64,10 @@ const styles = StyleSheet.create({
   },
   listContainer: {
     paddingBottom: 16,
+
   },
   markerItem: {
-    backgroundColor: '#fff',
+    backgroundColor: '#eaeaea',
     padding: 16,
     borderRadius: 8,
     marginVertical: 8,
