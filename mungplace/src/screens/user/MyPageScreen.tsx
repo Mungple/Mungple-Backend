@@ -14,6 +14,7 @@ import CustomModal from '@/components/common/CustomModal';
 import CustomText from '@/components/common/CustomText';
 import CustomModalHeader from '@/components/common/CustomModalHeader';
 import { SettingStackParamList } from '@/navigations/stack/SettingStackNavigator';
+import usePet from '@/hooks/queries/usePet';
 
 export type MyPageScreenProps = NativeStackScreenProps<
   SettingStackParamList,
@@ -21,9 +22,11 @@ export type MyPageScreenProps = NativeStackScreenProps<
 >;
 
 const MyPageScreen: React.FC<MyPageScreenProps> = ({ navigation }) => {
+  const { useGetPet } = usePet();
   const userId = useUserStore((state) => state.userId);
+  const { data: petData } = useGetPet(userId);
   const userData = useUserStore((state) => state.userData);
-  const defalutDogName = useUserStore((state) => state.petData[0].name);
+  const defaultPet = petData?.find((pet) => pet.isDefault === true);
   const setUserData = useUserStore((state) => state.setUserData);
   const [modalVisible, setModalVisible] = useState(false);
   const { useGetProfile } = useAuth();
@@ -53,7 +56,7 @@ const MyPageScreen: React.FC<MyPageScreenProps> = ({ navigation }) => {
           <CustomText fontWeight="bold" fontSize={18}>
             {userData.nickname}
           </CustomText>
-          <CustomText color={colors.GRAY_200}>대표 반려견 | {defalutDogName}</CustomText>
+          <CustomText color={colors.GRAY_200}>대표 반려견 | {defaultPet?.name}</CustomText>
         </Context>
       </ProfileCard>
       {/* 반려견 목록 */}
