@@ -10,6 +10,7 @@ const authNavigations = {
   SOCIAL_LOGIN: 'SocialLogin',
   POST_PROFILE: 'PostProfile',
   POST_PROFILE_PET: 'InputPet',
+  SPLASH: 'SplashScreen',
 } as const;
 
 const mapNavigations = {

@@ -1,12 +1,12 @@
 import React from 'react';
+import { TouchableOpacity } from 'react-native';
 import { NavigatorScreenParams, RouteProp } from '@react-navigation/native';
-import { colors, mainNavigations } from '@/constants';
-import Ionicons from 'react-native-vector-icons/Ionicons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-
-import MapScreen from '@/screens/map/MapScreen';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import { colors, mainNavigations } from '@/constants';
 import HomeScreen from '@/screens/home/HomeScreen';
 import SettingStackNavigator, { SettingStackParamList } from '../stack/SettingStackNavigator';
+import MapScreen from '@/screens/map/MapScreen';
 import RecordStackNavigator from '../stack/RecordStackNavigator';
 
 type MainTabParamList = {
@@ -62,7 +62,10 @@ const MainTabNavigator = () => {
         },
         tabBarLabelStyle: {
           fontSize: 12,
-          fontWeight: 'bold',
+          fontFamily: 'OTLaundryGothicB',
+        },
+        tabBarButton(props) {
+          return <TouchableOpacity {...props} />;
         },
         headerShown: false,
         tabBarIcon: ({ focused }) => TabBarIcons(route, focused),

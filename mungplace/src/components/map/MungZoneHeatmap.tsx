@@ -1,74 +1,57 @@
 import React, { useEffect } from 'react';
 import { Marker, Circle } from 'react-native-maps';
-import useUserLocation from '@/hooks/useUserLocation';
-import  useWebsocketActions  from '@/hooks/useWebsocketActions'
-import useWebSocket from '@/hooks/useWebsocket';
+
+import { ToMungZone } from '@/types';
 import { useMapStore } from '@/state/useMapStore';
+import { useUserStore } from '@/state/useUserStore';
 
+type MungZoneHeatmapProps = {
+  mungZone: Array<{ geohash: string }> | null;
+  checkMungPlace: (allUserZone: ToMungZone) => void;
+};
 
-interface MungZone {
-  point: {
-    lat: number;
-    lon: number;
-  };
-}
+type GeoZoneMarkerProps = {
+  lat: number;
+  lon: number;
+  geohash: string;
+};
 
-const MungZoneHeatmap = () => {
-  const { userLocation } = useUserLocation(); // 사용자 위치 가져오기
-  const getGeohashCenter = useMapStore(state => state.getGeohashCenter)
-  const { checkMungPlace } = useWebsocketActions()
+const GeoZoneMarker = ({ lat, lon, geohash }: GeoZoneMarkerProps) => (
+  <React.Fragment key={geohash}>
+    <Circle
+      center={{ latitude: lat, longitude: lon }}
+      radius={75}
+      fillColor="rgba(0, 0, 255, 0.5)"
+      strokeColor="rgba(0, 0, 255, 1)"
+    />
+    <Marker coordinate={{ latitude: lat, longitude: lon }} pinColor="blue" />
+  </React.Fragment>
+);
 
+const MungZoneHeatmap = ({ mungZone, checkMungPlace }: MungZoneHeatmapProps) => {
+  const userLocation = useUserStore((state) => state.userLocation);
+  const getGeohashCenter = useMapStore((state) => state.getGeohashCenter);
 
   // 사용자 위치 변경 시 블루존 요청
   useEffect(() => {
-    if (userLocation) {
-      const centerLat = userLocation.latitude;
-      const centerLon = userLocation.longitude;
+    if (!userLocation) return;
 
-      const zoneData: MungZone = {
-        point: { lat: centerLat, lon: centerLon },
-      };
-      checkMungPlace(zoneData);
-    }
+    const zoneData: ToMungZone = { point: { lat: userLocation.lat, lon: userLocation.lon } };
+    checkMungPlace(zoneData);
   }, [userLocation, checkMungPlace]);
-  
-  const { mungZone } = useWebSocket()
-  // console.log("멍존 입니다", mungZone)
+
+  if (!mungZone) return null;
+
   return (
     <>
-      {/* 멍존 렌더링 */}
-      {mungZone && (
-        <>
-          {mungZone.map((zone: { geohash: string }) => {
-            // geohash를 통해 geohashCenter 얻기
-            const geohashCenter = getGeohashCenter(zone.geohash);
-            if (!geohashCenter) return null; // geohashCenter가 없으면 아무것도 렌더링하지 않음
+      {mungZone.map(({ geohash }) => {
+        const geohashCenter = getGeohashCenter(geohash);
+        if (!geohashCenter) return null;
 
-            return (
-              <React.Fragment key={zone.geohash}>
-                {/* 투명한 파란 원 렌더링 */}
-                <Circle
-                  center={{
-                    latitude: geohashCenter.lat,
-                    longitude: geohashCenter.lon,
-                  }}
-                  radius={75} // 반지름 75m
-                  fillColor="rgba(0, 0, 255, 0.5)" // 파란색 투명
-                  strokeColor="rgba(0, 0, 255, 1)" // 경계선 색상
-                />
-                {/* 중앙에 마커 추가 */}
-                <Marker
-                  coordinate={{
-                    latitude: geohashCenter.lat,
-                    longitude: geohashCenter.lon,
-                  }}
-                  pinColor="blue" // 마커 색상
-                />
-              </React.Fragment>
-            );
-          })}
-        </>
-      )}
+        const { lat, lon } = geohashCenter;
+
+        return <GeoZoneMarker key={geohash} lat={lat} lon={lon} geohash={geohash} />;
+      })}
     </>
   );
 };

@@ -1,7 +1,6 @@
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import React, { useEffect, useState } from 'react';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Dimensions, Image as RNImage, Text } from 'react-native';
-import IonIcons from 'react-native-vector-icons/Ionicons';
 import styled from 'styled-components/native';
 
 import useAuth from '@/hooks/queries/useAuth';
@@ -12,7 +11,6 @@ import DefaultImage from '@/assets/profile-image.png';
 import { colors, settingNavigations } from '@/constants';
 import CustomCard from '@/components/common/CustomCard';
 import CustomModal from '@/components/common/CustomModal';
-import CustomHeader from '@/components/common/CustomHeader';
 import CustomModalHeader from '@/components/common/CustomModalHeader';
 import { SettingStackParamList } from '@/navigations/stack/SettingStackNavigator';
 
@@ -37,26 +35,12 @@ const MyPageScreen: React.FC<MyPageScreenProps> = ({ navigation }) => {
     }
   }, [data]);
 
-  const handleSettingPress = () => {
-    navigation.navigate(settingNavigations.SETTING);
-  };
-
   const handleAddPet = () => {
     setModalVisible((prev) => !prev);
   };
 
   return (
     <Container>
-      {/* 프로필 영역 */}
-      <CustomHeader title="내 정보">
-        <IonIcons
-          name={'settings-outline'}
-          size={32}
-          color={colors.BLACK}
-          onPress={handleSettingPress}
-        />
-      </CustomHeader>
-
       <ProfileCard>
         <Image
           source={

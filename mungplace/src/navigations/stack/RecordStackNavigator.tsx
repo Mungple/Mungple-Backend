@@ -22,7 +22,10 @@ const RecordStack = createNativeStackNavigator<RecordStackParamList>();
 
 const RecordStackNavigator = () => {
   return (
-    <RecordStack.Navigator>
+    <RecordStack.Navigator
+      screenOptions={{
+        headerTitleStyle: { fontFamily: 'OTLaundryGothicB', fontSize: 24 },
+      }}>
       <RecordStack.Screen
         name="RecordScreen"
         component={RecordScreen}

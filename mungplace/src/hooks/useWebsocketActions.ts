@@ -1,43 +1,25 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
+
 import { useAppStore } from '@/state/useAppStore';
-
-interface ToZone {
-  side: number;
-  point: {
-    lat: number;
-    lon: number;
-  };
-}
-
-interface MungZone {
-  point: {
-    lat: number;
-    lon: number;
-  };
-}
-
-interface ToLocation {
-  lat: number;
-  lon: number;
-  recordedAt: string;
-}
+import { ToLocation, ToMungZone, ToZone } from '@/types';
 
 const useWebSocketActions = () => {
   const { clientSocket } = useAppStore((state) => state);
 
+  useEffect(() => {
+    if (!clientSocket || !clientSocket.connected) {
+      console.log('WebSocket이 아직 초기화되지 않았습니다. 기다리는 중...');
+    }
+  }, [clientSocket]);
+
   const sendLocation = (explorationId: number, location: ToLocation) => {
-    if (clientSocket && clientSocket.connected) {
-      try {
-        clientSocket.publish({
-          destination: `/user/pub/explorations/${explorationId}`,
-          body: JSON.stringify(location),
-        });
-        console.log('useWebSocketActions >>> 데이터 전송 완료');
-      } catch (e) {
-        console.error('useWebSocketActions >>> 데이터 전송 실패', e);
-      }
+    if (clientSocket?.connected) {
+      clientSocket.publish({
+        destination: `/pub/explorations/${explorationId}`,
+        body: JSON.stringify(location),
+      });
     } else {
-      console.error('useWebSocketActions >>> 소켓 연결 끊김');
+      console.error('sendLocation 소켓 연결이 되어있지 않습니다.');
     }
   };
 
@@ -71,7 +53,7 @@ const useWebSocketActions = () => {
   );
 
   const checkMungPlace = useCallback(
-    (allUserZone: MungZone) => {
+    (allUserZone: ToMungZone) => {
       if (clientSocket?.connected) {
         clientSocket.publish({
           destination: '/user/pub/mungplace',

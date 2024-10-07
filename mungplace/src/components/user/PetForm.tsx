@@ -12,7 +12,6 @@ import { useNavigation } from '@react-navigation/native';
 import RadioButtonGroup from '../common/RadioButtonGroup';
 import CustomButton from '@/components/common/CustomButton';
 import CustomInputField from '@/components/common/CustomInputField';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
 type PetFormProps = {
   petData?: ResponsePetProfile;
@@ -67,43 +66,41 @@ const PetForm = ({ setModalVisible, petData }: PetFormProps) => {
 
   return (
     <Container>
-      <KeyboardAwareScrollView>
-        {petData && <ImagePicker petData={petData} onPress={handlePressImage} />}
+      {petData && <ImagePicker petData={petData} onPress={handlePressImage} />}
 
-        <InputContainer>
-          <CustomInputField
-            placeholder="반려견 이름"
-            error={inputUser.errors.petName}
-            touched={inputUser.touched.petName}
-            {...inputUser.getTextInputProps('petName')}
-          />
-          <CustomInputField
-            placeholder="생년월일 (yyyy-mm-dd)"
-            error={inputUser.errors.petBirth}
-            touched={inputUser.touched.petBirth}
-            {...inputUser.getTextInputProps('petBirth')}
-          />
-          <CustomInputField
-            placeholder="몸무게"
-            error={inputUser.errors.petWeight}
-            touched={inputUser.touched.petWeight}
-            inputMode="numeric"
-            keyboardType="number-pad"
-            {...inputUser.getTextInputProps('petWeight')}
-          />
-          <RadioButtonGroup selected={inputUser.values.petGender} onSelected={handleRadioChange}>
-            {[
-              { label: '남아', key: 'MALE' },
-              { label: '여아', key: 'FEMALE' },
-            ].map((radio) => (
-              <RadioButtonGroup.RadioButtonItem key={radio.key} value={radio.key}>
-                <Text>{radio.label}</Text>
-              </RadioButtonGroup.RadioButtonItem>
-            ))}
-          </RadioButtonGroup>
-          <CustomButton label={`${petData ? '변경' : '등록'} 완료`} onPress={handleSubmit} />
-        </InputContainer>
-      </KeyboardAwareScrollView>
+      <InputContainer>
+        <CustomInputField
+          placeholder="반려견 이름"
+          error={inputUser.errors.petName}
+          touched={inputUser.touched.petName}
+          {...inputUser.getTextInputProps('petName')}
+        />
+        <CustomInputField
+          placeholder="생년월일 (yyyy-mm-dd)"
+          error={inputUser.errors.petBirth}
+          touched={inputUser.touched.petBirth}
+          {...inputUser.getTextInputProps('petBirth')}
+        />
+        <CustomInputField
+          placeholder="몸무게"
+          error={inputUser.errors.petWeight}
+          touched={inputUser.touched.petWeight}
+          inputMode="numeric"
+          keyboardType="number-pad"
+          {...inputUser.getTextInputProps('petWeight')}
+        />
+        <RadioButtonGroup selected={inputUser.values.petGender} onSelected={handleRadioChange}>
+          {[
+            { label: '남아', key: 'MALE' },
+            { label: '여아', key: 'FEMALE' },
+          ].map((radio) => (
+            <RadioButtonGroup.RadioButtonItem key={radio.key} value={radio.key}>
+              <Text>{radio.label}</Text>
+            </RadioButtonGroup.RadioButtonItem>
+          ))}
+        </RadioButtonGroup>
+        <CustomButton label={`${petData ? '변경' : '등록'} 완료`} onPress={handleSubmit} />
+      </InputContainer>
     </Container>
   );
 };

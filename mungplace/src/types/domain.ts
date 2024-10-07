@@ -1,9 +1,3 @@
-// 이미지 URI를 나타내는 타입 정의
-interface ImageUri {
-  id?: number;
-  uri: string;
-}
-
 // 사용자 프로필 정보를 정의한 타입
 interface UserProfile {
   userId: number;
@@ -43,11 +37,21 @@ interface Exploration {
   endAt: string;
 }
 
+interface Distance {
+  distance: number;
+}
+
+interface Location {
+  lat: number;
+  lon: number;
+}
+
 export type {
+  Location,
+  Distance,
+  UserProfile,
   Exploration,
-  ImageUri,
+  StartExplorate,
   RequestPetProfile,
   ResponsePetProfile,
-  StartExplorate,
-  UserProfile,
 };

@@ -1,23 +1,35 @@
+// 1. 라이브러리 및 네이티브 기능
 import React, { useState } from 'react';
+import { Alert, Dimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
+// 2. API 호출
 import { startWalk } from '@/api/walk';
-import * as HS from './HomeScreenStyle';
-import { mapNavigations } from '@/constants';
-import { Alert, Dimensions } from 'react-native';
+
+// 3. 커스텀 컴포넌트
 import PetList from '@/components/user/PetList';
-import { useAppStore } from '@/state/useAppStore';
 import PetInfoBox from '@/components/user/PetInfoBox';
-import useUserLocation from '@/hooks/useUserLocation';
 import CustomModal from '@/components/common/CustomModal';
 import CustomButton from '@/components/common/CustomButton';
 import CustomModalHeader from '@/components/common/CustomModalHeader';
-import { MapStackParamList } from '@/navigations/stack/MapStackNavigator';
-import { useUserStore } from '@/state/useUserStore';
-import { calculateAge } from '@/hooks/usePetAge';
+
+// 4. 스타일 및 이미지
+import * as HS from './HomeScreenStyle';
 import dogMain from '@/assets/dog_main.png';
+
+// 5. 상수 및 네비게이션
+import { mapNavigations } from '@/constants';
+import { MapStackParamList } from '@/navigations/stack/MapStackNavigator';
+
+// 6. 상태 관리
+import { useAppStore } from '@/state/useAppStore';
+import { useUserStore } from '@/state/useUserStore';
+
+// 7. 훅(Hooks)
 import usePet from '@/hooks/queries/usePet';
+import { calculateAge } from '@/hooks/usePetAge';
+import useUserLocation from '@/hooks/useUserLocation';
 
 const windowHeight = Dimensions.get('window').height;
 
@@ -27,12 +39,13 @@ const HomeScreen: React.FC = () => {
   const { useGetPet } = usePet();
   const { data: petData } = useGetPet(userId);
   const defaultPet = petData?.find((pet) => pet.isDefault === true);
-  const { userLocation, isUserLocationError } = useUserLocation();
   const age = defaultPet ? calculateAge(defaultPet.birth) : undefined;
 
   // 산책
+  const { isUserLocationError } = useUserLocation();
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedPets, setSelectedPets] = useState<number[]>([]);
+  const userLocation = useUserStore((state) => state.userLocation);
   const setWalkingStart = useAppStore((state) => state.setWalkingStart);
   const setStartExplorate = useAppStore((state) => state.setStartExplorate);
   const navigation = useNavigation<NativeStackNavigationProp<MapStackParamList>>();
@@ -51,10 +64,10 @@ const HomeScreen: React.FC = () => {
 
   // 산책 시작 함수
   const handleWalkingStart = async () => {
-    if (!isUserLocationError && selectedPets.length > 0) {
+    if (userLocation && !isUserLocationError && selectedPets.length > 0) {
       const walkData = JSON.stringify({
-        lat: userLocation.latitude.toString(),
-        lon: userLocation.longitude.toString(),
+        lat: userLocation.lat.toString(),
+        lon: userLocation.lon.toString(),
         dogIds: selectedPets,
       });
 
@@ -62,7 +75,7 @@ const HomeScreen: React.FC = () => {
       setWalkingStart(true);
       setStartExplorate(await startWalk(walkData));
       navigation.navigate(mapNavigations.WALKING);
-    } else if (isUserLocationError) {
+    } else if (!userLocation && isUserLocationError) {
       Alert.alert('Error', '위치 권한을 허용해주세요');
     } else {
       Alert.alert('Error', '반려견을 선택해주세요');

@@ -1,16 +1,27 @@
 // src/state/useMapStore.ts
+import { PetFacility } from '@/types';
 import { create } from 'zustand'; // 상태 관리 store
 
 // 마커 데이터 인터페이스
 export interface MarkerData {
-  markerId: string
-  latitude: number
-  longitude: number
-  title: string
-  body: string
-  imageUri?: string // 마커에 사용될 이미지 uri도 선택적임
-  explorationId?: number // 있으면 산책임
-  type: 'BLUE' | 'RED'
+  markerId: string;
+  latitude: number;
+  longitude: number;
+  title: string;
+  body: string;
+  imageUri?: string; // 마커에 사용될 이미지 uri도 선택적임
+  explorationId?: number; // 있으면 산책임
+  type: 'BLUE' | 'RED';
+}
+
+// 내 마커 데이터 인터페이스
+export interface MyMarkerData {
+  markerId: string;
+  title: string;
+  createdAt: string;
+  markerType: "ALL"
+  latitude: number;
+  longitude: number;
 }
 
 // 마커 상세 정보 인터페이스
@@ -30,63 +41,64 @@ export interface MarkerDetails {
 
 // 주변 조회 마커 (클러스터 내에 있는 마커) 인터페이스
 export interface NearbyMarkerData {
-  markerId : string
-  userId : number
-  createdAt : string
-  type : string
+  markerId: string;
+  userId: number;
+  createdAt: string;
+  type: string;
 }
 
 // 각각의 클러스터 데이터
 export interface ClusterData {
-  geohashCenter : {
-    lat : number
-    lon : number
-  }
-  count : number
-  markers : NearbyMarkerData[]
+  geohashCenter: {
+    lat: number;
+    lon: number;
+  };
+  count: number;
+  markers: NearbyMarkerData[];
 }
 
 // 주변 조회 전체를 받아오는 데이터
 export interface NearbyMarkersData {
   markersGroupedByGeohash: {
-    [key: string]: ClusterData; 
+    [key: string]: ClusterData;
   };
 }
 
 // 맵 화면의 상태 정의
 interface MapState {
+  markers: MarkerData[]; // 마커 추가 로직
+  myMarkers: MyMarkerData[]
   showUserMarkers: boolean;
-  markers: MarkerData[] // 이게 myMarkers랑 동일함, 즉 내 마커
-  nearbyMarkers: NearbyMarkersData | null // 주변 마커, 마커랑 통합할 지 고민
-  addMarker: (marker: MarkerData) => void; // 마커 추가용 함수
-  getGeohashCenter: (hashKey: string) => { lat: number; lon: number } | null;
-  setNearbyMarkers: (clusters: NearbyMarkersData) => void // 주변 마커 설정 함수인데 수정필요할듯
-  setMarkers: (markers: MarkerData[] ) => void
+  petFacilities: PetFacility[];
+  nearbyMarkers: NearbyMarkersData | null;
+
+  toggleUserMarkers: () => void;
+  addMarker: (value: MarkerData) => void;
+  setMarkers: (value: MarkerData[]) => void;
+  setMyMarkers: (value: MyMarkerData[]) => void
+  setPetFacilities: (value: PetFacility[]) => void;
+  setNearbyMarkers: (value: NearbyMarkersData) => void;
+  getGeohashCenter: (value: string) => { lat: number; lon: number } | null;
 }
 
-
-
-export const useMapStore = create<MapState>((set) => ({
+export const useMapStore = create<MapState>((set, get) => ({
+  markers: [],
+  myMarkers: [],
+  petFacilities: [],
+  nearbyMarkers: null,
   showUserMarkers: true,
-  markers: [], // 내 마커
-  nearbyMarkers: null, // 주변 마커 (내 마커 + 다른 사용자 마커)
+
+  setMarkers: (value: MarkerData[]) => set(() => ({ markers: value })),
+  setMyMarkers: (newMarkers: MyMarkerData[]) => set((state) => ({ myMarkers: [...state.myMarkers, ...newMarkers]})),
+  setPetFacilities: (value: PetFacility[]) => set({ petFacilities: value }),
+  setNearbyMarkers: (value: NearbyMarkersData) => set({ nearbyMarkers: value }),
   toggleUserMarkers: () => set((state) => ({ showUserMarkers: !state.showUserMarkers })),
-
+  addMarker: (value: MarkerData) => set((state) => ({ markers: [...state.markers, value] })),
   getGeohashCenter: (hashKey) => {
-    const nearbyMarkers = get().nearbyMarkers; // get()을 통해 상태에 접근
-    if (!nearbyMarkers) return null; // nearbyMarkers가 null일 경우
-    const cluster = nearbyMarkers.markersGroupedByGeohash[hashKey]; 
-    return cluster ? cluster.geohashCenter : null; 
+    const { nearbyMarkers } = get();
+    if (!nearbyMarkers || !nearbyMarkers.markersGroupedByGeohash[hashKey]) {
+      return null;
+    }
+    return nearbyMarkers.markersGroupedByGeohash[hashKey].geohashCenter || null;
   },
-
-  addMarker: (marker) => set((state) => ({
-    markers: [...state.markers, marker],
-  })),
-
-  setNearbyMarkers: (clusters: NearbyMarkersData) => set(() => ({
-    nearbyMarkers : clusters,
-  })), // 주변 마커 설정
-  setMarkers: (markers: MarkerData[]) => set(() => ({
-     markers: markers
-    }))
 }));

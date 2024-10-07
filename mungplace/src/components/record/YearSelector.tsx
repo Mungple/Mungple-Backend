@@ -4,6 +4,7 @@ import styled from 'styled-components/native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { colors, numbers } from '@/constants';
 import { useUserStore } from '@/state/useUserStore';
+import CustomText from '@/components/common/CustomText';
 
 interface YearSelectorProps {
   isVisible: boolean;
@@ -45,14 +46,21 @@ const YearSelector = ({ isVisible, currentyear, onChangeYear, hide }: YearSelect
                 key={item.id}
                 onPress={() => onChangeYear(item.num)}
                 selected={currentyear === item.num}>
-                <YearText selected={currentyear === item.num}>{item.num}</YearText>
+                <CustomText
+                  fontWeight={currentyear === item.num ? 'bold' : 'regular'}
+                  fontSize={16}
+                  color={currentyear === item.num ? colors.WHITE : colors.BLACK}>
+                  {item.num}
+                </CustomText>
               </YearButton>
             )}
             keyExtractor={(item) => String(item.id)}
             numColumns={4}
           />
           <CloseButton onPress={hide}>
-            <CloseText>닫기</CloseText>
+            <CustomText fontWeight="bold" fontSize={16} style={{ marginRight: 10 }}>
+              닫기
+            </CustomText>
             <MaterialIcons name="keyboard-arrow-up" size={20} />
           </CloseButton>
         </YearsContainer>
@@ -87,12 +95,6 @@ const YearButton = styled.TouchableOpacity<{ selected: boolean }>`
   background-color: ${(props) => (props.selected ? colors.ORANGE.BASE : 'transparent')};
 `;
 
-const YearText = styled.Text<{ selected: boolean }>`
-  font-size: 16px;
-  font-weight: ${(props) => (props.selected ? '600' : '500')};
-  color: ${(props) => (props.selected ? colors.WHITE : colors.GRAY_500)};
-`;
-
 const CloseButton = styled.TouchableOpacity`
   flex-direction: row;
   align-items: center;
@@ -104,13 +106,6 @@ const CloseButton = styled.TouchableOpacity`
   border-bottom-left-radius: 10px;
   border-bottom-right-radius: 10px;
   margin-top: 15px;
-`;
-
-const CloseText = styled.Text`
-  color: ${colors.BLACK};
-  font-size: 16px;
-  font-weight: 600;
-  margin-right: 10px;
 `;
 
 const styles = StyleSheet.create({

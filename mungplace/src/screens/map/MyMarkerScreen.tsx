@@ -5,12 +5,10 @@ import { useNavigation } from '@react-navigation/native';
 import { MapStackParamList } from '@/navigations/stack/MapStackNavigator';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { mapNavigations } from '@/constants';
-import { useUserStore } from '@/state/useUserStore';
 
 const MyMar = () => {
-  const { markers, fetchMyMarkers, loading } = useMyMarkers();
+  const { myMarkers, fetchMyMarkers, loading } = useMyMarkers();
   const navigation = useNavigation<NativeStackNavigationProp<MapStackParamList>>()
-  const userNickname = useUserStore((state) => state.userData.nickname)
   useEffect(() => {
     fetchMyMarkers(); // 페이지 로딩 시 내 마커 데이터를 불러옴
   }, []);
@@ -28,13 +26,12 @@ const MyMar = () => {
     <View style={styles.container}>
       <Text style={styles.title}>내 마커 리스트</Text>
       <FlatList
-        data={markers}
+        data={myMarkers}
         keyExtractor={(item) => item.markerId}
         renderItem={({ item }) => (
           <TouchableOpacity onPress={() => handleMarkerPress(item.markerId)} style={styles.markerItem}>
             <View>
               <Text style={styles.markerTitle}>{item.title}</Text>
-              <Text style={styles.markerTitle}>{userNickname}</Text>
             </View>
           </TouchableOpacity>
         )}
@@ -64,14 +61,14 @@ const styles = StyleSheet.create({
   },
   listContainer: {
     paddingBottom: 16,
+
   },
   markerItem: {
-    backgroundColor: '#fff',
+    backgroundColor: '#eaeaea',
     padding: 16,
     borderRadius: 8,
     marginVertical: 8,
     elevation: 1, // 안드로이드 그림자 효과
-    shadowColor: '#000', // iOS 그림자 효과
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.2,
     shadowRadius: 1.41,
