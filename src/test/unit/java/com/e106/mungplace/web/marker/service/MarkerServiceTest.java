@@ -41,6 +41,7 @@ import com.e106.mungplace.web.marker.dto.MarkerCreateRequest;
 import com.e106.mungplace.web.marker.dto.MarkerPayload;
 import com.e106.mungplace.web.marker.dto.MarkerSearchRequest;
 import com.e106.mungplace.web.marker.dto.RequestMarkerType;
+import com.e106.mungplace.web.util.RequestDeduplicator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @ExtendWith(MockitoExtension.class)
@@ -51,6 +52,9 @@ class MarkerServiceTest {
 
 	@Mock
 	private MarkerWriter markerWriter;
+
+	@Mock
+	private RequestDeduplicator requestDeduplicator;
 
 	@Mock
 	private MarkerReader markerReader;

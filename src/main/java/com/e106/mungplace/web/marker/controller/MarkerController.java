@@ -23,6 +23,7 @@ import com.e106.mungplace.web.marker.dto.MarkerInfoResponse;
 import com.e106.mungplace.web.marker.dto.MarkerResponse;
 import com.e106.mungplace.web.marker.dto.MarkerSearchRequest;
 import com.e106.mungplace.web.marker.service.MarkerService;
+import com.e106.mungplace.web.util.RequestDeduplicator;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

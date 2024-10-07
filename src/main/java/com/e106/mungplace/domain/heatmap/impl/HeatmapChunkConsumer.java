@@ -33,7 +33,7 @@ public class HeatmapChunkConsumer {
 		while (System.currentTimeMillis() < endTime) {
 			HeatmapChunk chunk = redisTemplate.opsForList().leftPop(key, 500, TimeUnit.MILLISECONDS);
 			if (chunk != null) {
-				log.info("key: {}, chunk: {}", key, chunk);
+				// log.info("key: {}, chunk: {}", key, chunk);
 				messagingTemplate.convertAndSendToUser(userId.toString(), destination, chunk);
 			}
 		}
