@@ -80,6 +80,7 @@ const StyledTextInput = styled.TextInput.attrs<{ isEditable?: boolean }>((props)
   padding: 0;
   font-size: 16px;
   color: ${colors.BLACK};
+  font-family: 'OTLaundryGothicR';
   ${(props) =>
     !props.editable &&
     `

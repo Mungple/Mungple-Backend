@@ -11,8 +11,14 @@ import CustomModal from '@/components/common/CustomModal';
 import CustomModalHeader from '@/components/common/CustomModalHeader';
 import { SettingStackParamList } from '@/navigations/stack/SettingStackNavigator';
 import usePet from '@/hooks/queries/usePet';
+import CustomText from '@/components/common/CustomText';
 
 type PetDetailRouteProp = RouteProp<SettingStackParamList, 'PetDetail'>;
+
+const changeGtoKg = (weight: number) => {
+  const kg = weight / 1000;
+  return kg.toFixed(2);
+};
 
 const PetDetailScreen: React.FC = () => {
   const [modalVisible, setModalVisible] = useState(false);
@@ -54,27 +60,39 @@ const PetDetailScreen: React.FC = () => {
       <Column>
         <Row>
           <Title>이름</Title>
-          <Context>{petData.name}</Context>
+          <CustomText fontWeight="bold" fontSize={22}>
+            {petData.name}
+          </CustomText>
         </Row>
         <Row>
           <Title>성별</Title>
-          <Context>{petData.gender === 'MALE' ? '남아' : '여아'}</Context>
+          <CustomText fontWeight="bold" fontSize={22}>
+            {petData.gender === 'MALE' ? '남아' : '여아'}
+          </CustomText>
         </Row>
         <Row>
           <Title>나이</Title>
-          <Context>{calculateAge(petData.birth)}개월</Context>
+          <CustomText fontWeight="bold" fontSize={22}>
+            {calculateAge(petData.birth)}개월
+          </CustomText>
         </Row>
         <Row>
           <Title>몸무게</Title>
-          <Context>{petData.weight}kg</Context>
+          <CustomText fontWeight="bold" fontSize={22}>
+            {changeGtoKg(petData.weight)}kg
+          </CustomText>
         </Row>
       </Column>
       <ButtonContainer>
         <ActionButton onPress={() => setModalVisible(true)}>
-          <ButtonText>변경</ButtonText>
+          <CustomText fontWeight="bold" fontSize={18} color={colors.WHITE}>
+            변경
+          </CustomText>
         </ActionButton>
         <ActionButton onPress={handleDelete} danger>
-          <ButtonText>삭제</ButtonText>
+          <CustomText fontWeight="bold" fontSize={18} color={colors.WHITE}>
+            삭제
+          </CustomText>
         </ActionButton>
       </ButtonContainer>
 
@@ -105,7 +123,7 @@ const Row = styled.View`
   justify-content: space-between;
 `;
 
-const Title = styled.Text`
+const Title = styled(CustomText)`
   font-size: 20px;
   color: ${colors.BLACK};
 `;
@@ -115,11 +133,6 @@ const Image = styled(RNImage)`
   height: 160px;
   border-radius: 80px;
   margin: 100px 0;
-`;
-
-const Context = styled(Title)`
-  font-weight: bold;
-  text-align: right;
 `;
 
 const ButtonContainer = styled.View`
@@ -135,12 +148,7 @@ const ActionButton = styled.TouchableOpacity<{ danger?: boolean }>`
   background-color: ${(props) => (props.danger ? colors.RED.BASE : colors.ORANGE.BASE)};
   border-radius: 8px;
   align-items: center;
-`;
-
-const ButtonText = styled.Text`
-  font-size: 18px;
-  font-weight: bold;
-  color: ${colors.WHITE};
+  justify-content: center;
 `;
 
 export default PetDetailScreen;
