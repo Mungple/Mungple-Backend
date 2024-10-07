@@ -3,7 +3,7 @@ import { Marker, Circle } from 'react-native-maps';
 
 import { ToMungZone } from '@/types';
 import { useMapStore } from '@/state/useMapStore';
-import useUserLocation from '@/hooks/useUserLocation';
+import { useUserStore } from '@/state/useUserStore';
 
 type MungZoneHeatmapProps = {
   mungZone: Array<{ geohash: string }> | null;
@@ -29,17 +29,14 @@ const GeoZoneMarker = ({ lat, lon, geohash }: GeoZoneMarkerProps) => (
 );
 
 const MungZoneHeatmap = ({ mungZone, checkMungPlace }: MungZoneHeatmapProps) => {
-  const { userLocation } = useUserLocation();
+  const { lat, lon } = useUserStore((state) => state.userLocation);
   const getGeohashCenter = useMapStore((state) => state.getGeohashCenter);
 
   // 사용자 위치 변경 시 블루존 요청
   useEffect(() => {
-    if (!userLocation) return;
-
-    const { latitude: lat, longitude: lon } = userLocation;
     const zoneData: ToMungZone = { point: { lat, lon } };
     checkMungPlace(zoneData);
-  }, [userLocation, checkMungPlace]);
+  }, [lat, lon, checkMungPlace]);
 
   if (!mungZone) return null;
 

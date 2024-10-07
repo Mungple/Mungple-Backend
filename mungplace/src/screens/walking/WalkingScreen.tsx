@@ -89,21 +89,17 @@ const WalkingScreen = () => {
   // 5초마다 웹소켓을 통해 위치 정보 전송
   useEffect(() => {
     const intervalId = setInterval(() => {
-      // lat, lon, recordedAt 데이터 생성
       const location = {
         lat,
         lon,
         recordedAt: new Date().toISOString(),
       };
-      // 산책 ID와 위치 데이터를 서버에 전송
       sendLocation(Number(startExplorate?.explorationId), location);
     }, 3000);
 
-    // 컴포넌트가 언마운트될 때 setInterval을 정리하여 메모리 누수 방지
     return () => {
       clearInterval(intervalId);
     };
-    // 마운트 될때 useEffect 실행
   }, [clientSocket]);
 
   // ========== UI Rendering ==========
