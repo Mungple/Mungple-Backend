@@ -5,16 +5,14 @@ import { useNavigation } from '@react-navigation/native';
 import { MapStackParamList } from '@/navigations/stack/MapStackNavigator';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { mapNavigations } from '@/constants';
-import { useUserStore } from '@/state/useUserStore';
 
 const MyMar = () => {
   const { myMarkers, fetchMyMarkers, loading } = useMyMarkers();
   const navigation = useNavigation<NativeStackNavigationProp<MapStackParamList>>()
-  const userLocation = useUserStore((state) => state.userLocation);
 
   useEffect(() => {
     fetchMyMarkers(); // 페이지 로딩 시 내 마커 데이터를 불러옴
-  }, [userLocation]);
+  }, []);
 
   // 각 마커를 클릭했을 때 상세 페이지로 이동하는 핸들러
   const handleMarkerPress = (markerId: string) => {
