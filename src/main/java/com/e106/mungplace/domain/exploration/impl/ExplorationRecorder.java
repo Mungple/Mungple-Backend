@@ -4,7 +4,9 @@ import static com.e106.mungplace.web.exception.dto.ApplicationSocketError.*;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -23,9 +25,13 @@ import com.e106.mungplace.domain.util.GeoUtils;
 import com.e106.mungplace.web.exception.ApplicationSocketException;
 import com.e106.mungplace.web.exception.dto.ErrorResponse;
 import com.e106.mungplace.web.handler.interceptor.WebSocketSessionManager;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RequiredArgsConstructor
 @Component
 public class ExplorationRecorder {
@@ -33,6 +39,7 @@ public class ExplorationRecorder {
 	@Value("${mungple.creation-threshold}")
 	private int MUNGPLE_THRESHOLD;
 
+	private final ObjectMapper objectMapper;
 	private final ExplorationRepository explorationRepository;
 	private final RedisTemplate<String, String> redisTemplate;
 	private final WebSocketSessionManager sessionManager;
@@ -90,7 +97,8 @@ public class ExplorationRecorder {
 
 		String totalDistance = GeoUtils.secondDecimalFormat(calculateDistance(userId, lat, lon));
 		redisTemplate.opsForValue().set(getTotalDistanceKey(userId), totalDistance);
-		messagingTemplate.convertAndSendToUser(userId, "/sub/explorations/distance", totalDistance);
+
+		sendDistanceToUser(userId, totalDistance);
 	}
 
 	private boolean validateUserIdWhenGeoHashIsDifference(String userId, String userPreviousGeoHash,
@@ -133,6 +141,18 @@ public class ExplorationRecorder {
 		}
 
 		return String.valueOf(amountDistance);
+	}
+
+	private void sendDistanceToUser(String userId, String totalDistance) {
+		Map<String, String> distanceMap = new HashMap<>();
+		distanceMap.put("distance", totalDistance);
+
+		try {
+			String distanceJson = objectMapper.writeValueAsString(distanceMap);
+			messagingTemplate.convertAndSendToUser(userId, "/sub/explorations/distance", distanceJson);
+		} catch (JsonProcessingException e) {
+			log.error("JSON 변환 오류: {}", e.getMessage());
+		}
 	}
 
 	@Scheduled(fixedRate = 3000)

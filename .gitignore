@@ -242,7 +242,7 @@ src/main/resources/application-prod.yml
 
 *.data
 data
-
+grafana
 # End of https://www.toptal.com/developers/gitignore/api/gradle,macos,windows,intellij
 
 /logs/
