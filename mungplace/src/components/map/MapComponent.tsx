@@ -136,8 +136,8 @@ const MapComponent: React.FC<MapComponentProps> = ({
   const handlePressUserLocation = () => {
     if (!isUserLocationError) {
       mapRef.current?.animateToRegion({
-        latitude: userLocation.latitude || 35.096406,
-        longitude: userLocation.longitude || 128.853919,
+        latitude: userLocation.latitude,
+        longitude: userLocation.longitude,
         latitudeDelta: 0.0922,
         longitudeDelta: 0.0421,
       });
@@ -241,8 +241,8 @@ const MapComponent: React.FC<MapComponentProps> = ({
         followsUserLocation
         showsMyLocationButton={false}
         initialRegion={{
-          latitude: userLocation.latitude || 35.096406,
-          longitude: userLocation.longitude || 128.853919,
+          latitude: userLocation.latitude,
+          longitude: userLocation.longitude,
           latitudeDelta: 0.0922,
           longitudeDelta: 0.0421,
         }}

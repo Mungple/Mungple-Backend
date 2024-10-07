@@ -37,4 +37,15 @@ interface Exploration {
   endAt: string;
 }
 
-export type { Exploration, RequestPetProfile, ResponsePetProfile, StartExplorate, UserProfile };
+interface Distance {
+  distance: number;
+}
+
+export type {
+  Exploration,
+  RequestPetProfile,
+  ResponsePetProfile,
+  StartExplorate,
+  UserProfile,
+  Distance,
+};

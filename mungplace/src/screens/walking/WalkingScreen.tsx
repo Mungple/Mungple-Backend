@@ -91,7 +91,7 @@ const WalkingScreen = () => {
       const jsonData = {
         lat: userLocation.latitude,
         lon: userLocation.longitude,
-        recordedAt: new Date().toISOString().replace('T', ' ').substring(0, 19),
+        recordedAt: new Date().toISOString(),
       };
       // 산책 ID와 위치 데이터를 서버에 전송
       sendLocation(Number(startExplorate?.explorationId), jsonData);

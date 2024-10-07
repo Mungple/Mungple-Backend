@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 
 import { getAccessToken } from '@/api';
 import { useAppStore } from '@/state/useAppStore';
-import { FromZone } from '@/types';
+import { Distance, FromZone } from '@/types';
 
 export interface ErrorMessage {
   errorCode: string;
@@ -70,8 +70,8 @@ const useWebSocket = (explorationId: number = -1) => {
 
   const subscribeToTopics = (socket: Client, explorationId: number) => {
     // 에러 메시지 수신
-    socket.subscribe('/user/sub/errors', () => {
-      console.error('useWebSocket >>> Error message received');
+    socket.subscribe('/user/sub/errors', (message) => {
+      console.error('useWebSocket >>> Error message received', message);
     });
 
     // 산책 기록 위치 수집
