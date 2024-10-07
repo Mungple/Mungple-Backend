@@ -99,7 +99,11 @@ const PetForm = ({ setModalVisible, petData }: PetFormProps) => {
             </RadioButtonGroup.RadioButtonItem>
           ))}
         </RadioButtonGroup>
-        <CustomButton label={`${petData ? '변경' : '등록'} 완료`} onPress={handleSubmit} />
+        <CustomButton
+          label={`${petData ? '변경' : '등록'} 완료`}
+          onPress={handleSubmit}
+          inValid={!inputUser.isValid}
+        />
       </InputContainer>
     </Container>
   );

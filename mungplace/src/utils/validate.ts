@@ -43,6 +43,8 @@ function validateInputPet(values: RequestPetProfile) {
   }
   if (isZero(Number(values.petWeight))) {
     errors.petWeight = '몸무게를 정확히 입력해주세요.';
+  } else if (isNaN(values.petWeight)) {
+    errors.petWeight = '몸무게는 숫자로 입력해주세요.';
   } else if (Number(values.petWeight) < 0 || Number(values.petWeight) > 1000000) {
     errors.petWeight = '몸무게는 0kg 이상 1000kg 이하로 입력해주세요.';
   }
