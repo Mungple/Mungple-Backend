@@ -1,6 +1,5 @@
 package com.e106.mungplace.common.log.impl;
 
-import java.security.Principal;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -9,7 +8,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.NoTransactionException;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
@@ -29,20 +27,11 @@ public class ApplicationLogger {
 
 	private final ObjectMapper objectMapper;
 
-	public void log(LogLevel level, LogAction action, String payload, Class<?> clazz) {
+	public void log(LogLevel level, LogAction action, Object payload, Class<?> clazz) {
 		logging(level, toFormattedMessage(action, payload, clazz), clazz);
 	}
 
-	public void log(LogLevel level, LogAction action, Object payload, Class<?> clazz) {
-		try {
-			String msg = objectMapper.writeValueAsString(payload);
-			logging(level, toFormattedMessage(action, msg, clazz), clazz);
-		} catch (JsonProcessingException e) {
-			logging(level, toFormattedMessage(action, payload.toString(), clazz), clazz);
-		}
-	}
-
-	private String toFormattedMessage(LogAction action, String message, Class<?> clazz) {
+	private String toFormattedMessage(LogAction action, Object message, Class<?> clazz) {
 		Object userId = Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication())
 			.map(Authentication::getPrincipal)
 			.orElse(null);

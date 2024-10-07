@@ -4,7 +4,6 @@ public record ControllerLog(
 	String ip,
 	String method,
 	String uri,
-	String params,
-	String body
+	String params
 ) {
 }
