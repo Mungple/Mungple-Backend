@@ -110,38 +110,6 @@ public class MarkerService {
 		return new CreateMarkerResponse(marker.getId());
 	}
 
-	private void validateImageFileCount(List<MultipartFile> imageFiles) {
-		if (imageFiles != null && imageFiles.size() > MAX_IMAGE_FILE_COUNT) {
-			throw new ApplicationException(ApplicationError.IMAGE_COUNT_EXCEEDS_LIMIT);
-		}
-	}
-
-	private MarkerCreateRequest parseMarkerInfo(String markerInfoJson) {
-		try {
-			return objectMapper.readValue(markerInfoJson, MarkerCreateRequest.class);
-		} catch (JsonProcessingException e) {
-			throw new ApplicationException(ApplicationError.MARKER_REQUEST_NOT_VALID);
-		}
-	}
-
-	private Marker createMarker(MarkerCreateRequest markerInfo) {
-		if (markerInfo.getExplorationId() == null) {
-			return markerInfo.toEntity();
-		}
-		Exploration exploration = explorationReader.get(markerInfo.getExplorationId());
-		return markerInfo.toEntity(exploration);
-	}
-
-	private void validateIsUsersMarker(Marker marker, Long userId) {
-		if (!Objects.equals(marker.getUser().getUserId(), userId)) {
-			throw new ApplicationException(ApplicationError.EXPLORATION_NOT_OWNED);
-		}
-	}
-
-	private Marker getMarkerOrThrow(UUID markerId) {
-		return markerReader.find(markerId).orElseThrow(
-			() -> new ApplicationException(ApplicationError.MARKER_NOT_FOUND));
-	}
 
 	@GlobalTransactional
 	public void deleteMarkerProcess(UUID markerId) {
@@ -164,6 +132,41 @@ public class MarkerService {
 		return GeohashMarkerResponse.builder()
 			.markersGroupedByGeohash(groupedMarkers)
 			.build();
+	}
+
+	public MarkerInfoResponse getMarkerInfo(UUID markerId) {
+		Marker marker = getMarkerOrThrow(markerId);
+		List<ImageInfo> imageInfos = markerReader.findMarkerImage(markerId);
+
+		List<String> imageNames = imageInfos.stream()
+			.map(ImageInfo::getImageName)
+			.toList();
+
+		return MarkerInfoResponse.builder()
+			.id(marker.getId())
+			.point(new Point(marker.getLon(), marker.getLat()))
+			.title(marker.getTitle())
+			.content(marker.getContent())
+			.type(marker.getType().name())
+			.userId(marker.getUser().getUserId())
+			.images(imageNames)
+			.createdAt(marker.getCreatedDate())
+			.build();
+	}
+
+	public List<MarkerResponse> getUserMarkers(Long size, UUID cursorId) {
+		Long userId = userHelper.getCurrentUserId();
+
+		List<Marker> markers = (cursorId == null) ?
+			markerReader.findFirstMarkersByUserId(userId, size) :
+			markerReader.find(cursorId)
+				.map(cursorMarker -> markerReader.findMarkersByUserIdAndCursor(userId, size,
+					cursorMarker.getCreatedDate()))
+				.orElseThrow(RuntimeException::new);
+
+		return markers.stream()
+			.map(MarkerResponse::of)
+			.collect(Collectors.toList());
 	}
 
 	private List<MarkerPoint> findMarkersWithinRadius(MarkerSearchRequest markerSearchRequest) {
@@ -231,38 +234,36 @@ public class MarkerService {
 			.build();
 	}
 
-	public MarkerInfoResponse getMarkerInfo(UUID markerId) {
-		Marker marker = getMarkerOrThrow(markerId);
-		List<ImageInfo> imageInfos = markerReader.findMarkerImage(markerId);
-
-		List<String> imageNames = imageInfos.stream()
-			.map(ImageInfo::getImageName)
-			.toList();
-
-		return MarkerInfoResponse.builder()
-			.id(marker.getId())
-			.point(new Point(marker.getLon(), marker.getLat()))
-			.title(marker.getTitle())
-			.content(marker.getContent())
-			.type(marker.getType().name())
-			.userId(marker.getUser().getUserId())
-			.images(imageNames)
-			.createdAt(marker.getCreatedDate())
-			.build();
+	private void validateImageFileCount(List<MultipartFile> imageFiles) {
+		if (imageFiles != null && imageFiles.size() > MAX_IMAGE_FILE_COUNT) {
+			throw new ApplicationException(ApplicationError.IMAGE_COUNT_EXCEEDS_LIMIT);
+		}
 	}
 
-	public List<MarkerResponse> getUserMarkers(Long size, UUID cursorId) {
-		Long userId = userHelper.getCurrentUserId();
+	private MarkerCreateRequest parseMarkerInfo(String markerInfoJson) {
+		try {
+			return objectMapper.readValue(markerInfoJson, MarkerCreateRequest.class);
+		} catch (JsonProcessingException e) {
+			throw new ApplicationException(ApplicationError.MARKER_REQUEST_NOT_VALID);
+		}
+	}
 
-		List<Marker> markers = (cursorId == null) ?
-			markerReader.findFirstMarkersByUserId(userId, size) :
-			markerReader.find(cursorId)
-				.map(cursorMarker -> markerReader.findMarkersByUserIdAndCursor(userId, size,
-					cursorMarker.getCreatedDate()))
-				.orElseThrow(RuntimeException::new);
+	private Marker createMarker(MarkerCreateRequest markerInfo) {
+		if (markerInfo.getExplorationId() == null) {
+			return markerInfo.toEntity();
+		}
+		Exploration exploration = explorationReader.get(markerInfo.getExplorationId());
+		return markerInfo.toEntity(exploration);
+	}
 
-		return markers.stream()
-			.map(MarkerResponse::of)
-			.collect(Collectors.toList());
+	private void validateIsUsersMarker(Marker marker, Long userId) {
+		if (!Objects.equals(marker.getUser().getUserId(), userId)) {
+			throw new ApplicationException(ApplicationError.EXPLORATION_NOT_OWNED);
+		}
+	}
+
+	private Marker getMarkerOrThrow(UUID markerId) {
+		return markerReader.find(markerId).orElseThrow(
+			() -> new ApplicationException(ApplicationError.MARKER_NOT_FOUND));
 	}
 }

@@ -2,8 +2,6 @@ package com.e106.mungplace.web.marker.consumer;
 
 import static com.e106.mungplace.web.exception.dto.ApplicationError.*;
 
-import java.util.Optional;
-
 import org.apache.kafka.clients.admin.NewTopic;
 import org.springframework.data.elasticsearch.core.geo.GeoPoint;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -25,7 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class MarkerConsumer {
 
-	private static final String KAFKA_TOPIC = "markerRollback";
+	private static final String KAFKA_TOPIC = "markerSaveFailure";
 
 	public final String topic;
 
@@ -56,7 +54,7 @@ public class MarkerConsumer {
 			ack.acknowledge();
 		} catch (Exception e) {
 			kafkaTemplate.send(KAFKA_TOPIC, KAFKA_TOPIC, event.getEntityId().toString());
-			throw new ApplicationException(ELASTIC_SEARCH_SAVE_ERROR); // 예외 재발생
+			throw new ApplicationException(ELASTIC_SEARCH_SAVE_ERROR);
 		}
 	}
 

@@ -17,7 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
-public class MarkerRollbackConsumer {
+public class MarkerSaveFailureConsumer {
 
 	public final String topic;
 
@@ -27,9 +27,9 @@ public class MarkerRollbackConsumer {
 
 	private final MarkerImageInfoRepository markerImageInfoRepository;
 
-	public MarkerRollbackConsumer(NewTopic markerRollbackTopic, MarkerRepository markerRepository, ImageManager imageManager,
+	public MarkerSaveFailureConsumer(NewTopic markerSaveFailureTopic, MarkerRepository markerRepository, ImageManager imageManager,
 		MarkerImageInfoRepository markerImageInfoRepository) {
-		this.topic = markerRollbackTopic.name();
+		this.topic = markerSaveFailureTopic.name();
 		this.markerRepository = markerRepository;
 		this.imageManager = imageManager;
 		this.markerImageInfoRepository = markerImageInfoRepository;

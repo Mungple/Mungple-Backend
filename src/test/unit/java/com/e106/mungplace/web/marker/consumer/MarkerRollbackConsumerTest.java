@@ -13,7 +13,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.kafka.support.Acknowledgment;
@@ -27,7 +26,7 @@ import com.e106.mungplace.domain.marker.repository.MarkerRepository;
 @ExtendWith(MockitoExtension.class)
 class MarkerRollbackConsumerTest {
 
-	private MarkerRollbackConsumer markerRollbackConsumer;
+	private MarkerSaveFailureConsumer markerSaveFailureConsumer;
 
 	@Mock
 	private MarkerRepository markerRepository;
@@ -48,8 +47,8 @@ class MarkerRollbackConsumerTest {
 
 	@BeforeEach
 	void setUp() {
-		when(markerRollbackTopic.name()).thenReturn("markerRollback");
-		markerRollbackConsumer = new MarkerRollbackConsumer(markerRollbackTopic, markerRepository, imageManager,
+		when(markerRollbackTopic.name()).thenReturn("markerSaveFailure");
+		markerSaveFailureConsumer = new MarkerSaveFailureConsumer(markerRollbackTopic, markerRepository, imageManager,
 			markerImageInfoRepository);
 		markerUUID = UUID.randomUUID();
 	}
@@ -72,7 +71,7 @@ class MarkerRollbackConsumerTest {
 		when(markerImageInfoRepository.findByMarkerId(markerUUID)).thenReturn(images);
 
 		// when
-		markerRollbackConsumer.rollbackMarkerEvent(markerUUID.toString(), acknowledgment);
+		markerSaveFailureConsumer.rollbackMarkerEvent(markerUUID.toString(), acknowledgment);
 
 		// then
 		verify(imageManager, times(1)).deleteImage("image1.jpg");
@@ -90,7 +89,7 @@ class MarkerRollbackConsumerTest {
 		when(markerImageInfoRepository.findByMarkerId(markerUUID)).thenReturn(List.of());
 
 		// when
-		markerRollbackConsumer.rollbackMarkerEvent(markerUUID.toString(), acknowledgment);
+		markerSaveFailureConsumer.rollbackMarkerEvent(markerUUID.toString(), acknowledgment);
 
 		// then
 		verify(imageManager, never()).deleteImage(anyString());
@@ -113,7 +112,7 @@ class MarkerRollbackConsumerTest {
 		doThrow(new RuntimeException("Image deletion failed")).when(imageManager).deleteImage("image1.jpg");
 
 		// when
-		ThrowableAssert.ThrowingCallable callable = () -> markerRollbackConsumer.rollbackMarkerEvent(markerUUID.toString(), acknowledgment);
+		ThrowableAssert.ThrowingCallable callable = () -> markerSaveFailureConsumer.rollbackMarkerEvent(markerUUID.toString(), acknowledgment);
 
 		// then
 		assertThatThrownBy(callable).isInstanceOf(RuntimeException.class).hasMessageContaining("Image deletion failed");
