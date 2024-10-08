@@ -14,6 +14,7 @@ const authNavigations = {
 } as const;
 
 const mapNavigations = {
+  COUNTDOWN: 'CountDown',
   WALKING: 'Walking',
   HOME: 'MapHome',
   MARKERDETAIL: 'MarkerDetail',

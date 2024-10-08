@@ -6,6 +6,7 @@ import WalkingScreen from '@/screens/walking/WalkingScreen';
 import MarkerDetailScreen from '@/screens/map/MarkerDetailScreen';
 import MyMarkerScreen from '@/screens/map/MyMarkerScreen';
 import FacilityDetailScreen from '@/screens/map/FacilityDetailScreen'
+import Countdown from '@/screens/walking/CountDown';
 
 export type MapStackParamList = {
   [mapNavigations.HOME]: undefined;
@@ -13,6 +14,7 @@ export type MapStackParamList = {
   [mapNavigations.MARKERDETAIL]: { markerId: string };
   [mapNavigations.MYMARKERLIST]: undefined;
   [mapNavigations.FACILITYDETAIL]: { facilityId : number}
+  [mapNavigations.COUNTDOWN] : undefined
 };
 
 const HomeStack = createNativeStackNavigator<MapStackParamList>();
@@ -22,6 +24,7 @@ const MapStackNavigator: React.FC = () => {
     <HomeStack.Navigator screenOptions={{ headerShown: false }}>
       <HomeStack.Screen name={mapNavigations.HOME} component={MainTabNavigator} />
       <HomeStack.Screen name={mapNavigations.WALKING} component={WalkingScreen} />
+      <HomeStack.Screen name={mapNavigations.COUNTDOWN} component={Countdown} />
       <HomeStack.Screen name={mapNavigations.MARKERDETAIL} component={MarkerDetailScreen} />
       <HomeStack.Screen name={mapNavigations.MYMARKERLIST} component={MyMarkerScreen} />
       <HomeStack.Screen name={mapNavigations.FACILITYDETAIL} component={FacilityDetailScreen} />

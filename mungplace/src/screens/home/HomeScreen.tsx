@@ -71,9 +71,8 @@ const HomeScreen: React.FC = () => {
       });
 
       setModalVisible(false);
-      setWalkingStart(true);
       setStartExplorate(await startWalk(walkData));
-      navigation.navigate(mapNavigations.WALKING);
+      navigation.navigate(mapNavigations.COUNTDOWN)
     } else if (isUserLocationError) {
       Alert.alert('Error', '위치 권한을 허용해주세요');
     } else {
