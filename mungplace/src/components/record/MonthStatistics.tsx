@@ -1,5 +1,4 @@
 import React, { useState, useCallback } from 'react';
-import { ActivityIndicator } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import styled from 'styled-components/native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
@@ -7,6 +6,7 @@ import { getStatistics } from '@/api/walk';
 import { colors } from '@/constants';
 import { calculateTime, calculateDistance } from '@/utils/recordCalculator';
 import CustomText from '../common/CustomText';
+import LoadingSpinner from '../common/LoadingSpinner';
 
 interface Statistics {
   year: number;
@@ -65,11 +65,7 @@ const MonthStatistics: React.FC<{ year: number; month: number }> = ({ year, mont
   );
 
   if (loading) {
-    return (
-      <LoadingContainer>
-        <ActivityIndicator size="large" color={colors.ORANGE.BASE} />
-      </LoadingContainer>
-    );
+    return <LoadingSpinner />
   }
 
   if (error) {
@@ -119,12 +115,6 @@ const StatCard: React.FC<StatCardProps> = ({ icon, label, value }) => (
     </CardContent>
   </Card>
 );
-
-const LoadingContainer = styled.View`
-  align-items: center;
-  justify-content: center;
-  height: 100px;
-`;
 
 const ErrorContainer = styled.View`
   align-items: center;

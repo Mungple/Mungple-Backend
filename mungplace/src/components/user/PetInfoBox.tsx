@@ -6,10 +6,12 @@ import { colors } from '@/constants';
 import { ResponsePetProfile } from '@/types';
 import CustomCard from '../common/CustomCard';
 import CustomText from '../common/CustomText';
+import LoadingSpinner from '../common/LoadingSpinner';
 
 type PetInfoBoxProps = {
   defaultPet?: ResponsePetProfile;
   age?: number;
+  isLoading?: boolean;
 };
 
 const makeGtoKg = (g: number) => {
@@ -17,7 +19,12 @@ const makeGtoKg = (g: number) => {
   return kg.toFixed(2);
 };
 
-const PetInfoBox = ({ defaultPet, age }: PetInfoBoxProps) => {
+const PetInfoBox = ({ defaultPet, age, isLoading }: PetInfoBoxProps) => {
+
+  if (isLoading) {
+    return <LoadingSpinner />
+  }
+
   return (
     <Container>
       {defaultPet ? (

@@ -13,6 +13,7 @@ import PetInfoBox from '@/components/user/PetInfoBox';
 import CustomModal from '@/components/common/CustomModal';
 import CustomButton from '@/components/common/CustomButton';
 import CustomModalHeader from '@/components/common/CustomModalHeader';
+import LoadingSpinner from '@/components/common/LoadingSpinner';
 
 // 4. 스타일 및 이미지
 import * as HS from './HomeScreenStyle';
@@ -37,7 +38,7 @@ const HomeScreen: React.FC = () => {
   // 펫 정보
   const { useGetPet } = usePet();
   const { userId } = useUserStore.getState();
-  const { data: petData } = useGetPet(userId);
+  const { data: petData, isLoading } = useGetPet(userId);
   const defaultPet = petData?.find((pet) => pet.isDefault === true);
   const age = defaultPet ? calculateAge(defaultPet.birth) : undefined;
 
@@ -82,6 +83,10 @@ const HomeScreen: React.FC = () => {
 
   return (
     <HS.Container>
+      {isLoading ? ( // 로딩 중일 때 로딩 스피너 표시
+        <LoadingSpinner />
+      ) : (
+        <>
       <HS.ImageCard>
         <HS.Image
           source={
@@ -102,6 +107,8 @@ const HomeScreen: React.FC = () => {
         <PetList selectedPets={selectedPets} homeScreenPress={handlePetSelect} />
         <HS.StartButton label="산책 시작하기" onPress={handleWalkingStart} />
       </CustomModal>
+      </>
+      )}
     </HS.Container>
   );
 };
