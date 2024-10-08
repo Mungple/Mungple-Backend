@@ -78,10 +78,9 @@ interface MapState {
   setMyMarkers: (value: MyMarkerData[]) => void
   setPetFacilities: (value: PetFacility[]) => void;
   setNearbyMarkers: (value: NearbyMarkersData) => void;
-  getGeohashCenter: (value: string) => { lat: number; lon: number } | null;
 }
 
-export const useMapStore = create<MapState>((set, get) => ({
+export const useMapStore = create<MapState>((set) => ({
   markers: [],
   myMarkers: [],
   petFacilities: [],
@@ -94,11 +93,4 @@ export const useMapStore = create<MapState>((set, get) => ({
   setNearbyMarkers: (value: NearbyMarkersData) => set({ nearbyMarkers: value }),
   toggleUserMarkers: () => set((state) => ({ showUserMarkers: !state.showUserMarkers })),
   addMarker: (value: MarkerData) => set((state) => ({ markers: [...state.markers, value] })),
-  getGeohashCenter: (hashKey) => {
-    const { nearbyMarkers } = get();
-    if (!nearbyMarkers || !nearbyMarkers.markersGroupedByGeohash[hashKey]) {
-      return null;
-    }
-    return nearbyMarkers.markersGroupedByGeohash[hashKey].geohashCenter || null;
-  },
 }));

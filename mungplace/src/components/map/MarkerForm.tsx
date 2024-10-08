@@ -1,5 +1,5 @@
 import React, {useState} from 'react'
-import {View, Button, TextInput, StyleSheet, Image} from 'react-native'
+import {View, TextInput, StyleSheet, Image} from 'react-native'
 import CustomModal from '../common/CustomModal'
 import {launchImageLibrary} from 'react-native-image-picker'
 import {Picker} from '@react-native-picker/picker'
