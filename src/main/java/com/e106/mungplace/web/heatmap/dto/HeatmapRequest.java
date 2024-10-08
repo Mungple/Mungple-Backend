@@ -8,7 +8,6 @@ import com.e106.mungplace.domain.heatmap.event.HeatmapQueryType;
 import com.e106.mungplace.domain.util.GeoUtils;
 
 public record HeatmapRequest(
-	String requestId,
 	Point point,
 	Integer side
 ) {
@@ -18,7 +17,6 @@ public record HeatmapRequest(
 		Point se = GeoUtils.calculateSouthEastPoint(point, side);
 
 		return HeatmapQueryEvent.builder()
-			.requestId(requestId)
 			.userId(userId)
 			.side(side)
 			.queryType(queryType)

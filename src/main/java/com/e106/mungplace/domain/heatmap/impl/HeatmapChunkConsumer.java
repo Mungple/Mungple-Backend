@@ -27,7 +27,7 @@ public class HeatmapChunkConsumer {
 	private final SimpMessagingTemplate messagingTemplate;
 
 	@Async("taskExecutor")
-	public void consume(String requestId, Long userId, HeatmapQueryType queryType) {
+	public void consume(Long userId, HeatmapQueryType queryType) {
 		String key = generateQueueKey(userId, queryType);
 		String destination = generateDestination(queryType);
 
@@ -38,7 +38,6 @@ public class HeatmapChunkConsumer {
 			if (chunk != null) {
 				logger.log(LogLevel.DEBUG, LogAction.CONSUME, String.format("key: %s, chunk: %s", key, chunk), getClass());
 				messagingTemplate.convertAndSendToUser(userId.toString(), destination, chunk);
-				messagingTemplate.convertAndSendToUser(userId.toString(), destination, requestId);
 				break;
 			}
 		}
