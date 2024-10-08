@@ -22,7 +22,7 @@ const useWebSocket = (explorationId: number = -1) => {
   const [allBlueZone, setAllBlueZone] = useState<FromZone | null>(null);
   const [allRedZone, setAllRedZone] = useState<FromZone | null>(null);
   const [myBlueZone, setMyBlueZone] = useState<FromZone | null>(null);
-  const [mungZone, setMungZone] = useState<Array<string> | null>(null);
+  const [mungZone, setMungZone] = useState<Array<{lat : number ; lon: number}> | null>(null);
 
   // 소켓 연결 시도
   useEffect(() => {
@@ -72,8 +72,8 @@ const useWebSocket = (explorationId: number = -1) => {
 
   const subscribeToTopics = (socket: Client, explorationId: number) => {
     // 에러 메시지 수신
-    socket.subscribe('/user/sub/errors', (message) => {
-      console.error('useWebSocket >>> Error message received', message);
+    socket.subscribe('/user/sub/errors', () => {
+      console.error('useWebSocket >>> Error message received');
     });
 
     // 산책 기록 위치 수집
@@ -113,9 +113,9 @@ const useWebSocket = (explorationId: number = -1) => {
       }
     });
     // 멍플 조회
-    socket.subscribe('/user/sub/mungplace', (message) => {
+    socket.subscribe('/user/sub/mungple', (message) => {
       try {
-        const parsedMessage = JSON.parse(message.body) as Array<string>;
+        const parsedMessage = JSON.parse(message.body) as Array<{lat: number; lon: number}>;
         setMungZone(parsedMessage);
       } catch (e) {
         console.error('useWebSocket for mungplace >>>', e);

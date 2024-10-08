@@ -56,7 +56,7 @@ const useWebSocketActions = () => {
     (allUserZone: ToMungZone) => {
       if (clientSocket?.connected) {
         clientSocket.publish({
-          destination: '/user/pub/mungplace',
+          destination: '/pub/mungple',
           body: JSON.stringify(allUserZone),
         });
       } else {
