@@ -23,7 +23,6 @@ import com.e106.mungplace.web.marker.dto.MarkerInfoResponse;
 import com.e106.mungplace.web.marker.dto.MarkerResponse;
 import com.e106.mungplace.web.marker.dto.MarkerSearchRequest;
 import com.e106.mungplace.web.marker.service.MarkerService;
-import com.e106.mungplace.web.util.RequestDeduplicator;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,7 +38,7 @@ public class MarkerController {
 	@PostMapping(consumes = "multipart/form-data")
 	public ResponseEntity<CreateMarkerResponse> createMarker(
 		@RequestPart("MarkerCreateRequest") String markerInfoJson,
-		@RequestPart(name = "image", required = false) List<MultipartFile> imageFiles) throws Exception {
+		@RequestPart(name = "image", required = false) List<MultipartFile> imageFiles) {
 
 		return ResponseEntity.ok(markerService.createMarkerProcess(markerInfoJson, imageFiles));
 	}
