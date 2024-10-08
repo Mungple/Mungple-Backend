@@ -14,10 +14,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.data.redis.core.ListOperations;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.SetOperations;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import com.e106.mungplace.common.map.dto.Point;
@@ -26,9 +26,12 @@ import com.e106.mungplace.domain.exploration.repository.DogExplorationRepository
 import com.e106.mungplace.domain.exploration.repository.ExplorationRepository;
 import com.e106.mungplace.web.exception.ApplicationSocketException;
 import com.e106.mungplace.web.handler.interceptor.WebSocketSessionManager;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @ExtendWith(MockitoExtension.class)
 class ExplorationRecorderUnitTest {
+	@Mock
+	private ObjectMapper objectMapper;
 
 	@Mock
 	private RedisTemplate<String, String> redisTemplate;
@@ -55,8 +58,8 @@ class ExplorationRecorderUnitTest {
 	void setUp() {
 		userId = "1";
 		explorationId = "100";
-		explorationRecorder = new ExplorationRecorder(explorationRepository, redisTemplate, sessionManager,
-			messagingTemplate, dogExplorationRepository);
+		explorationRecorder = new ExplorationRecorder(objectMapper, explorationRepository, redisTemplate,
+			sessionManager, messagingTemplate, dogExplorationRepository);
 	}
 
 	@Test

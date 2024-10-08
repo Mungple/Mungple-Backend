@@ -60,7 +60,6 @@ public class ExplorationRecorder {
 		redisTemplate.opsForValue().set(getPrePointKey(userId), lat + "," + lon);
 		redisTemplate.opsForList().rightPush(getThreePointDistanceKey(userId), "0");
 		redisTemplate.opsForSet().add(getActiveUsersKey(), userId + ":" + explorationId);
-
 	}
 
 	public void endRecord(String userId, String explorationId) {
@@ -83,8 +82,10 @@ public class ExplorationRecorder {
 		redisTemplate.opsForValue().setIfPresent(getTotalDistanceKey(userId), "0", 1, TimeUnit.MILLISECONDS);
 
 		String[] userLatLon = redisTemplate.opsForValue().get(getPrePointKey(userId)).split(",");
-		decreaseGeoHashUserCount(Point.toMungpleGeoHash(userLatLon[0], userLatLon[1]), userId);
-		
+		String lat = userLatLon[0];
+		String lon = userLatLon[1];
+
+		decreaseGeoHashUserCount(Point.toMungpleGeoHash(lat, lon), userId);
 		deleteAllValue(userId);
 	}
 
@@ -132,13 +133,13 @@ public class ExplorationRecorder {
 			redisTemplate.opsForList().leftPop(getThreePointDistanceKey(userId));
 		}
 		redisTemplate.opsForList().rightPush(getThreePointDistanceKey(userId), String.valueOf(distance));
-		redisTemplate.opsForValue().set(getPrePointKey(userId), lat + "," + lon);
 
 		double calculateNineSecondsDistance = getCalculateNineSecondsDistance(userId);
 		if (calculateNineSecondsDistance >= 90.00) {
-
 			throw new ApplicationSocketException(TOO_FAST_EXPLORING);
 		}
+
+		redisTemplate.opsForValue().set(getPrePointKey(userId), lat + "," + lon);
 
 		return String.valueOf(amountDistance);
 	}

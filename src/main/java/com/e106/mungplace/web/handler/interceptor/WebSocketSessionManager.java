@@ -8,6 +8,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.WebSocketHandler;
@@ -22,21 +23,33 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class WebSocketSessionManager extends WebSocketHandlerDecorator {
 
+	private static final String SESSION_SET_KEY = "websocket:sessions";
+	private static final String USER_SET_KEY = "websocket:users";
 	private ConcurrentHashMap<String, WebSocketSession> sessionStore = new ConcurrentHashMap<>();
+	private final RedisTemplate<String, String> redisTemplate;
 
-	public WebSocketSessionManager(@Qualifier("subProtocolWebSocketHandler") WebSocketHandler delegate) {
+	public WebSocketSessionManager(@Qualifier("subProtocolWebSocketHandler") WebSocketHandler delegate, RedisTemplate<String, String> redisTemplate) {
 		super(delegate);
+		this.redisTemplate = redisTemplate;
 	}
 
 	@Override
 	public void afterConnectionEstablished(WebSocketSession session) throws Exception {
-		sessionStore.put(session.getId(), session);
+		String sessionId = session.getId();
+		String userId = session.getPrincipal().getName();
+		sessionStore.put(sessionId, session);
+		createSessionReferenceInfo(sessionId, userId);
+
 		super.afterConnectionEstablished(session);
 	}
 
 	@Override
 	public void afterConnectionClosed(WebSocketSession session, CloseStatus closeStatus) throws Exception {
-		sessionStore.remove(session.getId());
+		String sessionId = session.getId();
+		String userId = session.getPrincipal().getName();
+		sessionStore.remove(sessionId);
+		removeSessionReferenceInfo(sessionId, userId);
+
 		super.afterConnectionClosed(session, closeStatus);
 	}
 
@@ -48,10 +61,16 @@ public class WebSocketSessionManager extends WebSocketHandlerDecorator {
 	}
 
 	public Set<String> getConnectedUserIds() {
-		return sessionStore.values().stream()
-			.map(WebSocketSession::getPrincipal)
-			.filter(Objects::nonNull)
-			.map(Principal::getName)
-			.collect(Collectors.toSet());
+		return redisTemplate.opsForSet().members(USER_SET_KEY);
+	}
+
+	private void createSessionReferenceInfo(String sessionId, String userId) {
+		redisTemplate.opsForSet().add(SESSION_SET_KEY, sessionId);
+		redisTemplate.opsForSet().add(USER_SET_KEY, userId);
+	}
+
+	private void removeSessionReferenceInfo(String sessionId, String userId) {
+		redisTemplate.opsForSet().remove(SESSION_SET_KEY, sessionId);
+		redisTemplate.opsForSet().remove(USER_SET_KEY, userId);
 	}
 }

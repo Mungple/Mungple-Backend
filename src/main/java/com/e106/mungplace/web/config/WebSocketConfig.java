@@ -3,6 +3,7 @@ package com.e106.mungplace.web.config;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.WebSocketHandler;
@@ -24,6 +25,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
 	private final StompInterceptor stompInterceptor;
 	private final StompExceptionHandler stompExceptionHandler;
+	private final RedisTemplate<String, String> redisTemplate;
 
 	@Override
 	public void configureWebSocketTransport(WebSocketTransportRegistration registry) {
@@ -50,6 +52,6 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 	@Bean
 	public WebSocketSessionManager webSocketSessionManager(
 		@Qualifier("subProtocolWebSocketHandler") WebSocketHandler webSocketHandler) {
-		return new WebSocketSessionManager(webSocketHandler);
+		return new WebSocketSessionManager(webSocketHandler, redisTemplate);
 	}
 }
