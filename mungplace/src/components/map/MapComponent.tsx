@@ -9,7 +9,7 @@ import MapView, { Marker, Polyline, PROVIDER_GOOGLE } from 'react-native-maps';
 
 // 2. 커스텀 컴포넌트
 import MapSettings from './MapSettings';
-import MarkerForm from '../marker/MarkerForm';
+import MarkerForm from './MarkerForm';
 import CustomMapButton from '../common/CustomMapButton';
 import CustomBottomSheet from '../common/CustomBottomSheet';
 import CustomText from '../common/CustomText';
