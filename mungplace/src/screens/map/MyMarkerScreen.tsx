@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
 import {
   View,
-  Text,
   FlatList,
   TouchableOpacity,
   ActivityIndicator,
@@ -12,6 +11,7 @@ import { useNavigation } from '@react-navigation/native';
 import { MapStackParamList } from '@/navigations/stack/MapStackNavigator';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { mapNavigations } from '@/constants';
+import CustomText from '@/components/common/CustomText';
 
 const MyMar = () => {
   const { myMarkers, fetchMyMarkers, loading } = useMyMarkers();
@@ -30,9 +30,14 @@ const MyMar = () => {
     return <ActivityIndicator size="large" color="#0000ff" />;
   }
 
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString)
+    const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false }
+    return date.toLocaleString('ko-KR', options).replace(',', '') // 한국어 형식 변환
+  }
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>내 마커 리스트</Text>
       <FlatList
         data={myMarkers}
         keyExtractor={(item) => item.markerId}
@@ -41,7 +46,10 @@ const MyMar = () => {
             onPress={() => handleMarkerPress(item.markerId)}
             style={styles.markerItem}>
             <View>
-              <Text style={styles.markerTitle}>{item.title}</Text>
+              <CustomText fontSize={18}>{item.title}</CustomText>
+              <View style={{ marginTop: 5}}>
+                <CustomText fontSize={10} color='gray'>{`${formatDate(item.createdAt)}`}</CustomText>
+              </View>
             </View>
           </TouchableOpacity>
         )}
@@ -84,8 +92,6 @@ const styles = StyleSheet.create({
   },
   markerTitle: {
     fontSize: 18,
-    fontWeight: '600',
-    color: '#333',
   },
 });
 

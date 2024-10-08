@@ -6,6 +6,7 @@ import {Picker} from '@react-native-picker/picker'
 import {MarkerData} from '../../state/useMapStore'
 import {useAppStore} from '@/state/useAppStore'
 import axiosInstance from '@/api/axios'
+import CustomButton from '../common/CustomButton'
 
 export interface MarkerFormProps {
   isVisible: boolean
@@ -102,63 +103,90 @@ const MarkerForm: React.FC<MarkerFormProps> = ({isVisible, onSubmit, onClose, la
 
   return (
     <CustomModal modalVisible={isVisible} setModalVisible={onClose}>
-      <View>
-        <View>
-          <TextInput placeholder="제목을 입력하세요" value={title} onChangeText={setTitle} />
-          <TextInput placeholder="내용을 입력하세요" value={body} onChangeText={setBody} />
-          {imageUri && <Image source={{uri: imageUri}} />}
-          <Button title="이미지 선택" onPress={handleImagePick} />
-
+      <View style={styles.modalContainer}>
+        <View style={styles.formContainer}>
+          <TextInput
+            style={styles.input}
+            placeholder="제목을 입력하세요"
+            value={title}
+            onChangeText={setTitle}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="내용을 입력하세요"
+            value={body}
+            onChangeText={setBody}
+            multiline={true}
+            numberOfLines={4}
+          />
+          {imageUri && <Image source={{ uri: imageUri }} style={styles.image} />}
+          <CustomButton label="이미지 선택" onPress={handleImagePick} variant='outlined'/>
+  
           <View style={styles.pickerContainer}>
             <Picker
               selectedValue={type}
               onValueChange={itemValue => setType(itemValue as 'BLUE' | 'RED')}
               style={styles.picker}>
-              <Picker.Item label="파랑" value="BLUE" />
-              <Picker.Item label="빨강" value="RED" />
+              <Picker.Item label="블루 마커" value="BLUE" />
+              <Picker.Item label="레드 마커" value="RED" />
             </Picker>
           </View>
-
-          <Button title="작성 완료" onPress={handleSubmit} />
-          <Button title="닫기" onPress={onClose} />
+  
+          <CustomButton label="작성 완료" onPress={handleSubmit} variant='outlined'/>
+          <View style={{ marginTop:10 }}>
+            <CustomButton label="닫기" onPress={onClose} variant='outlined'/>
+          </View>
         </View>
       </View>
     </CustomModal>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
   modalContainer: {
-    flex: 1,
+    width: '100%',
+    padding: 20,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.5)',
   },
   formContainer: {
-    width: '80%',
-    padding: 20,
-    backgroundColor: 'white',
-    borderRadius: 10,
+    width: '100%',  // 더 넓은 폭
+    padding: 30,  // 패딩 추가
+    backgroundColor: '#f9f9f9',  // 밝은 배경색
+    borderRadius: 20,  // 둥근 모서리
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
   },
   input: {
-    height: 40,
-    borderColor: 'gray',
-    borderBottomWidth: 1,
-    marginBottom: 10,
-    paddingHorizontal: 10,
+    width: '100%',
+    padding: 10,
+    borderColor: '#ccc',
+    borderWidth: 1,
+    marginBottom: 15,
+    borderRadius: 8,  // 둥근 입력 필드
+    backgroundColor: 'white',  // 입력 필드 배경색
   },
   image: {
-    width: 100,
-    height: 100,
-    marginVertical: 10,
+    width: '100%',
+    height: 200,  // 이미지 크기 키움
+    marginVertical: 15,
+    borderRadius: 10,  // 둥근 모서리
   },
   pickerContainer: {
-    marginVertical: 10,
+    width: '100%',
+    marginVertical: 15,
+    borderColor: '#ccc',
+    borderWidth: 1,
+    borderRadius: 10,
+    overflow: 'hidden',
   },
   picker: {
-    height: 50,
     width: '100%',
+    backgroundColor: 'white',
   },
-})
+});
 
 export default MarkerForm

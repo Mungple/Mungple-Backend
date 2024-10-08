@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
 import { Heatmap } from 'react-native-maps';
-
 import { colors } from '@/constants';
 import { FromZone, ToZone } from '@/types';
 import useUserLocation from '@/hooks/useUserLocation';
@@ -12,6 +11,7 @@ type AllBlueZoneHeatmapProps = {
 
 const AllBlueZoneHeatmap = ({ allBlueZone, checkAllUserZone }: AllBlueZoneHeatmapProps) => {
   const { userLocation } = useUserLocation();
+  // const requestId = Math.random().toString(36).substr(2, 9);
 
   // 사용자 위치 변경 시 블루존 요청
   useEffect(() => {
@@ -21,9 +21,10 @@ const AllBlueZoneHeatmap = ({ allBlueZone, checkAllUserZone }: AllBlueZoneHeatma
 
       // 반경 1000미터 내 블루존 요청
       const zoneData: ToZone = {
+        // requestId: requestId,
         side: 500,
         point: { lat: centerLat, lon: centerLon },
-      };
+      }
       checkAllUserZone(0, zoneData);
     }
   }, [userLocation, checkAllUserZone]);
