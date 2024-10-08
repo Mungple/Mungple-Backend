@@ -31,7 +31,7 @@ public class HeatmapQueryExecutorService {
 		this.heatmapChunkPublisher = heatmapChunkPublisher;
 	}
 
-	@KafkaListener(topics = "#{__listener.topic}", groupId = "#{__listener.topic}-executor")
+	@KafkaListener(topics = "#{__listener.topic}", groupId = "#{__listener.topic}-executor", concurrency = "6")
 	public void handleHeatmapQueryEventProcess(HeatmapQueryEvent event, Acknowledgment ack) {
 		Long userId = event.userId();
 		HeatmapSearchCondition condition = new HeatmapSearchCondition(event.leftTop(), event.rightBottom(),

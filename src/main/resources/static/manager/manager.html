@@ -16,11 +16,57 @@
             border-radius: 5px;
             box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.3);
         }
-        #nameInput {
-            width: 200px;
+
+        #latLonInputContainer {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1;
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+            font-family: Arial, sans-serif;
+        }
+
+        #latLonInputContainer label {
+            font-weight: bold;
+            color: #333;
+            margin-right: 10px;
+        }
+
+        #latLonInputContainer input {
+            width: 120px;
+            height: 30px;
+            margin-right: 10px;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        #latLonInputContainer button {
+            padding: 8px 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        #latLonInputContainer button:hover {
+            background-color: #45a049;
+        }
+
+        #nameInput, #latInput, #lonInput {
+            width: 100px;
             height: 30px;
             font-size: 16px;
+            margin: 5px;
         }
+
         #map {
             height: 98vh;
             width: 100%;
@@ -32,22 +78,33 @@
     <label for="nameInput">이름:</label>
     <input type="text" id="nameInput" value="manager" placeholder="사용자 이름 입력">
 </div>
+
+<div id="latLonInputContainer">
+    <label for="latInput">위도:</label>
+    <input type="text" id="latInput" placeholder="위도 입력">
+    <label for="lonInput">경도:</label>
+    <input type="text" id="lonInput" placeholder="경도 입력">
+    <button onclick="sendExplorePointDetail()">전송</button>
+</div>
+
 <div id="map"></div>
+
 <script>
     let map;
     let polyline = null;
     let drawing = false;
     let points = [];
     let isDKeyPressed = false;
-    let isMousePressed = false; // 마우스가 눌렸는지 확인하기 위한 변수
+    let isMousePressed = false;
     let isRKeyPressed = false;
     let isBKeyPressed = false;
-    let markerData = []; // CSV 데이터를 저장할 배열
+    let isLKeyPressed = false; // 'L' 키를 눌렀는지 확인하는 변수
+    let markerData = [];
     let baseUrl = window.location.origin + window.location.pathname;
 
     async function loadCSVData() {
         try {
-            const response = await fetch('`${baseUrl}/../markers/csv');
+            const response = await fetch(`${baseUrl}/../markers/csv`);
             const data = await response.text();
             parseCSVData(data);
         } catch (error) {
@@ -56,7 +113,7 @@
     }
 
     function parseCSVData(csvData) {
-        const rows = csvData.split("\n").slice(1); // 헤더는 제외
+        const rows = csvData.split("\n").slice(1);
         rows.forEach(row => {
             const [uuid, title, content, markerType] = row.split(",").map(col => col.trim());
             markerData.push({ uuid, title, content, markerType });
@@ -71,14 +128,12 @@
             zoomControl: true,
         });
 
-        // 마우스 이동 이벤트 등록 (기존 선 그리기 기능)
         google.maps.event.addListener(map, "mousemove", (event) => {
             if (drawing && isDKeyPressed && isMousePressed) {
                 drawLine(event);
             }
         });
 
-        // 키 다운 이벤트 등록 ('r', 'b', 'd' 키)
         window.addEventListener("keydown", (event) => {
             if (event.key === 'r' || event.key === 'R') {
                 isRKeyPressed = true;
@@ -86,10 +141,11 @@
                 isBKeyPressed = true;
             } else if (event.key === 'd' || event.key === 'D') {
                 isDKeyPressed = true;
+            } else if (event.key === 'l' || event.key === 'L') {
+                isLKeyPressed = true;
             }
         });
 
-        // 키 업 이벤트 등록
         window.addEventListener("keyup", (event) => {
             if (event.key === 'r' || event.key === 'R') {
                 isRKeyPressed = false;
@@ -100,6 +156,24 @@
                 if (drawing) {
                     finishDrawing();
                 }
+            } else if (event.key === 'l' || event.key === 'L') {
+                isLKeyPressed = false;
+            }
+        });
+
+        google.maps.event.addListener(map, 'click', (event) => {
+            const lat = event.latLng.lat();
+            const lon = event.latLng.lng();
+
+            if (isLKeyPressed) {
+                document.getElementById('latInput').value = lat;
+                document.getElementById('lonInput').value = lon;
+            }
+
+            if (isRKeyPressed) {
+                addMarker(lat, lon, "RED");
+            } else if (isBKeyPressed) {
+                addMarker(lat, lon, "BLUE");
             }
         });
 
@@ -120,20 +194,8 @@
                 finishDrawing();
             }
         });
-
-        // 지도 클릭 이벤트 (마커 추가)
-        map.addListener('click', (event) => {
-            const lat = event.latLng.lat();
-            const lon = event.latLng.lng();
-            if (isRKeyPressed) {
-                addMarker(lat, lon, "RED");
-            } else if (isBKeyPressed) {
-                addMarker(lat, lon, "BLUE");
-            }
-        });
     }
 
-    // 마커 추가 함수
     function addMarker(lat, lon, markerType) {
         const markerInfo = getRandomMarker(markerType);
         const marker = new google.maps.Marker({
@@ -155,13 +217,11 @@
         sendMarkerToBackend(lat, lon, markerType, markerInfo);
     }
 
-    // CSV 데이터에서 랜덤한 마커 정보 선택
     function getRandomMarker(markerType) {
         const filteredMarkers = markerData.filter(marker => marker.markerType === markerType);
         return filteredMarkers[Math.floor(Math.random() * filteredMarkers.length)];
     }
 
-    // 마커 데이터를 서버로 전송하는 함수
     async function sendMarkerToBackend(lat, lon, markerType, markerInfo) {
         const managerName = document.getElementById("nameInput").value || "manager";
         const data = {
@@ -193,7 +253,7 @@
         }
     }
 
-    // 그리기 시작 함수 (기존 기능)
+    // 그리기 시작 함수
     function startDrawing() {
         drawing = true;
         points = [];
@@ -213,13 +273,13 @@
         console.log('그리기 시작');
     }
 
-    // 선을 그리는 함수 (기존 기능)
+    // 선을 그리는 함수
     function drawLine(event) {
         points.push(event.latLng);
         polyline.setPath(points);
     }
 
-    // 그리기 종료 함수 (기존 기능)
+    // 그리기 종료 함수
     function finishDrawing() {
         drawing = false;
         map.setOptions({draggable: true});
@@ -230,7 +290,7 @@
         sendPointsToBackend(points);
     }
 
-    // 좌표를 서버로 전송하는 함수 (기존 기능)
+    // 좌표를 서버로 전송하는 함수
     async function sendPointsToBackend(points) {
         const managerName = document.getElementById("nameInput").value || "manager";
         const formattedPoints = points.map(point => ({
@@ -262,10 +322,43 @@
         }
     }
 
+    async function sendExplorePointDetail() {
+        const lat = document.getElementById('latInput').value;
+        const lon = document.getElementById('lonInput').value;
+        const managerName = document.getElementById('nameInput').value || 'manager';
+
+        const data = {
+            managerName: managerName,
+            centerPoint: {
+                lat: parseFloat(lat),
+                lon: parseFloat(lon)
+            }
+        };
+
+        try {
+            const response = await fetch('/manager/explorations/details', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            });
+
+            if (response.status === 201) {
+                console.log('Explore Point Detail 성공적으로 전송되었습니다.');
+            } else {
+                console.error('Explore Point Detail 전송 실패:', response.status);
+            }
+        } catch (error) {
+            console.error('서버 전송 중 오류 발생:', error);
+        }
+    }
+
     window.onload = function() {
         loadCSVData();
         initMap();
     };
 </script>
+
 </body>
 </html>

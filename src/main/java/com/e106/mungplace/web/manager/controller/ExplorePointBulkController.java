@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.e106.mungplace.web.manager.dto.ManagerExplorePointCreateRequest;
+import com.e106.mungplace.web.manager.dto.ManagerExplorePointDetailCreateRequest;
 import com.e106.mungplace.web.manager.service.ManagerExplorePointService;
 
 import lombok.RequiredArgsConstructor;
@@ -23,5 +24,11 @@ public class ExplorePointBulkController {
 	@PostMapping
 	public void insertBulkExplorePoint(@RequestBody ManagerExplorePointCreateRequest request) {
 		explorePointService.bulkInsertProcess(request.managerName(), request.points());
+	}
+
+	@ResponseStatus(HttpStatus.CREATED)
+	@PostMapping("/details")
+	public void insertBulkExplorePointDetail(@RequestBody ManagerExplorePointDetailCreateRequest request) {
+		explorePointService.bulkInsertDetailProcess(request.managerName(), request.centerPoint());
 	}
 }

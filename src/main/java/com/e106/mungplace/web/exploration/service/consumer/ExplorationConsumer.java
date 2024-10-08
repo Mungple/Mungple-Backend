@@ -26,8 +26,7 @@ public class ExplorationConsumer {
 
 	@KafkaListener(
 		topics = {"#{__listener.topic}"},
-		groupId = "#{__listener.topic}-create-group",
-		concurrency = "3"
+		groupId = "#{__listener.topic}-create-group"
 	)
 
 	public void listen(ExplorationEvent receivedEvent, Acknowledgment ack) {
