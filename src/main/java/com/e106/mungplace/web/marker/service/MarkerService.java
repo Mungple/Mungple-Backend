@@ -48,7 +48,6 @@ import com.e106.mungplace.web.util.RequestDeduplicator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -153,7 +152,7 @@ public class MarkerService {
 
 		return MarkerInfoResponse.builder()
 			.id(marker.getId())
-			.point(new Point(marker.getLon(), marker.getLat()))
+			.point(new Point(marker.getLat(), marker.getLon()))
 			.title(marker.getTitle())
 			.content(marker.getContent())
 			.type(marker.getType().name())
