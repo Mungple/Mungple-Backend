@@ -3,6 +3,7 @@ import React from 'react';
 import styled from 'styled-components/native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { FlatList, TouchableOpacity } from 'react-native';
+import CustomText from '../common/CustomText';
 
 interface ButtonItem {
   label: string;
@@ -75,12 +76,35 @@ const MapSettings: React.FC<MapSettingProps> = ({ visibleElements, toggleElement
   const renderButtonItem = ({ item }: { item: ButtonItem }) => {
     const isSelected = visibleElements[item.elementKey];
 
+    let zoneType: string;
+    switch (item.elementKey) {
+      case 'blueMarkers':
+      case 'blueZone':
+      case 'myBlueZone':
+        zoneType = 'BLUE'
+        break
+      case 'redMarkers':
+      case 'redZone':
+        zoneType = 'RED'
+        break
+      default:
+        zoneType = 'default'
+    }
+
     return (
       <ButtonContainer>
-        <Button onPress={() => toggleElementVisibility(item.elementKey)} selected={isSelected}>
+        <Button 
+          onPress={() => toggleElementVisibility(item.elementKey)} 
+          selected={isSelected}
+          zoneType={zoneType}
+          >
           <Icon name={item.iconName} size={28} color={colors.WHITE} />
         </Button>
-        <ButtonLabel>{item.label}</ButtonLabel>
+        <ButtonLabel>
+          <CustomText fontSize={20}>
+            {item.label}
+          </CustomText>
+        </ButtonLabel>
       </ButtonContainer>
     );
   };
@@ -109,7 +133,17 @@ const Button = styled(TouchableOpacity)<{ selected: boolean }>`
   border-radius: 35px;
   align-items: center;
   justify-content: center;
-  background-color: ${({ selected }) => (selected ? colors.ORANGE.BASE : colors.GRAY_300)};
+  background-color: ${({ selected, zoneType }) => {
+    if (selected) {
+      // zoneType에 따라 색상 변경
+      return zoneType === 'BLUE'
+        ? colors.BLUE.DARKER
+        : zoneType === 'RED'
+        ? colors.RED.BASE
+        : colors.ORANGE.BASE;
+    }
+    return colors.GRAY_300;
+  }};
 `;
 
 const ButtonContainer = styled.View`

@@ -11,6 +11,7 @@ type MyBlueZoneHeatmapProps = {
 
 const MyBlueZoneHeatmap = ({ myBlueZone, checkMyBlueZone }: MyBlueZoneHeatmapProps) => {
   const { userLocation } = useUserLocation();
+  // const requestId = Math.random().toString(36).substr(2, 9);
 
   // 사용자 위치 변경 시 블루존 요청
   useEffect(() => {
@@ -20,6 +21,7 @@ const MyBlueZoneHeatmap = ({ myBlueZone, checkMyBlueZone }: MyBlueZoneHeatmapPro
 
       // 반경 1000미터 내 블루존 요청
       const zoneData: ToZone = {
+        // requestId: requestId,
         side: 500,
         point: { lat: centerLat, lon: centerLon },
       };

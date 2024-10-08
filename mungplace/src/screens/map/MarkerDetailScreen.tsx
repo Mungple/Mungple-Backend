@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Button, Image, StyleSheet, ActivityIndicator, ScrollView } from 'react-native';
+import { View, Image, StyleSheet, ActivityIndicator, ScrollView } from 'react-native';
 import axiosInstance from '@/api/axios';
 import { MarkerDetails } from '../../state/useMapStore'; // MarkerDetails 타입을 useMapStore에서 가져옵니다.
 import { useAppStore } from '@/state/useAppStore';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { useUserStore } from '@/state/useUserStore';
+import { useUserStore } from '@/state/useUserStore'; // 유저 스토어
+import CustomText from '@/components/common/CustomText'; // 커스텀 텍스트
+import CustomButton from '@/components/common/CustomButton'; // 커스텀 버튼
 
 const MarkerDetailScreen: React.FC = () => {
   const navigation = useNavigation();
@@ -15,6 +17,7 @@ const MarkerDetailScreen: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const accessToken = useAppStore(state => state.token)
   const currentUserId = useUserStore(state => state.userId)
+  const { userData } = useUserStore((state) => state)
 
   useEffect(() => {
     fetchMarkerDetails(markerId);
@@ -78,19 +81,20 @@ const MarkerDetailScreen: React.FC = () => {
   }
 
   if (error) {
-    return <Text style={styles.errorText}>{error}</Text>;
+    return <CustomText >{error}</CustomText>;
   }
 
   if (!markerDetails) {
     return null; // 마커 데이터가 없을 경우 null 반환
   }
 
+  const nickname = userData.userId === markerDetails.userId ? userData.nickname : '익명'
+
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>{markerDetails.title}</Text>
-      <Text style={styles.content}>{markerDetails.content}</Text>
-      <Text style={styles.date}>{`${formatDate(markerDetails.createdAt)}에 생성됨`}</Text>
-      
+      <CustomText style={styles.title}>{markerDetails.title}</CustomText>
+      <CustomText style={styles.content}>{markerDetails.content}</CustomText>      
       {markerDetails.images.length > 0 && (
         <View style={styles.imageContainer}>
           {markerDetails.images.map((imageUri, index) => (
@@ -99,14 +103,14 @@ const MarkerDetailScreen: React.FC = () => {
         </View>
       )}
       
-      <Text style={styles.userId}>작성자: {markerDetails.userId}</Text>
-      
+      <CustomText style={styles.userId}>작성자: {nickname}</CustomText>
+      <CustomText style={styles.date}>{`${formatDate(markerDetails.createdAt)}에 생성됨`}</CustomText>
       {/* 현재 접속한 유저와 작성자가 동일할 때만 삭제 버튼 렌더링 */}
       {currentUserId === markerDetails.userId && (
-        <Button title="삭제" onPress={handleDelete} color="#d9534f" />
+        <CustomButton label="삭제" onPress={handleDelete} variant='outlined' />
       )}
       
-      <Button title="Back" onPress={() => navigation.goBack()} color="#5bc0de" />
+      <CustomButton label="뒤로 가기" onPress={() => navigation.goBack()} variant='outlined' />
     </ScrollView>
   );
 };

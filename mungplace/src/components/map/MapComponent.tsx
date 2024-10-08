@@ -12,6 +12,7 @@ import MapSettings from './MapSettings';
 import MarkerForm from '../marker/MarkerForm';
 import CustomMapButton from '../common/CustomMapButton';
 import CustomBottomSheet from '../common/CustomBottomSheet';
+import CustomText from '../common/CustomText';
 
 // 3. 지도 관련
 import MungZoneHeatmap from './MungZoneHeatmap';
@@ -76,11 +77,11 @@ const MapComponent: React.FC<MapComponentProps> = ({
   const petFacilities = useMapStore((state) => state.petFacilities);
   const [isSettingModalVisible, setIsSettingModalVisible] = useState(false);
   const [visibleElements, setVisibleElements] = useState({
-    blueZone: true,
-    redZone: true,
-    mungZone: true,
+    blueZone: false,
+    redZone: false,
+    mungZone: false,
     convenienceInfo: true,
-    myBlueZone: true,
+    myBlueZone: false,
     redMarkers: true,
     blueMarkers: true,
   });
@@ -337,7 +338,11 @@ const MapComponent: React.FC<MapComponentProps> = ({
           right: 0,
         }}>
         <ButtonWithTextContainer top={40} right={20}>
-          <TextLabel>마커 등록</TextLabel>
+          <TextLabel>
+            <CustomText fontSize={26}>
+              마커 등록
+            </CustomText>
+          </TextLabel>
           <CustomMapButton
             onPress={() => {
               setFormVisible(true);
@@ -355,7 +360,11 @@ const MapComponent: React.FC<MapComponentProps> = ({
           longitude={userLocation.longitude || 128.853919}
         />
         <ButtonWithTextContainer top={120} right={20}>
-          <TextLabel>지도 설정</TextLabel>
+          <TextLabel>
+            <CustomText fontSize={26}>
+              지도 설정
+            </CustomText>
+          </TextLabel>
           <CustomMapButton
             onPress={handlePressSetting}
             iconName="settings-outline"
@@ -373,7 +382,11 @@ const MapComponent: React.FC<MapComponentProps> = ({
           />
         </CustomBottomSheet>
         <ButtonWithTextContainer top={200} right={20}>
-          <TextLabel>내 마커 보기</TextLabel>
+          <TextLabel>
+            <CustomText fontSize={26}>
+              내 마커 보기
+            </CustomText>
+          </TextLabel>
           <CustomMapButton onPress={handleViewMyMarkers} iconName="location" inValid={isDisabled} />
         </ButtonWithTextContainer>
       </Animated.View>
