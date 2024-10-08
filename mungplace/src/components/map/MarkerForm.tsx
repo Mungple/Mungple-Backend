@@ -7,6 +7,7 @@ import {MarkerData} from '../../state/useMapStore'
 import {useAppStore} from '@/state/useAppStore'
 import axiosInstance from '@/api/axios'
 import CustomButton from '../common/CustomButton'
+import LoadingSpinner from '../common/LoadingSpinner'
 
 export interface MarkerFormProps {
   isVisible: boolean
@@ -21,6 +22,7 @@ const MarkerForm: React.FC<MarkerFormProps> = ({isVisible, onSubmit, onClose, la
   const [body, setBody] = useState('')
   const [imageUri, setImageUri] = useState<string | undefined>(undefined)
   const [type, setType] = useState<'BLUE' | 'RED'>('BLUE')
+  const [ isLoading, setIsLoading ] = useState(true)
 
   const accessToken = useAppStore(state => state.token)
   // console.log("토큰 :", accessToken)
@@ -84,8 +86,8 @@ const MarkerForm: React.FC<MarkerFormProps> = ({isVisible, onSubmit, onClose, la
         },
       })
 
-      console.log('서버 응답:', response.data)
-      console.log('마커 ID:', response.data.markerId)
+      // console.log('서버 응답:', response.data)
+      // console.log('마커 ID:', response.data.markerId)
       // 서버에서 응답받은 데이터로 마커 생성
       const createdMarker: MarkerData = {
         ...markerData,
@@ -98,7 +100,13 @@ const MarkerForm: React.FC<MarkerFormProps> = ({isVisible, onSubmit, onClose, la
     } catch (error) {
       console.error('Error adding marker:', error)
       // 서버에서 반환한 에러 응답을 콘솔에 출력
+    } finally {
+      setIsLoading(false)
     }
+  }
+
+  if (isLoading) {
+    return <LoadingSpinner />
   }
 
   return (
