@@ -2,12 +2,15 @@ package com.e106.mungplace.web.handler;
 
 import static org.mockito.Mockito.*;
 
+import java.security.Principal;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.SetOperations;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.WebSocketSession;
@@ -20,14 +23,24 @@ class WebSocketSessionManagerUnitTest {
 
 	private WebSocketHandler mockHandler;
 	private WebSocketSession mockSession;
+	private Principal mockPrincipal;
+	private RedisTemplate<String, String> redisTemplate;
 
 	@BeforeEach
 	public void setUp() {
+		redisTemplate = mock(RedisTemplate.class);
+		SetOperations<String, String> setOperations = mock(SetOperations.class);
+
 		mockHandler = mock(WebSocketHandler.class);
 		mockSession = mock(WebSocketSession.class);
-		sessionManager = new WebSocketSessionManager(mockHandler);
+		mockPrincipal = mock(Principal.class);
 
 		when(mockSession.getId()).thenReturn("test-session");
+		when(mockSession.getPrincipal()).thenReturn(mockPrincipal);
+		when(mockSession.getPrincipal().getName()).thenReturn("test-user");
+		when(redisTemplate.opsForSet()).thenReturn(setOperations);
+
+		sessionManager = new WebSocketSessionManager(mockHandler, redisTemplate);
 	}
 
 	@AfterEach
