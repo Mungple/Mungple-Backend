@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import styled from 'styled-components/native';
-import { Dimensions, TextInput, TouchableOpacity } from 'react-native';
+import { Dimensions, Image, TextInput } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { managerLogin } from '@/components/common/ManagerLogin';
-import { authNavigations } from '@/constants';
-import Logo from '@/assets/mungple_logo.png';
+import { authNavigations, colors } from '@/constants';
+import Logo from '@/assets/mungpleAppLogo.png';
 import kakaoLogo from '@/assets/kakao_login_button.png';
 import { AuthStackParamList } from '@/navigations/stack/AuthStackNavigator';
 import CustomButton from '@/components/common/CustomButton';
+import CustomText from '@/components/common/CustomText';
 
 type AuthHomeScreenProps = NativeStackScreenProps<
   AuthStackParamList,
@@ -29,7 +30,13 @@ const AuthHomeScreen: React.FC<AuthHomeScreenProps> = ({ navigation }) => {
   return (
     <Container>
       <LogoContainer>
-        <LogoImage source={Logo} />
+        <Image source={Logo} style={{ height: 100, resizeMode: 'contain' }} />
+        <CustomText fontWeight={'bold'} fontSize={36}>
+          mungple
+        </CustomText>
+        <CustomText style={{ marginTop: 15, marginBottom: 50 }}>
+          반려견과 즐거운 산책을 시작해보세요!
+        </CustomText>
       </LogoContainer>
 
       <ButtonsContainer>
@@ -45,30 +52,26 @@ const AuthHomeScreen: React.FC<AuthHomeScreenProps> = ({ navigation }) => {
 };
 
 const Container = styled.SafeAreaView`
-  flex: 1.5;
+  flex: 1;
   padding: 20px;
   align-items: center;
   justify-content: center;
 `;
 
 const LogoContainer = styled.View`
+  align-items: center;
+  justify-content: center;
   width: ${width * 0.6}px;
-  height: ${width * 0.6}px;
-  margin-bottom: 40px;
-`;
-
-const LogoImage = styled.Image`
-  width: 100%;
-  height: 100%;
   resizemode: contain;
 `;
 
 const ButtonsContainer = styled.View`
   width: 100%;
   align-items: center;
+  justify-content: flex-start;
 `;
 
-const LoginButton = styled(TouchableOpacity)`
+const LoginButton = styled.TouchableOpacity`
   width: 100%;
   align-items: center;
 `;

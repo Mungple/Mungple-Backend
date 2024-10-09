@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, Animated } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import dogfoot from '@/assets/dogfoot.png'
+import dogfoot from '@/assets/dogfoot.png';
 import { mapNavigations } from '@/constants';
+import { MapStackParamList } from '@/navigations/stack/MapStackNavigator';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 const Countdown: React.FC = () => {
   const [pawCount, setPawCount] = useState(3);
-  const [animatedValues, setAnimatedValues] = useState<Animated.Value[]>([])
-  const navigation = useNavigation()
+  const [animatedValues, setAnimatedValues] = useState<Animated.Value[]>([]);
+  const navigation = useNavigation<NativeStackNavigationProp<MapStackParamList>>();
 
   // 카운트다운 로직
   useEffect(() => {
@@ -28,7 +30,6 @@ const Countdown: React.FC = () => {
 
     return () => clearInterval(countdownInterval); // 인터벌 클리어
   }, []);
-
 
   // 발바닥 이미지 애니메이션
   useEffect(() => {
@@ -60,10 +61,11 @@ const Countdown: React.FC = () => {
                 opacity: animatedValues[index],
                 transform: [
                   {
-                    translateY: animatedValues[index]?.interpolate({
-                      inputRange: [0, 1],
-                      outputRange: [-30, 0], // 위로 튀는 효과
-                    }) || 0,
+                    translateY:
+                      animatedValues[index]?.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: [-30, 0], // 위로 튀는 효과
+                      }) || 0,
                   },
                 ],
               },
@@ -88,7 +90,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   pawImage: {
-    width: 100,  // 이미지 크기 증가
+    width: 100, // 이미지 크기 증가
     height: 100, // 이미지 크기 증가
     marginHorizontal: 10, // 이미지 간 간격
   },

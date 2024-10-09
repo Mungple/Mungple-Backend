@@ -1,15 +1,15 @@
 // 1. 라이브러리 및 네이티브 기능
 import styled from 'styled-components/native';
-import { Animated, Image as RNImage } from 'react-native';
+import { Animated, Image as RNImage, Text } from 'react-native';
 import ClusteredMapView from 'react-native-map-clustering';
 import React, { useEffect, useRef, useState } from 'react';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import MapView, { Marker, Polyline, PROVIDER_GOOGLE } from 'react-native-maps';
+import MapView, { LatLng, Marker, Polyline, PROVIDER_GOOGLE } from 'react-native-maps';
 
 // 2. 커스텀 컴포넌트
 import MapSettings from './MapSettings';
-import MarkerForm from './MarkerForm';
+import MarkerForm from '../marker/MarkerForm';
 import CustomMapButton from '../common/CustomMapButton';
 import CustomBottomSheet from '../common/CustomBottomSheet';
 import CustomText from '../common/CustomText';
@@ -28,7 +28,6 @@ import blueMarker from '@/assets/blueMarker.png';
 // 5. 훅(Hooks)
 import useWebSocket from '@/hooks/useWebsocket';
 import usePermission from '@/hooks/usePermission';
-import useUserLocation from '@/hooks/useUserLocation';
 import useMarkersWithinRadius from '@/hooks/useMarkersWithinRadius';
 
 // 6. 상태 관리 및 데이터
@@ -42,7 +41,7 @@ import { MapStackParamList } from '@/navigations/stack/MapStackNavigator';
 
 // 컴포넌트에 전달되는 props 정의
 interface MapComponentProps {
-  userLocation: { latitude: number; longitude: number };
+  userLocation: LatLng | null;
   path?: { latitude: number; longitude: number }[];
   bottomOffset?: number;
   markers?: MarkerData[]; // 마커 생성 용
@@ -88,7 +87,6 @@ const MapComponent: React.FC<MapComponentProps> = ({
 
   // 지도 관련 레퍼런스 및 위치 상태
   const mapRef = useRef<MapView | null>(null);
-  const { isUserLocationError } = useUserLocation();
   const setPetFacilities = useMapStore((state) => state.setPetFacilities);
   const navigation = useNavigation<NativeStackNavigationProp<MapStackParamList>>();
   const { myBlueZone, allBlueZone, allRedZone, mungZone } = useWebSocket(explorationId);
@@ -138,7 +136,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
 
   // 유저의 위치를 호출하는 함수
   const handlePressUserLocation = () => {
-    if (userLocation && !isUserLocationError) {
+    if (userLocation) {
       mapRef.current?.animateToRegion({
         latitude: userLocation.latitude,
         longitude: userLocation.longitude,
@@ -235,6 +233,13 @@ const MapComponent: React.FC<MapComponentProps> = ({
   }, [userLocation]);
 
   // ========== UI Rendering ==========
+  if (!userLocation)
+    return (
+      <Container>
+        <Text>위치 권한을 허용해주세요</Text>
+      </Container>
+    );
+
   return (
     <Container>
       <ClusteredMapView
@@ -253,7 +258,8 @@ const MapComponent: React.FC<MapComponentProps> = ({
         maxZoomLevel={20}
         style={{ flex: 1 }}
         clusteringEnabled={true}
-        clusterColor={colors.ORANGE.DARKER}>
+        clusterColor={colors.ORANGE.DARKER}
+        tracksViewChanges={false}>
         {/* 블루 마커 */}
         {visibleElements.blueMarkers &&
           updatedMarkers
@@ -339,9 +345,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
         }}>
         <ButtonWithTextContainer top={40} right={20}>
           <TextLabel>
-            <CustomText fontSize={26}>
-              마커 등록
-            </CustomText>
+            <CustomText fontSize={26}>마커 등록</CustomText>
           </TextLabel>
           <CustomMapButton
             onPress={() => {
@@ -356,14 +360,12 @@ const MapComponent: React.FC<MapComponentProps> = ({
           isVisible={formVisible}
           onSubmit={handleMarkerSubmit}
           onClose={() => setFormVisible(false)}
-          latitude={userLocation.latitude || 35.096406}
-          longitude={userLocation.longitude || 128.853919}
+          latitude={userLocation.latitude}
+          longitude={userLocation.longitude}
         />
         <ButtonWithTextContainer top={120} right={20}>
           <TextLabel>
-            <CustomText fontSize={26}>
-              지도 설정
-            </CustomText>
+            <CustomText fontSize={26}>지도 설정</CustomText>
           </TextLabel>
           <CustomMapButton
             onPress={handlePressSetting}
@@ -383,9 +385,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
         </CustomBottomSheet>
         <ButtonWithTextContainer top={200} right={20}>
           <TextLabel>
-            <CustomText fontSize={26}>
-              내 마커 보기
-            </CustomText>
+            <CustomText fontSize={26}>내 마커 보기</CustomText>
           </TextLabel>
           <CustomMapButton onPress={handleViewMyMarkers} iconName="location" inValid={isDisabled} />
         </ButtonWithTextContainer>
