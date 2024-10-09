@@ -129,16 +129,20 @@ const useWebSocket = (explorationId: number = -1) => {
     });
   };
 
-  const sendLocation = (explorationId: number, location: ToLocation) => {
-    if (clientSocket?.connected) {
-      clientSocket.publish({
-        destination: `/pub/explorations/${explorationId}`,
-        body: JSON.stringify(location),
-      });
-    } else {
-      console.error('sendLocation 소켓 연결이 되어있지 않습니다.');
-    }
-  };
+  const sendLocation = useCallback(
+    (explorationId: number, location: ToLocation) => {
+      if (clientSocket?.connected) {
+        console.log(location);
+        clientSocket.publish({
+          destination: `/pub/explorations/${explorationId}`,
+          body: JSON.stringify(location),
+        });
+      } else {
+        console.error('sendLocation 소켓 연결이 되어있지 않습니다.');
+      }
+    },
+    [clientSocket],
+  );
 
   const checkMyBlueZone = useCallback(
     (myBlueZone: ToZone) => {
