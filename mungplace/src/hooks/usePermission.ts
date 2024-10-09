@@ -1,7 +1,14 @@
 import { alerts } from '@/constants';
 import { useEffect } from 'react';
 import { Alert, Linking } from 'react-native';
-import { check, request, Permission, RESULTS, PERMISSIONS } from 'react-native-permissions';
+import {
+  requestMultiple,
+  Permission,
+  RESULTS,
+  PERMISSIONS,
+  check,
+  request,
+} from 'react-native-permissions';
 
 // 권한 유형 정의
 type PermissionType = 'LOCATION' | 'PHOTO' | 'CAMERA';
@@ -12,6 +19,13 @@ const androidPermissons: { [key in PermissionType]: Permission } = {
   PHOTO: PERMISSIONS.ANDROID.READ_MEDIA_IMAGES,
   CAMERA: PERMISSIONS.ANDROID.CAMERA,
 };
+
+// 모든 위치 권한을 포함하는 배열
+const allLocationPermissions = [
+  PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION, // GPS 권한
+  PERMISSIONS.ANDROID.ACCESS_COARSE_LOCATION, // 네트워크 위치 권한
+  PERMISSIONS.ANDROID.ACCESS_BACKGROUND_LOCATION, // 백그라운드 위치 권한
+];
 
 const usePermission = (type: PermissionType) => {
   useEffect(() => {
@@ -35,16 +49,17 @@ const usePermission = (type: PermissionType) => {
 
       // 권한 상태에 따른 로직 처리
       switch (checked) {
-        // 1. 권한이 거부된 경우 경고 알림만 표시하고 종료
+        // 1. 권한이 거부된 경우
         case RESULTS.DENIED: {
           const result = await request(androidPermissons[type]);
 
+          // 요청 후 결과 처리
           if (result !== RESULTS.GRANTED) {
             showPermissonAlert();
           }
           return;
         }
-        // 2. 권한이 차단되거나 제한된 경우 설정 페이지로 이동하도록 유도
+        // 2. 권한이 차단되거나 제한된 경우
         case RESULTS.BLOCKED:
         case RESULTS.LIMITED:
           showPermissonAlert();
@@ -52,6 +67,21 @@ const usePermission = (type: PermissionType) => {
         // 3. 그 외 (권한이 이미 부여된 경우 등) 아무 작업도 하지 않음
         default:
           break;
+      }
+
+      // LOCATION 권한 요청 시, 모든 위치 관련 권한을 한 번에 요청
+      if (type === 'LOCATION') {
+        const results = await requestMultiple(allLocationPermissions);
+
+        // 각 권한의 상태를 체크하여 거부된 권한 확인
+        const notGranted = allLocationPermissions.filter(
+          (permission) => results[permission] !== RESULTS.GRANTED,
+        );
+
+        // 거부된 권한에 대한 알림 표시
+        if (notGranted.length > 0) {
+          showPermissonAlert();
+        }
       }
     })();
   }, [type]); // type이 변경될 때마다 useEffect 실행
