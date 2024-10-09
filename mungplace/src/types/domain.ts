@@ -1,5 +1,7 @@
+import { JwtPayload } from 'jwt-decode';
+
 // 사용자 프로필 정보를 정의한 타입
-interface UserProfile {
+interface ResponseUserProfile {
   userId: number;
   nickname: string;
   imageName: string | null;
@@ -46,12 +48,17 @@ interface Location {
   lon: number;
 }
 
+interface CustomJwtPayload extends JwtPayload {
+  userId: number;
+}
+
 export type {
   Location,
   Distance,
-  UserProfile,
   Exploration,
   StartExplorate,
+  CustomJwtPayload,
   RequestPetProfile,
   ResponsePetProfile,
+  ResponseUserProfile,
 };

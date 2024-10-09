@@ -4,6 +4,7 @@ const queryKeys = {
   GET_PROFILE: 'getProfile',
   GET_USER_ID: 'getUserId',
   GET_PETS: 'getPets',
+  GET_PET_FACILITIY: 'getPetFacility',
 } as const;
 
 const storageKeys = {

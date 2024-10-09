@@ -6,11 +6,11 @@ import ImagePicker, { Image as PickerImage } from 'react-native-image-crop-picke
 import { getFormDataImage } from '@/utils';
 import useImage from './queries/useImage';
 
-interface UseImagePickerProps {
+type UseImagePickerProps = {
   petId?: number;
   image?: string;
   onSettled?: () => void;
-}
+};
 
 // 이미지 선택 및 업로드를 관리하는 커스텀 훅
 const useImagePicker = ({ petId, image = '', onSettled }: UseImagePickerProps) => {

@@ -20,11 +20,11 @@ interface Statistics {
   bestTime: number;
 }
 
-interface StatCardProps {
+type StatCardProps = {
   icon: string;
   label: string;
   value: string;
-}
+};
 
 const MonthStatistics: React.FC<{ year: number; month: number }> = ({ year, month }) => {
   const [statistics, setStatistics] = useState<Statistics | null>(null);

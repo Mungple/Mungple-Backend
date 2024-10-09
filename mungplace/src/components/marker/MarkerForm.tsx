@@ -8,13 +8,13 @@ import LoadingSpinner from '../common/LoadingSpinner';
 import { createMarker } from '@/api';
 import { MarkerData } from '@/types';
 
-export interface MarkerFormProps {
+type MarkerFormProps = {
   isVisible: boolean;
   onSubmit: (markerData: MarkerData) => void;
   onClose: () => void;
   latitude: number;
   longitude: number;
-}
+};
 
 const MarkerForm: React.FC<MarkerFormProps> = ({
   isVisible,

@@ -5,12 +5,12 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { colors, numbers } from '@/constants';
 import CustomText from '@/components/common/CustomText';
 
-interface MonthSelectorProps {
+type MonthSelectorProps = {
   isVisible: boolean;
   currentmonth: number;
   onChangeMonth: (month: number) => void;
   hide: () => void;
-}
+};
 
 const months = [
   '1월',
