@@ -29,7 +29,6 @@ const WalkingScreen: React.FC = () => {
   // ========== Constants ==========
   // 상태 관리 (앱 스토어 및 맵 스토어에서 상태 추출)
   const markers = useMapStore((state) => state.markers);
-  const distance = useAppStore((state) => state.distance);
   const isSocket = useAppStore((state) => state.isSocket);
   const setIsSocket = useAppStore((state) => state.setIsSocket);
   const startExplorate = useAppStore((state) => state.startExplorate);
@@ -43,6 +42,7 @@ const WalkingScreen: React.FC = () => {
     allBlueZone,
     allRedZone,
     mungZone,
+    distance,
     sendLocation,
     checkAllUserZone,
     checkMyBlueZone,

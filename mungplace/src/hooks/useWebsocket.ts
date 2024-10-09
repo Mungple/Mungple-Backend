@@ -15,13 +15,13 @@ const WEBSOCKET_URI = 'wss://j11e106.p.ssafy.io/api/ws';
 
 const useWebSocket = (explorationId: number = -1) => {
   const setIsSocket = useAppStore((state) => state.setIsSocket);
-  const setDistance = useAppStore((state) => state.setDistance);
   const [clientSocket, setClientSocket] = useState<Client | null>(null);
   const [explorations, setExplorations] = useState<ErrorMessage | null>(null);
   const [allBlueZone, setAllBlueZone] = useState<FromZone | null>(null);
   const [allRedZone, setAllRedZone] = useState<FromZone | null>(null);
   const [myBlueZone, setMyBlueZone] = useState<FromZone | null>(null);
   const [mungZone, setMungZone] = useState<Array<Point> | null>(null);
+  const [distance, setDistance] = useState(0);
 
   // 소켓 연결 시도
   useEffect(() => {
@@ -192,6 +192,7 @@ const useWebSocket = (explorationId: number = -1) => {
     allBlueZone,
     allRedZone,
     mungZone,
+    distance,
     sendLocation,
     checkMyBlueZone,
     checkAllUserZone,
