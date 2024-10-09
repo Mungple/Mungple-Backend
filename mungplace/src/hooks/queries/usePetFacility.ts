@@ -11,7 +11,7 @@ function useGetPetFacility(
 ) {
   return useQuery({
     queryFn: () => getPetFacility(Number(lat), Number(lon)),
-    queryKey: [queryKeys.GET_PET_FACILITIY],
+    queryKey: [queryKeys.GET_PET_FACILITIY, lat, lon],
     enabled: Boolean(lat) && Boolean(lon),
     throwOnError: true,
     ...queryOptions,
