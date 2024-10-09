@@ -30,7 +30,7 @@ import usePermission from '@/hooks/usePermission';
 import useMarkersWithinRadius from '@/hooks/useMarkersWithinRadius';
 
 // 6. 상태 관리 및 데이터
-import { getWithPetPlace } from '@/api';
+import { getPetFacility } from '@/api';
 import { colors, mapNavigations } from '@/constants';
 import { FromZone, Point, ToMungZone, ToZone } from '@/types';
 import { useMapStore, MarkerData } from '@/state/useMapStore';
@@ -225,7 +225,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
   useEffect(() => {
     const getPetFacilities = async () => {
       if (userLocation) {
-        const petFacilities = await getWithPetPlace(userLocation.latitude, userLocation.longitude);
+        const petFacilities = await getPetFacility(userLocation.latitude, userLocation.longitude);
         const facilityPoints = petFacilities.facilityPoints;
         setPetFacilities(facilityPoints);
       }

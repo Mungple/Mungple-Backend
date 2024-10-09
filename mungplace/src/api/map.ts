@@ -1,7 +1,7 @@
 import axiosInstance from './axios';
-import { FacilityPoints } from '@/types';
+import { FacilityPoints, PetFacilityDetail } from '@/types';
 
-const getWithPetPlace = async (lat: number, lon: number): Promise<FacilityPoints> => {
+const getPetFacility = async (lat: number, lon: number): Promise<FacilityPoints> => {
   try {
     const params = {
       radius: 1000,
@@ -22,4 +22,18 @@ const getWithPetPlace = async (lat: number, lon: number): Promise<FacilityPoints
   }
 };
 
-export { getWithPetPlace };
+const getPetFacilityDetail = async (facilityId: number): Promise<PetFacilityDetail> => {
+  try {
+    const { data } = await axiosInstance.get(`/pet-facilities/${facilityId}`, {
+      headers: {
+        'Content-Type': 'application/json; charset=utf8',
+      },
+    });
+    return data;
+  } catch (error) {
+    console.error('[FAIL] getPetFacilityDetail :', error);
+    throw error;
+  }
+};
+
+export { getPetFacility, getPetFacilityDetail };
