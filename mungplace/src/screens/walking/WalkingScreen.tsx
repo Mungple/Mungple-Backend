@@ -29,8 +29,6 @@ const WalkingScreen: React.FC = () => {
   // ========== Constants ==========
   // 상태 관리 (앱 스토어 및 맵 스토어에서 상태 추출)
   const markers = useMapStore((state) => state.markers);
-  const isSocket = useAppStore((state) => state.isSocket);
-  const setIsSocket = useAppStore((state) => state.setIsSocket);
   const startExplorate = useAppStore((state) => state.startExplorate);
 
   const userLocation = useUserStore((state) => state.userLocation);
@@ -69,7 +67,6 @@ const WalkingScreen: React.FC = () => {
   const confirmEndWalking = () => {
     if (startExplorate) {
       exitWalk(startExplorate.explorationId);
-      setIsSocket(false);
       setModalVisible(false);
       navigation.navigate(mapNavigations.HOME);
     } else {
@@ -109,7 +106,7 @@ const WalkingScreen: React.FC = () => {
     return () => {
       clearInterval(intervalId);
     };
-  }, [isSocket]);
+  }, []);
 
   // ========== UI Rendering ==========
   if (!startExplorate) {
