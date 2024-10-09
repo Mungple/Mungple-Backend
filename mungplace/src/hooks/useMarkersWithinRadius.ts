@@ -2,7 +2,7 @@ import React from 'react';
 import { useUserStore } from '@/state/useUserStore';
 import { useFocusEffect } from '@react-navigation/native';
 import { useMapStore, NearbyMarkersData, ClusterData } from '@/state/useMapStore';
-import { getNearbyMarkers } from '@/api/map';
+import { getNearbyMarkers } from '@/api';
 
 // 마커 데이터를 조회하고 클러스터링하는 훅
 const useMarkersWithinRadius = () => {

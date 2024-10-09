@@ -8,10 +8,9 @@ const addImage = async (formData: FormData): Promise<string> => {
         'Content-Type': 'multipart/form-data; charset=utf8',
       },
     });
-    console.log('프로필 사진 등록 완료');
     return data;
   } catch (error) {
-    console.log('프로필 사진 등록 실패 :', error);
+    console.error('[FAIL] 프로필 사진 등록 실패 :', error);
     throw error;
   }
 };
@@ -19,7 +18,7 @@ const addImage = async (formData: FormData): Promise<string> => {
 // 반려견 프로필 사진을 등록하는 함수
 const addPetImage = async (body: FormData, petId?: number): Promise<string> => {
   if (!petId) {
-    console.log(`petId가 없습니다`);
+    console.error(`[FAIL] petId가 없습니다`);
     throw Error;
   }
   try {
@@ -28,10 +27,9 @@ const addPetImage = async (body: FormData, petId?: number): Promise<string> => {
         'Content-Type': 'multipart/form-data; charset=utf8',
       },
     });
-    console.log('반려견 사진 등록 완료');
     return data;
   } catch (error) {
-    console.log('반려견 사진 등록 실패 :', error);
+    console.error('[FAIL] 반려견 사진 등록 실패 :', error);
     throw Error;
   }
 };

@@ -5,7 +5,7 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 // 2. API 호출
-import { startWalk } from '@/api/walk';
+import { startWalk } from '@/api';
 
 // 3. 커스텀 컴포넌트
 import PetList from '@/components/user/PetList';

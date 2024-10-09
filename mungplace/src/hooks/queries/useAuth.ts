@@ -5,7 +5,7 @@ import { useAppStore } from '@/state/useAppStore';
 import { useUserStore } from '@/state/useUserStore';
 import { queryKeys, storageKeys } from '@/constants';
 import { setEncryptStorage, setHeader } from '@/utils';
-import { ResponseProfile, getProfile, getUserId, socialLogin } from '@/api/auth';
+import { ResponseProfile, getProfile, getUserId, socialLogin } from '@/api';
 import type { UseMutationCustomOptions, UseQueryCustomOptions } from '@/types/common';
 
 // 로그인 커스텀 훅

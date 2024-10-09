@@ -2,7 +2,7 @@ import React, { useState, useCallback } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 import styled from 'styled-components/native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import { getStatistics } from '@/api/walk';
+import { getStatistics } from '@/api';
 import { colors } from '@/constants';
 import { calculateTime, calculateDistance } from '@/utils/recordCalculator';
 import CustomText from '../common/CustomText';
@@ -45,7 +45,6 @@ const MonthStatistics: React.FC<{ year: number; month: number }> = ({ year, mont
             bestTime: calculateTime(response.bestTime),
           };
           setStatistics(formattedStatistics);
-          console.log(response);
         } catch (err) {
           if (err instanceof Error) {
             console.error(err);
@@ -65,7 +64,7 @@ const MonthStatistics: React.FC<{ year: number; month: number }> = ({ year, mont
   );
 
   if (loading) {
-    return <LoadingSpinner />
+    return <LoadingSpinner />;
   }
 
   if (error) {

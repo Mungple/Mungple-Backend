@@ -30,9 +30,9 @@ import usePermission from '@/hooks/usePermission';
 import useMarkersWithinRadius from '@/hooks/useMarkersWithinRadius';
 
 // 6. 상태 관리 및 데이터
-import { FromZone, Point, ToMungZone, ToZone } from '@/types';
-import { getWithPetPlace } from '@/api/map';
+import { getWithPetPlace } from '@/api';
 import { colors, mapNavigations } from '@/constants';
+import { FromZone, Point, ToMungZone, ToZone } from '@/types';
 import { useMapStore, MarkerData } from '@/state/useMapStore';
 
 // 7. 네비게이션 타입
@@ -170,7 +170,6 @@ const MapComponent: React.FC<MapComponentProps> = ({
         // 해당 markerId가 있는 경우 상세 페이지로 이동
         if (marker) {
           navigation.navigate(mapNavigations.MARKERDETAIL, { markerId });
-          console.log(`마커 클릭 : ${markerId}`);
         }
       });
     }

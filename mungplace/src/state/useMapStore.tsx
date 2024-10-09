@@ -14,6 +14,10 @@ export interface MarkerData {
   type: 'BLUE' | 'RED';
 }
 
+export interface MarkerId {
+  markerId: string;
+}
+
 // 내 마커 데이터 인터페이스
 export interface MyMarkerData {
   markerId: string;
@@ -67,8 +71,8 @@ export interface NearbyMarkersData {
 // 맵 화면의 상태 정의
 interface MapState {
   markers: MarkerData[]; // 마커 추가 로직
-  myMarkers: MyMarkerData[];
   showUserMarkers: boolean;
+  myMarkers: MyMarkerData[];
   petFacilities: PetFacility[];
   nearbyMarkers: NearbyMarkersData | null;
 
