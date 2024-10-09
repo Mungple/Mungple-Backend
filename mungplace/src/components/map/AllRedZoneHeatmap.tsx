@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { Heatmap } from 'react-native-maps';
 
 import { FromZone, ToZone } from '@/types';
-import useUserLocation from '@/hooks/useUserLocation';
+import { useUserStore } from '@/state/useUserStore';
 
 type AllRedZoneHeatmapProps = {
   allRedZone: FromZone | null;
@@ -10,7 +10,7 @@ type AllRedZoneHeatmapProps = {
 };
 
 const AllRedZoneHeatmap = ({ allRedZone, checkAllUserZone }: AllRedZoneHeatmapProps) => {
-  const { userLocation } = useUserLocation();
+  const userLocation = useUserStore((state) => state.userLocation);
   // const requestId = Math.random().toString(36).substr(2, 9);
   // 사용자 위치 변경 시 블루존 요청
   useEffect(() => {

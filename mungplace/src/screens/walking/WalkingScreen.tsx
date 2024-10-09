@@ -16,9 +16,9 @@ import CustomModal from '@/components/common/CustomModal';
 import ElapsedTime from '@/components/walking/ElapsedTime';
 import CustomButton from '@/components/common/CustomButton';
 
-import useUserLocation from '@/hooks/useUserLocation';
 import useWebSocketActions from '@/hooks/useWebsocketActions';
 import { MapStackParamList } from '@/navigations/stack/MapStackNavigator';
+import { useUserStore } from '@/state/useUserStore';
 
 // 화면 크기에 맞춰 하단 블록 크기 설정
 const bottomBlockHeight = (Dimensions.get('window').height * 1) / 5;
@@ -33,9 +33,8 @@ const WalkingScreen = () => {
   const isSocket = useAppStore((state) => state.isSocket);
   const setIsSocket = useAppStore((state) => state.setIsSocket);
   const startExplorate = useAppStore((state) => state.startExplorate);
-  const setWalkingStart = useAppStore((state) => state.setWalkingStart);
 
-  const { userLocation } = useUserLocation();
+  const userLocation = useUserStore((state) => state.userLocation);
   const [modalVisible, setModalVisible] = useState(false);
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [path, setPath] = useState<{ latitude: number; longitude: number }[]>([]);
@@ -62,7 +61,6 @@ const WalkingScreen = () => {
     if (startExplorate) {
       exitWalk(startExplorate.explorationId);
       setIsSocket(false);
-      setWalkingStart(false);
       setModalVisible(false);
       navigation.navigate(mapNavigations.HOME);
     } else {

@@ -45,10 +45,11 @@ const HomeScreen: React.FC = () => {
   // 산책
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedPets, setSelectedPets] = useState<number[]>([]);
-  const { userLocation, isUserLocationError } = useUserLocation();
-  const setWalkingStart = useAppStore((state) => state.setWalkingStart);
+  const userLocation = useUserStore((state) => state.userLocation);
   const setStartExplorate = useAppStore((state) => state.setStartExplorate);
   const navigation = useNavigation<NativeStackNavigationProp<MapStackParamList>>();
+
+  useUserLocation();
 
   // 산책 시작 모달
   const handleModalVisivle = () => {
@@ -64,7 +65,7 @@ const HomeScreen: React.FC = () => {
 
   // 산책 시작 함수
   const handleWalkingStart = async () => {
-    if (!isUserLocationError && selectedPets.length > 0) {
+    if (userLocation && selectedPets.length > 0) {
       const walkData = JSON.stringify({
         lat: userLocation.latitude.toString(),
         lon: userLocation.longitude.toString(),
@@ -73,8 +74,8 @@ const HomeScreen: React.FC = () => {
 
       setModalVisible(false);
       setStartExplorate(await startWalk(walkData));
-      navigation.navigate(mapNavigations.COUNTDOWN)
-    } else if (isUserLocationError) {
+      navigation.navigate(mapNavigations.COUNTDOWN);
+    } else if (!userLocation) {
       Alert.alert('Error', '위치 권한을 허용해주세요');
     } else {
       Alert.alert('Error', '반려견을 선택해주세요');
@@ -87,27 +88,27 @@ const HomeScreen: React.FC = () => {
         <LoadingSpinner />
       ) : (
         <>
-      <HS.ImageCard>
-        <HS.Image
-          source={
-            defaultPet && defaultPet.photo
-              ? { uri: `http://j11e106.p.ssafy.io:9000/images/${defaultPet.photo}` }
-              : dogMain
-          }></HS.Image>
-      </HS.ImageCard>
-      <PetInfoBox defaultPet={defaultPet} age={age} />
-      <CustomButton label="산책 시작하기" onPress={handleModalVisivle} />
-      {/* 산책 시작 확인 모달 */}
-      <CustomModal
-        isWide={true}
-        height={windowHeight * 0.7}
-        modalVisible={modalVisible}
-        setModalVisible={setModalVisible}>
-        <CustomModalHeader title="반려견 선택" closeButton={handleModalVisivle} />
-        <PetList selectedPets={selectedPets} homeScreenPress={handlePetSelect} />
-        <HS.StartButton label="산책 시작하기" onPress={handleWalkingStart} />
-      </CustomModal>
-      </>
+          <HS.ImageCard>
+            <HS.Image
+              source={
+                defaultPet && defaultPet.photo
+                  ? { uri: `http://j11e106.p.ssafy.io:9000/images/${defaultPet.photo}` }
+                  : dogMain
+              }></HS.Image>
+          </HS.ImageCard>
+          <PetInfoBox defaultPet={defaultPet} age={age} />
+          <CustomButton label="산책 시작하기" onPress={handleModalVisivle} />
+          {/* 산책 시작 확인 모달 */}
+          <CustomModal
+            isWide={true}
+            height={windowHeight * 0.7}
+            modalVisible={modalVisible}
+            setModalVisible={setModalVisible}>
+            <CustomModalHeader title="반려견 선택" closeButton={handleModalVisivle} />
+            <PetList selectedPets={selectedPets} homeScreenPress={handlePetSelect} />
+            <HS.StartButton label="산책 시작하기" onPress={handleWalkingStart} />
+          </CustomModal>
+        </>
       )}
     </HS.Container>
   );

@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { Heatmap } from 'react-native-maps';
 import { colors } from '@/constants';
 import { FromZone, ToZone } from '@/types';
-import useUserLocation from '@/hooks/useUserLocation';
+import { useUserStore } from '@/state/useUserStore';
 
 type MyBlueZoneHeatmapProps = {
   myBlueZone: FromZone | null;
@@ -10,7 +10,7 @@ type MyBlueZoneHeatmapProps = {
 };
 
 const MyBlueZoneHeatmap = ({ myBlueZone, checkMyBlueZone }: MyBlueZoneHeatmapProps) => {
-  const { userLocation } = useUserLocation();
+  const userLocation = useUserStore((state) => state.userLocation);
   // const requestId = Math.random().toString(36).substr(2, 9);
 
   // 사용자 위치 변경 시 블루존 요청
@@ -28,7 +28,7 @@ const MyBlueZoneHeatmap = ({ myBlueZone, checkMyBlueZone }: MyBlueZoneHeatmapPro
       checkMyBlueZone(zoneData);
     }
   }, [userLocation, checkMyBlueZone]);
-  console.log("myBlueZone:", myBlueZone);
+  console.log('myBlueZone:', myBlueZone);
   return (
     <>
       {/* 개인 블루존 히트맵 렌더링 */}
