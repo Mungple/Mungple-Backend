@@ -7,6 +7,7 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import { useUserStore } from '@/state/useUserStore'; // 유저 스토어
 import CustomText from '@/components/common/CustomText'; // 커스텀 텍스트
 import CustomButton from '@/components/common/CustomButton'; // 커스텀 버튼
+import { getMarkerDetails } from '@/api/map';
 
 const MarkerDetailScreen: React.FC = () => {
   const navigation = useNavigation();
@@ -29,17 +30,10 @@ const MarkerDetailScreen: React.FC = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await axiosInstance.get(`/markers/${markerId}`, {
-        headers: {
-          'Content-Type': 'application/json; charset=utf8',
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
-      console.log('서버 응답:', response.data);
+      const markerDatas = await getMarkerDetails(markerId);
+      const imageWithUrl = markerDatas.images.map((imageName) => BASE_IMAGE_URL + imageName);
 
-      const imageWithUrl = response.data.images.map((imageName) => BASE_IMAGE_URL + imageName);
-
-      setMarkerDetails({ ...response.data, images: imageWithUrl });
+      setMarkerDetails({ ...markerDatas, images: imageWithUrl });
     } catch (err) {
       setError('마커 디테일을 가져오는 데 실패');
       console.log(err);
@@ -70,7 +64,7 @@ const MarkerDetailScreen: React.FC = () => {
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    const options = {
+    const options: Intl.DateTimeFormatOptions = {
       year: 'numeric',
       month: '2-digit',
       day: '2-digit',

@@ -1,11 +1,5 @@
 import React, { useEffect } from 'react';
-import {
-  View,
-  FlatList,
-  TouchableOpacity,
-  ActivityIndicator,
-  StyleSheet,
-} from 'react-native';
+import { View, FlatList, TouchableOpacity, ActivityIndicator, StyleSheet } from 'react-native';
 import useMyMarkers from '@/hooks/useMyMarkers';
 import { useNavigation } from '@react-navigation/native';
 import { MapStackParamList } from '@/navigations/stack/MapStackNavigator';
@@ -13,7 +7,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { mapNavigations } from '@/constants';
 import CustomText from '@/components/common/CustomText';
 
-const MyMar = () => {
+const MyMar: React.FC = () => {
   const { myMarkers, fetchMyMarkers, loading } = useMyMarkers();
   const navigation = useNavigation<NativeStackNavigationProp<MapStackParamList>>();
 
@@ -31,10 +25,17 @@ const MyMar = () => {
   }
 
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString)
-    const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false }
-    return date.toLocaleString('ko-KR', options).replace(',', '') // 한국어 형식 변환
-  }
+    const date = new Date(dateString);
+    const options: Intl.DateTimeFormatOptions = {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    };
+    return date.toLocaleString('ko-KR', options).replace(',', ''); // 한국어 형식 변환
+  };
 
   return (
     <View style={styles.container}>
@@ -47,8 +48,10 @@ const MyMar = () => {
             style={styles.markerItem}>
             <View>
               <CustomText fontSize={18}>{item.title}</CustomText>
-              <View style={{ marginTop: 5}}>
-                <CustomText fontSize={10} color='gray'>{`${formatDate(item.createdAt)}`}</CustomText>
+              <View style={{ marginTop: 5 }}>
+                <CustomText fontSize={10} color="gray">{`${formatDate(
+                  item.createdAt,
+                )}`}</CustomText>
               </View>
             </View>
           </TouchableOpacity>

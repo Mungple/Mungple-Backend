@@ -26,7 +26,7 @@ export interface MyMarkerData {
 
 // 마커 상세 정보 인터페이스
 export interface MarkerDetails {
-  markerId: string;
+  id: string;
   userId: number;
   point: {
     lat: number;
