@@ -25,7 +25,7 @@ const bottomBlockHeight = (Dimensions.get('window').height * 1) / 5;
 const bottomBlockWidth = Dimensions.get('window').width - 40;
 
 // ========== Main Functional Component ==========
-const WalkingScreen = () => {
+const WalkingScreen: React.FC = () => {
   // ========== Constants ==========
   // 상태 관리 (앱 스토어 및 맵 스토어에서 상태 추출)
   const markers = useMapStore((state) => state.markers);
@@ -85,25 +85,25 @@ const WalkingScreen = () => {
   // ========== Side Effects ==========
   // 5초마다 좌표를 수집하여 경로 업데이트
   useEffect(() => {
-    if (!userLocation) return;
-
-    setPath((prevPath) => [
-      ...prevPath,
-      { latitude: userLocation.latitude, longitude: userLocation.longitude },
-    ]);
+    if (userLocation) {
+      setPath((prevPath) => [
+        ...prevPath,
+        { latitude: userLocation.latitude, longitude: userLocation.longitude },
+      ]);
+    }
   }, [userLocation]);
 
   // 3초마다 웹소켓을 통해 위치 정보 전송
   useEffect(() => {
-    if (!userLocation) return;
-
     const intervalId = setInterval(() => {
-      const location = {
-        lat: userLocation.latitude,
-        lon: userLocation.longitude,
-        recordedAt: new Date().toISOString(),
-      };
-      sendLocation(Number(startExplorate?.explorationId), location);
+      if (userLocation) {
+        const location = {
+          lat: userLocation.latitude,
+          lon: userLocation.longitude,
+          recordedAt: new Date().toISOString(),
+        };
+        sendLocation(Number(startExplorate?.explorationId), location);
+      }
     }, 3000);
 
     return () => {
@@ -113,7 +113,8 @@ const WalkingScreen = () => {
 
   // ========== UI Rendering ==========
   if (!startExplorate) {
-    return navigation.goBack();
+    navigation.goBack();
+    return null;
   }
 
   return (

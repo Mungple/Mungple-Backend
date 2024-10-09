@@ -16,14 +16,14 @@ interface Facility {
   description: string;
 }
 
-const FacilityDetailScreen = () => {
-  const navigation = useNavigation()
+const FacilityDetailScreen: React.FC = () => {
+  const navigation = useNavigation();
   const route = useRoute();
-  const { facilityId } = route.params; // facilityId를 route.params에서 가져옴
-  const [facility, setFacility] = useState<Facility | null>(null)
+  const { facilityId } = route.params as { facilityId: number }; // facilityId를 route.params에서 가져옴
+  const [facility, setFacility] = useState<Facility | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const accessToken = useAppStore((state) => state.token)
+  const error = null;
+  const accessToken = useAppStore((state) => state.token);
 
   // 시설 상세 정보 조회 함수
   const fetchFacilityDetails = async () => {
@@ -31,13 +31,13 @@ const FacilityDetailScreen = () => {
       const response = await axiosInstance.get(`/pet-facilities/${facilityId}`, {
         headers: {
           'Content-Type': 'application/json; charset=utf8',
-          'Authorization': `Bearer ${accessToken}`, // accessToken 변수를 적절히 가져와야 함
+          Authorization: `Bearer ${accessToken}`, // accessToken 변수를 적절히 가져와야 함
         },
       });
       setFacility(response.data);
     } catch (err) {
-      setError(err);
-      console.error("상세 정보 조회 오류", err);
+      console.error('상세 정보 조회 오류', err);
+      throw err;
     } finally {
       setLoading(false);
     }
@@ -60,11 +60,19 @@ const FacilityDetailScreen = () => {
       <CustomText style={styles.title}>{facility?.name ?? '시설 이름이 없습니다.'}</CustomText>
       <CustomText style={styles.text}>{facility?.address ?? '주소가 없습니다.'}</CustomText>
       <CustomText style={styles.text}>{facility?.phone ?? '전화번호가 없습니다.'}</CustomText>
-      <CustomText style={styles.text}>{facility?.homepage ?? '홈페이지 정보가 없습니다.'}</CustomText>
-      <CustomText style={styles.text}>{facility?.closedDays ?? '휴무일 정보가 없습니다.'}</CustomText>
-      <CustomText style={styles.text}>{facility?.businessHours ?? '영업시간 정보가 없습니다.'}</CustomText>
-      <CustomText style={styles.description}>{facility?.description ?? '설명 정보가 없습니다.'}</CustomText>
-      <TouchableOpacity onPress={() => navigation.goBack} style={styles.backButton}>
+      <CustomText style={styles.text}>
+        {facility?.homepage ?? '홈페이지 정보가 없습니다.'}
+      </CustomText>
+      <CustomText style={styles.text}>
+        {facility?.closedDays ?? '휴무일 정보가 없습니다.'}
+      </CustomText>
+      <CustomText style={styles.text}>
+        {facility?.businessHours ?? '영업시간 정보가 없습니다.'}
+      </CustomText>
+      <CustomText style={styles.description}>
+        {facility?.description ?? '설명 정보가 없습니다.'}
+      </CustomText>
+      <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
         <CustomText style={styles.buttonText}>뒤로 가기</CustomText>
       </TouchableOpacity>
     </View>

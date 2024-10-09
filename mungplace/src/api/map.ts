@@ -1,4 +1,4 @@
-import { NearbyMarkersData } from '@/state/useMapStore';
+import { MarkerDetails, NearbyMarkersData } from '@/state/useMapStore';
 import axiosInstance from './axios';
 import { FacilityPoints } from '@/types';
 
@@ -40,9 +40,23 @@ const getNearbyMarkers = async (lat: number, lon: number): Promise<NearbyMarkers
     });
     return data;
   } catch (error) {
-    console.error('애견 동반 시설 조회 오류', error);
+    console.error('주변 마커 조회 오류', error);
     throw error;
   }
 };
 
-export { getWithPetPlace, getNearbyMarkers };
+const getMarkerDetails = async (markerId: string): Promise<MarkerDetails> => {
+  try {
+    const { data } = await axiosInstance.get(`/markers/${markerId}`, {
+      headers: {
+        'Content-Type': 'application/json; charset=utf8',
+      },
+    });
+    return data;
+  } catch (error) {
+    console.error('주변 마커 상세 조회 오류', error);
+    throw error;
+  }
+};
+
+export { getWithPetPlace, getNearbyMarkers, getMarkerDetails };
