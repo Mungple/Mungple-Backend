@@ -1,5 +1,5 @@
 import { Alert, Dimensions } from 'react-native';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -52,6 +52,7 @@ const WalkingScreen: React.FC = () => {
 
   const formatDistance = distance < 100 ? `${distance} m` : `${(distance / 1000).toFixed(2)} km`;
 
+  const userLocationRef = useRef(userLocation);
   // ========== Methods ==========
   // 산책 종료 처리
   const handleWalkingEnd = () => {
@@ -80,6 +81,11 @@ const WalkingScreen: React.FC = () => {
   };
 
   // ========== Side Effects ==========
+  // userLocation 변경 시 useRef 업데이트
+  useEffect(() => {
+    userLocationRef.current = userLocation;
+  }, [userLocation]);
+
   // 5초마다 좌표를 수집하여 경로 업데이트
   useEffect(() => {
     if (userLocation) {
@@ -93,10 +99,12 @@ const WalkingScreen: React.FC = () => {
   // 3초마다 웹소켓을 통해 위치 정보 전송
   useEffect(() => {
     const intervalId = setInterval(async () => {
-      if (userLocation) {
+      const currentLocation = userLocationRef.current; // 최신 userLocation 참조
+
+      if (currentLocation) {
         const location = {
-          lat: userLocation.latitude,
-          lon: userLocation.longitude,
+          lat: currentLocation.latitude,
+          lon: currentLocation.longitude,
           recordedAt: new Date().toISOString(),
         };
         console.log('Sending Location:', location); // 전송되는 위치 로그
@@ -108,7 +116,7 @@ const WalkingScreen: React.FC = () => {
     return () => {
       clearInterval(intervalId);
     };
-  }, [sendLocation, userLocation]);
+  }, [sendLocation]);
 
   // ========== UI Rendering ==========
   if (!startExplorate) {
