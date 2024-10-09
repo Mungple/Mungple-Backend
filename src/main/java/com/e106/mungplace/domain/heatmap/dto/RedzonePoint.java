@@ -31,4 +31,9 @@ public class RedzonePoint {
 		this.point = new GeoPoint(point.lat(), point.lon());
 		this.recordedAt = recordedAt;
 	}
+
+	public RedzonePoint(GeoPoint point, LocalDateTime recordedAt) {
+		this.point = point;
+		this.recordedAt = recordedAt;
+	}
 }

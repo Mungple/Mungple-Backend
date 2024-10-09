@@ -1,5 +1,6 @@
 package com.e106.mungplace.web.manager.service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,6 +10,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.e106.mungplace.common.log.MethodLoggable;
 import com.e106.mungplace.common.log.dto.LogAction;
+import com.e106.mungplace.domain.heatmap.dto.RedzonePoint;
+import com.e106.mungplace.domain.heatmap.repository.RedzonePointRepository;
 import com.e106.mungplace.domain.image.entity.ImageInfo;
 import com.e106.mungplace.domain.image.repository.MarkerImageInfoRepository;
 import com.e106.mungplace.domain.manager.impl.ManagerReader;
@@ -28,6 +31,7 @@ public class ManagerMarkerDummyService {
 
 	private final MarkerImageInfoRepository markerImageInfoRepository;
 	private final MarkerPointRepository markerPointRepository;
+	private final RedzonePointRepository redzonePointRepository;
 	private final MarkerRepository markerRepository;
 	private final ManagerReader managerReader;
 
@@ -50,6 +54,12 @@ public class ManagerMarkerDummyService {
 			.build();
 
 		markerPointRepository.save(markerPoint);
+
+		if (marker.getType().equals(MarkerType.RED)) {
+			RedzonePoint redzonePoint = new RedzonePoint(geoPoint, LocalDateTime.now());
+			redzonePointRepository.save(redzonePoint);
+		}
+
 		saveMarkerImages(marker);
 	}
 
