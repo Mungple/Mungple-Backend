@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { View, Image, StyleSheet, ActivityIndicator, ScrollView } from 'react-native';
-import { MarkerDetails } from '../../state/useMapStore';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { useUserStore } from '@/state/useUserStore'; // 유저 스토어
 import CustomText from '@/components/common/CustomText'; // 커스텀 텍스트
 import CustomButton from '@/components/common/CustomButton'; // 커스텀 버튼
 import { deleteMarker, getMarkerDetails } from '@/api';
+import { MarkerDetails } from '@/types';
 
 const MarkerDetailScreen: React.FC = () => {
   const navigation = useNavigation();

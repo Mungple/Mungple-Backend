@@ -32,8 +32,8 @@ import useMarkersWithinRadius from '@/hooks/useMarkersWithinRadius';
 // 6. 상태 관리 및 데이터
 import { getPetFacility } from '@/api';
 import { colors, mapNavigations } from '@/constants';
-import { FromZone, Point, ToMungZone, ToZone } from '@/types';
-import { useMapStore, MarkerData } from '@/state/useMapStore';
+import { FromZone, MarkerData, Point, ToMungZone, ToZone } from '@/types';
+import { useMapStore } from '@/state/useMapStore';
 
 // 7. 네비게이션 타입
 import { MapStackParamList } from '@/navigations/stack/MapStackNavigator';

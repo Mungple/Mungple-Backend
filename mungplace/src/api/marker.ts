@@ -1,4 +1,4 @@
-import { MarkerDetails, MarkerId, MyMarkerData, NearbyMarkersData } from '@/state/useMapStore';
+import { MarkerDetails, MarkerId, MyMarkerData, NearbyMarkersData } from '@/types';
 import axiosInstance from './axios';
 
 const createMarker = async (formData: FormData): Promise<MarkerId> => {

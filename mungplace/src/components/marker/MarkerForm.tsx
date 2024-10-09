@@ -3,10 +3,10 @@ import { View, TextInput, StyleSheet, Image } from 'react-native';
 import CustomModal from '../common/CustomModal';
 import { launchImageLibrary } from 'react-native-image-picker';
 import { Picker } from '@react-native-picker/picker';
-import { MarkerData } from '../../state/useMapStore';
 import CustomButton from '../common/CustomButton';
 import LoadingSpinner from '../common/LoadingSpinner';
 import { createMarker } from '@/api';
+import { MarkerData } from '@/types';
 
 export interface MarkerFormProps {
   isVisible: boolean;
