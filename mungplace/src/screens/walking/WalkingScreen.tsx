@@ -92,21 +92,23 @@ const WalkingScreen: React.FC = () => {
 
   // 3초마다 웹소켓을 통해 위치 정보 전송
   useEffect(() => {
-    const intervalId = setInterval(() => {
+    const intervalId = setInterval(async () => {
       if (userLocation) {
         const location = {
           lat: userLocation.latitude,
           lon: userLocation.longitude,
           recordedAt: new Date().toISOString(),
         };
-        sendLocation(Number(startExplorate?.explorationId), location);
+        console.log('Sending Location:', location); // 전송되는 위치 로그
+
+        await sendLocation(Number(startExplorate?.explorationId), location);
       }
     }, 3000);
 
     return () => {
       clearInterval(intervalId);
     };
-  }, [sendLocation]);
+  }, [sendLocation, userLocation]);
 
   // ========== UI Rendering ==========
   if (!startExplorate) {
