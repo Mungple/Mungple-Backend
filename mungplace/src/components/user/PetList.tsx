@@ -41,7 +41,7 @@ const PetList: React.FC<PetListProps> = ({ navigation, selectedPets = [], homeSc
       <View>
         {index === 0 && (
           <HighlightContainer>
-            <Ionicons name="trophy" size={24} color={colors.YELLOW.LIGHTER} />
+            <Ionicons name="trophy" size={24} color={colors.BLUE.DARKER} />
             <CustomText
               fontSize={16}
               fontWeight="bold"
@@ -95,7 +95,7 @@ const DogCard = styled(CustomCard)<{ isSelected: boolean; isDefalut: boolean }>`
   justify-content: space-around;
   border-width: ${({ isSelected, isDefalut }) => (isSelected ? 3 : isDefalut ? 2 : 1)}px;
   border-color: ${({ isSelected, isDefalut }) =>
-    isSelected ? colors.ORANGE.BASE : isDefalut ? colors.YELLOW.LIGHTER : colors.GRAY_100};
+    isSelected ? colors.ORANGE.BASE : isDefalut ? colors.BLUE.DARKER : colors.GRAY_100};
 `;
 
 const Image = styled(RNImage)`
