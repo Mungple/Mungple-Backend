@@ -146,6 +146,9 @@ const WalkingScreen: React.FC = () => {
             </WS.InfoBlock>
             <WS.InfoBlock>
               <WS.InfoLabel>이동 거리</WS.InfoLabel>
+              <WS.InfoLabel>{`${userLocation?.latitude.toFixed(
+                6,
+              )} / ${userLocation?.longitude.toFixed(6)}`}</WS.InfoLabel>
               <WS.InfoValue>{formatDistance}</WS.InfoValue>
             </WS.InfoBlock>
           </WS.InfoRow>
