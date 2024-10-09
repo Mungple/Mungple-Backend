@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Text } from 'react-native';
-import styled from 'styled-components/native';
+import CustomText from '../common/CustomText';
+import { colors } from '@/constants';
 
 const ElapsedTime = () => {
   const [startTime] = useState(new Date());
@@ -29,13 +29,11 @@ const ElapsedTime = () => {
     return () => clearInterval(intervalId);
   }, [startTime]);
 
-  return <ElapsedTimeText>{elapsedTime}</ElapsedTimeText>;
+  return (
+    <CustomText fontWeight="bold" fontSize={32} color={colors.BLACK}>
+      {elapsedTime}
+    </CustomText>
+  );
 };
-
-const ElapsedTimeText = styled(Text)`
-  font-size: 32px;
-  font-weight: bold;
-  color: #000000;
-`;
 
 export default ElapsedTime;

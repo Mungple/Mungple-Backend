@@ -44,7 +44,12 @@ const AuthHomeScreen: React.FC<AuthHomeScreenProps> = ({ navigation }) => {
           <ButtonImage source={kakaoLogo} />
         </LoginButton>
 
-        <TextInput value={username} onChangeText={setUsername} placeholder="매니저 이름" />
+        <TextInput
+          value={username}
+          onChangeText={setUsername}
+          placeholder="매니저 이름"
+          style={{ fontFamily: 'OTLaundryGothicR' }}
+        />
         <CustomButton label="매니저 로그인" onPress={handleLoginPress} />
       </ButtonsContainer>
     </Container>
