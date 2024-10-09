@@ -2,7 +2,6 @@ import { Client } from '@stomp/stompjs';
 import { useState, useEffect, useCallback } from 'react';
 
 import { getAccessToken } from '@/api';
-import { useAppStore } from '@/state/useAppStore';
 import { Distance, FromZone, Point, ToLocation, ToMungZone, ToZone } from '@/types';
 
 export interface ErrorMessage {
@@ -14,7 +13,6 @@ export interface ErrorMessage {
 const WEBSOCKET_URI = 'wss://j11e106.p.ssafy.io/api/ws';
 
 const useWebSocket = (explorationId: number = -1) => {
-  const setIsSocket = useAppStore((state) => state.setIsSocket);
   const [clientSocket, setClientSocket] = useState<Client | null>(null);
   const [explorations, setExplorations] = useState<ErrorMessage | null>(null);
   const [allBlueZone, setAllBlueZone] = useState<FromZone | null>(null);
@@ -43,7 +41,6 @@ const useWebSocket = (explorationId: number = -1) => {
           onConnect: () => {
             setClientSocket(socket);
             subscribeToTopics(socket, explorationId);
-            setIsSocket(true);
             console.log('useWebSocket >>> 소켓 연결 성공 | explorationId =', explorationId);
           },
           onStompError: (frame) => {
@@ -132,16 +129,20 @@ const useWebSocket = (explorationId: number = -1) => {
     });
   };
 
-  const sendLocation = (explorationId: number, location: ToLocation) => {
-    if (clientSocket?.connected) {
-      clientSocket.publish({
-        destination: `/pub/explorations/${explorationId}`,
-        body: JSON.stringify(location),
-      });
-    } else {
-      console.error('sendLocation 소켓 연결이 되어있지 않습니다.');
-    }
-  };
+  const sendLocation = useCallback(
+    (explorationId: number, location: ToLocation) => {
+      if (clientSocket?.connected) {
+        console.log(location);
+        clientSocket.publish({
+          destination: `/pub/explorations/${explorationId}`,
+          body: JSON.stringify(location),
+        });
+      } else {
+        console.error('sendLocation 소켓 연결이 되어있지 않습니다.');
+      }
+    },
+    [clientSocket],
+  );
 
   const checkMyBlueZone = useCallback(
     (myBlueZone: ToZone) => {
