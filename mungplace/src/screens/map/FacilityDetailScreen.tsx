@@ -4,6 +4,7 @@ import axiosInstance from '@/api/axios';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { useAppStore } from '@/state/useAppStore';
 import CustomText from '@/components/common/CustomText';
+import LoadingSpinner from '@/components/common/LoadingSpinner';
 
 interface Facility {
   id: number;
@@ -48,7 +49,7 @@ const FacilityDetailScreen: React.FC = () => {
   }, [facilityId]);
 
   if (loading) {
-    return <CustomText>Loading...</CustomText>; // 로딩 중인 경우
+    return <LoadingSpinner />
   }
 
   if (error) {
@@ -81,6 +82,7 @@ const FacilityDetailScreen: React.FC = () => {
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
     padding: 20,
     backgroundColor: '#fff', // 밝은 배경색
     borderRadius: 10,
@@ -90,21 +92,24 @@ const styles = StyleSheet.create({
     shadowRadius: 5,
     elevation: 3,
     margin: 20,
+    justifyContent: 'space-between',
+  },
+  content: {
+    flexGrow: 1,
+    justifyContent: 'flex-start',
   },
   title: {
     fontSize: 20,
-    fontWeight: 'bold',
-    color: '#333',
     marginBottom: 10,
   },
   text: {
     fontSize: 16,
-    color: '#666',
+    color: 'gray',
     marginBottom: 5,
   },
   description: {
     fontSize: 16,
-    color: '#666',
+    color: 'black',
     marginTop: 10,
     marginBottom: 20,
     lineHeight: 22,
