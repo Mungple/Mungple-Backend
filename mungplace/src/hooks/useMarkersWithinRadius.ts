@@ -1,9 +1,10 @@
-import axiosInstance from '@/api/axios';
 import React from 'react';
 import { useUserStore } from '@/state/useUserStore';
 import { useFocusEffect } from '@react-navigation/native';
-import { useMapStore, NearbyMarkersData, NearbyMarkerData, ClusterData } from '@/state/useMapStore';
+import { useMapStore, NearbyMarkersData, ClusterData } from '@/state/useMapStore';
+import { getNearbyMarkers } from '@/api/map';
 
+// 마커 데이터를 조회하고 클러스터링하는 훅
 const useMarkersWithinRadius = () => {
   const { setNearbyMarkers } = useMapStore((state) => ({
     setNearbyMarkers: state.setNearbyMarkers,
@@ -15,44 +16,26 @@ const useMarkersWithinRadius = () => {
     try {
       if (!userLocation) return;
 
-      const response = await axiosInstance.get('/markers', {
-        headers: {
-          'Content-Type': 'application/json; charset=utf8',
-        },
-        params: {
-          radius: 500,
-          latitude: userLocation.latitude,
-          longitude: userLocation.longitude,
-          markerType: 'ALL',
-        },
-      });
+      const nearbyMarkers = await getNearbyMarkers(userLocation.latitude, userLocation.longitude);
 
-      const nearbyMarkersFromServer: NearbyMarkersData = response.data.markersGroupedByGeohash;
-      const clusters: { [key: string]: NearbyMarkerData[] } = {};
-
-      Object.keys(nearbyMarkersFromServer).forEach((geohash) => {
-        const clusterData = nearbyMarkersFromServer[geohash];
-        clusterData.markers.forEach((marker) => {
-          if (!clusters[geohash]) {
-            clusters[geohash] = [];
-          }
-          clusters[geohash].push(marker);
-        });
-      });
-
-      // clusters 객체를 NearbyMarkersData 형태로 변환
       const updatedNearbyMarkersData: NearbyMarkersData = {
-        markersGroupedByGeohash: Object.keys(clusters).reduce((acc, geohash) => {
-          acc[geohash] = {
-            geohashCenter: nearbyMarkersFromServer[geohash].geohashCenter, // 기존의 geohashCenter 사용
-            count: clusters[geohash].length, // 마커의 개수를 count로 설정
-            markers: clusters[geohash], // 마커 배열 추가
-          };
-          return acc;
-        }, {} as { [key: string]: ClusterData }),
+        // 반환된 geohash 값들을 순회하며 acc(누적 객체)에 각 geohash와 관련된 데이터를 추가
+        markersGroupedByGeohash: Object.keys(nearbyMarkers.markersGroupedByGeohash).reduce(
+          (acc, geohash) => {
+            const clusterData = nearbyMarkers.markersGroupedByGeohash[geohash];
+            acc[geohash] = {
+              geohashCenter: clusterData.geohashCenter, // geohashCenter 사용
+              count: clusterData.markers.length, // 마커의 개수를 count로 설정
+              markers: clusterData.markers, // 마커 배열 추가
+            };
+            return acc;
+          },
+          {} as { [key: string]: ClusterData },
+        ),
       };
+
       // 변환한 데이터 저장소에 세팅
-      setNearbyMarkers(updatedNearbyMarkersData); // 주변 마커 설정
+      setNearbyMarkers(updatedNearbyMarkersData);
     } catch (error) {
       console.error('주변 마커 조회에 실패함', error);
     }
@@ -65,8 +48,6 @@ const useMarkersWithinRadius = () => {
       }
     }, [userLocation]),
   );
-
-  return null; // 상태 관리만 하니까 렌더링 필요 x
 };
 
 export default useMarkersWithinRadius;

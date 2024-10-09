@@ -35,6 +35,7 @@ import useUserLocation from '@/hooks/useUserLocation';
 const windowHeight = Dimensions.get('window').height;
 
 const HomeScreen: React.FC = () => {
+  useUserLocation();
   // 펫 정보
   const { useGetPet } = usePet();
   const { userId } = useUserStore.getState();

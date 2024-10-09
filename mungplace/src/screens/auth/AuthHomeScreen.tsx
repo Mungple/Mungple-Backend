@@ -3,7 +3,7 @@ import styled from 'styled-components/native';
 import { Dimensions, Image, TextInput } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { managerLogin } from '@/components/common/ManagerLogin';
-import { authNavigations, colors } from '@/constants';
+import { authNavigations } from '@/constants';
 import Logo from '@/assets/mungpleAppLogo.png';
 import kakaoLogo from '@/assets/kakao_login_button.png';
 import { AuthStackParamList } from '@/navigations/stack/AuthStackNavigator';
