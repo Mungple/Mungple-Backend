@@ -4,12 +4,20 @@ import styled from 'styled-components/native';
 
 import { useUserStore } from '@/state/useUserStore';
 import MapComponent from '@/components/map/MapComponent';
-import useWebSocketActions from '@/hooks/useWebsocketActions';
+import useWebSocket from '@/hooks/useWebsocket';
 
 const MapScreen = () => {
   const userLocation = useUserStore((state) => state.userLocation);
   const [isFormVisible, setIsFormVisible] = useState(false);
-  const { checkAllUserZone, checkMyBlueZone, checkMungPlace } = useWebSocketActions();
+  const {
+    myBlueZone,
+    allBlueZone,
+    allRedZone,
+    mungZone,
+    checkAllUserZone,
+    checkMyBlueZone,
+    checkMungPlace,
+  } = useWebSocket();
 
   const handleFormClose = () => {
     setIsFormVisible(false);
@@ -21,6 +29,10 @@ const MapScreen = () => {
         userLocation={userLocation}
         isFormVisible={isFormVisible}
         onFormClose={handleFormClose}
+        myBlueZone={myBlueZone}
+        allBlueZone={allBlueZone}
+        allRedZone={allRedZone}
+        mungZone={mungZone}
         checkMyBlueZone={checkMyBlueZone}
         checkAllUserZone={checkAllUserZone}
         checkMungPlace={checkMungPlace}

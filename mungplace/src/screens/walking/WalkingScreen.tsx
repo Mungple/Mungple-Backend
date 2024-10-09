@@ -16,9 +16,9 @@ import CustomModal from '@/components/common/CustomModal';
 import ElapsedTime from '@/components/walking/ElapsedTime';
 import CustomButton from '@/components/common/CustomButton';
 
-import useWebSocketActions from '@/hooks/useWebsocketActions';
 import { MapStackParamList } from '@/navigations/stack/MapStackNavigator';
 import { useUserStore } from '@/state/useUserStore';
+import useWebSocket from '@/hooks/useWebsocket';
 
 // 화면 크기에 맞춰 하단 블록 크기 설정
 const bottomBlockHeight = (Dimensions.get('window').height * 1) / 5;
@@ -38,7 +38,16 @@ const WalkingScreen = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [path, setPath] = useState<{ latitude: number; longitude: number }[]>([]);
-  const { sendLocation, checkAllUserZone, checkMyBlueZone, checkMungPlace } = useWebSocketActions();
+  const {
+    myBlueZone,
+    allBlueZone,
+    allRedZone,
+    mungZone,
+    sendLocation,
+    checkAllUserZone,
+    checkMyBlueZone,
+    checkMungPlace,
+  } = useWebSocket(startExplorate?.explorationId);
 
   // 네비게이션 훅
   const navigation = useNavigation<NativeStackNavigationProp<MapStackParamList>>();
@@ -117,6 +126,10 @@ const WalkingScreen = () => {
         onFormClose={handleFormClose}
         bottomOffset={bottomBlockHeight + 20}
         explorationId={startExplorate.explorationId}
+        myBlueZone={myBlueZone}
+        allBlueZone={allBlueZone}
+        allRedZone={allRedZone}
+        mungZone={mungZone}
         checkMyBlueZone={checkMyBlueZone}
         checkAllUserZone={checkAllUserZone}
         checkMungPlace={checkMungPlace}

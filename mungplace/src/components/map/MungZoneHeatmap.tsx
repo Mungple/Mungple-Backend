@@ -1,20 +1,15 @@
 import React, { useEffect } from 'react';
 import { Marker, Circle } from 'react-native-maps';
 
-import { ToMungZone } from '@/types';
+import { Point, ToMungZone } from '@/types';
 import { useUserStore } from '@/state/useUserStore';
 
 type MungZoneHeatmapProps = {
-  mungZone: Array<{ lat: number; lon: number }> | null;
+  mungZone: Array<Point> | null;
   checkMungPlace: (allUserZone: ToMungZone) => void;
 };
 
-type GeoZoneMarkerProps = {
-  lat: number;
-  lon: number;
-};
-
-const GeoZoneMarker = ({ lat, lon }: GeoZoneMarkerProps) => (
+const GeoZoneMarker = ({ lat, lon }: Point) => (
   <React.Fragment>
     <Circle
       center={{ latitude: lat, longitude: lon }}

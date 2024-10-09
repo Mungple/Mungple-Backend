@@ -1,9 +1,9 @@
 import { Client } from '@stomp/stompjs';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 import { getAccessToken } from '@/api';
 import { useAppStore } from '@/state/useAppStore';
-import { Distance, FromZone } from '@/types';
+import { Distance, FromZone, Point, ToLocation, ToMungZone, ToZone } from '@/types';
 
 export interface ErrorMessage {
   errorCode: string;
@@ -16,13 +16,12 @@ const WEBSOCKET_URI = 'wss://j11e106.p.ssafy.io/api/ws';
 const useWebSocket = (explorationId: number = -1) => {
   const setIsSocket = useAppStore((state) => state.setIsSocket);
   const setDistance = useAppStore((state) => state.setDistance);
-  const clientSocket = useAppStore((state) => state.clientSocket);
-  const setClientSocket = useAppStore((state) => state.setClientSocket);
+  const [clientSocket, setClientSocket] = useState<Client | null>(null);
   const [explorations, setExplorations] = useState<ErrorMessage | null>(null);
   const [allBlueZone, setAllBlueZone] = useState<FromZone | null>(null);
   const [allRedZone, setAllRedZone] = useState<FromZone | null>(null);
   const [myBlueZone, setMyBlueZone] = useState<FromZone | null>(null);
-  const [mungZone, setMungZone] = useState<Array<{lat : number ; lon: number}> | null>(null);
+  const [mungZone, setMungZone] = useState<Array<Point> | null>(null);
 
   // 소켓 연결 시도
   useEffect(() => {
@@ -64,6 +63,7 @@ const useWebSocket = (explorationId: number = -1) => {
 
     return () => {
       if (clientSocket) {
+        console.log('the end');
         clientSocket.deactivate();
         setClientSocket(null);
       }
@@ -115,7 +115,7 @@ const useWebSocket = (explorationId: number = -1) => {
     // 멍플 조회
     socket.subscribe('/user/sub/mungple', (message) => {
       try {
-        const parsedMessage = JSON.parse(message.body) as Array<{lat: number; lon: number}>;
+        const parsedMessage = JSON.parse(message.body) as Array<Point>;
         setMungZone(parsedMessage);
       } catch (e) {
         console.error('useWebSocket for mungplace >>>', e);
@@ -132,12 +132,70 @@ const useWebSocket = (explorationId: number = -1) => {
     });
   };
 
+  const sendLocation = (explorationId: number, location: ToLocation) => {
+    if (clientSocket?.connected) {
+      clientSocket.publish({
+        destination: `/pub/explorations/${explorationId}`,
+        body: JSON.stringify(location),
+      });
+    } else {
+      console.error('sendLocation 소켓 연결이 되어있지 않습니다.');
+    }
+  };
+
+  const checkMyBlueZone = useCallback(
+    (myBlueZone: ToZone) => {
+      if (clientSocket?.connected) {
+        clientSocket.publish({
+          destination: '/pub/users/bluezone',
+          body: JSON.stringify(myBlueZone),
+        });
+      } else {
+        console.log('checkMyBlueZone 소켓 연결이 되어있지 않습니다.');
+      }
+    },
+    [clientSocket],
+  );
+
+  const checkAllUserZone = useCallback(
+    (zoneType: number, allUserZone: ToZone) => {
+      if (clientSocket?.connected) {
+        const destination = zoneType === 0 ? '/pub/bluezone' : '/pub/redzone';
+        clientSocket.publish({
+          destination,
+          body: JSON.stringify(allUserZone),
+        });
+      } else {
+        console.log('checkAllUserZone 소켓 연결이 되어있지 않습니다.');
+      }
+    },
+    [clientSocket],
+  );
+
+  const checkMungPlace = useCallback(
+    (allUserZone: ToMungZone) => {
+      if (clientSocket?.connected) {
+        clientSocket.publish({
+          destination: '/pub/mungple',
+          body: JSON.stringify(allUserZone),
+        });
+      } else {
+        console.log('checkMungPlace 소켓 연결이 되어있지 않습니다.');
+      }
+    },
+    [clientSocket],
+  );
+
   return {
     explorations,
     myBlueZone,
     allBlueZone,
     allRedZone,
     mungZone,
+    sendLocation,
+    checkMyBlueZone,
+    checkAllUserZone,
+    checkMungPlace,
   };
 };
 

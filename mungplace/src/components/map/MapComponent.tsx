@@ -1,9 +1,9 @@
 // 1. 라이브러리 및 네이티브 기능
 import styled from 'styled-components/native';
-import { Animated, Image as RNImage, Text } from 'react-native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import ClusteredMapView from 'react-native-map-clustering';
 import React, { useEffect, useRef, useState } from 'react';
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { Animated, Image as RNImage, Text } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import MapView, { LatLng, Marker, Polyline, PROVIDER_GOOGLE } from 'react-native-maps';
 
@@ -26,13 +26,12 @@ import redMarker from '@/assets/redMarker.png';
 import blueMarker from '@/assets/blueMarker.png';
 
 // 5. 훅(Hooks)
-import useWebSocket from '@/hooks/useWebsocket';
 import usePermission from '@/hooks/usePermission';
 import useMarkersWithinRadius from '@/hooks/useMarkersWithinRadius';
 
 // 6. 상태 관리 및 데이터
-import { ToMungZone, ToZone } from '@/types';
-import { fetchWithPetPlace } from '@/api/map';
+import { FromZone, Point, ToMungZone, ToZone } from '@/types';
+import { getWithPetPlace } from '@/api/map';
 import { colors, mapNavigations } from '@/constants';
 import { useMapStore, MarkerData } from '@/state/useMapStore';
 
@@ -48,6 +47,10 @@ interface MapComponentProps {
   isFormVisible: boolean;
   onFormClose: () => void;
   explorationId?: number;
+  myBlueZone: FromZone | null;
+  allBlueZone: FromZone | null;
+  allRedZone: FromZone | null;
+  mungZone: Array<Point> | null;
   checkMyBlueZone: (myBlueZone: ToZone) => void;
   checkAllUserZone: (zoneType: number, allUserZone: ToZone) => void;
   checkMungPlace: (allUserZone: ToMungZone) => void;
@@ -58,7 +61,10 @@ const MapComponent: React.FC<MapComponentProps> = ({
   userLocation,
   bottomOffset = 0,
   path = [],
-  explorationId = -1,
+  myBlueZone,
+  allBlueZone,
+  allRedZone,
+  mungZone,
   checkMyBlueZone,
   checkAllUserZone,
   checkMungPlace,
@@ -89,7 +95,6 @@ const MapComponent: React.FC<MapComponentProps> = ({
   const mapRef = useRef<MapView | null>(null);
   const setPetFacilities = useMapStore((state) => state.setPetFacilities);
   const navigation = useNavigation<NativeStackNavigationProp<MapStackParamList>>();
-  const { myBlueZone, allBlueZone, allRedZone, mungZone } = useWebSocket(explorationId);
 
   // 마커 처리 및 업데이트
   const { addMarker } = useMapStore();
@@ -221,15 +226,13 @@ const MapComponent: React.FC<MapComponentProps> = ({
   useEffect(() => {
     const getPetFacilities = async () => {
       if (userLocation) {
-        const petFacilities = await fetchWithPetPlace(
-          userLocation.latitude,
-          userLocation.longitude,
-        );
+        const petFacilities = await getWithPetPlace(userLocation.latitude, userLocation.longitude);
         const facilityPoints = petFacilities.facilityPoints;
         setPetFacilities(facilityPoints);
       }
     };
     getPetFacilities();
+    return () => {};
   }, [userLocation]);
 
   // ========== UI Rendering ==========

@@ -5,6 +5,20 @@ interface UseFormProps<T> {
   validate: (values: T) => Record<keyof T, string>;
 }
 
+const formatBirthDate = (value: string) => {
+  // 숫자만 남기기
+  const cleanedValue = value.replace(/[^0-9]/g, '');
+
+  // 길이에 따라 하이픈을 삽입
+  if (cleanedValue.length <= 3) {
+    return cleanedValue;
+  } else if (cleanedValue.length <= 5) {
+    return `${cleanedValue.slice(0, 4)}-${cleanedValue.slice(4)}`;
+  } else {
+    return `${cleanedValue.slice(0, 4)}-${cleanedValue.slice(4, 6)}-${cleanedValue.slice(6)}`;
+  }
+};
+
 const useForm = <T>({ initialValue, validate }: UseFormProps<T>) => {
   const [values, setValues] = useState(initialValue);
   const [touched, setTouched] = useState<Record<string, boolean>>({});
@@ -13,7 +27,13 @@ const useForm = <T>({ initialValue, validate }: UseFormProps<T>) => {
 
   // 입력을 변경할 때 호출
   const handleChangeText = (name: keyof T, value: string | number) => {
-    setValues({ ...values, [name]: value });
+    // 생년월일 필드에 대해 자동 하이픈 삽입 로직 적용
+    if (name === 'petBirth') {
+      const formattedValue = formatBirthDate(String(value));
+      setValues({ ...values, [name]: formattedValue });
+    } else {
+      setValues({ ...values, [name]: value });
+    }
   };
 
   // 필드에서 포커스를 벗어났을 때 호출
