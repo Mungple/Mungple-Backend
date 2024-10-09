@@ -41,7 +41,7 @@ public class MarkerConsumer {
 		this.kafkaTemplate = kafkaTemplate;
 	}
 
-	@KafkaListener(topics = "#{__listener.topic}", groupId = "#{__listener.topic}-create-group")
+	@KafkaListener(topics = "#{__listener.topic}", groupId = "#{__listener.topic}-create-group", concurrency = "9")
 	public void saveMarkerEventProcess(MarkerEvent event, Acknowledgment ack) {
 		try {
 			MarkerPayload markerPayload = markerSerializer.deserializeMarker(event.getPayload())

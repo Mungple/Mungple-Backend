@@ -32,7 +32,6 @@ public class HeatmapQueryListenerService {
 		LocalDateTime to = LocalDateTime.now();
 		LocalDateTime from = to.minusMonths(1);
 		emitHitMapQueryEvent(request.toEvent(userId, HeatmapQueryType.USER_BLUEZONE, from, to));
-		heatmapChunkConsumer.consume(userId, HeatmapQueryType.USER_BLUEZONE);
 	}
 
 	@MethodLoggable(action = LogAction.SELECT)
@@ -40,7 +39,6 @@ public class HeatmapQueryListenerService {
 		LocalDateTime to = LocalDateTime.now();
 		LocalDateTime from = to.minusMonths(6);
 		emitHitMapQueryEvent(request.toEvent(userId, HeatmapQueryType.BLUEZONE, from, to));
-		heatmapChunkConsumer.consume(userId, HeatmapQueryType.BLUEZONE);
 	}
 
 	@MethodLoggable(action = LogAction.SELECT)
@@ -48,7 +46,6 @@ public class HeatmapQueryListenerService {
 		LocalDateTime to = LocalDateTime.now();
 		LocalDateTime from = to.minusMonths(6);
 		emitHitMapQueryEvent(request.toEvent(userId, HeatmapQueryType.REDZONE, from, to));
-		heatmapChunkConsumer.consume(userId, HeatmapQueryType.REDZONE);
 	}
 
 	private void emitHitMapQueryEvent(HeatmapQueryEvent event) {

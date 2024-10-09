@@ -43,7 +43,7 @@ public class MungpleConsumer {
 	@KafkaListener(
 		topics = {"#{__listener.topic}"},
 		groupId = "#{__listener.topic}-geohash-group",
-		concurrency = "3"
+		concurrency = "9"
 	)
 	public void listen(ExplorationEvent receivedEvent, Acknowledgment ack) {
 		String userId = receivedEvent.userId().toString();

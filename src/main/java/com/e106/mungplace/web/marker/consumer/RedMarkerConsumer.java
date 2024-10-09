@@ -31,7 +31,7 @@ public class RedMarkerConsumer {
 		this.redzonePointRepository = redzonePointRepository;
 	}
 
-	@KafkaListener(topics = "#{__listener.topic}", groupId = "#{__listener.topic}-redzone-group")
+	@KafkaListener(topics = "#{__listener.topic}", groupId = "#{__listener.topic}-redzone-group", concurrency = "9")
 	public void saveRedzone(MarkerEvent event, Acknowledgment ack) {
 		if (event.getOperationType() == OperationType.CREATE) {
 			markerSerializer.deserializeMarker(event.getPayload())

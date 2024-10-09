@@ -35,7 +35,7 @@ public class MarkerSaveFailureConsumer {
 		this.markerImageInfoRepository = markerImageInfoRepository;
 	}
 
-	@KafkaListener(topics = "#{__listener.topic}", groupId = "#{__listener.topic}-create-group")
+	@KafkaListener(topics = "#{__listener.topic}", groupId = "#{__listener.topic}-create-group", concurrency = "9")
 	public void rollbackMarkerEvent(String markerId, Acknowledgment ack) {
 		UUID markerUUID = UUID.fromString(markerId);
 

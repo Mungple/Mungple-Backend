@@ -53,7 +53,6 @@ public class KafkaConfig {
 		factory.setCommonErrorHandler(
 			new DefaultErrorHandler(new DeadLetterPublishingRecoverer(kafkaTemplate), generatedBackoff()));
 		factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL);
-		factory.setConcurrency(3);
 		return factory;
 	}
 
