@@ -2,7 +2,6 @@ import { Client } from '@stomp/stompjs';
 import { useState, useEffect, useCallback } from 'react';
 
 import { getAccessToken } from '@/api';
-import { useAppStore } from '@/state/useAppStore';
 import { Distance, FromZone, Point, ToLocation, ToMungZone, ToZone } from '@/types';
 
 export interface ErrorMessage {
@@ -14,14 +13,13 @@ export interface ErrorMessage {
 const WEBSOCKET_URI = 'wss://j11e106.p.ssafy.io/api/ws';
 
 const useWebSocket = (explorationId: number = -1) => {
-  const setIsSocket = useAppStore((state) => state.setIsSocket);
-  const setDistance = useAppStore((state) => state.setDistance);
   const [clientSocket, setClientSocket] = useState<Client | null>(null);
   const [explorations, setExplorations] = useState<ErrorMessage | null>(null);
   const [allBlueZone, setAllBlueZone] = useState<FromZone | null>(null);
   const [allRedZone, setAllRedZone] = useState<FromZone | null>(null);
   const [myBlueZone, setMyBlueZone] = useState<FromZone | null>(null);
   const [mungZone, setMungZone] = useState<Array<Point> | null>(null);
+  const [distance, setDistance] = useState(0);
 
   // 소켓 연결 시도
   useEffect(() => {
@@ -43,7 +41,6 @@ const useWebSocket = (explorationId: number = -1) => {
           onConnect: () => {
             setClientSocket(socket);
             subscribeToTopics(socket, explorationId);
-            setIsSocket(true);
             console.log('useWebSocket >>> 소켓 연결 성공 | explorationId =', explorationId);
           },
           onStompError: (frame) => {
@@ -192,6 +189,7 @@ const useWebSocket = (explorationId: number = -1) => {
     allBlueZone,
     allRedZone,
     mungZone,
+    distance,
     sendLocation,
     checkMyBlueZone,
     checkAllUserZone,

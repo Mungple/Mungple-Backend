@@ -6,7 +6,6 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import useAuth from '@/hooks/queries/useAuth';
 import { useAppStore } from '@/state/useAppStore';
 import { AuthStackParamList } from '@/navigations/stack/AuthStackNavigator';
-import { convertToObject } from 'typescript';
 
 type SocialLoginScreenProps = NativeStackScreenProps<AuthStackParamList, 'SocialLogin'>;
 type CustomWebViewNavigation = Omit<WebViewNavigation, 'headers'>;
@@ -18,7 +17,7 @@ const SocialLoginScreen: React.FC<SocialLoginScreenProps> = () => {
 
   const handleNavigationStateChange = (event: CustomWebViewNavigation) => {
     const url = event.url;
-    console.log(url)
+    console.log(url);
 
     if (url.startsWith(`${domain}/api/auth/oauth-response`)) {
       loginMutation.mutate(url);

@@ -1,9 +1,9 @@
 declare module '*.png' {
-  const value: any
-  export default value
+  const value: string | ImageURISource;
+  export default value;
 }
 
 declare module '*.gif' {
-  const content: any;
+  const content: string | ImageURISource;
   export default content;
 }

@@ -81,29 +81,26 @@ const MapSettings: React.FC<MapSettingProps> = ({ visibleElements, toggleElement
       case 'blueMarkers':
       case 'blueZone':
       case 'myBlueZone':
-        zoneType = 'BLUE'
-        break
+        zoneType = 'BLUE';
+        break;
       case 'redMarkers':
       case 'redZone':
-        zoneType = 'RED'
-        break
+        zoneType = 'RED';
+        break;
       default:
-        zoneType = 'default'
+        zoneType = 'default';
     }
 
     return (
       <ButtonContainer>
-        <Button 
-          onPress={() => toggleElementVisibility(item.elementKey)} 
+        <Button
+          onPress={() => toggleElementVisibility(item.elementKey)}
           selected={isSelected}
-          zoneType={zoneType}
-          >
+          zoneType={zoneType}>
           <Icon name={item.iconName} size={28} color={colors.WHITE} />
         </Button>
         <ButtonLabel>
-          <CustomText fontSize={20}>
-            {item.label}
-          </CustomText>
+          <CustomText fontSize={20}>{item.label}</CustomText>
         </ButtonLabel>
       </ButtonContainer>
     );
@@ -125,7 +122,7 @@ const List = styled.FlatList`
   width: 100%;
 ` as unknown as typeof FlatList;
 
-const Button = styled(TouchableOpacity)<{ selected: boolean }>`
+const Button = styled(TouchableOpacity)<{ selected: boolean; zoneType: string }>`
   width: 70px;
   height: 70px;
   margin: 10px;
