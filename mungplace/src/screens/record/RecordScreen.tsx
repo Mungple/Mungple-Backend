@@ -93,7 +93,6 @@ const RecordScreen: React.FC<RecordScreenProps> = ({ navigation }) => {
         try {
           const response: MonthRecords = await getMonthWalks(monthYear.year, monthYear.month);
           processAttendance(response.explorationInfos);
-          console.log(response);
         } catch (err) {
           console.error(err);
         }

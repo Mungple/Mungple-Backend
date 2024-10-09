@@ -8,6 +8,7 @@ import { colors } from '@/constants';
 import WalkDetail from '@/components/record/WalkDetail';
 import CustomText from '@/components/common/CustomText';
 import WalkDogs from '@/components/record/WalkDogs';
+import WalkMap from '@/components/record/WalkMap';
 import { Point } from '@/types';
 
 type DayWalksDetailProps = NativeStackScreenProps<RecordStackParamList, 'WalkDetail'>;
@@ -24,6 +25,7 @@ interface WalkDetailData {
 const DayWalksDetail: React.FC<DayWalksDetailProps> = ({ route }) => {
   const { explorationId } = route.params;
   const [walkDetail, setWalkDetail] = useState<WalkDetailData | null>(null);
+
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -31,7 +33,6 @@ const DayWalksDetail: React.FC<DayWalksDetailProps> = ({ route }) => {
       try {
         const detail = await getWalkDetail(explorationId);
         setWalkDetail(detail);
-        console.log('산책 상세 정보 가져오기 성공', detail);
       } catch (error) {
         console.error('산책 상세 정보 가져오기 실패:', error);
       } finally {
@@ -54,8 +55,20 @@ const DayWalksDetail: React.FC<DayWalksDetailProps> = ({ route }) => {
     return <CustomText>산책 정보를 찾을 수 없습니다.</CustomText>;
   }
 
+  if (!walkDetail.points || walkDetail.points.length === 0) {
+    return <CustomText>산책 포인트가 없습니다.</CustomText>;
+  }
+
+  const latLngPoints: { latitude: number; longitude: number }[] = walkDetail.points.map(
+    (point) => ({
+      latitude: point.lat,
+      longitude: point.lon,
+    }),
+  );
+
   return (
     <Container>
+      <WalkMap points={latLngPoints} />
       <WalkDogs togetherDogIds={walkDetail.togetherDogIds} />
       <WalkDetail
         distance={walkDetail.distance}

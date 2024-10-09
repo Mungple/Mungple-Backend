@@ -15,16 +15,15 @@ const MarkerDetailScreen: React.FC = () => {
   const [markerDetails, setMarkerDetails] = useState<MarkerDetails | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const accessToken = useAppStore(state => state.token)
-  const currentUserId = useUserStore(state => state.userId)
-  const { userData } = useUserStore((state) => state)
+  const accessToken = useAppStore((state) => state.token);
+  const currentUserId = useUserStore((state) => state.userId);
+  const { userData } = useUserStore((state) => state);
 
   useEffect(() => {
     fetchMarkerDetails(markerId);
-    
   }, [markerId]);
 
-  const BASE_IMAGE_URL = 'http://j11e106.p.ssafy.io:9000/images/'
+  const BASE_IMAGE_URL = 'http://j11e106.p.ssafy.io:9000/images/';
 
   const fetchMarkerDetails = async (markerId: string) => {
     setLoading(true);
@@ -33,17 +32,17 @@ const MarkerDetailScreen: React.FC = () => {
       const response = await axiosInstance.get(`/markers/${markerId}`, {
         headers: {
           'Content-Type': 'application/json; charset=utf8',
-          'Authorization': `Bearer ${accessToken}`,
+          Authorization: `Bearer ${accessToken}`,
         },
       });
-      console.log("서버 응답:", response.data);
+      console.log('서버 응답:', response.data);
 
-      const imageWithUrl = response.data.images.map(imageName => BASE_IMAGE_URL + imageName)
+      const imageWithUrl = response.data.images.map((imageName) => BASE_IMAGE_URL + imageName);
 
-      setMarkerDetails({...response.data, images: imageWithUrl});
+      setMarkerDetails({ ...response.data, images: imageWithUrl });
     } catch (err) {
       setError('마커 디테일을 가져오는 데 실패');
-      console.log(err)
+      console.log(err);
     } finally {
       setLoading(false);
     }
@@ -54,10 +53,10 @@ const MarkerDetailScreen: React.FC = () => {
       const response = await axiosInstance.delete(`/markers/${markerId}`, {
         headers: {
           'Content-Type': 'application/json; charset=utf8',
-          'Authorization': `Bearer ${accessToken}`,
+          Authorization: `Bearer ${accessToken}`,
         },
       });
-      
+
       if (response.status === 202) {
         console.log('마커 삭제 성공');
         setTimeout(() => {
@@ -66,35 +65,40 @@ const MarkerDetailScreen: React.FC = () => {
       }
     } catch (err) {
       console.log('마커 삭제 중 에러 발생:', err);
-      
     }
   };
 
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString)
-    const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false }
-    return date.toLocaleString('ko-KR', options).replace(',', '') // 한국어 형식 변환
-  }
+    const date = new Date(dateString);
+    const options = {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    };
+    return date.toLocaleString('ko-KR', options).replace(',', ''); // 한국어 형식 변환
+  };
 
   if (loading) {
     return <ActivityIndicator size="large" color="#0000ff" />;
   }
 
   if (error) {
-    return <CustomText >{error}</CustomText>;
+    return <CustomText>{error}</CustomText>;
   }
 
   if (!markerDetails) {
     return null; // 마커 데이터가 없을 경우 null 반환
   }
 
-  const nickname = userData.userId === markerDetails.userId ? userData.nickname : '익명'
-
+  const nickname = userData.userId === markerDetails.userId ? userData.nickname : '익명';
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <CustomText style={styles.title}>{markerDetails.title}</CustomText>
-      <CustomText style={styles.content}>{markerDetails.content}</CustomText>      
+      <CustomText style={styles.content}>{markerDetails.content}</CustomText>
       {markerDetails.images.length > 0 && (
         <View style={styles.imageContainer}>
           {markerDetails.images.map((imageUri, index) => (
@@ -102,15 +106,20 @@ const MarkerDetailScreen: React.FC = () => {
           ))}
         </View>
       )}
-      
-      <CustomText style={styles.userId}>작성자: {nickname}</CustomText>
-      <CustomText style={styles.date}>{`${formatDate(markerDetails.createdAt)}에 생성됨`}</CustomText>
+      <View style={styles.userDateContainer}>
+        <View style={styles.infoContainer}>
+          <CustomText style={styles.userId}>작성자: {nickname}</CustomText>
+          <CustomText style={styles.date}>{`${formatDate(
+            markerDetails.createdAt,
+          )}에 생성됨`}</CustomText>
+        </View>
+      </View>
       {/* 현재 접속한 유저와 작성자가 동일할 때만 삭제 버튼 렌더링 */}
       {currentUserId === markerDetails.userId && (
-        <CustomButton label="삭제" onPress={handleDelete} variant='outlined' />
+        <CustomButton label="삭제" onPress={handleDelete} variant="outlined" />
       )}
-      
-      <CustomButton label="뒤로 가기" onPress={() => navigation.goBack()} variant='outlined' />
+
+      <CustomButton label="뒤로 가기" onPress={() => navigation.goBack()} variant="outlined" />
     </ScrollView>
   );
 };
@@ -152,8 +161,8 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   image: {
-    width: '48%',
-    height: 100,
+    width: '100%',
+    height: 200,
     borderRadius: 8,
     marginBottom: 10,
     borderWidth: 1,
@@ -164,7 +173,13 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginBottom: 20,
     color: '#7f8c8d',
-    fontStyle: 'italic',
+  },
+  userDateContainer: {
+    flexDirection: 'column',
+  },
+  infoContainer: {
+    justifyContent: 'flex-end',
+    alignItems: 'flex-end',
   },
 });
 
