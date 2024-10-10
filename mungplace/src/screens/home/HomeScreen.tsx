@@ -50,8 +50,6 @@ const HomeScreen: React.FC = () => {
   const setStartExplorate = useAppStore((state) => state.setStartExplorate);
   const navigation = useNavigation<NativeStackNavigationProp<MapStackParamList>>();
 
-  useUserLocation();
-
   // 산책 시작 모달
   const handleModalVisivle = () => {
     setModalVisible(!modalVisible);

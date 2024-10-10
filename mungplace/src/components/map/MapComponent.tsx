@@ -134,6 +134,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
   }
 
   usePermission('LOCATION');
+  usePermission('BACKGROUND_LOCATION');
 
   // ========== Methods ==========
   // 지도 요소 토글 함수

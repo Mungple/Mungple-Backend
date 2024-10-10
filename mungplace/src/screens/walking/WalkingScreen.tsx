@@ -107,7 +107,7 @@ const WalkingScreen: React.FC = () => {
     return () => {
       clearInterval(intervalId);
     };
-  }, [sendLocation]);
+  }, [userLocation, sendLocation]);
 
   // ========== UI Rendering ==========
   if (!startExplorate) {
