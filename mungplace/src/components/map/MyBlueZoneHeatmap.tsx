@@ -39,9 +39,10 @@ const MyBlueZoneHeatmap = ({ myBlueZone, checkMyBlueZone }: MyBlueZoneHeatmapPro
             longitude: cell.point.lon,
             weight: cell.weight,
           }))}
+          radius={35}
           gradient={{
-            colors: [colors.BEIGE.LIGHTER, colors.BLUE.BASE],
-            startPoints: [0.2, 1.0],
+            colors: [colors.BLUE.DARKER, colors.BLACK],
+            startPoints: [0.1, 1.0],
             colorMapSize: 256,
           }}
         />

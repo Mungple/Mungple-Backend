@@ -6,10 +6,12 @@ import CustomText from '@/components/common/CustomText'; // 커스텀 텍스트
 import CustomButton from '@/components/common/CustomButton'; // 커스텀 버튼
 import { deleteMarker, getMarkerDetails } from '@/api';
 import { MarkerDetails } from '@/types';
-import { colors } from '@/constants';
+import { mapNavigations } from '@/constants';
+import { MapStackParamList } from '@/navigations/stack/MapStackNavigator';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 const MarkerDetailScreen: React.FC = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<NativeStackNavigationProp<MapStackParamList>>();
   const route = useRoute();
   const { markerId } = route.params as { markerId: string };
   const [markerDetails, setMarkerDetails] = useState<MarkerDetails | null>(null);
@@ -40,12 +42,12 @@ const MarkerDetailScreen: React.FC = () => {
     }
   };
 
-  const handleDelete = async () => {
+  const handleDelete = (markerId : string ) => async () => {
     const status = await deleteMarker(markerId);
 
     if (status === 202) {
       setTimeout(() => {
-        navigation.goBack();
+        navigation.navigate(mapNavigations.HOME);
       }, 100);
     }
   };
