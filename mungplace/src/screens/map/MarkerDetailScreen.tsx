@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Image, StyleSheet, ActivityIndicator, ScrollView } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { useUserStore } from '@/state/useUserStore'; // 유저 스토어
+import { colors } from '@/constants';
 import CustomText from '@/components/common/CustomText'; // 커스텀 텍스트
 import CustomButton from '@/components/common/CustomButton'; // 커스텀 버튼
 import { deleteMarker, getMarkerDetails } from '@/api';
@@ -42,11 +43,10 @@ const MarkerDetailScreen: React.FC = () => {
     }
   };
 
-  const handleDelete = (markerId : string ) => async () => {
+  const handleDelete =  async () => {
     const status = await deleteMarker(markerId);
 
     if (status === 202) {
-      console.log('삭제 성공')
       setTimeout(() => {
         navigation.navigate(mapNavigations.HOME);
       }, 100);
@@ -101,10 +101,14 @@ const MarkerDetailScreen: React.FC = () => {
       </View>
       {/* 현재 접속한 유저와 작성자가 동일할 때만 삭제 버튼 렌더링 */}
       {currentUserId === markerDetails.userId && (
-        <CustomButton label="삭제" onPress={handleDelete(markerId)} variant="outlined" />
+        <CustomButton label="삭제" onPress={handleDelete} variant="outlined"
+        style={{ position: 'absolute', bottom: 90, left: 20, borderColor: `${colors.RED.BASE}` }}
+        textStyle={{ color: `${colors.RED.BASE}` }}
+        />
       )}
-
-      <CustomButton label="뒤로 가기" onPress={() => navigation.goBack()} variant="outlined" />
+      <CustomButton label="뒤로 가기" onPress={() => navigation.goBack()} variant="outlined"
+        style={{ position: 'absolute', bottom: 30, left: 20 }}
+      />
     </ScrollView>
   );
 };
@@ -140,16 +144,15 @@ const styles = StyleSheet.create({
     textAlign: 'right',
   },
   imageContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
+    alignItems: 'center',
     marginBottom: 20,
   },
   image: {
     width: '100%',
-    height: 200,
+    height: undefined,
+    aspectRatio: 1.5,
     borderRadius: 8,
-    marginBottom: 10,
     borderWidth: 1,
     borderColor: '#ecf0f1',
     resizeMode: 'cover',

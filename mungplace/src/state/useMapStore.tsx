@@ -6,6 +6,7 @@ import { create } from 'zustand'; // 상태 관리 store
 interface MapState {
   markers: MarkerData[]; // 마커 추가 로직
   showUserMarkers: boolean;
+  myMarkers: MyMarkerData[];
   petFacilities: PetFacility[];
   nearbyMarkers: NearbyMarkersData | null;
 
@@ -24,7 +25,6 @@ export const useMapStore = create<MapState>((set) => ({
   showUserMarkers: true,
 
   setMarkers: (value: MarkerData[]) => set(() => ({ markers: value })),
-
   setPetFacilities: (value: PetFacility[]) => set({ petFacilities: value }),
   setNearbyMarkers: (value: NearbyMarkersData) => set({ nearbyMarkers: value }),
   toggleUserMarkers: () => set((state) => ({ showUserMarkers: !state.showUserMarkers })),

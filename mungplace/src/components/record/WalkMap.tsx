@@ -35,7 +35,7 @@ const WalkMap: React.FC<WalkMapProps> = ({ points }) => {
           longitudeDelta: 0.001, // 범위 조정
         }}
         minZoomLevel={16}
-        maxZoomLevel={20}>
+        maxZoomLevel={16}>
         <Polyline
           coordinates={points} // LatLng 타입의 points
           strokeColor={colors.ORANGE.LIGHTER}

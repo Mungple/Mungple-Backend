@@ -29,11 +29,11 @@ const deleteMarker = async (markerId: string): Promise<number> => {
   }
 };
 
-const getMyMarkers = async ( cursorId: string | null ): Promise<MyMarkerData[]> => {
+const getMyMarkers = async (cursorId: string | null): Promise<MyMarkerData[]> => {
   try {
-    const params: { size: number, cursorId? : string } = { size : 50}
+    const params: { size: number, cursorId?: string } = { size: 50 };
     if (cursorId) {
-      params.cursorId = cursorId
+      params.cursorId = cursorId;
     }
 
     const { data } = await axiosInstance.get('/markers/users', {
@@ -42,7 +42,6 @@ const getMyMarkers = async ( cursorId: string | null ): Promise<MyMarkerData[]> 
       },
       params,
     });
-    console.log('내 마커 정보 겟', data)
     return data;
   } catch (error) {
     console.error('[FAIL] getMyMarkers :', error);

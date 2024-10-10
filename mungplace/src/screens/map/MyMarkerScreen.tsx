@@ -8,6 +8,7 @@ import CustomText from '@/components/common/CustomText';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import { getMyMarkers } from '@/api';
 import { MyMarkerData } from '@/types';
+import CustomButton from '@/components/common/CustomButton';
 
 const MyMar: React.FC = () => {
   const [loading, setLoading] = useState(true)
@@ -79,6 +80,9 @@ const MyMar: React.FC = () => {
           </TouchableOpacity>
         )}
         contentContainerStyle={styles.listContainer}
+      />
+      <CustomButton label="뒤로 가기" onPress={() => navigation.goBack()} variant="outlined" 
+        style={{ position: 'absolute', bottom: 30, left: 20 }}
       />
     </View>
   );

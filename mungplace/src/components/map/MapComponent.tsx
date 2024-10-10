@@ -70,6 +70,8 @@ const MapComponent: React.FC<MapComponentProps> = ({
   checkMungPlace,
 }) => {
   useMarkersWithinRadius();
+  usePermission('LOCATION');
+  usePermission('BACKGROUND_LOCATION');
   // ========== Constants ==========
   // 애니메이션 값 및 상태 관리
   const opacity = useRef(new Animated.Value(0)).current;
@@ -132,9 +134,6 @@ const MapComponent: React.FC<MapComponentProps> = ({
       });
     });
   }
-
-  usePermission('LOCATION');
-  usePermission('BACKGROUND_LOCATION');
 
   // ========== Methods ==========
   // 지도 요소 토글 함수

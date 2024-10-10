@@ -30,7 +30,7 @@ const ElapsedTime = () => {
   }, [startTime]);
 
   return (
-    <CustomText fontWeight="bold" fontSize={32} color={colors.BLACK} style={{ marginVertical: 10 }}>
+    <CustomText fontWeight="bold" fontSize={22} color={colors.BLACK} style={{ marginVertical: 10 }}>
       {elapsedTime}
     </CustomText>
   );

@@ -102,8 +102,8 @@ const Header = styled.View`
 
 const Container = styled(CustomCard)`
   flex: 1;
-  margin: 20px;
-  padding: 30px;
+  margin: 15px;
+  padding: 25px;
   flex-direction: column;
   background-color: ${colors.BEIGE.LIGHTER};
   overflow: hidden;
