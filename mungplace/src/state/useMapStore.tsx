@@ -1,5 +1,5 @@
 // src/state/useMapStore.ts
-import { MarkerData, NearbyMarkersData, PetFacility } from '@/types';
+import { MarkerData, MyMarkerData, NearbyMarkersData, PetFacility } from '@/types';
 import { create } from 'zustand'; // 상태 관리 store
 
 // 맵 화면의 상태 정의
