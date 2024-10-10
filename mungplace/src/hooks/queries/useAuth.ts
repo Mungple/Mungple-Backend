@@ -1,11 +1,12 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 
 import queryClient from '@/api/queryClient';
+import { ResponseUserProfile } from '@/types';
 import { useAppStore } from '@/state/useAppStore';
 import { useUserStore } from '@/state/useUserStore';
 import { queryKeys, storageKeys } from '@/constants';
 import { setEncryptStorage, setHeader } from '@/utils';
-import { ResponseProfile, getProfile, getUserId, socialLogin } from '@/api/auth';
+import { getProfile, getUserId, socialLogin } from '@/api';
 import type { UseMutationCustomOptions, UseQueryCustomOptions } from '@/types/common';
 
 // 로그인 커스텀 훅
@@ -48,7 +49,7 @@ function useGetUserId(token: string | null, queryOptions?: UseQueryCustomOptions
 }
 
 // 프로필 정보 가져오기 훅
-function useGetProfile(userId: number, queryOptions?: UseQueryCustomOptions<ResponseProfile>) {
+function useGetProfile(userId: number, queryOptions?: UseQueryCustomOptions<ResponseUserProfile>) {
   return useQuery({
     queryFn: () => getProfile(userId),
     queryKey: [queryKeys.AUTH, queryKeys.GET_PROFILE, userId],

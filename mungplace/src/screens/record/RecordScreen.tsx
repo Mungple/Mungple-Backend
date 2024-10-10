@@ -4,7 +4,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import styled from 'styled-components/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { colors } from '@/constants';
-import { getMonthWalks, getDayWalks } from '@/api/walk';
+import { getMonthWalks, getDayWalks } from '@/api';
 import { getMonthYearDetails, getNewMonthYear } from '@/utils/date';
 import { RecordStackParamList } from '@/navigations/stack/RecordStackNavigator';
 import Calendar from '@/components/record/Calendar';
@@ -71,7 +71,6 @@ const RecordScreen: React.FC<RecordScreenProps> = ({ navigation }) => {
 
     try {
       const data = await getDayWalks(dateString); // 날짜에 맞는 산책 데이터 가져오기
-      console.log('일간 산책 목록 가져오기 성공:', data);
       processDayWalks(data.explorationInfos);
     } catch (error) {
       console.error('일간 산책 목록 가져오기 실패:', error);

@@ -15,7 +15,7 @@ const startWalk = async (JSON: string) => {
     });
     return data;
   } catch (error) {
-    console.error('산책 시작 실패 :', error);
+    console.error('[FAIL] postStartWalk :', error);
     throw error;
   }
 };
@@ -28,10 +28,9 @@ const exitWalk = async (explorationId: number) => {
         'Content-Type': `application/json; charset=utf8`,
       },
     });
-    console.log('산책 종료 성공', data);
     return data;
   } catch (error) {
-    console.error('산책 종료 실패 :', error);
+    console.error('[FAIL] patchExitWalk :', error);
     throw error;
   }
 };
@@ -47,7 +46,7 @@ const getMonthWalks = async (year: number, month: number) => {
     });
     return data;
   } catch (error) {
-    console.error('월간 산책 기록 목록 조회 실패 :', error);
+    console.error('[FAIL] getMonthWalks :', error);
     throw error;
   }
 };
@@ -63,7 +62,7 @@ const getStatistics = async (year: number, month: number) => {
     });
     return data;
   } catch (error) {
-    console.error('월간 산책 통계 조회 실패 :', error);
+    console.error('[FAIL] getStatistics :', error);
     throw error;
   }
 };
@@ -78,7 +77,7 @@ const getDayWalks = async (date: string) => {
     });
     return data;
   } catch (error) {
-    console.error('일간 산책 기록 목록 조회 실패 :', error);
+    console.error('[FAIL] getDayWalks :', error);
     throw error;
   }
 };
@@ -89,7 +88,7 @@ const getWalkDetail = async (explorationId: number) => {
     const { data } = await axiosInstance.get(`/explorations/${explorationId}`);
     return data;
   } catch (error) {
-    console.error('산책 기록 상세 조회 실패 :', error);
+    console.error('[FAIL] getWalkDetail :', error);
     throw error;
   }
 };

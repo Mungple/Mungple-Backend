@@ -28,7 +28,7 @@ const MyBlueZoneHeatmap = ({ myBlueZone, checkMyBlueZone }: MyBlueZoneHeatmapPro
       checkMyBlueZone(zoneData);
     }
   }, [userLocation, checkMyBlueZone]);
-  console.log('myBlueZone:', myBlueZone);
+
   return (
     <>
       {/* 개인 블루존 히트맵 렌더링 */}

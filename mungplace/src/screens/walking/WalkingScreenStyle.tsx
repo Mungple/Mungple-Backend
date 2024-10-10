@@ -66,12 +66,6 @@ const InfoLabel = styled.Text`
   font-size: 18px;
 `;
 
-const InfoValue = styled.Text`
-  font-size: 32px;
-  font-weight: bold;
-  color: ${colors.BLACK};
-`;
-
 export {
   ModalTitle,
   ButtonContainer,
@@ -83,5 +77,4 @@ export {
   InfoRow,
   InfoBlock,
   InfoLabel,
-  InfoValue,
 };

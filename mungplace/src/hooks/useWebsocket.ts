@@ -41,7 +41,6 @@ const useWebSocket = (explorationId: number = -1) => {
           onConnect: () => {
             setClientSocket(socket);
             subscribeToTopics(socket, explorationId);
-            console.log('useWebSocket >>> 소켓 연결 성공 | explorationId =', explorationId);
           },
           onStompError: (frame) => {
             console.error('useWebSocket >>> 소켓 연결 에러 발생:', frame.headers['message']);
@@ -60,7 +59,6 @@ const useWebSocket = (explorationId: number = -1) => {
 
     return () => {
       if (clientSocket) {
-        console.log('the end');
         clientSocket.deactivate();
         setClientSocket(null);
       }
@@ -132,7 +130,6 @@ const useWebSocket = (explorationId: number = -1) => {
   const sendLocation = useCallback(
     (explorationId: number, location: ToLocation) => {
       if (clientSocket?.connected) {
-        console.log(location);
         clientSocket.publish({
           destination: `/pub/explorations/${explorationId}`,
           body: JSON.stringify(location),
@@ -152,7 +149,7 @@ const useWebSocket = (explorationId: number = -1) => {
           body: JSON.stringify(myBlueZone),
         });
       } else {
-        console.log('checkMyBlueZone 소켓 연결이 되어있지 않습니다.');
+        console.error('checkMyBlueZone 소켓 연결이 되어있지 않습니다.');
       }
     },
     [clientSocket],
@@ -167,7 +164,7 @@ const useWebSocket = (explorationId: number = -1) => {
           body: JSON.stringify(allUserZone),
         });
       } else {
-        console.log('checkAllUserZone 소켓 연결이 되어있지 않습니다.');
+        console.error('checkAllUserZone 소켓 연결이 되어있지 않습니다.');
       }
     },
     [clientSocket],
@@ -181,7 +178,7 @@ const useWebSocket = (explorationId: number = -1) => {
           body: JSON.stringify(allUserZone),
         });
       } else {
-        console.log('checkMungPlace 소켓 연결이 되어있지 않습니다.');
+        console.error('checkMungPlace 소켓 연결이 되어있지 않습니다.');
       }
     },
     [clientSocket],

@@ -1,16 +1,16 @@
-import { ResponsePetProfile, UserProfile } from '@/types';
+import { ResponsePetProfile, ResponseUserProfile } from '@/types';
 import { LatLng } from 'react-native-maps';
 import { create } from 'zustand';
 
 interface UserState {
   userId: number;
   petData: ResponsePetProfile[];
-  userData: UserProfile;
+  userData: ResponseUserProfile;
   userLocation: LatLng | null;
 
   setUserId: (value: number) => void;
   setPetData: (value: ResponsePetProfile[]) => void;
-  setUserData: (value: UserProfile) => void;
+  setUserData: (value: ResponseUserProfile) => void;
   setUserLocation: (value: LatLng | null) => void;
 }
 
@@ -27,6 +27,6 @@ export const useUserStore = create<UserState>((set) => ({
 
   setUserId: (value: number) => set({ userId: value }),
   setPetData: (value: ResponsePetProfile[]) => set({ petData: value }),
-  setUserData: (value: UserProfile) => set({ userData: value }),
+  setUserData: (value: ResponseUserProfile) => set({ userData: value }),
   setUserLocation: (value: LatLng | null) => set({ userLocation: value }),
 }));
