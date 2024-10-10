@@ -23,7 +23,6 @@ import com.e106.mungplace.domain.exploration.repository.DogExplorationRepository
 import com.e106.mungplace.domain.exploration.repository.ExplorationRepository;
 import com.e106.mungplace.domain.util.GeoUtils;
 import com.e106.mungplace.web.exception.ApplicationSocketException;
-import com.e106.mungplace.web.exception.dto.ErrorResponse;
 import com.e106.mungplace.web.handler.interceptor.WebSocketSessionManager;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -47,6 +46,7 @@ public class ExplorationRecorder {
 
 	private static final int MAX_DISTANCE_CAPACITY = 3;
 	private final DogExplorationRepository dogExplorationRepository;
+	private final ExplorationReader explorationReader;
 
 	public void initRecord(String explorationId, String userId, String lat, String lon) {
 		String userCurrentGeoHash = Point.toUserCurrentGeoHash(lat, lon);
@@ -54,7 +54,7 @@ public class ExplorationRecorder {
 
 		deleteAllValue(userId);
 
-		redisTemplate.opsForValue().set(getUserKey(userId), userCurrentGeoHash, 60, TimeUnit.SECONDS);
+		redisTemplate.opsForValue().set(getUserGeoHashKey(userId), userCurrentGeoHash, 60, TimeUnit.SECONDS);
 		redisTemplate.opsForValue().set(getConstantKey(userId), constantGeoHash, 30, TimeUnit.MINUTES);
 		redisTemplate.opsForValue().set(getTotalDistanceKey(userId), "0");
 		redisTemplate.opsForValue().set(getPrePointKey(userId), lat + "," + lon);
@@ -92,7 +92,7 @@ public class ExplorationRecorder {
 	public void recordExploration(String userId, String lat, String lon) {
 		String previousGeoHash = getValidatedUserGeoHash(userId);
 		String currentGeoHash = Point.toUserCurrentGeoHash(lat, lon);
-		redisTemplate.opsForValue().set(getUserKey(userId), currentGeoHash, 60, TimeUnit.SECONDS);
+		redisTemplate.opsForValue().set(getUserGeoHashKey(userId), currentGeoHash, 60, TimeUnit.SECONDS);
 
 		validateUserIdWhenGeoHashIsDifference(userId, previousGeoHash, currentGeoHash);
 
@@ -100,6 +100,7 @@ public class ExplorationRecorder {
 		redisTemplate.opsForValue().set(getTotalDistanceKey(userId), totalDistance);
 
 		sendDistanceToUser(userId, totalDistance);
+		log.info("Service 산책 거리 저장 완료");
 	}
 
 	private boolean validateUserIdWhenGeoHashIsDifference(String userId, String userPreviousGeoHash,
@@ -155,30 +156,29 @@ public class ExplorationRecorder {
 			log.error("JSON 변환 오류: {}", e.getMessage());
 		}
 	}
-
-	@Scheduled(fixedRate = 3000)
+	
+	@Scheduled(fixedRate = 20000)
 	public void validateActiveUsers() {
-		Set<String> connectedUserIds = sessionManager.getConnectedUserIds();
 		Set<String> activeUserInfos = redisTemplate.opsForSet().members(getActiveUsersKey());
 
 		if (activeUserInfos == null || activeUserInfos.isEmpty()) {
 			return;
 		}
 
-		ErrorResponse response = ErrorResponse.of(DONT_SEND_ANY_REQUEST);
-		activeUserInfos.stream()
-			.filter(activeUserInfo -> {
-				String userId = activeUserInfo.split(":")[0]; // userId만 추출
-				return !connectedUserIds.contains(userId); // 연결된 userId가 아닌 경우 필터링
-			})
-			.forEach(activeUserInfo -> {
-				String[] info = activeUserInfo.split(":");
-				String userId = info[0];
-				String explorationId = info[1];
+		activeUserInfos.forEach((activeUserInfo) -> {
+			String userId = activeUserInfo.split(":")[0];
+			String explorationId = activeUserInfo.split(":")[1];
 
-				messagingTemplate.convertAndSendToUser(userId, "/sub/errors", response);
+			if(redisTemplate.opsForValue().get(getUserGeoHashKey(userId)) != null) return;
+
+			Exploration exploration = explorationReader.get(Long.parseLong(explorationId));
+
+			if(!exploration.isEnded()) {
 				endRecord(userId, explorationId);
-			});
+			} else {
+				redisTemplate.opsForSet().remove(getActiveUsersKey(), userId + ":" + explorationId);
+			}
+		});
 	}
 
 	private static double getDistanceBetweenPoints(String lat, String lon, String[] previousLatLon) {
@@ -196,7 +196,7 @@ public class ExplorationRecorder {
 	}
 
 	private String getValidatedUserGeoHash(String userId) {
-		String geoHash = redisTemplate.opsForValue().get(getUserKey(userId));
+		String geoHash = redisTemplate.opsForValue().get(getUserGeoHashKey(userId));
 		if (geoHash == null) {
 			throw new ApplicationSocketException(DONT_SEND_ANY_REQUEST);
 		}
@@ -216,7 +216,7 @@ public class ExplorationRecorder {
 		return "active_users";
 	}
 
-	private String getUserKey(String userId) {
+	private String getUserGeoHashKey(String userId) {
 		return "users:" + userId + ":geohash";
 	}
 
@@ -258,7 +258,7 @@ public class ExplorationRecorder {
 	}
 
 	private void deleteAllValue(String userId) {
-		redisTemplate.delete(getUserKey(userId));
+		redisTemplate.delete(getUserGeoHashKey(userId));
 		redisTemplate.delete(getConstantKey(userId));
 		redisTemplate.delete(getThreePointDistanceKey(userId));
 		redisTemplate.delete(getPrePointKey(userId));

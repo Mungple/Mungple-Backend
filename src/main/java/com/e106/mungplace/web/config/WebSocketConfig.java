@@ -25,7 +25,6 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
 	private final StompInterceptor stompInterceptor;
 	private final StompExceptionHandler stompExceptionHandler;
-	private final RedisTemplate<String, String> redisTemplate;
 
 	@Override
 	public void configureWebSocketTransport(WebSocketTransportRegistration registry) {
@@ -52,6 +51,6 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 	@Bean
 	public WebSocketSessionManager webSocketSessionManager(
 		@Qualifier("subProtocolWebSocketHandler") WebSocketHandler webSocketHandler) {
-		return new WebSocketSessionManager(webSocketHandler, redisTemplate);
+		return new WebSocketSessionManager(webSocketHandler);
 	}
 }

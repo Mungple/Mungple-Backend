@@ -38,7 +38,6 @@ public class WebSocketErrorControllerAdvice {
 	@MessageExceptionHandler(SocketException.class)
 	public void handleSocketException(StompHeaderAccessor accessor) throws IOException {
 		sendErrorMessage(accessor, UN_RECOGNIZED_SOCKET_EXCEPTION);
-		postProcessIfFatalException(accessor);
 		sessionManager.closeSession(accessor.getSessionId());
 
 		errorLogging(accessor, UN_RECOGNIZED_SOCKET_EXCEPTION);
@@ -50,8 +49,6 @@ public class WebSocketErrorControllerAdvice {
 		MessageConversionException.class})
 	public void handleInValidMessageBody(StompHeaderAccessor accessor) throws IOException {
 		sendErrorMessage(accessor, MESSAGE_BODY_NOT_VALID);
-		postProcessIfFatalException(accessor);
-		sessionManager.closeSession(accessor.getSessionId());
 
 		errorLogging(accessor, MESSAGE_BODY_NOT_VALID);
 	}
@@ -60,8 +57,6 @@ public class WebSocketErrorControllerAdvice {
 	@MessageExceptionHandler(MessageDeliveryException.class)
 	public void handleFailedMessageDelivery(StompHeaderAccessor accessor) throws IOException {
 		sendErrorMessage(accessor, MESSAGE_DELIVERY_FAILED);
-		postProcessIfFatalException(accessor);
-		sessionManager.closeSession(accessor.getSessionId());
 
 		errorLogging(accessor, MESSAGE_DELIVERY_FAILED);
 	}
@@ -75,6 +70,7 @@ public class WebSocketErrorControllerAdvice {
 		}
 		errorLogging(accessor, e.getError());
 	}
+
 	private void postProcessIfFatalException(StompHeaderAccessor accessor) throws IOException {
 		String userId = accessor.getUser().getName();
 		if(accessor.getSessionAttributes().containsKey("explorationId")) {

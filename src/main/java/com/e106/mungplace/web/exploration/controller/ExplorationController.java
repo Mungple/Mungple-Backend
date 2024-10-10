@@ -29,7 +29,9 @@ import com.e106.mungplace.web.exploration.service.ExplorationService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RequiredArgsConstructor
 @RequestMapping("/explorations")
 @RestController
@@ -75,6 +77,8 @@ public class ExplorationController {
 	@MessageMapping("/explorations/{explorationId}")
 	public void createExplorationEvent(@Valid ExplorationEventRequest eventRequest,
 		@DestinationVariable Long explorationId, Principal principal) {
+		log.info("Lat : {}, Lon : {} ", eventRequest.getLat(), eventRequest.getLon());
+
 		explorationService.createExplorationEventProcess(eventRequest, explorationId, principal);
 	}
 }
