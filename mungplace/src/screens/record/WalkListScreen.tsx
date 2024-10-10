@@ -10,12 +10,15 @@ import { calculateDistance } from '@/utils/recordCalculator';
 import DefaultImage from '@/assets/profile-image.png';
 import { colors } from '@/constants';
 import CustomText from '@/components/common/CustomText';
+import usePet from '@/hooks/queries/usePet';
 
 type WalkListScreenProps = NativeStackScreenProps<RecordStackParamList, 'WalkList'>;
 
 const WalkListScreen: React.FC<WalkListScreenProps> = ({ navigation, route }) => {
   const { dayListData } = route.params;
-  const petData = useUserStore((state) => state.petData);
+  const { useGetPet } = usePet()
+  const { userId } = useUserStore.getState();
+  const { data: petData } = useGetPet(userId);
 
   const processPetPhoto = (petData: ResponsePetProfile[], dogId: number) => {
     const pet = petData.find((pet) => pet.id === dogId);
@@ -41,7 +44,7 @@ const WalkListScreen: React.FC<WalkListScreenProps> = ({ navigation, route }) =>
             </CustomText>
           </NumContainer>
           <DogList>
-            {togetherDogIds.length > 0 ? (
+            {petData && togetherDogIds.length > 0 ? (
               <FlatList
                 data={togetherDogIds}
                 renderItem={({ item }) => {
