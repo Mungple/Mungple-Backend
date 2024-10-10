@@ -40,10 +40,11 @@ const AllRedZoneHeatmap = ({ allRedZone, checkAllUserZone }: AllRedZoneHeatmapPr
             longitude: cell.point.lon,
             weight: cell.weight,
           }))}
+          radius={35}
           gradient={{
             colors: ['red', 'darkred'],
             startPoints: [0.2, 1.0],
-            colorMapSize: 256,
+            colorMapSize: 512,
           }}
         />
       )}

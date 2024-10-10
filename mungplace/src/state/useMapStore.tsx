@@ -78,6 +78,7 @@ interface MapState {
   setMyMarkers: (value: MyMarkerData[]) => void;
   setPetFacilities: (value: PetFacility[]) => void;
   setNearbyMarkers: (value: NearbyMarkersData) => void;
+  removeMarker: (markerId: string) => void;
 }
 
 export const useMapStore = create<MapState>((set) => ({
@@ -94,4 +95,8 @@ export const useMapStore = create<MapState>((set) => ({
   setNearbyMarkers: (value: NearbyMarkersData) => set({ nearbyMarkers: value }),
   toggleUserMarkers: () => set((state) => ({ showUserMarkers: !state.showUserMarkers })),
   addMarker: (value: MarkerData) => set((state) => ({ markers: [...state.markers, value] })),
+  removeMarker: (markerId: string) => 
+    set((state) => ({
+      myMarkers: state.myMarkers.filter((marker) => marker.markerId !== markerId),
+    })),
 }));

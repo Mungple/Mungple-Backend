@@ -1,11 +1,12 @@
 import React, { useEffect } from 'react';
-import { View, FlatList, TouchableOpacity, ActivityIndicator, StyleSheet } from 'react-native';
+import { View, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
 import useMyMarkers from '@/hooks/useMyMarkers';
 import { useNavigation } from '@react-navigation/native';
 import { MapStackParamList } from '@/navigations/stack/MapStackNavigator';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { mapNavigations } from '@/constants';
 import CustomText from '@/components/common/CustomText';
+import LoadingSpinner from '@/components/common/LoadingSpinner';
 
 const MyMar: React.FC = () => {
   const { myMarkers, fetchMyMarkers, loading } = useMyMarkers();
@@ -21,7 +22,7 @@ const MyMar: React.FC = () => {
   };
 
   if (loading) {
-    return <ActivityIndicator size="large" color="#0000ff" />;
+    return <LoadingSpinner />;
   }
 
   const formatDate = (dateString: string) => {

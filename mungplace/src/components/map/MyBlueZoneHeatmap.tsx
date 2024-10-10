@@ -28,7 +28,7 @@ const MyBlueZoneHeatmap = ({ myBlueZone, checkMyBlueZone }: MyBlueZoneHeatmapPro
       checkMyBlueZone(zoneData);
     }
   }, [userLocation, checkMyBlueZone]);
-  console.log('myBlueZone:', myBlueZone);
+
   return (
     <>
       {/* 개인 블루존 히트맵 렌더링 */}
@@ -39,9 +39,10 @@ const MyBlueZoneHeatmap = ({ myBlueZone, checkMyBlueZone }: MyBlueZoneHeatmapPro
             longitude: cell.point.lon,
             weight: cell.weight,
           }))}
+          radius={35}
           gradient={{
-            colors: [colors.BEIGE.LIGHTER, colors.BLUE.BASE],
-            startPoints: [0.2, 1.0],
+            colors: [colors.BLUE.DARKER, colors.BLACK],
+            startPoints: [0.1, 1.0],
             colorMapSize: 256,
           }}
         />

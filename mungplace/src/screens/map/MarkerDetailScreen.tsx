@@ -8,6 +8,7 @@ import { useUserStore } from '@/state/useUserStore'; // 유저 스토어
 import CustomText from '@/components/common/CustomText'; // 커스텀 텍스트
 import CustomButton from '@/components/common/CustomButton'; // 커스텀 버튼
 import { getMarkerDetails } from '@/api/map';
+import { useMapStore } from '../../state/useMapStore';
 
 const MarkerDetailScreen: React.FC = () => {
   const navigation = useNavigation();
@@ -19,6 +20,7 @@ const MarkerDetailScreen: React.FC = () => {
   const accessToken = useAppStore((state) => state.token);
   const currentUserId = useUserStore((state) => state.userId);
   const { userData } = useUserStore((state) => state);
+  const removeMarker = useMapStore((state) => state.removeMarker)
 
   useEffect(() => {
     fetchMarkerDetails(markerId);
@@ -42,7 +44,7 @@ const MarkerDetailScreen: React.FC = () => {
     }
   };
 
-  const handleDelete = async () => {
+  const handleDelete = (markerId: string) => async () => {
     try {
       const response = await axiosInstance.delete(`/markers/${markerId}`, {
         headers: {
@@ -53,6 +55,7 @@ const MarkerDetailScreen: React.FC = () => {
 
       if (response.status === 202) {
         console.log('마커 삭제 성공');
+        removeMarker(markerId)
         setTimeout(() => {
           navigation.goBack();
         }, 100); // 100ms 후에 goBack 호출
@@ -110,7 +113,7 @@ const MarkerDetailScreen: React.FC = () => {
       </View>
       {/* 현재 접속한 유저와 작성자가 동일할 때만 삭제 버튼 렌더링 */}
       {currentUserId === markerDetails.userId && (
-        <CustomButton label="삭제" onPress={handleDelete} variant="outlined" />
+        <CustomButton label="삭제" onPress={handleDelete(markerId)} variant="outlined" />
       )}
 
       <CustomButton label="뒤로 가기" onPress={() => navigation.goBack()} variant="outlined" />
