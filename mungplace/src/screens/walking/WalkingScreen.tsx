@@ -146,7 +146,7 @@ const WalkingScreen: React.FC = () => {
               <WS.InfoLabel>이동 거리</WS.InfoLabel>
               <CustomText
                 fontWeight="bold"
-                fontSize={32}
+                fontSize={22}
                 color={colors.BLACK}
                 style={{ marginVertical: 10 }}>
                 {formatDistance}

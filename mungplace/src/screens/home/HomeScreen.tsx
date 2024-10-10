@@ -95,7 +95,7 @@ const HomeScreen: React.FC = () => {
                   : dogMain
               }></HS.Image>
           </HS.ImageCard>
-          <PetInfoBox defaultPet={defaultPet} age={age} />
+          <PetInfoBox defaultPet={defaultPet} age={age} isLoading={isLoading}/>
           <CustomButton label="산책 시작하기" onPress={handleModalVisivle} />
           {/* 산책 시작 확인 모달 */}
           <CustomModal
