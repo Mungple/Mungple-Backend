@@ -3,17 +3,19 @@ import { FlatList } from 'react-native';
 import styled from 'styled-components/native';
 import CustomText from '../common/CustomText';
 import DefaultImage from '@/assets/profile-image.png';
-import { useUserStore } from '@/state/useUserStore';
 import { ResponsePetProfile } from '@/types';
 import { colors } from '@/constants';
+import usePet from '@/hooks/queries/usePet';
+import { useUserStore } from '@/state/useUserStore';
 
 interface WalkDogsProps {
   togetherDogIds: number[];
 }
 
 const WalkDogs: React.FC<WalkDogsProps> = ({ togetherDogIds }) => {
-  const petData = useUserStore((state) => state.petData);
-
+  const { useGetPet } = usePet()
+  const { userId } = useUserStore.getState();
+  const { data: petData } = useGetPet(userId);
   const getPetImageSource = (pet: ResponsePetProfile) => {
     return pet?.photo
       ? { uri: `http://j11e106.p.ssafy.io:9000/images/${pet.photo}` }
@@ -32,7 +34,7 @@ const WalkDogs: React.FC<WalkDogsProps> = ({ togetherDogIds }) => {
           <FlatList
             data={togetherDogIds}
             renderItem={({ item }) => {
-              const pet = petData.find((pet) => pet.id === item);
+              const pet = petData?.find((pet) => pet.id === item);
               const petName = pet?.name || '정보 없음';
               const imageSource = pet ? getPetImageSource(pet) : DefaultImage;
               return (
