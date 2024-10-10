@@ -1,0 +1,17 @@
+{
+  "name": "s11p21e106",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://lab.ssafy.com/s11-bigdata-dist-sub1/S11P21E106.git"
+  },
+  "private": true,
+  "dependencies": {
+    "k6": "^0.0.0"
+  }
+}
