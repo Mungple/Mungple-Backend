@@ -28,9 +28,6 @@ const AllBlueZoneHeatmap = ({ allBlueZone, checkAllUserZone }: AllBlueZoneHeatma
     }
   }, [userLocation, checkAllUserZone]);
 
-  // console.log("visibleElements:", visibleElements);
-  // console.log("myBlueZone:", myBlueZone);
-  // console.log("Heatmap Point:", myBlueZone.cells)
   return (
     <>
       {/* 블루존 히트맵 렌더링 */}

@@ -3,7 +3,7 @@ import { ActivityIndicator } from 'react-native';
 import styled from 'styled-components/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RecordStackParamList } from '@/navigations/stack/RecordStackNavigator';
-import { getWalkDetail } from '@/api/walk';
+import { getWalkDetail } from '@/api';
 import { colors } from '@/constants';
 import WalkDetail from '@/components/record/WalkDetail';
 import CustomText from '@/components/common/CustomText';

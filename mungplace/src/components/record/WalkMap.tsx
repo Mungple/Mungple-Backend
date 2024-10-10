@@ -14,7 +14,6 @@ interface WalkMapProps {
 }
 
 const WalkMap: React.FC<WalkMapProps> = ({ points }) => {
-  console.log('WalkMap points:', points);
   const mapRef = useRef<MapView | null>(null);
 
   return (

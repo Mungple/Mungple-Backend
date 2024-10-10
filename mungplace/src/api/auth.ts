@@ -1,23 +1,9 @@
-import type { UserProfile } from '@/types/domain';
-import { getEncryptStorage } from '@/utils';
 import axiosInstance from './axios';
-import { JwtPayload, jwtDecode } from 'jwt-decode';
+import { jwtDecode } from 'jwt-decode';
+
+import { getEncryptStorage } from '@/utils';
 import { storageKeys } from '@/constants';
-
-interface CustomJwtPayload extends JwtPayload {
-  userId: number;
-}
-
-// 사용자 프로필 요청 타입
-type RequestProfile = Omit<UserProfile, 'nickname' | 'imageName'>;
-
-// 사용자 프로필 반환 타입
-type ResponseProfile = {
-  userId: number;
-  nickname: string;
-  imageName: string | null;
-  createdAt: string;
-};
+import { CustomJwtPayload, ResponseUserProfile } from '@/types';
 
 // 소셜 로그인 함수
 const socialLogin = async (url: string): Promise<string> => {
@@ -34,17 +20,16 @@ const getUserId = async (token: string): Promise<number> => {
 };
 
 // 프로필 정보 요청 함수
-const getProfile = async (userId: number): Promise<ResponseProfile> => {
+const getProfile = async (userId: number): Promise<ResponseUserProfile> => {
   try {
     const { data } = await axiosInstance.get(`/users/${userId}`, {
       headers: {
         'Content-Type': `application/json; charset=utf8`,
       },
     });
-    console.log('프로필 정보 요청 성공');
     return data;
   } catch (error) {
-    console.error('프로필 정보 요청 실패 :', error);
+    console.error('[FAIL] getProfile :', error);
     throw error;
   }
 };
@@ -56,4 +41,3 @@ const getAccessToken = async (): Promise<string> => {
 };
 
 export { getAccessToken, getProfile, socialLogin, getUserId };
-export type { RequestProfile, ResponseProfile };

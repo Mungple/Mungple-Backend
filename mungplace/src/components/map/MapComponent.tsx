@@ -1,6 +1,6 @@
 // 1. 라이브러리 및 네이티브 기능
 import styled from 'styled-components/native';
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import ClusteredMapView from 'react-native-map-clustering';
 import React, { useEffect, useRef, useState } from 'react';
 import { Animated, Image as RNImage, Text } from 'react-native';
@@ -27,13 +27,13 @@ import blueMarker from '@/assets/blueMarker.png';
 
 // 5. 훅(Hooks)
 import usePermission from '@/hooks/usePermission';
+import useGetPetFacility from '@/hooks/queries/usePetFacility';
 import useMarkersWithinRadius from '@/hooks/useMarkersWithinRadius';
 
 // 6. 상태 관리 및 데이터
-import { FromZone, Point, ToMungZone, ToZone } from '@/types';
-import { getWithPetPlace } from '@/api/map';
 import { colors, mapNavigations } from '@/constants';
-import { useMapStore, MarkerData } from '@/state/useMapStore';
+import { FromZone, MarkerData, Point, ToMungZone, ToZone } from '@/types';
+import { useMapStore } from '@/state/useMapStore';
 
 // 7. 네비게이션 타입
 import { MapStackParamList } from '@/navigations/stack/MapStackNavigator';
@@ -107,6 +107,11 @@ const MapComponent: React.FC<MapComponentProps> = ({
     lat: number;
     lon: number;
   }[] = [];
+  const { data } = useGetPetFacility(
+    userLocation?.latitude ?? null,
+    userLocation?.longitude ?? null,
+  );
+  const facilityPoints = data?.facilityPoints || [];
 
   if (nearbyMarkers && nearbyMarkers.markersGroupedByGeohash) {
     // 모든 geohash에 대해 순회
@@ -129,6 +134,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
   }
 
   usePermission('LOCATION');
+  usePermission('BACKGROUND_LOCATION');
 
   // ========== Methods ==========
   // 지도 요소 토글 함수
@@ -170,7 +176,6 @@ const MapComponent: React.FC<MapComponentProps> = ({
         // 해당 markerId가 있는 경우 상세 페이지로 이동
         if (marker) {
           navigation.navigate(mapNavigations.MARKERDETAIL, { markerId });
-          console.log(`마커 클릭 : ${markerId}`);
         }
       });
     }
@@ -213,27 +218,12 @@ const MapComponent: React.FC<MapComponentProps> = ({
   };
 
   // ========== Side Effects ==========
-  // 화면을 떠날 때 WebSocket 연결 해제
-  useFocusEffect(
-    React.useCallback(() => {
-      console.log('MapComponent focused >>> WebSocket connected');
-      return () => {
-        console.log('MapComponent unfocused >>> WebSocket disconnected');
-      };
-    }, []),
-  );
-
+  // facilityPoints 업데이트
   useEffect(() => {
-    const getPetFacilities = async () => {
-      if (userLocation) {
-        const petFacilities = await getWithPetPlace(userLocation.latitude, userLocation.longitude);
-        const facilityPoints = petFacilities.facilityPoints;
-        setPetFacilities(facilityPoints);
-      }
-    };
-    getPetFacilities();
-    return () => {};
-  }, [userLocation]);
+    if (facilityPoints.length > 0) {
+      setPetFacilities(facilityPoints);
+    }
+  }, [facilityPoints, setPetFacilities]);
 
   // ========== UI Rendering ==========
   if (!userLocation)

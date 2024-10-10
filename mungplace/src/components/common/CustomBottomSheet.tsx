@@ -5,13 +5,13 @@ import { colors } from '@/constants';
 import styled from 'styled-components/native';
 import CustomModalHeader from './CustomModalHeader';
 
-interface CustomBottomSheetProps {
+type CustomBottomSheetProps = {
   setModalVisible: (visible: boolean) => void;
   children?: React.ReactNode;
   modalVisible: boolean;
   menuName: string;
   height?: number;
-}
+};
 
 const CustomBottomSheet: React.FC<CustomBottomSheetProps> = ({
   setModalVisible,

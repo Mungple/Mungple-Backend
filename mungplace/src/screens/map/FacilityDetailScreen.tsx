@@ -1,44 +1,22 @@
 import React, { useEffect, useState } from 'react';
 import { View, TouchableOpacity, StyleSheet } from 'react-native';
-import axiosInstance from '@/api/axios';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { useAppStore } from '@/state/useAppStore';
 import CustomText from '@/components/common/CustomText';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
-
-interface Facility {
-  id: number;
-  name: string;
-  address: string;
-  phone: string;
-  homepage: string;
-  closedDays: string;
-  businessHours: string;
-  description: string;
-}
+import { PetFacilityDetail } from '@/types';
+import { getPetFacilityDetail } from '@/api';
 
 const FacilityDetailScreen: React.FC = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const { facilityId } = route.params as { facilityId: number }; // facilityId를 route.params에서 가져옴
-  const [facility, setFacility] = useState<Facility | null>(null);
+  const [facility, setFacility] = useState<PetFacilityDetail | null>(null);
   const [loading, setLoading] = useState(true);
-  const error = null;
-  const accessToken = useAppStore((state) => state.token);
 
   // 시설 상세 정보 조회 함수
   const fetchFacilityDetails = async () => {
     try {
-      const response = await axiosInstance.get(`/pet-facilities/${facilityId}`, {
-        headers: {
-          'Content-Type': 'application/json; charset=utf8',
-          Authorization: `Bearer ${accessToken}`, // accessToken 변수를 적절히 가져와야 함
-        },
-      });
-      setFacility(response.data);
-    } catch (err) {
-      console.error('상세 정보 조회 오류', err);
-      throw err;
+      setFacility(await getPetFacilityDetail(facilityId));
     } finally {
       setLoading(false);
     }
@@ -49,11 +27,7 @@ const FacilityDetailScreen: React.FC = () => {
   }, [facilityId]);
 
   if (loading) {
-    return <LoadingSpinner />
-  }
-
-  if (error) {
-    return <CustomText>오류 발생: {error}</CustomText>; // 오류가 발생한 경우
+    return <LoadingSpinner />;
   }
 
   return (
