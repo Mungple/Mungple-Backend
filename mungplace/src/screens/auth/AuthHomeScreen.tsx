@@ -18,10 +18,10 @@ type AuthHomeScreenProps = NativeStackScreenProps<
 const width = Dimensions.get('screen').width;
 
 const AuthHomeScreen: React.FC<AuthHomeScreenProps> = ({ navigation }) => {
-  const [username, setUsername] = useState('');
   const [count, setCount] = useState(0)
 
   const handleLoginPress = () => {
+    const username = '디비둡하'
     if (username.trim()) {
       managerLogin(username);
     } else {
@@ -31,18 +31,16 @@ const AuthHomeScreen: React.FC<AuthHomeScreenProps> = ({ navigation }) => {
 
   const handleLogoText = () => {
     setCount(count + 1)
+    console.log(count)
     if (count === 2) {
       Alert.alert('멍플', '즐거운 산책의 시작 멍플!')
     } else if (count === 5) {
       Alert.alert('멍플', '왈왈!')
     } else if (count === 7) {
+      setCount(0)
       navigation.navigate(authNavigations.EASTER_EGG);
     }
   }
-
-  useEffect(() => {
-    setCount(0)
-  }, [])
 
   return (
     <Container>
@@ -57,17 +55,9 @@ const AuthHomeScreen: React.FC<AuthHomeScreenProps> = ({ navigation }) => {
       </LogoContainer>
 
       <ButtonsContainer>
-        <LoginButton onPress={() => navigation.navigate(authNavigations.SOCIAL_LOGIN)}>
+        <LoginButton onPress={handleLoginPress}>
           <ButtonImage source={kakaoLogo} />
         </LoginButton>
-
-        <TextInput
-          value={username}
-          onChangeText={setUsername}
-          placeholder="매니저 이름"
-          style={{ fontFamily: 'OTLaundryGothicR' }}
-        />
-        <CustomButton label="매니저 로그인" onPress={handleLoginPress} />
       </ButtonsContainer>
     </Container>
   );
