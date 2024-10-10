@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { View, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import CustomText from '@/components/common/CustomText';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import { PetFacilityDetail } from '@/types';
 import { getPetFacilityDetail } from '@/api';
+import CustomButton from '@/components/common/CustomButton';
 
 const FacilityDetailScreen: React.FC = () => {
   const navigation = useNavigation();
@@ -31,7 +32,7 @@ const FacilityDetailScreen: React.FC = () => {
   }
 
   return (
-    <View>
+    <View style={styles.container}>
       <CustomText style={styles.title}>{facility?.name ?? '시설 이름이 없습니다.'}</CustomText>
       <CustomText style={styles.text}>{facility?.address ?? '주소가 없습니다.'}</CustomText>
       <CustomText style={styles.text}>{facility?.phone ?? '전화번호가 없습니다.'}</CustomText>
@@ -47,9 +48,9 @@ const FacilityDetailScreen: React.FC = () => {
       <CustomText style={styles.description}>
         {facility?.description ?? '설명 정보가 없습니다.'}
       </CustomText>
-      <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-        <CustomText style={styles.buttonText}>뒤로 가기</CustomText>
-      </TouchableOpacity>
+      <CustomButton label="뒤로 가기" onPress={() => navigation.goBack()} variant="outlined" 
+        style={{ position: 'absolute', bottom: 30, left: 20 }}
+      />
     </View>
   );
 };
@@ -57,6 +58,7 @@ const FacilityDetailScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    gap: 15,
     padding: 20,
     backgroundColor: '#fff', // 밝은 배경색
     borderRadius: 10,
@@ -66,7 +68,6 @@ const styles = StyleSheet.create({
     shadowRadius: 5,
     elevation: 3,
     margin: 20,
-    justifyContent: 'space-between',
   },
   content: {
     flexGrow: 1,
@@ -87,18 +88,6 @@ const styles = StyleSheet.create({
     marginTop: 10,
     marginBottom: 20,
     lineHeight: 22,
-  },
-  backButton: {
-    backgroundColor: '#007AFF',
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    borderRadius: 5,
-    alignItems: 'center',
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
   },
 });
 
