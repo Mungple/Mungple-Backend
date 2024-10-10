@@ -6,9 +6,11 @@ import { MapStackParamList } from '@/navigations/stack/MapStackNavigator';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { mapNavigations } from '@/constants';
 import CustomText from '@/components/common/CustomText';
+import { useMapStore } from '@/state/useMapStore';
 
 const MyMar: React.FC = () => {
-  const { myMarkers, fetchMyMarkers, loading } = useMyMarkers();
+  const { fetchMyMarkers, loading } = useMyMarkers();
+  const myMarkers = useMapStore((state) => state.myMarkers);
   const navigation = useNavigation<NativeStackNavigationProp<MapStackParamList>>();
 
   useEffect(() => {

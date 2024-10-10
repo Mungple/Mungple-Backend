@@ -6,6 +6,7 @@ import CustomText from '@/components/common/CustomText'; // 커스텀 텍스트
 import CustomButton from '@/components/common/CustomButton'; // 커스텀 버튼
 import { deleteMarker, getMarkerDetails } from '@/api';
 import { MarkerDetails } from '@/types';
+import { colors } from '@/constants';
 
 const MarkerDetailScreen: React.FC = () => {
   const navigation = useNavigation();
@@ -97,10 +98,14 @@ const MarkerDetailScreen: React.FC = () => {
       </View>
       {/* 현재 접속한 유저와 작성자가 동일할 때만 삭제 버튼 렌더링 */}
       {currentUserId === markerDetails.userId && (
-        <CustomButton label="삭제" onPress={handleDelete} variant="outlined" />
+        <CustomButton label="삭제" onPress={handleDelete} variant="outlined"
+        style={{ position: 'absolute', bottom: 90, left: 20, borderColor: `${colors.RED.BASE}` }}
+        textStyle={{ color: `${colors.RED.BASE}` }}
+        />
       )}
-
-      <CustomButton label="뒤로 가기" onPress={() => navigation.goBack()} variant="outlined" />
+      <CustomButton label="뒤로 가기" onPress={() => navigation.goBack()} variant="outlined"
+        style={{ position: 'absolute', bottom: 30, left: 20 }}
+      />
     </ScrollView>
   );
 };

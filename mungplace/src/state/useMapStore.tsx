@@ -27,7 +27,7 @@ export const useMapStore = create<MapState>((set) => ({
 
   setMarkers: (value: MarkerData[]) => set(() => ({ markers: value })),
   setMyMarkers: (newMarkers: MyMarkerData[]) =>
-    set((state) => ({ myMarkers: [...state.myMarkers, ...newMarkers] })),
+    set((state) => ({ myMarkers: [...newMarkers, ...state.myMarkers] })),
   setPetFacilities: (value: PetFacility[]) => set({ petFacilities: value }),
   setNearbyMarkers: (value: NearbyMarkersData) => set({ nearbyMarkers: value }),
   toggleUserMarkers: () => set((state) => ({ showUserMarkers: !state.showUserMarkers })),

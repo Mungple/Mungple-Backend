@@ -31,7 +31,11 @@ const deleteMarker = async (markerId: string): Promise<number> => {
 
 const getMyMarkers = async (cursorId: string | null): Promise<MyMarkerData[]> => {
   try {
-    const params = { size: 50, cursorId };
+    const params: { size: number, cursorId?: string } = { size: 50 };
+    if (cursorId) {
+      params.cursorId = cursorId;
+    }
+
     const { data } = await axiosInstance.get('/markers/users', {
       headers: {
         'Content-Type': 'application/json; charset=utf8',
