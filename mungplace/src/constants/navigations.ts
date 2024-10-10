@@ -11,6 +11,7 @@ const authNavigations = {
   POST_PROFILE: 'PostProfile',
   POST_PROFILE_PET: 'InputPet',
   SPLASH: 'SplashScreen',
+  EASTER_EGG: 'EasterEgg',
 } as const;
 
 const mapNavigations = {

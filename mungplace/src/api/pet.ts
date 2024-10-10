@@ -34,11 +34,13 @@ const getPetProfiles = async (userId: number): Promise<ResponsePetProfile[]> => 
 // 반려견 정보 수정 함수
 const editPetProfile = async (petId: number, JSON: string): Promise<ResponsePetProfile[]> => {
   try {
+    console.log(JSON)
     const { data } = await axiosInstance.put(`/users/dogs/${petId}`, JSON, {
       headers: {
         'Content-Type': `application/json; charset=utf8`,
       },
     });
+    console.log(data)
     return data;
   } catch (error) {
     console.error('[FAIL] putPetProfile :', error);
