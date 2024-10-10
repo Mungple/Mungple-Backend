@@ -11,7 +11,7 @@ const createPetProfile = async (JSON: string): Promise<void> => {
     });
     return data;
   } catch (error) {
-    console.log('반려견 정보 등록 실패 :', error);
+    console.error('[FAIL] postPetProfile :', error);
     throw error;
   }
 };
@@ -26,7 +26,7 @@ const getPetProfiles = async (userId: number): Promise<ResponsePetProfile[]> => 
     });
     return data;
   } catch (error) {
-    console.log('반려견 정보 등록 실패 :', error);
+    console.error('[FAIL] getPetProfiles :', error);
     throw error;
   }
 };
@@ -41,7 +41,7 @@ const editPetProfile = async (petId: number, JSON: string): Promise<ResponsePetP
     });
     return data;
   } catch (error) {
-    console.log('반려견 정보 변경 실패 :', error);
+    console.error('[FAIL] putPetProfile :', error);
     throw error;
   }
 };
@@ -55,7 +55,7 @@ const deletePetProfile = async (petId: number): Promise<void> => {
       },
     });
   } catch (error) {
-    console.log('반려견 정보 삭제 실패 :', error);
+    console.error('[FAIL] deletePetProfile :', error);
     throw error;
   }
 };

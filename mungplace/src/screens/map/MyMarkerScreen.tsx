@@ -1,20 +1,41 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
-import useMyMarkers from '@/hooks/useMyMarkers';
 import { useNavigation } from '@react-navigation/native';
 import { MapStackParamList } from '@/navigations/stack/MapStackNavigator';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { mapNavigations } from '@/constants';
 import CustomText from '@/components/common/CustomText';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
+import { getMyMarkers } from '@/api';
+import { MyMarkerData } from '@/types';
 
 const MyMar: React.FC = () => {
-  const { myMarkers, fetchMyMarkers, loading } = useMyMarkers();
+  const [loading, setLoading] = useState(true)
   const navigation = useNavigation<NativeStackNavigationProp<MapStackParamList>>();
+  const [ myMarkers, setMyMarkers ] = useState<MyMarkerData[]>([])
+
+  const fetchMyMarkers = async () => {
+    try {
+      const cursorId = myMarkers.length > 0 ? myMarkers[myMarkers.length -1].markerId : null
+      const data = await getMyMarkers(cursorId)
+
+      setMyMarkers((prevMarkers) => [
+        ...prevMarkers, ...(Array.isArray(data) ? data : [data]),
+      ])
+    } catch (error) {
+      console.error('내 마커 조회 실패', error)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   useEffect(() => {
-    fetchMyMarkers(); // 페이지 로딩 시 내 마커 데이터를 불러옴
-  }, []);
+    fetchMyMarkers()
+  }, [])
+
+  if (loading) {
+    return <LoadingSpinner/>; // 로딩 중 상태 표시
+  }
 
   // 각 마커를 클릭했을 때 상세 페이지로 이동하는 핸들러
   const handleMarkerPress = (markerId: string) => {

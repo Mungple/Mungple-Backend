@@ -4,7 +4,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
-import { exitWalk } from '@/api/walk';
+import { exitWalk } from '@/api';
 import * as WS from './WalkingScreenStyle';
 import { colors, mapNavigations } from '@/constants';
 
@@ -19,6 +19,7 @@ import CustomButton from '@/components/common/CustomButton';
 import { MapStackParamList } from '@/navigations/stack/MapStackNavigator';
 import { useUserStore } from '@/state/useUserStore';
 import useWebSocket from '@/hooks/useWebsocket';
+import CustomText from '@/components/common/CustomText';
 
 // 화면 크기에 맞춰 하단 블록 크기 설정
 const bottomBlockHeight = (Dimensions.get('window').height * 1) / 5;
@@ -106,7 +107,7 @@ const WalkingScreen: React.FC = () => {
     return () => {
       clearInterval(intervalId);
     };
-  }, [sendLocation]);
+  }, [userLocation, sendLocation]);
 
   // ========== UI Rendering ==========
   if (!startExplorate) {
@@ -143,10 +144,13 @@ const WalkingScreen: React.FC = () => {
             </WS.InfoBlock>
             <WS.InfoBlock>
               <WS.InfoLabel>이동 거리</WS.InfoLabel>
-              <WS.InfoLabel>{`${userLocation?.latitude.toFixed(
-                6,
-              )} / ${userLocation?.longitude.toFixed(6)}`}</WS.InfoLabel>
-              <WS.InfoValue>{formatDistance}</WS.InfoValue>
+              <CustomText
+                fontWeight="bold"
+                fontSize={32}
+                color={colors.BLACK}
+                style={{ marginVertical: 10 }}>
+                {formatDistance}
+              </CustomText>
             </WS.InfoBlock>
           </WS.InfoRow>
         </WS.WalkingInfo>

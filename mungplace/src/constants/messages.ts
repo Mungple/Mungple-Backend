@@ -8,6 +8,14 @@ const alerts = {
     TITLE: '위치 권한 허용이 필요합니다.',
     DESCRIPTION: '설정 화면에서 위치 권한을 허용해주세요.',
   },
+  COARSE_LOCATION_PERMISSION: {
+    TITLE: '네트워크 위치 권한 허용이 필요합니다.',
+    DESCRIPTION: '설정 화면에서 네트워크 위치 권한을 허용해주세요.',
+  },
+  BACKGROUND_LOCATION_PERMISSION: {
+    TITLE: '백그라운드 위치 권한 허용이 필요합니다.',
+    DESCRIPTION: '설정 화면에서 백그라운드 위치 권한을 허용해주세요.',
+  },
   PHOTO_PERMISSION: {
     TITLE: '사진 접근 권한이 필요합니다.',
     DESCRIPTION: '설정 화면에서 사진 권한을 허용해주세요.',

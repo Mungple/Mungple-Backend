@@ -17,7 +17,6 @@ const SocialLoginScreen: React.FC<SocialLoginScreenProps> = () => {
 
   const handleNavigationStateChange = (event: CustomWebViewNavigation) => {
     const url = event.url;
-    console.log(url);
 
     if (url.startsWith(`${domain}/api/auth/oauth-response`)) {
       loginMutation.mutate(url);

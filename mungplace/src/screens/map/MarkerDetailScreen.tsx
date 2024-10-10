@@ -1,26 +1,24 @@
 import React, { useEffect, useState } from 'react';
 import { View, Image, StyleSheet, ActivityIndicator, ScrollView } from 'react-native';
-import axiosInstance from '@/api/axios';
-import { MarkerDetails } from '../../state/useMapStore'; // MarkerDetails 타입을 useMapStore에서 가져옵니다.
-import { useAppStore } from '@/state/useAppStore';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { useUserStore } from '@/state/useUserStore'; // 유저 스토어
 import CustomText from '@/components/common/CustomText'; // 커스텀 텍스트
 import CustomButton from '@/components/common/CustomButton'; // 커스텀 버튼
-import { getMarkerDetails } from '@/api/map';
-import { useMapStore } from '../../state/useMapStore';
+import { deleteMarker, getMarkerDetails } from '@/api';
+import { MarkerDetails } from '@/types';
+import { mapNavigations } from '@/constants';
+import { MapStackParamList } from '@/navigations/stack/MapStackNavigator';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 const MarkerDetailScreen: React.FC = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<NativeStackNavigationProp<MapStackParamList>>();
   const route = useRoute();
-  const { markerId } = route.params as { markerId: string }; // route.params에서 markerId를 가져옵니다.
+  const { markerId } = route.params as { markerId: string };
   const [markerDetails, setMarkerDetails] = useState<MarkerDetails | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const accessToken = useAppStore((state) => state.token);
   const currentUserId = useUserStore((state) => state.userId);
   const { userData } = useUserStore((state) => state);
-  const removeMarker = useMapStore((state) => state.removeMarker)
 
   useEffect(() => {
     fetchMarkerDetails(markerId);
@@ -38,30 +36,20 @@ const MarkerDetailScreen: React.FC = () => {
       setMarkerDetails({ ...markerDatas, images: imageWithUrl });
     } catch (err) {
       setError('마커 디테일을 가져오는 데 실패');
-      console.log(err);
+      console.error(err);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleDelete = (markerId: string) => async () => {
-    try {
-      const response = await axiosInstance.delete(`/markers/${markerId}`, {
-        headers: {
-          'Content-Type': 'application/json; charset=utf8',
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
+  const handleDelete = (markerId : string ) => async () => {
+    const status = await deleteMarker(markerId);
 
-      if (response.status === 202) {
-        console.log('마커 삭제 성공');
-        removeMarker(markerId)
-        setTimeout(() => {
-          navigation.goBack();
-        }, 100); // 100ms 후에 goBack 호출
-      }
-    } catch (err) {
-      console.log('마커 삭제 중 에러 발생:', err);
+    if (status === 202) {
+      console.log('삭제 성공')
+      setTimeout(() => {
+        navigation.navigate(mapNavigations.HOME);
+      }, 100);
     }
   };
 

@@ -1,8 +1,7 @@
-import { MarkerDetails, NearbyMarkersData } from '@/state/useMapStore';
 import axiosInstance from './axios';
-import { FacilityPoints } from '@/types';
+import { FacilityPoints, PetFacilityDetail } from '@/types';
 
-const getWithPetPlace = async (lat: number, lon: number): Promise<FacilityPoints> => {
+const getPetFacility = async (lat: number, lon: number): Promise<FacilityPoints> => {
   try {
     const params = {
       radius: 1000,
@@ -18,45 +17,23 @@ const getWithPetPlace = async (lat: number, lon: number): Promise<FacilityPoints
     });
     return data;
   } catch (error) {
-    console.error('애견 동반 시설 조회 오류', error);
+    console.error('[FAIL] getWithPetPlace :', error);
     throw error;
   }
 };
 
-const getNearbyMarkers = async (lat: number, lon: number): Promise<NearbyMarkersData> => {
+const getPetFacilityDetail = async (facilityId: number): Promise<PetFacilityDetail> => {
   try {
-    const params = {
-      radius: 500,
-      latitude: lat,
-      longitude: lon,
-      markerType: 'ALL',
-    };
-
-    const { data } = await axiosInstance.get('/markers', {
-      headers: {
-        'Content-Type': 'application/json; charset=utf8',
-      },
-      params,
-    });
-    return data;
-  } catch (error) {
-    console.error('주변 마커 조회 오류', error);
-    throw error;
-  }
-};
-
-const getMarkerDetails = async (markerId: string): Promise<MarkerDetails> => {
-  try {
-    const { data } = await axiosInstance.get(`/markers/${markerId}`, {
+    const { data } = await axiosInstance.get(`/pet-facilities/${facilityId}`, {
       headers: {
         'Content-Type': 'application/json; charset=utf8',
       },
     });
     return data;
   } catch (error) {
-    console.error('주변 마커 상세 조회 오류', error);
+    console.error('[FAIL] getPetFacilityDetail :', error);
     throw error;
   }
 };
 
-export { getWithPetPlace, getNearbyMarkers, getMarkerDetails };
+export { getPetFacility, getPetFacilityDetail };
