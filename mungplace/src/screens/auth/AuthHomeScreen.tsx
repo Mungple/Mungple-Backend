@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components/native';
-import { Dimensions, Image, TextInput } from 'react-native';
+import { Alert, Dimensions, Image, TextInput } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { managerLogin } from '@/components/common/ManagerLogin';
 import { authNavigations } from '@/constants';
@@ -19,6 +19,7 @@ const width = Dimensions.get('screen').width;
 
 const AuthHomeScreen: React.FC<AuthHomeScreenProps> = ({ navigation }) => {
   const [username, setUsername] = useState('');
+  const [count, setCount] = useState(0)
 
   const handleLoginPress = () => {
     if (username.trim()) {
@@ -27,11 +28,27 @@ const AuthHomeScreen: React.FC<AuthHomeScreenProps> = ({ navigation }) => {
       console.error('유저이름은 필수입니다');
     }
   };
+
+  const handleLogoText = () => {
+    setCount(count + 1)
+    if (count === 2) {
+      Alert.alert('멍플', '즐거운 산책의 시작 멍플!')
+    } else if (count === 5) {
+      Alert.alert('멍플', '왈왈!')
+    } else if (count === 7) {
+      navigation.navigate(authNavigations.EASTER_EGG);
+    }
+  }
+
+  useEffect(() => {
+    setCount(0)
+  }, [])
+
   return (
     <Container>
       <LogoContainer>
         <Image source={Logo} style={{ height: 100, resizeMode: 'contain' }} />
-        <CustomText fontWeight={'bold'} fontSize={36}>
+        <CustomText onPress={handleLogoText} fontWeight={'bold'} fontSize={36}>
           mungple
         </CustomText>
         <CustomText style={{ marginTop: 15, marginBottom: 50 }}>
