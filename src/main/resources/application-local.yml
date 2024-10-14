@@ -49,3 +49,20 @@ server:
 
 mungple:
   creation-threshold: 3
+
+chaos:
+  monkey:
+    enabled: true
+    watcher:
+      service: true
+    assaults:
+      latencyActive: true
+
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+#        include:
+#          - health
+#          - info
+#          - chaosmonkey
