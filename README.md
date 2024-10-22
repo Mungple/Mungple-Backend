@@ -1,10 +1,9 @@
 # Mungple Backend
 
-## [프로젝트 소개](https://github.com/Mungple)
-프로젝트에 대한 자세한 소개는 위 링크를 참조하주세요.
+## [프로젝트 소개 링크](https://github.com/Mungple)
 
-## [프론트엔드 프로젝트](https://github.com/Mungple/Mungple-Frontend)
-프론트엔드 리포지토리 링크는 위에서 확인할 수 있습니다.
+## [프론트엔드 레포지토리 링크](https://github.com/Mungple/Mungple-Frontend)
+
 ## 1. Introduction (프로젝트 소개)
 
 Mungple 프로젝트는 강아지 산책 시 실시간으로 위험, 정보 마커를 통해 정보를 공유하는 서비스입니다.
@@ -18,7 +17,7 @@ Mungple 프로젝트는 강아지 산책 시 실시간으로 위험, 정보 마�
 ---
 
 ## 2. Tech Stack (기술 스택)
-**Backend**: SpringBoot, WebScoekt
+**Backend**: SpringBoot, WebSocket
 
 **DevOps**: Docker, Jenkins, Logback, Kibana
 
@@ -44,8 +43,8 @@ Mungple 프로젝트는 강아지 산책 시 실시간으로 위험, 정보 마�
 ## 5. Core Features
 ### 1. **분산 트랜잭션**
 - 마커 등록 시 MinIO에 이미지를 저장하고, MySQL에 데이터를 삽입하며, Elasticsearch에 좌표 정보를 저장하는 과정에서 발생하는 트랜잭션을 관리합니다.
-- - **아웃박스 패턴**을 적용하여 MySQL에 이벤트를 저장하고, Kafka를 통해 이벤트를 비동기적으로 처리함으로써 데이터 일관성을 보장합니다.
-- Elasticsearch 또는 MinIO에서 오류가 발생할 경우, 이전 **트랜잭션을 보상(rollback)**하여 데이터 일관성을 유지합니다.
+- **아웃박스 패턴**을 적용하여 MySQL에 이벤트를 저장하고, Kafka를 통해 이벤트를 비동기적으로 처리함으로써 데이터 일관성을 보장합니다.
+- Elasticsearch 또는 MinIO에서 오류가 발생할 경우, 이전 **보상트랜잭션**을 통해 데이터 일관성을 유지합니다.
 
 ### 2. **분할 정복**
 - 대규모 데이터 요청 및 처리 시, **Divide and Conquer(분할 정복)** 패턴을 사용하여 데이터를 작은 단위로 나누어 병렬 처리합니다.
